@@ -1,0 +1,4 @@
+name: updroid-robot
+dependencies:
+   browser: any
+   http_server: ">=0.9.3 <0.10.0"

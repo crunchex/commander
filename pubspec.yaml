@@ -5,3 +5,4 @@ dependencies:
   http_server: '>=0.9.3 <0.10.0'
   logging: any
   logging_handlers: any
+  tokenizr: any

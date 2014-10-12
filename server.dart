@@ -1,3 +1,5 @@
+import 'terminal_commands.dart';
+
 import 'dart:io';
 import 'package:http_server/http_server.dart' show VirtualDirectory;
 import 'package:logging/logging.dart';
@@ -15,7 +17,8 @@ void handleWebSocket(WebSocket socket) {
   log.info('Client connected!');
   socket.listen((String s) {
     log.info('Client sent: $s');
-    Process.run('$s', []).then((ProcessResult results) {
+    List args = parseCommandInput(s);
+    Process.run(args[0], args[1]).then((ProcessResult results) {
       socket.add(results.stdout);
     });
   }, onDone: () {

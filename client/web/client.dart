@@ -2,8 +2,9 @@ library client.dart;
 
 import 'dart:html';
 import 'package:ace/ace.dart' as ace;
+import 'package:ace/proxy.dart';
 
-ace.Editor editor = ace.edit(querySelector('#editor'));
+
 
 void main() {
   print("Client has started!");
@@ -34,10 +35,13 @@ void main() {
 }
 
 void setUpEditor() {
+  ace.implementation = ACE_PROXY_IMPLEMENTATION;
+  
+  ace.Editor editor = ace.edit(querySelector('#editor'));
   editor
       ..theme = new ace.Theme.named(ace.Theme.CHROME)
-      ..session.mode = new ace.Mode.named(ace.Mode.DART)
-      ..setValue(ace.Mode.DART, -1);
+      ..session.mode = new ace.Mode.named(ace.Mode.DART);
+      //..setValue(ace.Mode.DART, -1);
 }
 
 void outputMessage(Element e, String message) {

@@ -3,15 +3,16 @@ import 'terminal_commands.dart';
 import 'dart:io';
 import 'package:logging/logging.dart';
 import 'package:logging_handlers/server_logging_handlers.dart';
+import 'package:args/args.dart';
 
 final Logger log = new Logger('server');
+var dir = Directory.current;
 
 void handleWebSocket(WebSocket socket) {
   log.info('Client connected!');
   socket.listen((String s) {
     if (s == 'REQUEST FILESYSTEM UPDATES') {
       String contents = 'DIRECTORY_LIST:';
-      var dir = Directory.current;
 
       // May want to use Directory.watch instead of having the user click Refresh
       var subscription = dir.list(recursive: true, followLinks: false).listen((FileSystemEntity entity) {
@@ -31,8 +32,15 @@ void handleWebSocket(WebSocket socket) {
   });
 }
 
-void main() {
+void main(List<String> args) {
   Logger.root.onRecord.listen(new SyncFileLoggingHandler("server.log"));
+  
+  var parser = new ArgParser();
+  parser.addOption('directory', abbr: 'd', defaultsTo: Directory.current.toString(), callback: (directory) {
+    dir = new Directory(directory);
+    print(directory);
+  });
+  var results = parser.parse(args);
   
   HttpServer.bind(InternetAddress.ANY_IP_V4, 8080).then((HttpServer server) {
     log.info("HttpServer listening on port:${server.port}...");

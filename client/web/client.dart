@@ -41,8 +41,8 @@ void setUpEditor() {
   ace.Editor editor = ace.edit(querySelector('#editor'));
   editor
       ..theme = new ace.Theme.named(ace.Theme.CHROME)
-      ..session.mode = new ace.Mode.named(ace.Mode.DART);
-      //..setValue(ace.Mode.DART, -1);
+      ..session.mode = new ace.Mode.named(ace.Mode.DART)
+      ..setValue(ROS_TALKER, -1);
 }
 
 void outputMessage(Element e, String message) {
@@ -53,3 +53,26 @@ void outputMessage(Element e, String message) {
   //Make sure we 'autoscroll' the new messages
   e.scrollTop = e.scrollHeight;
 }
+
+const String ROS_TALKER =
+r'''
+#!/usr/bin/env python
+
+import rospy
+from std_msgs.msg import String
+
+def talker():
+    pub = rospy.Publisher('chatter', String, queue_size=10)
+    rospy.init_node('talker', anonymous=True)
+    r = rospy.Rate(10) # 10hz
+    while not rospy.is_shutdown():
+        str = "hello world %s"%rospy.get_time()
+        rospy.loginfo(str)
+        pub.publish(str)
+        r.sleep()
+
+if __name__ == '__main__':
+    try:
+        talker()
+    except rospy.ROSInterruptException: pass
+''';

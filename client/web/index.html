@@ -8,12 +8,28 @@
 </head>
 
 <body>
-  <h1>UpDroid Command</h1>
+  <div class="page-header">
+    <h1>UpDroid Command</h1>
+  </div>
 
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-2">
-        <p>File Explorer</p>
+        <button type="button" class="btn btn-info" id="button-refresh">Refresh</button>
+        <div class="well well-sm" id="well-explorer">
+          <p>File Explorer</p>
+          <ul>
+            <li>web
+              <ul>
+                <li>index.html</li>
+                <li>main.css</li>
+                <li>client.dart</li>              
+              </ul>
+            </li>
+            <li>pubspec.yaml</li>
+            <li>packages</li>
+          </ul>
+        </div>
       </div>
 
       <div class="col-md-10">

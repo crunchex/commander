@@ -1,26 +1,46 @@
 <!DOCTYPE html>
-<html>
-   <head>
-      <title>Test</title>
-      <link rel="stylesheet" href="main.css"></link>
-   </head>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UpDroid Command</title>
+  <link rel="stylesheet" href="main.css"></link>
+  <link rel="stylesheet" href="/packages/bootjack/css/bootstrap.min.css"></link>
+</head>
 
-   <body>
-      <h1>Test</h1>
+<body>
+  <h1>UpDroid Command</h1>
 
-      <div id="editor">
-        function foo(items) {
+  <div class="row">
+    <div class="col-md-4">
+      <p>File Manager</p>
+    </div>
+
+    <div class="col-md-8">
+
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#tab1" data-toggle="tab">Editor</a></li>
+        <li><a href="#tab2" data-toggle="tab">Console</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" id="tab1">
+          <div id="editor">function foo(items) {
             var x = "All this is syntax highlighted";
             return x;
-        }
+          }</div>
+        </div>
+        <div class="tab-pane" id="tab2">
+          <p id="output"></p>
+          <input id="input" type="text"></input>
+        </div>
       </div>
-      
-      <p id="output"></p>
-      <input id="input" type="text"></input>
-      
-      <script type="text/javascript" src="../packages/ace/src/js/ace.js"></script>
-      <script type="text/javascript" src="../packages/ace/src/js/ext-language_tools.js"></script>
-      <script type="application/dart" src="client.dart"></script>
-      <script src="../packages/browser/dart.js"></script>
-   </body>
+    </div>
+  </div>
+  
+
+  
+  <script type="text/javascript" src="../packages/ace/src/js/ace.js"></script>
+  <script type="text/javascript" src="../packages/ace/src/js/ext-language_tools.js"></script>
+  <script type="application/dart" src="client.dart"></script>
+  <script src="../packages/browser/dart.js"></script>
+</body>
 </html>

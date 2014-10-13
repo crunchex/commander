@@ -3,11 +3,12 @@ library client.dart;
 import 'dart:html';
 import 'package:ace/ace.dart' as ace;
 import 'package:ace/proxy.dart';
-
-
+import 'package:bootjack/bootjack.dart';
 
 void main() {
   print("Client has started!");
+  
+  Tab.use();
 
   setUpEditor();
 

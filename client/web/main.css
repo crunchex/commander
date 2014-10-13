@@ -1,5 +1,5 @@
 #input {
-   width: 440px;
+   width: 100%;
    font-size: 18px;
    border-style: solid;
    border-style: black;
@@ -7,13 +7,13 @@
 }
 
 #output {
-   width: 440px;
+   width: 100%;
    height: 300px;
    font-size: 16px;
    overflow-y: scroll;
 }
 
 #editor {
-  width: 440px;
+  width: 100%;
   height: 300px; 
 }

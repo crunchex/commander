@@ -10,33 +10,39 @@
 <body>
   <h1>UpDroid Command</h1>
 
-  <div class="row">
-    <div class="col-md-4">
-      <p>File Manager</p>
-    </div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-2">
+        <p>File Explorer</p>
+      </div>
 
-    <div class="col-md-8">
+      <div class="col-md-10">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="active"><a href="#tab-editor" data-toggle="tab">Editor</a></li>
+          <li><a href="#tab-console" data-toggle="tab">Console</a></li>
+          <li><a href="#tab-help" data-toggle="tab">Help</a></li>
+        </ul>
 
-      <ul class="nav nav-tabs" role="tablist">
-        <li class="active"><a href="#tab1" data-toggle="tab">Editor</a></li>
-        <li><a href="#tab2" data-toggle="tab">Console</a></li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane active" id="tab1">
-          <div id="editor">function foo(items) {
-            var x = "All this is syntax highlighted";
-            return x;
-          }</div>
-        </div>
-        <div class="tab-pane" id="tab2">
-          <p id="output"></p>
-          <input id="input" type="text"></input>
+        <div class="tab-content">
+          <div class="tab-pane active" id="tab-editor">
+            <div id="editor">function foo(items) {
+              var x = "All this is syntax highlighted";
+              return x;
+            }</div>
+          </div>
+
+          <div class="tab-pane" id="tab-console">
+            <p id="output"></p>
+            <input id="input" type="text"></input>
+          </div>
+          
+          <div class="tab-pane" id="tab-help">
+            <p>Some genius method of showing help. Maybe embed StackOverflow, forums, and wiki???</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  
-
   
   <script type="text/javascript" src="../packages/ace/src/js/ace.js"></script>
   <script type="text/javascript" src="../packages/ace/src/js/ext-language_tools.js"></script>

@@ -1,0 +1,5 @@
+name: updroidclient
+description: A sample application
+dependencies:
+  ace: any
+  browser: any

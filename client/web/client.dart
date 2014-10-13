@@ -1,7 +1,14 @@
+library client.dart;
+
 import 'dart:html';
+import 'package:ace/ace.dart' as ace;
+
+ace.Editor editor = ace.edit(querySelector('#editor'));
 
 void main() {
   print("Client has started!");
+
+  setUpEditor();
 
   TextInputElement input = querySelector('#input');
   ParagraphElement output = querySelector('#output');
@@ -12,7 +19,7 @@ void main() {
     outputMessage(output, 'Connected to server');
   });
 
-  ws.onMessage.listen((MessageEvent e){
+  ws.onMessage.listen((MessageEvent e) {
     outputMessage(output, e.data);
   });
 
@@ -20,13 +27,20 @@ void main() {
     outputMessage(output, 'Connection to server lost...');
   });
 
-  input.onChange.listen((Event e){
+  input.onChange.listen((Event e) {
     ws.send(input.value.trim());
     input.value = "";
   });
 }
 
-void outputMessage(Element e, String message){
+void setUpEditor() {
+  editor
+      ..theme = new ace.Theme.named(ace.Theme.CHROME)
+      ..session.mode = new ace.Mode.named(ace.Mode.DART)
+      ..setValue(ace.Mode.DART, -1);
+}
+
+void outputMessage(Element e, String message) {
   print(message);
   e.appendText(message);
   e.appendHtml('<br/>');

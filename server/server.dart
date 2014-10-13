@@ -8,11 +8,6 @@ import 'package:logging_handlers/server_logging_handlers.dart';
 VirtualDirectory virDir;
 final Logger log = new Logger('server');
 
-void directoryHandler(dir, request) {
-  var indexUri = new Uri.file(dir.path).resolve('index.html');
-  virDir.serveFile(new File(indexUri.toFilePath()), request);
-}
-
 void handleWebSocket(WebSocket socket) {
   log.info('Client connected!');
   socket.listen((String s) {
@@ -26,11 +21,18 @@ void handleWebSocket(WebSocket socket) {
   });
 }
 
+void directoryHandler(dir, request) {
+  var indexUri = new Uri.file(dir.path).resolve('index.html');
+  virDir.serveFile(new File(indexUri.toFilePath()), request);
+}
+
 void main() {
   Logger.root.onRecord.listen(new SyncFileLoggingHandler("server.log"));
   
-  virDir = new VirtualDirectory(Platform.script.resolve('client').toFilePath())
+  virDir = new VirtualDirectory(Platform.script.resolve('../client/web').toFilePath())
     ..allowDirectoryListing = true
+    ..jailRoot = false
+    ..followLinks = true
     ..directoryHandler = directoryHandler;
 
   HttpServer.bind(InternetAddress.ANY_IP_V4, 8080).then((HttpServer server) {

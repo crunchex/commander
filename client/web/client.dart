@@ -13,13 +13,34 @@ void main() {
   print("Client has started!");
 
   setUpBootstrap();
+  setUpEditor();
   
   WebSocket ws = new WebSocket('ws://localhost:8080/ws');
-  registerConsoleEventHandlers(ws);
-  registerExplorerEventHandlers(ws);
-  setUpEditor();
+  FileExplorer fe = new FileExplorer(ws);
+  Console cs = new Console(ws);
+  
+  registerWebSocketEventHandlers(ws, fe, cs);
 }
 
 void setUpBootstrap() {
   Tab.use();
+}
+
+void registerWebSocketEventHandlers(WebSocket ws, FileExplorer fe, Console cs) {
+  ws.onOpen.listen((Event e) {
+      cs.updateOutputField('Connected to server');
+    });
+
+  ws.onMessage.listen((MessageEvent e) {
+    String data = e.data.toString();
+    if (data.startsWith(new RegExp('DIRECTORY_LIST'))) {
+      fe.updateFileExplorer(data);
+    } else {
+      cs.updateOutputField(e.data);
+    }
+  });
+
+  ws.onClose.listen((Event e) {
+    cs.updateOutputField('Connection to server lost...');
+  });
 }

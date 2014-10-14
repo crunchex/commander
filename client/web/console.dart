@@ -1,38 +1,33 @@
 part of client;
 
-void registerConsoleEventHandlers(WebSocket ws) {
+class Console {
+  WebSocket ws;
+  TextInputElement input;
+  ParagraphElement output;
   
-  TextInputElement input = querySelector('#input');
-  ParagraphElement output = querySelector('#output');
+  Console(WebSocket ws) {
+    this.ws = ws;
+    this.input = querySelector('#input');
+    this.output = querySelector('#output');
+    
+    registerConsoleEventHandlers();
+  }
+
+  void registerConsoleEventHandlers() {
+    input.onChange.listen((Event e) {
+      print("Input changed!");
+      ws.send(input.value.trim());
+      input.value = "";
+    });
+  }
+
+  void updateOutputField(String message) {
+    print(message);
+    output.appendText(message);
+    output.appendHtml('<br/>');
+
+    //Make sure we 'autoscroll' the new messages
+    output.scrollTop = output.scrollHeight;
+  }
   
-  ws.onOpen.listen((Event e) {
-    outputMessage(output, 'Connected to server');
-  });
-  
-  input.onChange.listen((Event e) {
-    ws.send(input.value.trim());
-    input.value = "";
-  });
-
-  ws.onMessage.listen((MessageEvent e) {
-    String data = e.data.toString();
-    if (data.startsWith(new RegExp('DIRECTORY_LIST'))) {
-      updateFileExplorer(data);
-    } else {
-      outputMessage(output, e.data);
-    }
-  });
-
-  ws.onClose.listen((Event e) {
-    outputMessage(output, 'Connection to server lost...');
-  });
-}
-
-void outputMessage(Element e, String message) {
-  print(message);
-  e.appendText(message);
-  e.appendHtml('<br/>');
-
-  //Make sure we 'autoscroll' the new messages
-  e.scrollTop = e.scrollHeight;
 }

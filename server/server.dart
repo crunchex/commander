@@ -16,9 +16,12 @@ void handleWebSocket(WebSocket socket) {
 
       // May want to use Directory.watch instead of having the user click Refresh
       var subscription = dir.list(recursive: true, followLinks: false).listen((FileSystemEntity entity) {
-        contents = contents + ' ' + entity.path.replaceFirst(new RegExp(dir.path + '/'), '');
+        var relativePath = entity.path.replaceFirst(new RegExp(dir.path), '');
+        contents = contents + ' ' + relativePath;
       });
-      subscription.onDone(() => socket.add(contents));
+      subscription.onDone(() {
+        socket.add(contents);
+      });
       
     } else {
       log.info('Client sent: $s');

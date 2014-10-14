@@ -5,14 +5,18 @@ import 'package:bootjack/bootjack.dart';
 import 'package:ace/ace.dart' as ace;
 import 'package:ace/proxy.dart';
 
-part 'console.dart';
+part 'explorer.dart';
 part 'editor.dart';
+part 'console.dart';
 
 void main() {
   print("Client has started!");
 
   setUpBootstrap();
-  setUpWebSocket();
+  
+  WebSocket ws = new WebSocket('ws://localhost:8080/ws');
+  registerConsoleEventHandlers(ws);
+  registerExplorerEventHandlers(ws);
   setUpEditor();
 }
 

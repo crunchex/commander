@@ -33,6 +33,12 @@ void handleWebSocket(WebSocket socket, Directory dir) {
     if (directoryPathRequest(s)) {
       log.info('Request for DirectoryPath received');
       socket.add('RESPONSE_DIRECTORY_PATH' + dir.path);
+      
+      // Since it is assumed DirectoryPath is only requested on open,
+      // Also send the initial directory list.
+      getDirContents(dir).then((files) {
+          socket.add('RESPONSE_DIRECTORY_LIST' + files.toString());
+        });
     } else {
       // It's a Console command.
       log.info('Client sent: $s');

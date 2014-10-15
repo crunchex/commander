@@ -2,6 +2,14 @@
   margin-left: 15px;
 }
 
+#row-main {
+  height: 100%;
+}
+
+#column-editor {
+  height: 100%;
+}
+
 #input {
    width: 100%;
    font-size: 14px;
@@ -22,8 +30,10 @@
   height: 500px; 
 }
 
-.footer .container {
+#row-spacing {
+  height: 50px;
+}
+
+#row-footer {
   font-size: 10px;
-  position: absolute;
-  bottom: 0px;
 }

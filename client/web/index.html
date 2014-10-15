@@ -5,8 +5,8 @@
   <meta http-equiv="X-UA-Compatible" content=="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UpDroid Command</title>
-  <link rel="stylesheet" href="main.css"></link>
   <link rel="stylesheet" href="cosmos-bootstrap.min.css"></link>
+  <link rel="stylesheet" href="main.css"></link>
 </head>
 
 <body>
@@ -80,6 +80,11 @@
       <div class="tab-content">
         <div class="tab-pane active" id="tab-editor">
           <div id="editor"></div>
+          <ul class="pager">
+            <li><a id="button-save" href="#">Save</a></li>
+            <li><a id="button-new" href="#">New</a></li>
+            <li><a id="button-theme" href="#">Theme</a></li>
+          </ul>
         </div>
 
         <div class="tab-pane" id="tab-console">
@@ -91,6 +96,8 @@
           <p>Some genius method of showing help. Maybe embed StackOverflow, forums, and wiki???</p>
         </div>
       </div>
+      
+      
     </div>
   </div>
   
@@ -104,6 +111,19 @@
     </div>
   </div>
 </div>
+
+      <div class="btn-group">
+        <button class="btn">Dropdown</button>
+        <button class="btn dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#">Menu Item #1</a></li>
+          <li><a href="#">Menu Item #2</a></li>
+          <li class="divider"></li>
+          <li><a href="#">Menu Item #3</a></li>
+        </ul>
+      </div>
 
   <script type="text/javascript" src="../packages/ace/src/js/ace.js"></script>
   <script type="text/javascript" src="../packages/ace/src/js/ext-language_tools.js"></script>

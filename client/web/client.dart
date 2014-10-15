@@ -13,7 +13,7 @@ void main() {
   print("Client has started!");
 
   setUpBootstrap();
-  setUpEditor();
+  Editor e = new Editor();
   
   WebSocket ws = new WebSocket('ws://localhost:8080/ws');
   FileExplorer fe = new FileExplorer(ws);
@@ -24,6 +24,7 @@ void main() {
 
 void setUpBootstrap() {
   Tab.use();
+  Button.use();
 }
 
 void registerWebSocketEventHandlers(WebSocket ws, FileExplorer fe, Console cs) {

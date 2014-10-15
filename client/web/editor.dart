@@ -1,16 +1,5 @@
 part of client;
 
-void setUpEditor() {
-  ace.implementation = ACE_PROXY_IMPLEMENTATION;
-  
-  ace.Editor editor = ace.edit(querySelector('#editor'));
-  editor
-      ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
-      ..fontSize = 14
-      ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
-      ..setValue(ROS_TALKER, -1);
-}
-
 const String ROS_TALKER =
 r'''
 #!/usr/bin/env python
@@ -33,3 +22,37 @@ if __name__ == '__main__':
         talker()
     except rospy.ROSInterruptException: pass
 ''';
+
+class Editor {
+  AnchorElement themeButton;
+  
+  ace.Editor editor;
+  
+  Editor() {
+    themeButton = querySelector('#button-theme');
+    
+    setUpEditor();
+    registerEditorEventHandlers();
+  }
+
+  void setUpEditor() {
+    ace.implementation = ACE_PROXY_IMPLEMENTATION;
+    
+    editor = ace.edit(querySelector('#editor'));
+    editor
+        ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
+        ..fontSize = 14
+        ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
+        ..setValue(ROS_TALKER, -1);
+  }
+  
+  void registerEditorEventHandlers() {
+    themeButton.onClick.listen((e) {
+      if (editor.theme.name == 'solarized_dark') {
+        editor.theme = new ace.Theme.named(ace.Theme.SOLARIZED_LIGHT);
+      } else {
+        editor.theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK);
+      }
+    });
+  }
+}

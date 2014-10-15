@@ -21,7 +21,6 @@ class Console {
   }
 
   void updateOutputField(String message) {
-    //print(message);
     output.appendText(message);
     output.appendHtml('<br/>');
 

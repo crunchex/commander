@@ -11,7 +11,6 @@ class FileExplorer {
   
   void updateFileExplorer(String data) {
     // Strip the packet header and brackets and split by ','
-    print(data);
     String strippedHeader = data.replaceAll(new RegExp(r'(Directory:|File:|\s)'), '');
     strippedHeader = strippedHeader.replaceAll(new RegExp(r'(\[|\])'), '');
     strippedHeader = strippedHeader.replaceAll(r"'", '');

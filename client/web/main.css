@@ -1,5 +1,23 @@
+@font-face {
+  font-family: RobotoCondensed-Light;
+  src: url(RobotoCondensed-Light.ttf);
+}
+
+@font-face {
+  font-family: RobotoCondensed-Regular;
+  src: url(RobotoCondensed-Regular.ttf);
+}
+
 #title {
-  margin-left: 15px;
+  font: 30px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+}
+
+#Layer_1 {
+  width: 100%;
+}
+
+#well-explorer {
+  margin-top: 20px;
 }
 
 #row-main {

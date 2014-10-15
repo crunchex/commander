@@ -6,6 +6,8 @@ void setUpEditor() {
   ace.Editor editor = ace.edit(querySelector('#editor'));
   editor
       ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
+      ..fontSize = 14
+      ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
       ..setValue(ROS_TALKER, -1);
 }
 

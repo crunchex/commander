@@ -16,14 +16,12 @@ class FileExplorer {
     strippedHeader = strippedHeader.replaceAll(r"'", '');
     List<String> files = strippedHeader.split(',');
     
-    DivElement well = querySelector('#well-explorer');
-    well.innerHtml = '<p>File Explorer</p><ul>';
+    UListElement explorer = querySelector('#ul-explorer');
+    explorer.innerHtml = '';
     
     for (String file in files) {
       file = file.replaceFirst(directoryPath, '');
-      well.appendHtml('<li>/${file}</li>');
+      explorer.appendHtml('<li><button type="button" class="btn btn-xs">${file}</button></li>');
     }
-    well.appendHtml('</ul>');
   }
-
 }

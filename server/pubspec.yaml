@@ -5,3 +5,4 @@ dependencies:
   logging: any
   logging_handlers: any
   tokenizr: any
+  watcher: any

@@ -2,30 +2,27 @@ part of client;
 
 class FileExplorer {
   WebSocket ws;
-  ButtonElement refresh;
+  String directoryPath;
   
   FileExplorer(WebSocket ws) {
     this.ws = ws;
-    this.refresh = querySelector('#button-refresh');
-    
-    registerExplorerEventHandlers();
-  }
-
-  void registerExplorerEventHandlers() {
-    refresh.onClick.listen((e) {
-      ws.send('REQUEST FILESYSTEM UPDATES');
-    });
+    directoryPath = '';
   }
   
   void updateFileExplorer(String data) {
-    String strippedHeader = data.replaceFirst(new RegExp('DIRECTORY_LIST: '), '');
-    List<String> files = strippedHeader.split(' ');
+    // Strip the packet header and brackets and split by ','
+    print(data);
+    String strippedHeader = data.replaceAll(new RegExp(r'(Directory:|File:|\s)'), '');
+    strippedHeader = strippedHeader.replaceAll(new RegExp(r'(\[|\])'), '');
+    strippedHeader = strippedHeader.replaceAll(r"'", '');
+    List<String> files = strippedHeader.split(',');
     
     DivElement well = querySelector('#well-explorer');
     well.innerHtml = '<p>File Explorer</p><ul>';
     
     for (String file in files) {
-      well.appendHtml('<li>${file}</li>');
+      file = file.replaceFirst(directoryPath, '');
+      well.appendHtml('<li>/${file}</li>');
     }
     well.appendHtml('</ul>');
   }

@@ -53,6 +53,9 @@ class Editor {
       } else {
         editor.theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK);
       }
+      
+      // Stops the button from sending the page to the top (href=#)
+      e.preventDefault();
     });
   }
 }

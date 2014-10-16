@@ -5,7 +5,7 @@ class Console {
   DivElement inputGroup;
   TextInputElement input;
   ParagraphElement output;
-  LIElement buttonConsole;
+  AnchorElement buttonConsole;
   AnchorElement themeButton;
   
   Console(WebSocket ws) {
@@ -25,7 +25,10 @@ class Console {
       input.value = "";
     });
     
-    themeButton.onClick.listen((e) => toggleTheme());
+    themeButton.onClick.listen((e) {
+      toggleTheme();
+      e.preventDefault();
+    });
     
     buttonConsole.onClick.listen((e) {
       // This is broken :(

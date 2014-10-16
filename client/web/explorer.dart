@@ -10,18 +10,34 @@ class FileExplorer {
   }
   
   void updateFileExplorer(String data) {
-    // Strip the packet header and brackets and split by ','
-    String strippedHeader = data.replaceAll(new RegExp(r'(Directory:|File:|\s)'), '');
-    strippedHeader = strippedHeader.replaceAll(new RegExp(r'(\[|\])'), '');
-    strippedHeader = strippedHeader.replaceAll(r"'", '');
-    List<String> files = strippedHeader.split(',');
-    
-    UListElement explorer = querySelector('#ul-explorer');
+    // Set the explorer list to empty for a full refresh
+    UListElement explorer = querySelector('#explorer-top');
     explorer.innerHtml = '';
     
-    for (String file in files) {
-      file = file.replaceFirst(directoryPath, '');
-      explorer.appendHtml('<li><button type="button" class="btn btn-xs">${file}</button></li>');
+    // Strip the brackets/single-quotes and split by ','
+    data = data.replaceAll(new RegExp(r'(Directory: |File: )'), '');
+    data = data.replaceAll(new RegExp(r"(\[|\]|')"), '');
+    List<String> entities = data.split(',');
+    
+    // Move all the directories to the front
+    entities.sort();
+    
+    List<String> dirString = ['#explorer-top'];
+    for (String entity in entities) {
+      // Strip the absolute path and trim if necessary
+      entity = entity.replaceFirst(directoryPath, '');
+      entity = entity.trimLeft();
+
+      if (entity.contains('.')) {
+        UListElement dirElement = querySelector(dirString[dirString.length - 1]);
+        dirElement.appendHtml('<li class="explorer"><button type="button" class="btn btn-xs">${entity}</button></li>');
+        dirString = ['#explorer-top'];
+      } else {
+        String newHtml = '<li class="explorer"><button type="button" class="btn btn-xs">' + entity + '</button><ul id="explorer-' + entity.replaceAll('/', '-') + '" class="explorer"></ul></li>';
+        UListElement dirElement = querySelector(dirString[dirString.length - 1]);
+        dirElement.appendHtml(newHtml);
+        dirString.add('#explorer-' + entity.replaceAll('/', '-'));
+      }
     }
   }
 }

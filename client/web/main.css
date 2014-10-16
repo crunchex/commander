@@ -14,11 +14,11 @@
   border-color: #ccc;
 }
 
-#ul-explorer > li {
-    margin-left: -30px;
+.explorer > .explorer {
+    margin-left: -15px;
 }
 
-#ul-explorer {
+.explorer {
   list-style-type: none;
 }
 

@@ -2,11 +2,11 @@ part of client;
 
 class FileExplorer {
   WebSocket ws;
-  String directoryPath;
+  String absolutePathPrefix;
   
   FileExplorer(WebSocket ws) {
     this.ws = ws;
-    directoryPath = '';
+    absolutePathPrefix = '';
   }
   
   void updateFileExplorer(String data) {
@@ -15,29 +15,64 @@ class FileExplorer {
     explorer.innerHtml = '';
     
     // Strip the brackets/single-quotes and split by ','
-    data = data.replaceAll(new RegExp(r'(Directory: |File: )'), '');
     data = data.replaceAll(new RegExp(r"(\[|\]|')"), '');
     List<String> entities = data.split(',');
     
-    // Move all the directories to the front
-    entities.sort();
-    
-    List<String> dirString = ['#explorer-top'];
+    // Build SimpleFile list our of raw strings
+    var files = [];
     for (String entity in entities) {
-      // Strip the absolute path and trim if necessary
-      entity = entity.replaceFirst(directoryPath, '');
-      entity = entity.trimLeft();
+      files.add(new SimpleFile(entity, absolutePathPrefix));
+    }
+    
+    // Sorting the files results in a null object exception for some reason
+    //files.sort();
 
-      if (entity.contains('.')) {
-        UListElement dirElement = querySelector(dirString[dirString.length - 1]);
-        dirElement.appendHtml('<li class="explorer"><button type="button" class="btn btn-xs">${entity}</button></li>');
-        dirString = ['#explorer-top'];
+    // Refresh FileExplorer
+    UListElement dirElement;
+    for (SimpleFile file in files) {
+      dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-${file.parentDir}');
+      
+      String newHtml;
+      if (file.isDirectory) {
+        newHtml = '<li class="explorer"><button type="button" class="btn btn-xs">' + file.name + '</button><ul id="explorer-' + file.name + '" class="explorer"></ul></li>';
       } else {
-        String newHtml = '<li class="explorer"><button type="button" class="btn btn-xs">' + entity + '</button><ul id="explorer-' + entity.replaceAll('/', '-') + '" class="explorer"></ul></li>';
-        UListElement dirElement = querySelector(dirString[dirString.length - 1]);
-        dirElement.appendHtml(newHtml);
-        dirString.add('#explorer-' + entity.replaceAll('/', '-'));
+        newHtml = '<li class="explorer"><button type="button" class="btn btn-xs">${file.name}</button></li>';
       }
+      dirElement.appendHtml(newHtml);
+    }
+  }
+}
+
+class SimpleFile implements Comparable {
+  bool isDirectory;
+  String name;
+  String parentDir;
+  
+  SimpleFile(String raw, String prefix) {
+    String workingString = stripFormatting(raw, prefix);
+    getData(workingString);
+  }
+  
+  @override
+  int compareTo(SimpleFile other) {
+    return name.compareTo(other.name);
+  }
+  
+  String stripFormatting(String raw, String prefix) {
+    raw = raw.trim();
+    isDirectory = raw.startsWith('Directory: ') ? true : false;
+    raw = raw.replaceFirst(new RegExp(r'(Directory: |File: )'), '');
+    raw = raw.replaceFirst(prefix, '');
+    return raw;
+  }
+  
+  void getData(String fullPath) {
+    List<String> pathList = fullPath.split('/');
+    name = pathList[pathList.length - 1];
+    if (pathList.length > 1) {
+      parentDir = pathList[pathList.length - 2];
+    } else {
+      parentDir = 'root';
     }
   }
 }

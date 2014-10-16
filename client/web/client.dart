@@ -41,7 +41,7 @@ void registerWebSocketEventHandlers(WebSocket ws, FileExplorer fe, Console cs) {
     if (data.startsWith('RESPONSE_DIRECTORY_LIST')) {
       fe.updateFileExplorer(data.replaceFirst('RESPONSE_DIRECTORY_LIST', ''));
     } else if (data.startsWith('RESPONSE_DIRECTORY_PATH')) {
-      fe.directoryPath = data.replaceFirst('RESPONSE_DIRECTORY_PATH', '');
+      fe.absolutePathPrefix = data.replaceFirst('RESPONSE_DIRECTORY_PATH', '');
     } else {
       cs.updateOutputField(e.data);
     }

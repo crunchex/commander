@@ -53,6 +53,18 @@
   margin-top: 20px;
 }
 
+#file-explorer-title {
+  margin-top: 0px;
+  font: 20px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+}
+
+#recycle-text {
+  margin-bottom: 0px;
+  padding: 2px;
+  text-align: center;
+  border: 1px solid #dddddd;
+}
+
 #row-main {
   height: 100%;
 }

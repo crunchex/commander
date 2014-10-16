@@ -74,7 +74,7 @@
     <div id="column-editor" class="col-sm-10">
       <ul class="nav nav-tabs" role="tablist">
         <li class="active"><a href="#tab-editor" data-toggle="tab">Editor</a></li>
-        <li><a href="#tab-console" data-toggle="tab">Console</a></li>
+        <li id="button-console"><a href="#tab-console" data-toggle="tab">Console</a></li>
         <li><a href="#tab-help" data-toggle="tab">Help</a></li>
       </ul>
 
@@ -84,13 +84,18 @@
           <ul class="pager">
             <li><a id="button-save" href="#">Save</a></li>
             <li><a id="button-new" href="#">New</a></li>
-            <li><a id="button-theme" href="#">Theme</a></li>
+            <li><a id="button-editor-theme" href="#">Theme</a></li>
           </ul>
         </div>
 
         <div class="tab-pane" id="tab-console">
-          <p id="output"></p>
-          <input id="input" type="text"></input>
+          <div id="input-group" class="input-group input-group-sm">
+            <p id="output"></p>
+            <input id="input" type="text" class="form-control">
+          </div>
+          <ul class="pager">
+            <li><a id="button-console-theme" href="#">Theme</a></li>
+          </ul>
         </div>
         
         <div class="tab-pane" id="tab-help">

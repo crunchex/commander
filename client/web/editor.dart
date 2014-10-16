@@ -29,7 +29,7 @@ class Editor {
   ace.Editor editor;
   
   Editor() {
-    themeButton = querySelector('#button-theme');
+    themeButton = querySelector('#button-editor-theme');
     
     setUpEditor();
     registerEditorEventHandlers();

@@ -29,7 +29,7 @@ void setUpBootstrap() {
 
 void registerWebSocketEventHandlers(WebSocket ws, FileExplorer fe, Console cs) {
   ws.onOpen.listen((Event e) {
-      cs.updateOutputField('Connected to server');
+      cs.updateOutputField('Connected to updroid!');
       ws.send('REQUEST_DIRECTORY_PATH');
     });
 
@@ -45,6 +45,6 @@ void registerWebSocketEventHandlers(WebSocket ws, FileExplorer fe, Console cs) {
   });
 
   ws.onClose.listen((Event e) {
-    cs.updateOutputField('Connection to server lost...');
+    cs.updateOutputField('Disconnected from updroid...');
   });
 }

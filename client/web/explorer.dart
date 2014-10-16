@@ -34,9 +34,9 @@ class FileExplorer {
       
       String newHtml;
       if (file.isDirectory) {
-        newHtml = '<li class="explorer"><button type="button" class="btn btn-xs">' + file.name + '</button><ul id="explorer-' + file.name + '" class="explorer"></ul></li>';
+        newHtml = '<li class="explorer-li"><button type="button" class="btn btn-xs"><span class="glyphicon glyphicon-folder-open"></span>  ${file.name}</button><ul id="explorer-${file.name}" class="explorer explorer-ul"></ul></li>';
       } else {
-        newHtml = '<li class="explorer"><button type="button" class="btn btn-xs">${file.name}</button></li>';
+        newHtml = '<li class="explorer-li"><button type="button" class="btn btn-xs"><span class="glyphicon glyphicon-file"></span> ${file.name}</button></li>';
       }
       dirElement.appendHtml(newHtml);
     }

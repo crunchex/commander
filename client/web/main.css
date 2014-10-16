@@ -14,13 +14,23 @@
   border-color: #ccc;
 }
 
-.explorer > .explorer {
-    margin-left: -15px;
+.explorer-ul-top > .explorer-li {
+    margin-left: -38px;
+}
+
+.explorer-ul > .explorer-li {
+    margin-left: -20px;
 }
 
 .explorer {
   list-style-type: none;
 }
+
+.btn .glyphicon {
+  margin-right: 4px;
+}
+
+
 
 #title {
   font: 30px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;

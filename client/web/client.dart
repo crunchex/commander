@@ -25,9 +25,10 @@ void main() {
 void setUpBootstrap() {
   Tab.use();
   Button.use();
+  Dropdown.use();
   
   // TODO: help button should open a link to UpDroid's official wiki
-  querySelector('#button-help').onClick.listen((e) => e.preventDefault());
+  //querySelector('#button-help').onClick.listen((e) => e.preventDefault());
 }
 
 void registerWebSocketEventHandlers(WebSocket ws, FileExplorer fe, Console cs) {

@@ -30,7 +30,16 @@
   margin-right: 4px;
 }
 
+.inner-tabs > li > a,
+.inner-tabs > li > a:hover {
+  border-color: transparent;
+  background-color: transparent;
+  margin: -8px;
+}
 
+.inner-tabs > li > a:hover {
+  color: #dddddd;
+}
 
 #title {
   font: 30px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
@@ -45,10 +54,6 @@
 }
 
 #row-main {
-  height: 100%;
-}
-
-#column-editor {
   height: 100%;
 }
 

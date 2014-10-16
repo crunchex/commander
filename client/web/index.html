@@ -17,7 +17,7 @@
   
   <div class="container-fluid">
     <div id="row-main" class="row">
-      <div class="col-sm-3">
+      <div class="col-md-2">
         <?xml version="1.0" encoding="utf-8"?>
         <!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
         <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -72,55 +72,64 @@
       </div>
     </div>
 
-    <div id="column-editor" class="col-sm-9">
+    <div id="column-content" class="col-md-5">
       <ul class="nav nav-tabs" role="tablist">
-        <li class="active"><a href="#tab-editor" data-toggle="tab">Editor</a></li>
-        <li><a id="button-console" href="#tab-console" data-toggle="tab">Console</a></li>
-        <li><a id="button-help" href="#">Help</a></li>
+        <li class="active"><a id="button-editor" href="#tab-editor-container" data-toggle="tab">Editor</a></li>
+        <li><a href="#video_tab" data-toggle="tab">Video</a></li>
       </ul>
-
       <div class="tab-content">
-        <div class="tab-pane active" id="tab-editor">
-          <div id="editor"></div>
-          <ul class="pager">
+        <div id="tab-editor-container" class="tab-pane active">
+          <ul class="nav nav-tabs inner-tabs" role="tablist">
             <li><a id="button-save" href="#">Save</a></li>
             <li><a id="button-new" href="#">New</a></li>
             <li><a id="button-editor-theme" href="#">Theme</a></li>
           </ul>
-        </div>
-
-        <div class="tab-pane" id="tab-console">
-          <div id="input-group" class="input-group input-group-sm">
-            <p id="output"></p>
-            <input id="input" type="text" class="form-control">
+          <div class="tab-content">
+            <div id="tab-editor" class="tab-pane active">
+              <div id="editor"></div>
+            </div>
           </div>
-          <ul class="pager">
-            <li><a id="button-console-theme" href="#">Theme</a></li>
-          </ul>
         </div>
-        
-        <div class="tab-pane" id="tab-help">
+        <div id="video_tab" class="tab-pane">
+          <p>Video tab</p>
         </div>
       </div>
-      
+    </div>
+    
+    <div id="column-content2" class="col-md-5">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a id="button-console" href="#tab-console-container" data-toggle="tab">Console</a></li>
+      </ul>
+      <div class="tab-content">
+        <div id="tab-console-container" class="tab-pane active">
+          <ul class="nav nav-tabs inner-tabs" role="tablist">
+            <li><a id="button-console-theme" href="#">Theme</a></li>
+          </ul>
+          <div class="tab-content">
+            <div id="input-group" class="input-group input-group-sm">
+              <p id="output"></p>
+              <input id="input" type="text" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="row-spacing" class="row">
+      <div class="col-sm-12"></div>
+    </div>
+    
+    <div id="row-footer" class="row">
+      <div class="col-sm-12">
+        <p class="text-muted text-right">Copyright 2014 UpDroid, Inc. All rights reserved.</p>
+      </div>
     </div>
   </div>
-  
-  <div id="row-spacing" class="row">
-    <div class="col-sm-12"></div>
-  </div>
-  
-  <div id="row-footer" class="row">
-    <div class="col-sm-12">
-      <p class="text-muted text-right">Copyright 2014 UpDroid, Inc. All rights reserved.</p>
-    </div>
-  </div>
-</div>
 
-<script type="text/javascript" src="../packages/ace/src/js/ace.js"></script>
-<script type="text/javascript" src="../packages/ace/src/js/ext-language_tools.js"></script>
-<script type="application/dart" src="client.dart"></script>
-<script src="../packages/browser/dart.js"></script>
+  <script type="text/javascript" src="../packages/ace/src/js/ace.js"></script>
+  <script type="text/javascript" src="../packages/ace/src/js/ext-language_tools.js"></script>
+  <script type="application/dart" src="client.dart"></script>
+  <script src="../packages/browser/dart.js"></script>
 
 </body>
 </html>

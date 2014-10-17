@@ -46,13 +46,13 @@ class Console {
   
   void toggleTheme() {
     if (inputGroup.style.backgroundColor == 'rgb(238, 232, 213)') {
-      inputGroup.style.backgroundColor = '#002b36';
-      input.style.color = '#268bd2';
-      output.style.color = '#93a1a1';
+      inputGroup.style.backgroundColor = '#002b36'; // base-green
+      input.style.color = '#268bd2';  // blue
+      output.style.color = '#93a1a1'; // light-grey
     } else {
-      inputGroup.style.backgroundColor = '#eee8d5';
-      input.style.color = '#dc322f';
-      output.style.color = '#586e75';
+      inputGroup.style.backgroundColor = '#eee8d5'; // base-tan
+      input.style.color = '#dc322f';  // red
+      output.style.color = '#586e75'; // dark-grey
     }
   }
 }

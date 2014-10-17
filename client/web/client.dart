@@ -14,13 +14,13 @@ void main() {
   print("Client has started!");
 
   setUpBootstrap();
-  Editor e = new Editor();
   
   WebSocket ws = new WebSocket('ws://localhost:8080/ws');
-  FileExplorer fe = new FileExplorer(ws);
+  Editor ed = new Editor();
+  FileExplorer fe = new FileExplorer(ws, ed);
   Console cs = new Console(ws);
   
-  registerWebSocketEventHandlers(ws, fe, cs);
+  registerWebSocketEventHandlers(ws, ed, fe, cs);
 }
 
 void setUpBootstrap() {
@@ -32,7 +32,7 @@ void setUpBootstrap() {
   //querySelector('#button-help').onClick.listen((e) => e.preventDefault());
 }
 
-void registerWebSocketEventHandlers(WebSocket ws, FileExplorer fe, Console cs) {
+void registerWebSocketEventHandlers(WebSocket ws, Editor ed, FileExplorer fe, Console cs) {
   ws.onOpen.listen((Event e) {
       cs.updateOutputField('Connected to updroid!');
       ws.send('REQUEST_DIRECTORY_PATH');
@@ -44,6 +44,8 @@ void registerWebSocketEventHandlers(WebSocket ws, FileExplorer fe, Console cs) {
       fe.updateFileExplorer(data.replaceFirst('RESPONSE_DIRECTORY_LIST', ''));
     } else if (data.startsWith('RESPONSE_DIRECTORY_PATH')) {
       fe.absolutePathPrefix = data.replaceFirst('RESPONSE_DIRECTORY_PATH', '');
+    } else if (data.startsWith('RESPONSE_FILE_TEXT')) {
+      ed.openText(data.replaceFirst('RESPONSE_FILE_TEXT', ''));
     } else {
       cs.updateOutputField(e.data);
     }

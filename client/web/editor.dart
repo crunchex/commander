@@ -58,4 +58,8 @@ class Editor {
       e.preventDefault();
     });
   }
+  
+  void openText(String s) {
+    editor.setValue(s);
+  }
 }

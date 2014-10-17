@@ -33,8 +33,8 @@ bool deleteRequest(String s) {
   return exp.hasMatch(s);
 }
 
-bool deleteFileRequest(String s) {
-  RegExp exp = new RegExp('REQUEST_DELETE_FILE');
+bool openRequest(String s) {
+  RegExp exp = new RegExp('REQUEST_FILE_TEXT');
   return exp.hasMatch(s);
 }
 
@@ -62,6 +62,13 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         var fileToDelete = new File(path);
         fileToDelete.delete();
       }
+    } else if (openRequest(s)) {
+      var path = s.replaceFirst('REQUEST_FILE_TEXT', '');
+
+      var fileToOpen = new File(path);
+      fileToOpen.readAsString().then((String contents) {
+        socket.add('RESPONSE_FILE_TEXT' + contents);
+      });
     } else {
       // It's a Console command.
       log.info('Client sent: $s');

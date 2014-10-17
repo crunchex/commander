@@ -66,6 +66,10 @@
   font: 20px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
 }
 
+#editor {
+  border: 1px solid #dddddd;
+}
+
 #recycle {
   margin-bottom: 0px;
   padding: 2px;

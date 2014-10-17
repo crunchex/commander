@@ -3,13 +3,19 @@ part of client;
 class FileExplorer {
   WebSocket ws;
   String absolutePathPrefix;
+  
+  DivElement editorDiv;
+  Dropzone dzEditor;
 
   ParagraphElement recycle;
   Dropzone dzRecycle;
   
-  FileExplorer(WebSocket ws) {
+  FileExplorer(WebSocket ws, Editor e) {
     this.ws = ws;
     absolutePathPrefix = '';
+    
+    editorDiv = querySelector('#editor');
+    dzEditor = new Dropzone(editorDiv);
     
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
@@ -33,6 +39,32 @@ class FileExplorer {
     dzRecycle.onDrop.listen((e) {
       var path = e.draggableElement.dataset['path'];
       ws.send('REQUEST_DELETE' + path);
+    });
+    
+    // This is buggy - doesn't reliably get set when entered
+    // from the left side.
+    dzEditor.onDragEnter.listen((e) {
+      var isDir = e.draggableElement.dataset['isDir'];
+      if (isDir == 'false') {
+        editorDiv.style
+          ..borderColor = '#ffffff';
+      }
+    });
+    
+    dzEditor.onDragLeave.listen((e) {
+      var isDir = e.draggableElement.dataset['isDir'];
+      if (isDir == 'false') {
+        editorDiv.style
+          ..borderColor = '#268bd2';
+      }
+    });
+    
+    dzEditor.onDrop.listen((e) {
+      var isDir = e.draggableElement.dataset['isDir'];
+      if (isDir == 'false') {
+        var path = e.draggableElement.dataset['path'];
+        ws.send('REQUEST_FILE_TEXT' + path);
+      }
     });
   }
   
@@ -63,6 +95,7 @@ class FileExplorer {
       li
         ..id = file.name
         ..dataset['path'] = file.path
+        ..dataset['isDir'] = file.isDirectory.toString()
         ..draggable = true
         ..classes.add('explorer-li');
       
@@ -87,13 +120,21 @@ class FileExplorer {
         recycle.style
           ..color = '#268bd2'
           ..borderColor = '#268bd2';
+        if (!file.isDirectory) {
+          editorDiv.style
+            ..borderColor = '#268bd2';
+        }
       });
       
       d.onDragEnd.listen((event) {
-              recycle.style
-                ..color = '#333333'
-                ..borderColor = '#dddddd';
-            });
+        recycle.style
+          ..color = '#333333'
+          ..borderColor = '#dddddd';
+        if (!file.isDirectory) {
+          editorDiv.style
+            ..borderColor = '#dddddd';
+        }
+      });
       
       dirElement.children.add(li);
     }

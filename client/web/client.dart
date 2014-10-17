@@ -16,7 +16,7 @@ void main() {
   setUpBootstrap();
   
   WebSocket ws = new WebSocket('ws://localhost:8080/ws');
-  Editor ed = new Editor();
+  Editor ed = new Editor(ws);
   FileExplorer fe = new FileExplorer(ws, ed);
   Console cs = new Console(ws);
   

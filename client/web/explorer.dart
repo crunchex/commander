@@ -3,6 +3,7 @@ part of client;
 class FileExplorer {
   WebSocket ws;
   String absolutePathPrefix;
+  String openFile;
   
   DivElement editorDiv;
   Dropzone dzEditor;
@@ -62,8 +63,8 @@ class FileExplorer {
     dzEditor.onDrop.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        var path = e.draggableElement.dataset['path'];
-        ws.send('REQUEST_FILE_TEXT' + path);
+        openFile = e.draggableElement.dataset['path'];
+        ws.send('REQUEST_FILE_TEXT' + openFile);
       }
     });
   }

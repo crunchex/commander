@@ -25,11 +25,15 @@ if __name__ == '__main__':
 
 class Editor {
   AnchorElement themeButton;
+  AnchorElement saveButton;
+  WebSocket ws;
   
   ace.Editor editor;
   
-  Editor() {
+  Editor(WebSocket ws) {
+    this.ws = ws;
     themeButton = querySelector('#button-editor-theme');
+    saveButton = querySelector('#button-save');
     
     setUpEditor();
     registerEditorEventHandlers();
@@ -57,6 +61,10 @@ class Editor {
       // Stops the button from sending the page to the top (href=#)
       e.preventDefault();
     });
+    
+    /*saveButton.onClick.listen((e) {
+      ws.send('REQUEST_SAVE' + editor.value + 'PATH' + );
+    });*/
   }
   
   void openText(String s) {

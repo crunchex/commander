@@ -8,9 +8,19 @@
   src: url(RobotoCondensed-Regular.ttf);
 }
 
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+
 .btn-default {
   color: #333;
-  background-color: #ddddd;
+  background-color: #dddddd;
   border-color: #ccc;
 }
 
@@ -24,6 +34,22 @@
 
 .explorer {
   list-style-type: none;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #fff;
+}
+
+.text-muted {
+  position: absolute;
+  bottom: 0px;
+  right: 10px;
+  font-size: 10px;
 }
 
 #explorer-top .btn {
@@ -108,12 +134,4 @@
    overflow-y: auto;
    background-color: transparent;
    color: #93a1a1;
-}
-
-#row-spacing {
-  height: 50px;
-}
-
-#row-footer {
-  font-size: 10px;
 }

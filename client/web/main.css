@@ -26,7 +26,15 @@
   list-style-type: none;
 }
 
-.btn .glyphicon {
+#explorer-top .btn {
+  background-color: transparent;  
+}
+
+#explorer-top .btn:hover {
+  color: #268bd2;
+}
+
+.glyphicon {
   margin-right: 4px;
 }
 

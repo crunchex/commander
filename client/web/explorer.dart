@@ -15,73 +15,67 @@ class FileExplorer {
   void registerExplorerEventHandlers() {
     var elements = document.querySelectorAll('#explorer-top .btn, #recycle');
     for (Element element in elements) {
+      // Target is a FileSystemEntity
       element.onDragStart.listen(_onDragStart);
-      element.onDragEnd.listen(_onDragEnd);
-      element.onDragEnter.listen(_onDragEnter);
       element.onDragOver.listen(_onDragOver);
-      element.onDragLeave.listen(_onDragLeave);
       element.onDrop.listen(_onDrop);
+      element.onDragEnd.listen(_onDragEnd);
+      
+      // Target is Recycle
+      element.onDragEnter.listen(_onDragEnter);
+      element.onDragLeave.listen(_onDragLeave);
     }
   }
 
   void _onDragStart(MouseEvent event) {
-    Element dragTarget = event.target;
-    dragTarget.classes.add('moving');
-    _dragSourceEl = dragTarget;
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/html', dragTarget.innerHtml);
-    
-    
-    print('dragging');
-  }
-
-  void _onDragEnd(MouseEvent event) {
-    Element dragTarget = event.target;
-    dragTarget.classes.remove('moving');
-    dragTarget.classes.remove('active');
-    print('end');
-  }
-
-  void _onDragEnter(MouseEvent event) {
-    Element dropTarget = event.target;
-    dropTarget.classes.add('over');
-    print('Entering: ${dropTarget.className}');
-    
-    if (dropTarget.className.contains('recycle')) {
-      dropTarget.style.color = '#268bd2';
-      dropTarget.style.borderColor = '#268bd2';
+      Element dragTarget = event.target;
+      dragTarget.classes.add('moving');
+      _dragSourceEl = dragTarget;
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/html', dragTarget.innerHtml);
+      print('Class name: ${dragTarget.className}');
     }
-  }
 
-  void _onDragOver(MouseEvent event) {
-    // This is necessary to allow us to drop.
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  }
-
-  void _onDragLeave(MouseEvent event) {
-    Element dropTarget = event.target;
-    dropTarget.classes.remove('over');
-    
-    if (dropTarget.className.contains('recycle')) {
-      dropTarget.style.color = '#333333';
-      dropTarget.style.borderColor = '#dddddd';
+    void _onDragEnd(MouseEvent event) {
+      Element dragTarget = event.target;
+      dragTarget.classes.remove('moving');
+      var cols = document.querySelectorAll('#columns .column');
+      for (var col in cols) {
+        col.classes.remove('over');
+      }
     }
-  }
 
-  void _onDrop(MouseEvent event) {
-    // Stop the browser from redirecting.
-    event.stopPropagation();
-
-    // Don't do anything if dropping onto the same column we're dragging.
-    Element dropTarget = event.target;
-    if (dropTarget.className.contains('recycle')) {
-      // Set the source column's HTML to the HTML of the column we dropped on.
-      dropTarget.style.color = '#333333';
-      dropTarget.style.borderColor = '#dddddd';
-      print('Delete this file');
+    void _onDragEnter(MouseEvent event) {
+      Element dropTarget = event.target;
+      dropTarget.classes.add('over');
     }
-  }
+
+    void _onDragOver(MouseEvent event) {
+      // This is necessary to allow us to drop.
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    }
+
+    void _onDragLeave(MouseEvent event) {
+      Element dropTarget = event.target;
+      dropTarget.classes.remove('over');
+    }
+
+    void _onDrop(MouseEvent event) {
+      // Stop the browser from redirecting.
+      event.stopPropagation();
+
+      // Don't do anything if dropping onto the same column we're dragging.
+      Element dropTarget = event.target;
+      if (_dragSourceEl != dropTarget) {
+        // Set the source column's HTML to the HTML of the column we dropped on.
+        //_dragSourceEl.innerHtml = dropTarget.innerHtml;
+        //dropTarget.innerHtml = event.dataTransfer.getData('text/html');
+        print('Targets are different');
+      } else {
+        print('Targets are the same');
+      }
+    }
   
   void updateFileExplorer(String data) {
     // Set the explorer list to empty for a full refresh
@@ -108,9 +102,9 @@ class FileExplorer {
       
       String newHtml;
       if (file.isDirectory) {
-        newHtml = '<li class="explorer-li"><button type="button" draggable="true" class="btn btn-xs"><span class="glyphicon glyphicon-folder-open"></span>  ${file.name}</button><ul id="explorer-${file.name}" class="explorer explorer-ul"></ul></li>';
+        newHtml = '<li draggable="true" class="explorer-li"><span class="glyphicon glyphicon-folder-open"></span> ${file.name}<ul id="explorer-${file.name}" class="explorer explorer-ul"></ul></li>';
       } else {
-        newHtml = '<li class="explorer-li"><button type="button" draggable="true" class="btn btn-xs"><span class="glyphicon glyphicon-file"></span> ${file.name}</button></li>';
+        newHtml = '<li draggable="true" class="explorer-li"><span class="glyphicon glyphicon-file"></span> ${file.name}</li>';
       }
       dirElement.appendHtml(newHtml);
     }

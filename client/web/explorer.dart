@@ -4,78 +4,15 @@ class FileExplorer {
   Element _dragSourceEl;
   WebSocket ws;
   String absolutePathPrefix;
+
+  Dropzone dzRecycle;
   
   FileExplorer(WebSocket ws) {
     this.ws = ws;
     absolutePathPrefix = '';
-    
-    registerExplorerEventHandlers();
-  }
-  
-  void registerExplorerEventHandlers() {
-    var elements = document.querySelectorAll('#explorer-top .btn, #recycle');
-    for (Element element in elements) {
-      // Target is a FileSystemEntity
-      element.onDragStart.listen(_onDragStart);
-      element.onDragOver.listen(_onDragOver);
-      element.onDrop.listen(_onDrop);
-      element.onDragEnd.listen(_onDragEnd);
-      
-      // Target is Recycle
-      element.onDragEnter.listen(_onDragEnter);
-      element.onDragLeave.listen(_onDragLeave);
-    }
+    dzRecycle = new Dropzone(querySelector('#recycle'));
   }
 
-  void _onDragStart(MouseEvent event) {
-      Element dragTarget = event.target;
-      dragTarget.classes.add('moving');
-      _dragSourceEl = dragTarget;
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('text/html', dragTarget.innerHtml);
-      print('Class name: ${dragTarget.className}');
-    }
-
-    void _onDragEnd(MouseEvent event) {
-      Element dragTarget = event.target;
-      dragTarget.classes.remove('moving');
-      var cols = document.querySelectorAll('#columns .column');
-      for (var col in cols) {
-        col.classes.remove('over');
-      }
-    }
-
-    void _onDragEnter(MouseEvent event) {
-      Element dropTarget = event.target;
-      dropTarget.classes.add('over');
-    }
-
-    void _onDragOver(MouseEvent event) {
-      // This is necessary to allow us to drop.
-      event.preventDefault();
-      event.dataTransfer.dropEffect = 'move';
-    }
-
-    void _onDragLeave(MouseEvent event) {
-      Element dropTarget = event.target;
-      dropTarget.classes.remove('over');
-    }
-
-    void _onDrop(MouseEvent event) {
-      // Stop the browser from redirecting.
-      event.stopPropagation();
-
-      // Don't do anything if dropping onto the same column we're dragging.
-      Element dropTarget = event.target;
-      if (_dragSourceEl != dropTarget) {
-        // Set the source column's HTML to the HTML of the column we dropped on.
-        //_dragSourceEl.innerHtml = dropTarget.innerHtml;
-        //dropTarget.innerHtml = event.dataTransfer.getData('text/html');
-        print('Targets are different');
-      } else {
-        print('Targets are the same');
-      }
-    }
   
   void updateFileExplorer(String data) {
     // Set the explorer list to empty for a full refresh
@@ -98,15 +35,35 @@ class FileExplorer {
     // Refresh FileExplorer
     UListElement dirElement;
     for (SimpleFile file in files) {
-      dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-${file.parentDir}');
+      dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
+
+      LIElement li = new LIElement();
+      li
+        ..id = file.name
+        ..draggable = true
+        ..classes.add('explorer-li');
       
-      String newHtml;
+      SpanElement span = new SpanElement();
+      var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
+      span.classes.addAll(['glyphicon', glyphType]);
+      li.children.add(span);
+      
+      li.appendHtml(' ${file.name}');
+      
       if (file.isDirectory) {
-        newHtml = '<li draggable="true" class="explorer-li"><span class="glyphicon glyphicon-folder-open"></span> ${file.name}<ul id="explorer-${file.name}" class="explorer explorer-ul"></ul></li>';
-      } else {
-        newHtml = '<li draggable="true" class="explorer-li"><span class="glyphicon glyphicon-file"></span> ${file.name}</li>';
+        UListElement ul = new UListElement();
+        ul
+          ..id = 'explorer-ul-${file.name}'
+          ..classes.addAll(['explorer', 'explorer-ul']);
+        li.children.add(ul);
       }
-      dirElement.appendHtml(newHtml);
+       
+      dirElement.children.add(li);
+      
+      /*Draggable d = new Draggable(querySelector('#explorer-${file.name}'), avatarHandler: new AvatarHandler.clone());
+      d.onDragStart.listen((event) {
+        print('Drag start! ${event.draggableElement.className}');
+      });*/
     }
   }
 }

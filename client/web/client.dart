@@ -4,6 +4,7 @@ import 'dart:html';
 import 'package:bootjack/bootjack.dart';
 import 'package:ace/ace.dart' as ace;
 import 'package:ace/proxy.dart';
+import 'package:dnd/dnd.dart';
 
 part 'explorer.dart';
 part 'editor.dart';

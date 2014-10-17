@@ -4,3 +4,4 @@ dependencies:
   ace: any
   bootjack: any
   browser: any
+  dnd: any

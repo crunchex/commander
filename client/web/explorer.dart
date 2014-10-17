@@ -1,18 +1,40 @@
 part of client;
 
 class FileExplorer {
-  Element _dragSourceEl;
   WebSocket ws;
   String absolutePathPrefix;
 
+  ParagraphElement recycle;
   Dropzone dzRecycle;
   
   FileExplorer(WebSocket ws) {
     this.ws = ws;
     absolutePathPrefix = '';
-    dzRecycle = new Dropzone(querySelector('#recycle'));
+    
+    recycle = querySelector('#recycle');
+    dzRecycle = new Dropzone(recycle);
+    
+    registerExplorerEventHandlers();
   }
-
+  
+  registerExplorerEventHandlers() {
+    dzRecycle.onDragEnter.listen((e) {
+      recycle.style
+        ..color = '#ffffff'
+        ..borderColor = '#ffffff';
+    });
+    
+    dzRecycle.onDragLeave.listen((e) {
+      recycle.style
+        ..color = '#268bd2'
+        ..borderColor = '#268bd2';
+    });
+    
+    dzRecycle.onDrop.listen((e) {
+      var path = e.draggableElement.dataset['path'];
+      ws.send('REQUEST_DELETE' + path);
+    });
+  }
   
   void updateFileExplorer(String data) {
     // Set the explorer list to empty for a full refresh
@@ -40,6 +62,7 @@ class FileExplorer {
       LIElement li = new LIElement();
       li
         ..id = file.name
+        ..dataset['path'] = file.path
         ..draggable = true
         ..classes.add('explorer-li');
       
@@ -57,19 +80,29 @@ class FileExplorer {
           ..classes.addAll(['explorer', 'explorer-ul']);
         li.children.add(ul);
       }
-       
-      dirElement.children.add(li);
       
-      /*Draggable d = new Draggable(querySelector('#explorer-${file.name}'), avatarHandler: new AvatarHandler.clone());
+      Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
+      
       d.onDragStart.listen((event) {
-        print('Drag start! ${event.draggableElement.className}');
-      });*/
+        recycle.style
+          ..color = '#268bd2'
+          ..borderColor = '#268bd2';
+      });
+      
+      d.onDragEnd.listen((event) {
+              recycle.style
+                ..color = '#333333'
+                ..borderColor = '#dddddd';
+            });
+      
+      dirElement.children.add(li);
     }
   }
 }
 
 class SimpleFile implements Comparable {
   String raw;
+  String path;
   bool isDirectory;
   String name;
   String parentDir;
@@ -89,6 +122,10 @@ class SimpleFile implements Comparable {
     raw = raw.trim();
     isDirectory = raw.startsWith('Directory: ') ? true : false;
     raw = raw.replaceFirst(new RegExp(r'(Directory: |File: )'), '');
+    
+    // Save the absolute path
+    path = raw;
+    
     raw = raw.replaceFirst(prefix, '');
     return raw;
   }

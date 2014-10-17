@@ -28,6 +28,16 @@ bool directoryPathRequest(String s) {
   return exp.hasMatch(s);
 }
 
+bool deleteRequest(String s) {
+  RegExp exp = new RegExp('REQUEST_DELETE');
+  return exp.hasMatch(s);
+}
+
+bool deleteFileRequest(String s) {
+  RegExp exp = new RegExp('REQUEST_DELETE_FILE');
+  return exp.hasMatch(s);
+}
+
 void handleWebSocket(WebSocket socket, Directory dir) {
   log.info('Client connected!');
   
@@ -41,6 +51,17 @@ void handleWebSocket(WebSocket socket, Directory dir) {
       getDirContents(dir).then((files) {
           socket.add('RESPONSE_DIRECTORY_LIST' + files.toString());
         });
+    } else if (deleteRequest(s)) {
+      var path = s.replaceFirst('REQUEST_DELETE', '');
+      
+      // Can't just create a FileSystemEntity and delete it :(
+      try {
+        var dirToDelete = new Directory(path);
+        dirToDelete.delete(recursive:true);
+      } catch (e) {
+        var fileToDelete = new File(path);
+        fileToDelete.delete();
+      }
     } else {
       // It's a Console command.
       log.info('Client sent: $s');
@@ -57,7 +78,6 @@ void handleWebSocket(WebSocket socket, Directory dir) {
   watcher.events.listen((WatchEvent e) => getDirContents(dir).then((files) {
     socket.add('RESPONSE_DIRECTORY_LIST' + files.toString());
   }));
-  
 }
 
 void main(List<String> args) {

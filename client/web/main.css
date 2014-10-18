@@ -22,10 +22,19 @@ body {
   padding-right: 10px;
 }
 
+.navbar-nav > li > a {
+  padding-top: 27px;
+  padding-bottom: 2px;
+}
+
 .btn-default {
   color: #333;
   background-color: #dddddd;
   border-color: #ccc;
+}
+
+.glyphicon {
+  margin-right: 4px;
 }
 
 .explorer-ul-top > .explorer-li {
@@ -38,6 +47,23 @@ body {
 
 .explorer {
   list-style-type: none;
+}
+
+.nav .nav-tabs .inner-tabs {
+  border-left-width: 1px;
+  border-bottom-width: 0px;
+  border-color: #000;
+}
+
+.inner-tabs > li > a,
+.inner-tabs > li > a:hover {
+  border-color: transparent;
+  background-color: transparent;
+  margin: -8px;
+}
+
+.inner-tabs > li > a:hover {
+  color: #dddddd;
 }
 
 .footer {
@@ -56,6 +82,25 @@ body {
   font-size: 10px;
 }
 
+#navbar-brand {
+  position: relative;
+  padding: 0px;
+}
+
+#updroid {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 65px;
+}
+
+#commander {
+  position: absolute;
+  bottom: -7px;
+  left: 76px;
+  font: 19px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+}
+
 #explorer-top .btn {
   background-color: transparent;  
 }
@@ -64,40 +109,11 @@ body {
   color: #268bd2;
 }
 
-.glyphicon {
-  margin-right: 4px;
-}
-
-.inner-tabs > li > a,
-.inner-tabs > li > a:hover {
-  border-color: transparent;
-  background-color: transparent;
-  margin: -8px;
-}
-
-.inner-tabs > li > a:hover {
-  color: #dddddd;
-}
-
-#logo {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 65px;
-}
-
-#title {
-  position:absolute;
-  top: 8px;
-  left: 60px;
-  font: 22px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
-}
-
 #file-explorer-title {
   margin-top: 0px;
   margin-bottom: 20px;
   text-align: center;
-  font: 20px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+  font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
 }
 
 #editor {

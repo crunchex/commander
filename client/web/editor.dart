@@ -23,14 +23,16 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException: pass
 ''';
 
-class Editor {
+class UpDroidEditor {
+  WebSocket ws;
+  int id;
+  
   AnchorElement themeButton;
   AnchorElement saveButton;
-  WebSocket ws;
   
-  ace.Editor editor;
+  Editor aceEditor;
   
-  Editor(WebSocket ws) {
+  UpDroidEditor(WebSocket ws, int id) {
     this.ws = ws;
     themeButton = querySelector('#button-editor-theme');
     saveButton = querySelector('#button-save');
@@ -40,25 +42,25 @@ class Editor {
   }
 
   void setUpEditor() {
-    ace.implementation = ACE_PROXY_IMPLEMENTATION;
+    implementation = ACE_PROXY_IMPLEMENTATION;
     
-    editor = ace.edit(querySelector('#editor'));
-    editor
-        ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
-        ..fontSize = 14
-        ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
-        ..setValue(ROS_TALKER, -1);
+    aceEditor = edit(querySelector('#editor'));
+    aceEditor
+      ..session.mode = new Mode.named(Mode.PYTHON)
+      ..fontSize = 14
+      ..theme = new Theme.named(Theme.SOLARIZED_DARK)
+      ..setValue(ROS_TALKER, -1);
   }
   
   void registerEditorEventHandlers() {
     themeButton.onClick.listen((e) {
-      if (editor.theme.name == 'solarized_dark') {
-        editor.theme = new ace.Theme.named(ace.Theme.SOLARIZED_LIGHT);
+      if (aceEditor.theme.name == 'solarized_dark') {
+        aceEditor.theme = new Theme.named(Theme.SOLARIZED_LIGHT);
       } else {
-        editor.theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK);
+        aceEditor.theme = new Theme.named(Theme.SOLARIZED_DARK);
       }
       
-      // Stops the button from sending the page to the top (href=#)
+      // Stops the button from sending the page to the top (href=#).
       e.preventDefault();
     });
     
@@ -68,6 +70,6 @@ class Editor {
   }
   
   void openText(String s) {
-    editor.setValue(s);
+    aceEditor.setValue(s);
   }
 }

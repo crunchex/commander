@@ -1,19 +1,20 @@
 part of client;
 
-class Console {
+class UpDroidConsole {
   WebSocket ws;
+  
   DivElement inputGroup;
   TextInputElement input;
   ParagraphElement output;
-  AnchorElement buttonConsole;
+  AnchorElement consoleButton;
   AnchorElement themeButton;
   
-  Console(WebSocket ws) {
+  UpDroidConsole(WebSocket ws) {
     this.ws = ws;
     inputGroup = querySelector('#input-group');
     input = querySelector('#input');
     output = querySelector('#output');
-    buttonConsole = querySelector('#button-console');
+    consoleButton = querySelector('#button-console');
     themeButton = querySelector('#button-console-theme');
     
     registerConsoleEventHandlers();
@@ -30,8 +31,8 @@ class Console {
       e.preventDefault();
     });
     
-    buttonConsole.onClick.listen((e) {
-      // This is broken :(
+    consoleButton.onClick.listen((e) {
+      // This is broken.
       input.focus();
     });
   }
@@ -40,7 +41,7 @@ class Console {
     output.appendText('up> ${message}');
     output.appendHtml('<br/>');
 
-    //Make sure we 'autoscroll' the new messages
+    // Make sure we 'autoscroll' the new messages.
     output.scrollTop = output.scrollHeight;
   }
   

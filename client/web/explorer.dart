@@ -1,6 +1,6 @@
 part of client;
 
-class FileExplorer {
+class UpDroidExplorer {
   WebSocket ws;
   String absolutePathPrefix;
   String openFile;
@@ -11,7 +11,7 @@ class FileExplorer {
   ParagraphElement recycle;
   Dropzone dzRecycle;
   
-  FileExplorer(WebSocket ws, Editor e) {
+  UpDroidExplorer(WebSocket ws, UpDroidEditor e) {
     this.ws = ws;
     absolutePathPrefix = '';
     
@@ -70,24 +70,24 @@ class FileExplorer {
   }
   
   void updateFileExplorer(String data) {
-    // Set the explorer list to empty for a full refresh
+    // Set the explorer list to empty for a full refresh.
     UListElement explorer = querySelector('#explorer-top');
     explorer.innerHtml = '';
     
-    // Strip the brackets/single-quotes and split by ','
+    // Strip the brackets/single-quotes and split by ','.
     data = data.replaceAll(new RegExp(r"(\[|\]|')"), '');
     List<String> entities = data.split(',');
     
-    // Build SimpleFile list our of raw strings
+    // Build SimpleFile list our of raw strings.
     var files = [];
     for (String entity in entities) {
       files.add(new SimpleFile(entity, absolutePathPrefix));
     }
     
-    // Sorting the files results in a null object exception for some reason
+    // Sorting the files results in a null object exception for some reason.
     //files.sort();
 
-    // Refresh FileExplorer
+    // Refresh the FileExplorer.
     UListElement dirElement;
     for (SimpleFile file in files) {
       dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
@@ -165,7 +165,7 @@ class SimpleFile implements Comparable {
     isDirectory = raw.startsWith('Directory: ') ? true : false;
     raw = raw.replaceFirst(new RegExp(r'(Directory: |File: )'), '');
     
-    // Save the absolute path
+    // Save the absolute path.
     path = raw;
     
     raw = raw.replaceFirst(prefix, '');

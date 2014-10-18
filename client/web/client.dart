@@ -2,7 +2,7 @@ library client;
 
 import 'dart:html';
 import 'package:bootjack/bootjack.dart';
-import 'package:ace/ace.dart' as ace;
+import 'package:ace/ace.dart';
 import 'package:ace/proxy.dart';
 import 'package:dnd/dnd.dart';
 
@@ -16,9 +16,9 @@ void main() {
   setUpBootstrap();
   
   WebSocket ws = new WebSocket('ws://localhost:8080/ws');
-  Editor ed = new Editor(ws);
-  FileExplorer fe = new FileExplorer(ws, ed);
-  Console cs = new Console(ws);
+  UpDroidEditor ed = new UpDroidEditor(ws, 1);
+  UpDroidExplorer fe = new UpDroidExplorer(ws, ed);
+  UpDroidConsole cs = new UpDroidConsole(ws);
   
   registerWebSocketEventHandlers(ws, ed, fe, cs);
 }
@@ -27,12 +27,9 @@ void setUpBootstrap() {
   Tab.use();
   Button.use();
   Dropdown.use();
-  
-  // TODO: help button should open a link to UpDroid's official wiki
-  //querySelector('#button-help').onClick.listen((e) => e.preventDefault());
 }
 
-void registerWebSocketEventHandlers(WebSocket ws, Editor ed, FileExplorer fe, Console cs) {
+void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplorer fe, UpDroidConsole cs) {
   ws.onOpen.listen((Event e) {
       cs.updateOutputField('Connected to updroid!');
       ws.send('REQUEST_DIRECTORY_PATH');

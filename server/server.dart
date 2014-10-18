@@ -17,7 +17,7 @@ Future<List<FileSystemEntity>> getDirContents(Directory dir) {
   var lister = dir.list(recursive: true);
   lister.listen ( 
       (file) => files.add(file),
-      // should also register onError
+      // Should also register onError.
       onDone:   () => completer.complete(files)
       );
   return completer.future;
@@ -54,7 +54,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
     } else if (deleteRequest(s)) {
       var path = s.replaceFirst('REQUEST_DELETE', '');
       
-      // Can't just create a FileSystemEntity and delete it :(
+      // Can't just create a FileSystemEntity and delete it.
       try {
         var dirToDelete = new Directory(path);
         dirToDelete.delete(recursive:true);
@@ -100,7 +100,7 @@ void main(List<String> args) {
   HttpServer.bind(InternetAddress.ANY_IP_V4, 8080).then((HttpServer server) {
     log.info("HttpServer listening on port:${server.port}...");
     server.listen((HttpRequest request) {
-      // WebSocket requests are considered "upgraded" HTTP requests
+      // WebSocket requests are considered "upgraded" HTTP requests.
       if (WebSocketTransformer.isUpgradeRequest(request)) {
         log.info("Upgraded ${request.method} request for: ${request.uri.path}");
         WebSocketTransformer.upgrade(request).then((WebSocket ws) {

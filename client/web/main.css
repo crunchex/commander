@@ -18,6 +18,10 @@ body {
   margin-bottom: 60px;
 }
 
+.navbar-right {
+  padding-right: 10px;
+}
+
 .btn-default {
   color: #333;
   background-color: #dddddd;
@@ -75,20 +79,24 @@ body {
   color: #dddddd;
 }
 
+#logo {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 65px;
+}
+
 #title {
-  font: 30px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
-}
-
-#Layer_1 {
-  width: 100%;
-}
-
-#well-explorer {
-  margin-top: 20px;
+  position:absolute;
+  top: 8px;
+  left: 60px;
+  font: 22px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
 }
 
 #file-explorer-title {
   margin-top: 0px;
+  margin-bottom: 20px;
+  text-align: center;
   font: 20px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
 }
 
@@ -97,6 +105,7 @@ body {
 }
 
 #recycle {
+  margin-top: 20px;
   margin-bottom: 0px;
   padding: 2px;
   text-align: center;

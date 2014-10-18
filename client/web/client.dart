@@ -32,23 +32,48 @@ void setUpBootstrap() {
 void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplorer fe, UpDroidConsole cs) {
   ws.onOpen.listen((Event e) {
       cs.updateOutputField('Connected to updroid!');
-      ws.send('REQUEST_DIRECTORY_PATH');
+      ws.send('[[EXPLORER_DIRECTORY_PATH]]');
     });
 
   ws.onMessage.listen((MessageEvent e) {
-    String data = e.data.toString();
-    if (data.startsWith('RESPONSE_DIRECTORY_LIST')) {
-      fe.updateFileExplorer(data.replaceFirst('RESPONSE_DIRECTORY_LIST', ''));
-    } else if (data.startsWith('RESPONSE_DIRECTORY_PATH')) {
-      fe.absolutePathPrefix = data.replaceFirst('RESPONSE_DIRECTORY_PATH', '');
-    } else if (data.startsWith('RESPONSE_FILE_TEXT')) {
-      ed.openText(data.replaceFirst('RESPONSE_FILE_TEXT', ''));
-    } else {
-      cs.updateOutputField(e.data);
+    CommanderMessage cm = new CommanderMessage(e.data);
+    
+    switch (cm.header()) {
+      case 'EXPLORER_DIRECTORY_LIST':
+        fe.updateFileExplorer(cm.body());
+        break;
+        
+      case 'EXPLORER_DIRECTORY_PATH':
+        fe.absolutePathPrefix = cm.body();
+        break;
+        
+      case 'EDITOR_FILE_TEXT':
+        ed.openText(cm.body());
+        break;
+        
+      case 'CONSOLE_COMMAND':
+        cs.updateOutputField(e.data);
+        break;
+        
+      default:
+        print('Message received without commander header');
     }
   });
 
   ws.onClose.listen((Event e) {
     cs.updateOutputField('Disconnected from updroid...');
   });
+}
+
+class CommanderMessage {
+  final String s;
+  
+  CommanderMessage(this.s);
+  
+  String header() {
+    var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
+    return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
+  }
+  
+  String body() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
 }

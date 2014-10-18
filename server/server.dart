@@ -23,59 +23,69 @@ Future<List<FileSystemEntity>> getDirContents(Directory dir) {
   return completer.future;
 }
 
-bool directoryPathRequest(String s) {
-  RegExp exp = new RegExp('REQUEST_DIRECTORY_PATH');
-  return exp.hasMatch(s);
-}
-
-bool deleteRequest(String s) {
-  RegExp exp = new RegExp('REQUEST_DELETE');
-  return exp.hasMatch(s);
-}
-
-bool openRequest(String s) {
-  RegExp exp = new RegExp('REQUEST_FILE_TEXT');
-  return exp.hasMatch(s);
+class CommanderMessage {
+  final String s;
+  
+  CommanderMessage(this.s);
+  
+  String header() {
+    var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
+    return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
+  }
+  
+  String body() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
 }
 
 void handleWebSocket(WebSocket socket, Directory dir) {
   log.info('Client connected!');
   
   socket.listen((String s) {
-    if (directoryPathRequest(s)) {
-      log.info('Request for DirectoryPath received');
-      socket.add('RESPONSE_DIRECTORY_PATH' + dir.path);
-      
-      // Since it is assumed DirectoryPath is only requested on open,
-      // Also send the initial directory list.
-      getDirContents(dir).then((files) {
-          socket.add('RESPONSE_DIRECTORY_LIST' + files.toString());
+    CommanderMessage cm = new CommanderMessage(s);
+    var switchConditional = cm.header();
+    switch (switchConditional) {
+      case 'EXPLORER_DIRECTORY_PATH':
+        socket.add('[[EXPLORER_DIRECTORY_PATH]]' + dir.path);
+        
+        // Since it is assumed DirectoryPath is only requested on open,
+        // Also send the initial directory list.
+        getDirContents(dir).then((files) {
+          socket.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
         });
-    } else if (deleteRequest(s)) {
-      var path = s.replaceFirst('REQUEST_DELETE', '');
-      
-      // Can't just create a FileSystemEntity and delete it.
-      try {
-        var dirToDelete = new Directory(path);
-        dirToDelete.delete(recursive:true);
-      } catch (e) {
-        var fileToDelete = new File(path);
-        fileToDelete.delete();
-      }
-    } else if (openRequest(s)) {
-      var path = s.replaceFirst('REQUEST_FILE_TEXT', '');
+        break;
+        
+      case 'EXPLORER_DELETE':
+        var path = cm.body();
+              
+        // Can't just create a FileSystemEntity and delete it.
+        try {
+          var dirToDelete = new Directory(path);
+          dirToDelete.delete(recursive:true);
+        } catch (e) {
+          var fileToDelete = new File(path);
+          fileToDelete.delete();
+        }
+        break;
+        
+      case 'EDITOR_OPEN':
+        var path = cm.body();
 
-      var fileToOpen = new File(path);
-      fileToOpen.readAsString().then((String contents) {
-        socket.add('RESPONSE_FILE_TEXT' + contents);
-      });
-    } else {
-      // It's a Console command.
-      log.info('Client sent: $s');
-      List args = parseCommandInput(s);
-      Process.run(args[0], args[1]).then((ProcessResult results) {
-        socket.add(results.stdout);
-      });
+        var fileToOpen = new File(path);
+        fileToOpen.readAsString().then((String contents) {
+          socket.add('[[EDITOR_FILE_TEXT]]' + contents);
+        });
+        break;
+        
+      case 'CONSOLE_COMMAND':
+        // It's a Console command.
+        log.info('Client sent: $s');
+        List args = parseCommandInput(s);
+        Process.run(args[0], args[1]).then((ProcessResult results) {
+          socket.add('[[CONSOLE_COMMAND]]' + results.stdout);
+        });
+        break;
+        
+      default:
+        log.severe('Message received without commander header');
     }
   }, onDone: () {
     log.info('Client disconnected');  
@@ -83,7 +93,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
 
   var watcher = new DirectoryWatcher(dir.path);
   watcher.events.listen((WatchEvent e) => getDirContents(dir).then((files) {
-    socket.add('RESPONSE_DIRECTORY_LIST' + files.toString());
+    socket.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
   }));
 }
 

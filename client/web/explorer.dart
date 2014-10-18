@@ -39,7 +39,7 @@ class UpDroidExplorer {
     
     dzRecycle.onDrop.listen((e) {
       var path = e.draggableElement.dataset['path'];
-      ws.send('REQUEST_DELETE' + path);
+      ws.send('[[EXPLORER_DELETE]]' + path);
     });
     
     // This is buggy - doesn't reliably get set when entered
@@ -64,7 +64,7 @@ class UpDroidExplorer {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
         openFile = e.draggableElement.dataset['path'];
-        ws.send('REQUEST_FILE_TEXT' + openFile);
+        ws.send('[[EDITOR_OPEN]]' + openFile);
       }
     });
   }

@@ -22,7 +22,7 @@ class UpDroidConsole {
 
   void registerConsoleEventHandlers() {
     input.onChange.listen((e) {
-      ws.send(input.value.trim());
+      ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());
       input.value = "";
     });
     

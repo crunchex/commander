@@ -2,8 +2,8 @@ part of client;
 
 class UpDroidExplorer {
   WebSocket ws;
+  UpDroidEditor ed;
   String absolutePathPrefix;
-  String openFile;
   
   DivElement editorDiv;
   Dropzone dzEditor;
@@ -11,8 +11,9 @@ class UpDroidExplorer {
   ParagraphElement recycle;
   Dropzone dzRecycle;
   
-  UpDroidExplorer(WebSocket ws, UpDroidEditor e) {
+  UpDroidExplorer(WebSocket ws, UpDroidEditor ed) {
     this.ws = ws;
+    this.ed = ed;
     absolutePathPrefix = '';
     
     editorDiv = querySelector('#editor');
@@ -63,8 +64,8 @@ class UpDroidExplorer {
     dzEditor.onDrop.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        openFile = e.draggableElement.dataset['path'];
-        ws.send('[[EDITOR_OPEN]]' + openFile);
+        ed.openFile = e.draggableElement.dataset['path'];
+        ws.send('[[EDITOR_OPEN]]' + ed.openFile);
       }
     });
   }

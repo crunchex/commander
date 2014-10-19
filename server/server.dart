@@ -75,6 +75,14 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         });
         break;
         
+      case 'EDITOR_SAVE':
+        // List[0] = data, List[1] = path.
+        List<String> data = cm.body().split('[[PATH]]');
+
+        var fileToSave = new File(data[1]);
+        fileToSave.writeAsString(data[0]);
+        break;
+        
       case 'CONSOLE_COMMAND':
         // It's a Console command.
         log.info('Client sent: $s');

@@ -26,16 +26,17 @@ if __name__ == '__main__':
 class UpDroidEditor {
   WebSocket ws;
   int id;
-  
-  AnchorElement themeButton;
+
   AnchorElement saveButton;
+  AnchorElement themeButton;
   
   Editor aceEditor;
+  String openFile;
   
   UpDroidEditor(WebSocket ws, int id) {
     this.ws = ws;
-    themeButton = querySelector('#button-editor-theme');
     saveButton = querySelector('#button-save');
+    themeButton = querySelector('#button-editor-theme');
     
     setUpEditor();
     registerEditorEventHandlers();
@@ -53,6 +54,10 @@ class UpDroidEditor {
   }
   
   void registerEditorEventHandlers() {
+    saveButton.onClick.listen((e) {
+      ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
+    });
+    
     themeButton.onClick.listen((e) {
       if (aceEditor.theme.name == 'solarized_dark') {
         aceEditor.theme = new Theme.named(Theme.SOLARIZED_LIGHT);
@@ -63,13 +68,9 @@ class UpDroidEditor {
       // Stops the button from sending the page to the top (href=#).
       e.preventDefault();
     });
-    
-    /*saveButton.onClick.listen((e) {
-      ws.send('REQUEST_SAVE' + editor.value + 'PATH' + );
-    });*/
   }
   
-  void openText(String s) {
-    aceEditor.setValue(s);
+  void openText(String text) {
+    aceEditor.setValue(text);
   }
 }

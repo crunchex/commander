@@ -27,6 +27,8 @@ void setUpBootstrap() {
   Tab.use();
   Button.use();
   Dropdown.use();
+  Modal.use();
+  //Transition.use();
 }
 
 void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplorer fe, UpDroidConsole cs) {
@@ -45,6 +47,7 @@ void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplo
         
       case 'EXPLORER_DIRECTORY_PATH':
         fe.absolutePathPrefix = cm.body();
+        ed.absolutePathPrefix = cm.body();
         break;
         
       case 'EDITOR_FILE_TEXT':

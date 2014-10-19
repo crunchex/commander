@@ -26,9 +26,13 @@ if __name__ == '__main__':
 class UpDroidEditor {
   WebSocket ws;
   int id;
+  String absolutePathPrefix;
 
   AnchorElement saveButton;
+  AnchorElement newButton;
   AnchorElement themeButton;
+  ButtonElement modalSaveButton;
+  ButtonElement modalDiscardButton;
   
   Editor aceEditor;
   String openFile;
@@ -36,7 +40,10 @@ class UpDroidEditor {
   UpDroidEditor(WebSocket ws, int id) {
     this.ws = ws;
     saveButton = querySelector('#button-save');
+    newButton = querySelector('#button-new');
     themeButton = querySelector('#button-editor-theme');
+    modalSaveButton = querySelector('#modal-save');
+    modalDiscardButton = querySelector('#modal-discard');
     
     setUpEditor();
     registerEditorEventHandlers();
@@ -49,13 +56,26 @@ class UpDroidEditor {
     aceEditor
       ..session.mode = new Mode.named(Mode.PYTHON)
       ..fontSize = 14
-      ..theme = new Theme.named(Theme.SOLARIZED_DARK)
-      ..setValue(ROS_TALKER, -1);
+      ..theme = new Theme.named(Theme.SOLARIZED_DARK);
   }
   
   void registerEditorEventHandlers() {
-    saveButton.onClick.listen((e) {
-      ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
+    saveButton.onClick.listen((e) => saveText());
+    
+    newButton.onClick.listen((e) {
+      ParagraphElement p = querySelector('#modal-save-text');
+      p.appendText('You have made more changes since the last save. Save these changes?');
+    });
+    
+    modalSaveButton.onClick.listen((e) {
+      saveText();
+      openFile = absolutePathPrefix + 'untitled.cc';
+      aceEditor.setValue(ROS_TALKER, 1);
+    });
+    
+    modalDiscardButton.onClick.listen((e) {
+      openFile = absolutePathPrefix + 'untitled.cc';
+      aceEditor.setValue(ROS_TALKER, 1);
     });
     
     themeButton.onClick.listen((e) {
@@ -70,7 +90,6 @@ class UpDroidEditor {
     });
   }
   
-  void openText(String text) {
-    aceEditor.setValue(text);
-  }
+  String openText(String text) => aceEditor.setValue(text);
+  void saveText() => ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
 }

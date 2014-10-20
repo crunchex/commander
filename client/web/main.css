@@ -49,6 +49,11 @@ body {
   list-style-type: none;
 }
 
+#column-content .nav-tabs,
+#column-content2 .nav-tabs {
+  border-bottom-width: 0px;
+}
+
 .nav .nav-tabs .inner-tabs {
   border-left-width: 1px;
   border-bottom-width: 0px;
@@ -126,6 +131,14 @@ body {
 
 #editor.editor-entered {
   border-color: #ffffff;
+}
+
+.tab-content {
+  border: 1px solid #dddddd;
+}
+
+#input-group {
+  border: 1px solid #dddddd;
 }
 
 #recycle {

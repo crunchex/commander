@@ -4,20 +4,17 @@ class UpDroidExplorer {
   WebSocket ws;
   UpDroidEditor ed;
   String absolutePathPrefix;
-  
-  DivElement editorDiv;
-  Dropzone dzEditor;
 
   ParagraphElement recycle;
   Dropzone dzRecycle;
+  Dropzone dzEditor;
   
   UpDroidExplorer(WebSocket ws, UpDroidEditor ed) {
     this.ws = ws;
     this.ed = ed;
     absolutePathPrefix = '';
-    
-    editorDiv = querySelector('#editor');
-    dzEditor = new Dropzone(editorDiv);
+
+    dzEditor = new Dropzone(ed.editorDiv);
     
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
@@ -38,11 +35,11 @@ class UpDroidExplorer {
     dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        editorDiv.classes.add('editor-entered');
+        ed.editorDiv.classes.add('editor-entered');
       }
     });
     
-    dzEditor.onDragLeave.listen((e) => editorDiv.classes.remove('editor-entered'));
+    dzEditor.onDragLeave.listen((e) => ed.editorDiv.classes.remove('editor-entered'));
     
     dzEditor.onDrop.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
@@ -116,13 +113,13 @@ class UpDroidExplorer {
       d.onDragStart.listen((event) {
         recycle.classes.add('recycle-ondrag');
         if (!file.isDirectory) {
-          editorDiv.classes.add('editor-ondrag');
+          ed.editorDiv.classes.add('editor-ondrag');
         }
       });
       
       d.onDragEnd.listen((event) {
         recycle.classes.remove('recycle-ondrag');
-        editorDiv.classes.remove('editor-ondrag');
+        ed.editorDiv.classes.remove('editor-ondrag');
       });
       
       UListElement dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');

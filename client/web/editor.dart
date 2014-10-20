@@ -25,7 +25,6 @@ if __name__ == '__main__':
 
 class UpDroidEditor {
   WebSocket ws;
-  int id;
   String absolutePathPrefix;
 
   AnchorElement saveButton;
@@ -33,17 +32,21 @@ class UpDroidEditor {
   AnchorElement themeButton;
   ButtonElement modalSaveButton;
   ButtonElement modalDiscardButton;
+  DivElement editorDiv;
   
   Editor aceEditor;
   String openFile;
   
-  UpDroidEditor(WebSocket ws, int id) {
+  UpDroidEditor(WebSocket ws, DivElement div) {
     this.ws = ws;
+    editorDiv = div;
+    
     saveButton = querySelector('#button-save');
     newButton = querySelector('#button-new');
     themeButton = querySelector('#button-editor-theme');
     modalSaveButton = querySelector('#modal-save');
     modalDiscardButton = querySelector('#modal-discard');
+    
     
     setUpEditor();
     registerEditorEventHandlers();

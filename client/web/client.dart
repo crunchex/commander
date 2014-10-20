@@ -16,7 +16,10 @@ void main() {
   setUpBootstrap();
   
   WebSocket ws = new WebSocket('ws://localhost:8080/ws');
-  UpDroidEditor ed = new UpDroidEditor(ws, 1);
+  
+  DivElement editorDiv = querySelector('#editor');
+  UpDroidEditor ed = new UpDroidEditor(ws, editorDiv);
+  
   UpDroidExplorer fe = new UpDroidExplorer(ws, ed);
   UpDroidConsole cs = new UpDroidConsole(ws);
   

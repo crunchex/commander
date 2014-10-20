@@ -42,7 +42,7 @@ void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplo
     
     switch (cm.header()) {
       case 'EXPLORER_DIRECTORY_LIST':
-        fe.updateFileExplorer(cm.body());
+        fe.syncExplorer(cm.body());
         break;
         
       case 'EXPLORER_DIRECTORY_PATH':

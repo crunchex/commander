@@ -70,25 +70,31 @@ class UpDroidExplorer {
     });
   }
   
-  void updateFileExplorer(String data) {
-    // Set the explorer list to empty for a full refresh.
-    UListElement explorer = querySelector('#explorer-top');
-    explorer.innerHtml = '';
+  /// Returns a list of file objects from the flattened
+  /// string returned from the server.
+  List<SimpleFile> fileList(String data) {
+    var files = [];
     
     // Strip the brackets/single-quotes and split by ','.
     data = data.replaceAll(new RegExp(r"(\[|\]|')"), '');
     List<String> entities = data.split(',');
     
     // Build SimpleFile list our of raw strings.
-    var files = [];
     for (String entity in entities) {
       files.add(new SimpleFile(entity, absolutePathPrefix));
     }
     
-    // Sorting the files results in a null object exception for some reason.
-    //files.sort();
+    return files;
+  }
+  
+  void syncExplorer(String data) {
+    var files = fileList(data);
+    
+    // Set the explorer list to empty for a full refresh.
+    UListElement explorer = querySelector('#explorer-top');
+    explorer.innerHtml = '';
 
-    // Refresh the FileExplorer.
+    // Generate the HTML for the File Explorer.
     UListElement dirElement;
     for (SimpleFile file in files) {
       dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');

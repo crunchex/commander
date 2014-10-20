@@ -15,7 +15,7 @@ class UpDroidConsole {
     input = querySelector('#input');
     output = querySelector('#output');
     consoleButton = querySelector('#button-console');
-    themeButton = querySelector('#button-console-theme');
+    themeButton = querySelector('.button-console-theme');
     
     registerConsoleEventHandlers();
   }

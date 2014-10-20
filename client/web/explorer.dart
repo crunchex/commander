@@ -26,40 +26,23 @@ class UpDroidExplorer {
   }
   
   registerExplorerEventHandlers() {
-    dzRecycle.onDragEnter.listen((e) {
-      recycle.style
-        ..color = '#ffffff'
-        ..borderColor = '#ffffff';
-    });
-    
-    dzRecycle.onDragLeave.listen((e) {
-      recycle.style
-        ..color = '#268bd2'
-        ..borderColor = '#268bd2';
-    });
+    dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));
+    dzRecycle.onDragLeave.listen((e) => recycle.classes.remove('recycle-entered'));
     
     dzRecycle.onDrop.listen((e) {
       var path = e.draggableElement.dataset['path'];
       ws.send('[[EXPLORER_DELETE]]' + path);
     });
     
-    // This is buggy - doesn't reliably get set when entered
-    // from the left side.
+    // Dragging through nested dropzones appears to be glitchy
     dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        editorDiv.style
-          ..borderColor = '#ffffff';
+        editorDiv.classes.add('editor-entered');
       }
     });
     
-    dzEditor.onDragLeave.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        editorDiv.style
-          ..borderColor = '#268bd2';
-      }
-    });
+    dzEditor.onDragLeave.listen((e) => editorDiv.classes.remove('editor-entered'));
     
     dzEditor.onDrop.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
@@ -124,24 +107,18 @@ class UpDroidExplorer {
       
       Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
       
+      // Dragging through nested dropzones appears to be glitchy
       d.onDragStart.listen((event) {
-        recycle.style
-          ..color = '#268bd2'
-          ..borderColor = '#268bd2';
+        recycle.classes.add('recycle-ondrag');
+        print(recycle.classes);
         if (!file.isDirectory) {
-          editorDiv.style
-            ..borderColor = '#268bd2';
+          editorDiv.classes.add('editor-ondrag');
         }
       });
       
       d.onDragEnd.listen((event) {
-        recycle.style
-          ..color = '#333333'
-          ..borderColor = '#dddddd';
-        if (!file.isDirectory) {
-          editorDiv.style
-            ..borderColor = '#dddddd';
-        }
+        recycle.classes.remove('recycle-ondrag');
+        editorDiv.classes.remove('editor-ondrag');
       });
       
       dirElement.children.add(li);

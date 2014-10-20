@@ -120,6 +120,14 @@ body {
   border: 1px solid #dddddd;
 }
 
+#editor.editor-ondrag {
+  border-color: #268bd2;
+}
+
+#editor.editor-entered {
+  border-color: #ffffff;
+}
+
 #recycle {
   margin-top: 20px;
   margin-bottom: 0px;
@@ -127,6 +135,16 @@ body {
   text-align: center;
   color: #333333;
   border: 1px solid #dddddd;
+}
+
+#recycle.recycle-ondrag {
+  color: #268bd2;
+  border-color: #268bd2;
+}
+
+#recycle.recycle-entered {
+  color: #ffffff;
+  border-color: #ffffff;
 }
 
 #row-main {

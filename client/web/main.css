@@ -58,15 +58,21 @@ body {
   border-color: #dddddd;
 }
 
-.inner-tabs > li > a,
-.inner-tabs > li > a:hover {
-  border-color: transparent;
-  background-color: transparent;
-  margin: -8px;
+.inner-tabs .dropdown-toggle {
+  border-width: 0px;
+  padding: 5px 10px 5px 10px;
 }
 
-.inner-tabs > li > a:hover {
+.inner-tabs .dropdown-toggle:hover,
+.inner-tabs .dropdown-toggle:focus {
+  background-color: #ffffff;
   color: #dddddd;
+}
+
+.nav .open>a,
+.nav .open>a:hover,
+.nav .open>a:focus {
+  background-color: transparent;
 }
 
 .footer {

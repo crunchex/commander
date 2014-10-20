@@ -32,7 +32,7 @@
         </div>
       </div>
 
-      <div id="column-content" class="col-md-5">
+      <div id="column-1" class="col-md-5 column-content">
         <ul class="nav nav-tabs" role="tablist">
           <li class="active"><a id="button-editor" href="#tab-editor-container" data-toggle="tab">Editor</a></li>
           <li><a href="#video_tab" data-toggle="tab">Video</a></li>
@@ -41,14 +41,14 @@
         <div class="tab-content">
           <div id="tab-editor-container" class="tab-pane active">
             <ul class="nav nav-tabs inner-tabs" role="tablist">
-              <li><a id="button-save" href="#">Save</a></li>
-              <li><a id="button-new" role="button" href="#myModal" data-toggle="modal">New</a></li>
-              <li><a id="button-editor-theme" href="#">Theme</a></li>
+              <li><a href="#" class="button-save">Save</a></li>
+              <li><a role="button" href="#myModal" class="button-new" data-toggle="modal">New</a></li>
+              <li><a href="#" class="button-editor-theme">Theme</a></li>
             </ul>
             
             <div class="tab-content">
               <div id="tab-editor" class="tab-pane active">
-                <div id="editor"></div>
+                <div id="editor-1" class="editor"></div>
               </div>
             </div>
           </div>
@@ -59,7 +59,7 @@
         </div>
       </div>
       
-      <div id="column-content2" class="col-md-5">
+      <div id="column-2" class="col-md-5 column-content">
         <ul class="nav nav-tabs" role="tablist">
           <li class="active"><a id="button-console" href="#tab-console-container" data-toggle="tab">Console</a></li>
         </ul>
@@ -94,8 +94,8 @@
           <p id="modal-save-text"></p>
         </div>
         <div class="modal-footer">
-          <button id="modal-discard" class="btn btn-warning" data-dismiss="modal">Nope</button>
-          <button id="modal-save" class="btn btn-primary">Save</button>
+          <button class="btn btn-warning modal-discard" data-dismiss="modal">Nope</button>
+          <button class="btn btn-primary modal-save">Save</button>
         </div>
       </div>
     </div>

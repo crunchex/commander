@@ -37,16 +37,15 @@ class UpDroidEditor {
   Editor aceEditor;
   String openFile;
   
-  UpDroidEditor(WebSocket ws, DivElement div) {
+  UpDroidEditor(WebSocket ws, int editorID) {
     this.ws = ws;
-    editorDiv = div;
+    editorDiv = querySelector('#editor-$editorID');
     
-    saveButton = querySelector('#button-save');
-    newButton = querySelector('#button-new');
-    themeButton = querySelector('#button-editor-theme');
-    modalSaveButton = querySelector('#modal-save');
-    modalDiscardButton = querySelector('#modal-discard');
-    
+    saveButton = querySelector('#column-${editorID} .button-save');
+    newButton = querySelector('#column-${editorID} .button-new');
+    themeButton = querySelector('#column-${editorID} .button-editor-theme');
+    modalSaveButton = querySelector('.modal-save');
+    modalDiscardButton = querySelector('.modal-discard');
     
     setUpEditor();
     registerEditorEventHandlers();
@@ -55,7 +54,7 @@ class UpDroidEditor {
   void setUpEditor() {
     implementation = ACE_PROXY_IMPLEMENTATION;
     
-    aceEditor = edit(querySelector('#editor'));
+    aceEditor = edit(editorDiv);
     aceEditor
       ..session.mode = new Mode.named(Mode.PYTHON)
       ..fontSize = 14

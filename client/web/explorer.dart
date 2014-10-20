@@ -53,8 +53,8 @@ class UpDroidExplorer {
     });
   }
   
-  /// Returns a list of file objects from the flattened
-  /// string returned from the server.
+  /// Returns a list of file objects from the flattened string returned from
+  /// the server.
   List<SimpleFile> fileList(String data) {
     var files = [];
     
@@ -70,6 +70,35 @@ class UpDroidExplorer {
     return files;
   }
   
+  /// Returns a generated LIElement with inner HTML based on the SimpleFile's
+  /// contents.
+  LIElement generateLiHtml(file) {
+    LIElement li = new LIElement();
+    li
+      ..id = file.name
+      ..dataset['path'] = file.path
+      ..dataset['isDir'] = file.isDirectory.toString()
+      ..draggable = true
+      ..classes.add('explorer-li');
+    
+    SpanElement span = new SpanElement();
+    var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
+    span.classes.addAll(['glyphicon', glyphType]);
+    li.children.add(span);
+    
+    li.appendHtml(' ${file.name}');
+    
+    if (file.isDirectory) {
+      UListElement ul = new UListElement();
+      ul
+        ..id = 'explorer-ul-${file.name}'
+        ..classes.addAll(['explorer', 'explorer-ul']);
+      li.children.add(ul);
+    }
+    
+    return li;
+  }
+  
   void syncExplorer(String data) {
     var files = fileList(data);
     
@@ -78,39 +107,14 @@ class UpDroidExplorer {
     explorer.innerHtml = '';
 
     // Generate the HTML for the File Explorer.
-    UListElement dirElement;
     for (SimpleFile file in files) {
-      dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
-
-      LIElement li = new LIElement();
-      li
-        ..id = file.name
-        ..dataset['path'] = file.path
-        ..dataset['isDir'] = file.isDirectory.toString()
-        ..draggable = true
-        ..classes.add('explorer-li');
-      
-      SpanElement span = new SpanElement();
-      var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
-      span.classes.addAll(['glyphicon', glyphType]);
-      li.children.add(span);
-      
-      li.appendHtml(' ${file.name}');
-      
-      if (file.isDirectory) {
-        UListElement ul = new UListElement();
-        ul
-          ..id = 'explorer-ul-${file.name}'
-          ..classes.addAll(['explorer', 'explorer-ul']);
-        li.children.add(ul);
-      }
+      LIElement li = generateLiHtml(file);
       
       Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
       
       // Dragging through nested dropzones appears to be glitchy
       d.onDragStart.listen((event) {
         recycle.classes.add('recycle-ondrag');
-        print(recycle.classes);
         if (!file.isDirectory) {
           editorDiv.classes.add('editor-ondrag');
         }
@@ -121,6 +125,7 @@ class UpDroidExplorer {
         editorDiv.classes.remove('editor-ondrag');
       });
       
+      UListElement dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
       dirElement.children.add(li);
     }
   }

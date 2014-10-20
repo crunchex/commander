@@ -30,7 +30,7 @@ void setUpBootstrap() {
   Button.use();
   Dropdown.use();
   Modal.use();
-  //Transition.use();
+  Transition.use();
 }
 
 void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplorer fe, UpDroidConsole cs) {

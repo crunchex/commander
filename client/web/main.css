@@ -53,10 +53,9 @@ body {
   border-bottom-width: 0px;
 }
 
-.nav .nav-tabs .inner-tabs {
-  border-left-width: 1px;
-  border-bottom-width: 0px;
-  border-color: #000;
+.nav.nav-tabs.inner-tabs {
+  border-bottom-width: 1px;
+  border-color: #dddddd;
 }
 
 .inner-tabs > li > a,

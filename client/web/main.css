@@ -59,19 +59,27 @@ body {
 }
 
 .inner-tabs .dropdown-toggle {
-  border-width: 0px;
+  border-width: 0px 0px 1px 0px;
   padding: 5px 10px 5px 10px;
 }
 
-.inner-tabs .dropdown-toggle:hover,
-.inner-tabs .dropdown-toggle:focus {
+.inner-tabs .dropdown-toggle:hover {
+  border-color: #dddddd;
   background-color: #ffffff;
   color: #dddddd;
+}
+
+.inner-tabs .dropdown-toggle:focus {
+  border-color: #dddddd;
+  background-color: #ffffff;
+  color: #2780e3;
 }
 
 .nav .open>a,
 .nav .open>a:hover,
 .nav .open>a:focus {
+  border-width: 0px 0px 1px 0px;
+  border-color: #dddddd;
   background-color: transparent;
 }
 

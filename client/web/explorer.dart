@@ -1,5 +1,8 @@
 part of client;
 
+/// [UpDroidExplorer] manages the data for the file explorer on the client
+/// side and all associated views. It also facilitates file operation requests
+/// to the server side.
 class UpDroidExplorer {
   WebSocket ws;
   UpDroidEditor ed;
@@ -22,6 +25,7 @@ class UpDroidExplorer {
     registerExplorerEventHandlers();
   }
   
+  /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
     dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));
     dzRecycle.onDragLeave.listen((e) => recycle.classes.remove('recycle-entered'));
@@ -67,7 +71,7 @@ class UpDroidExplorer {
     return files;
   }
   
-  /// Returns a generated LIElement with inner HTML based on the SimpleFile's
+  /// Returns a generated [LIElement] with inner HTML based on the [SimpleFile]'s
   /// contents.
   LIElement generateLiHtml(file) {
     LIElement li = new LIElement();
@@ -96,6 +100,7 @@ class UpDroidExplorer {
     return li;
   }
   
+  /// Redraws all file explorer views.
   void syncExplorer(String data) {
     var files = fileList(data);
     
@@ -128,6 +133,9 @@ class UpDroidExplorer {
   }
 }
 
+/// Container class that extracts data from the raw file text passed in from
+/// the server over [WebSocket]. Primarily used for generating the HTML views
+/// in the file explorer that represent the filesystem.
 class SimpleFile implements Comparable {
   String raw;
   String path;

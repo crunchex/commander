@@ -25,6 +25,7 @@ void main() {
   registerWebSocketEventHandlers(ws, ed, fe, cs);
 }
 
+/// Activates Bootjack features.
 void setUpBootstrap() {
   Tab.use();
   Button.use();
@@ -33,6 +34,8 @@ void setUpBootstrap() {
   Transition.use();
 }
 
+/// Sets up external event handlers for the various Commander classes. These
+/// are mostly listening events for [WebSocket] messages.
 void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplorer fe, UpDroidConsole cs) {
   ws.onOpen.listen((Event e) {
       cs.updateOutputField('Connected to updroid!');
@@ -70,6 +73,8 @@ void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplo
   });
 }
 
+/// Container class that extracts the header (denoted with double brackets)
+/// and body from the raw text of a [WebSocket] message.
 class CommanderMessage {
   final String s;
   

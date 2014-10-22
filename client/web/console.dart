@@ -1,5 +1,8 @@
 part of client;
 
+/// [UpDroidConsole] functions like a trimmed down terminal that allows the
+/// user to pass in white-listed commands to the server and view their output.
+/// It is not meant to be a complete terminal emulator like xterm.
 class UpDroidConsole {
   WebSocket ws;
   
@@ -20,6 +23,7 @@ class UpDroidConsole {
     registerConsoleEventHandlers();
   }
 
+  /// Sets up the event handlers for the console.
   void registerConsoleEventHandlers() {
     input.onChange.listen((e) {
       ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());
@@ -32,19 +36,25 @@ class UpDroidConsole {
     });
     
     consoleButton.onClick.listen((e) {
-      // This is broken.
+      // This is broken. It's supposed to move the cursor focus over to
+      // the input field when a user selects the Console tab.
       input.focus();
     });
   }
 
+  /// Updates the output field based on string messages passed in over the
+  /// [WebSocket]. Everything coming in here should be the result of passing a
+  /// command over the input, since everything else would have been filtered
+  /// out with the message headers.
   void updateOutputField(String message) {
     output.appendText('up> ${message}');
     output.appendHtml('<br/>');
 
-    // Make sure we 'autoscroll' the new messages.
+    // Autoscroll the new messages as they come in.
     output.scrollTop = output.scrollHeight;
   }
   
+  /// Toggles between a Solarized dark and light theme.
   void toggleTheme() {
     if (inputGroup.style.backgroundColor == 'rgb(238, 232, 213)') {
       inputGroup.style.backgroundColor = '#002b36'; // base-green

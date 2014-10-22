@@ -11,6 +11,8 @@ import 'terminal_commands.dart';
 
 final Logger log = new Logger('server');
 
+/// Recursively traverses the given directory path and asynchronously
+/// returns a list of filesystem entities.
 Future<List<FileSystemEntity>> getDirContents(Directory dir) {
   var files = <FileSystemEntity>[];
   var completer = new Completer();
@@ -23,6 +25,8 @@ Future<List<FileSystemEntity>> getDirContents(Directory dir) {
   return completer.future;
 }
 
+/// Container class that extracts the header (denoted with double brackets)
+/// and body from the raw text of a [WebSocket] message.
 class CommanderMessage {
   final String s;
   
@@ -36,6 +40,8 @@ class CommanderMessage {
   String body() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
 }
 
+/// Handler for the [WebSocket]. Performs various actions depending on requests
+/// it receives or local events that it detects.
 void handleWebSocket(WebSocket socket, Directory dir) {
   log.info('Client connected!');
   
@@ -47,7 +53,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         socket.add('[[EXPLORER_DIRECTORY_PATH]]' + dir.path);
         
         // Since it is assumed DirectoryPath is only requested on open,
-        // Also send the initial directory list.
+        // also send the initial directory list.
         getDirContents(dir).then((files) {
           socket.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
         });
@@ -56,7 +62,9 @@ void handleWebSocket(WebSocket socket, Directory dir) {
       case 'EXPLORER_DELETE':
         var path = cm.body();
               
-        // Can't just create a FileSystemEntity and delete it.
+        // Can't simply just create a FileSystemEntity and delete it, since
+        // it is an abstract class. This is a dumb way to create the proper
+        // entity class.
         try {
           var dirToDelete = new Directory(path);
           dirToDelete.delete(recursive:true);
@@ -109,12 +117,16 @@ void main(List<String> args) {
   var dir = Directory.current;
   Logger.root.onRecord.listen(new SyncFileLoggingHandler("server.log"));
   
+  // Allow the user to specify what directory to use for the Commander's
+  // server-side filesystem.
   var parser = new ArgParser();
   parser.addOption('directory', abbr: 'd', defaultsTo: Directory.current.toString(), callback: (directory) {
     dir = new Directory(directory);
   });
   var results = parser.parse(args);
   
+  // Set up an HTTP webserver and listen for standard page requests or upgraded
+  // [WebSocket] requests.
   HttpServer.bind(InternetAddress.ANY_IP_V4, 8080).then((HttpServer server) {
     log.info("HttpServer listening on port:${server.port}...");
     server.listen((HttpRequest request) {

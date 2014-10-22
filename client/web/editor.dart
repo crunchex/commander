@@ -1,5 +1,7 @@
 part of client;
 
+// Template for a new file.
+// TODO: make this contain boilerplate ROS code
 const String ROS_TALKER =
 r'''
 #!/usr/bin/env python
@@ -23,6 +25,8 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException: pass
 ''';
 
+/// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
+/// for the editor and an additional menu bar with some filesystem operations.
 class UpDroidEditor {
   WebSocket ws;
   String absolutePathPrefix;
@@ -51,6 +55,7 @@ class UpDroidEditor {
     registerEditorEventHandlers();
   }
 
+  /// Sets up the editor and styles.
   void setUpEditor() {
     implementation = ACE_PROXY_IMPLEMENTATION;
     
@@ -61,6 +66,7 @@ class UpDroidEditor {
       ..theme = new Theme.named(Theme.SOLARIZED_DARK);
   }
   
+  /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
     saveButton.onClick.listen((e) => saveText());
     
@@ -92,6 +98,7 @@ class UpDroidEditor {
     });
   }
   
+  // Helper methods for filesystem operations.
   String openText(String text) => aceEditor.setValue(text);
   void saveText() => ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
 }

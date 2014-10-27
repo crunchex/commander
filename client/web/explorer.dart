@@ -136,7 +136,7 @@ class UpDroidExplorer {
 /// Container class that extracts data from the raw file text passed in from
 /// the server over [WebSocket]. Primarily used for generating the HTML views
 /// in the file explorer that represent the filesystem.
-class SimpleFile implements Comparable {
+class SimpleFile {
   String raw;
   String path;
   bool isDirectory;
@@ -147,11 +147,6 @@ class SimpleFile implements Comparable {
     this.raw = raw;
     String workingString = stripFormatting(raw, prefix);
     getData(workingString);
-  }
-  
-  @override
-  int compareTo(SimpleFile other) {
-    return name.compareTo(other.name);
   }
   
   String stripFormatting(String raw, String prefix) {

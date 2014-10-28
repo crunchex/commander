@@ -112,7 +112,10 @@ class UpDroidExplorer {
       d.onDrop.listen((e) {
         var currentPath = e.draggableElement.dataset['path'];
         var newPath = '${span.parent.dataset['path']}/${e.draggableElement.id}';
-        ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+        // Avoid an exception thrown when the new name already exists.
+        if (currentPath != span.parent.dataset['path']) {
+          ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+        }
       });
     }
   }

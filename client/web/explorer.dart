@@ -172,7 +172,12 @@ class UpDroidExplorer {
       LIElement li = generateLiHtml(file);
       
       // Register double-click event handler for file renaming.
-      li.onDoubleClick.listen((e) => renameEventHandler(li, file));
+      li.onDoubleClick.listen((e) {
+        renameEventHandler(li, file);
+        // To prevent the rename event from propagating up the directory tree.
+        // Not sure what the difference is between this and stopPropagation().
+        e.stopImmediatePropagation();
+      });
       
       // Set up drag and drop for file open & delete.
       dragDropSetup(li, file);

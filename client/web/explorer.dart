@@ -85,6 +85,10 @@ class UpDroidExplorer {
     SpanElement span = new SpanElement();
     var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
     span.classes.addAll(['glyphicon', glyphType]);
+    span.id = file.name;
+    
+    dropSetup(span, file);
+    
     li.children.add(span);
     
     li.appendHtml(' ${file.name}');
@@ -98,6 +102,24 @@ class UpDroidExplorer {
     }
     
     return li;
+  }
+  
+  /// Sets up a [Dropzone] for the [SpanElement] to handle file moves.
+  void dropSetup(SpanElement span, SimpleFile file) {
+    if (file.isDirectory) {
+      Dropzone d = new Dropzone(span);
+      
+      d.onDragEnter.listen((e) => span.classes.add('span-entered'));
+      d.onDragLeave.listen((e) => span.classes.remove('span-entered'));
+  
+      d.onDrop.listen((e) {
+        var currentPath = e.draggableElement.dataset['path'];
+        print('current path: $currentPath');
+        var newPath = '${span.parent.dataset['path']}/${e.draggableElement.id}';
+        print('new path: $newPath');
+        //ws.send('[[EXPLORER_MOVE]]' + currentPath + [[PATH]] + newPath);
+      });
+    }
   }
   
   /// Handles file renaming with a double-click event.
@@ -139,8 +161,8 @@ class UpDroidExplorer {
     }
   }
   
-  /// Sets up drag-and-drop for the [LIElement] to handle file open and delete.
-  void dragDropSetup(LIElement li, SimpleFile file) {
+  /// Sets up a [Draggable] for the [LIElement] to handle file open and delete.
+  void dragSetup(LIElement li, SimpleFile file) {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
     Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
@@ -180,7 +202,7 @@ class UpDroidExplorer {
       });
       
       // Set up drag and drop for file open & delete.
-      dragDropSetup(li, file);
+      dragSetup(li, file);
       
       UListElement dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
       dirElement.children.add(li);

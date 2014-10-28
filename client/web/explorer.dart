@@ -120,6 +120,7 @@ class UpDroidExplorer {
       // TODO: need to make field width scale to the user's input.
       // Using a 'contenteditable' <span> instead of an <input> is a possible option.
       input.width = 100;
+      input.placeholder = file.name;
       
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);

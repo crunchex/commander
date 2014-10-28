@@ -37,6 +37,14 @@ body {
   margin-right: 4px;
 }
 
+.span-ondrag {
+  color: #268bd2;
+}
+
+.span-entered {
+  color: #ffffff;
+}
+
 .explorer-ul-top > .explorer-li {
     margin-left: -38px;
 }

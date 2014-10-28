@@ -85,10 +85,7 @@ class UpDroidExplorer {
     SpanElement span = new SpanElement();
     var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
     span.classes.addAll(['glyphicon', glyphType]);
-    span.id = file.name;
-    
     dropSetup(span, file);
-    
     li.children.add(span);
     
     li.appendHtml(' ${file.name}');
@@ -168,6 +165,10 @@ class UpDroidExplorer {
     // Dragging through nested dropzones appears to be glitchy.
     d.onDragStart.listen((event) {
       recycle.classes.add('recycle-ondrag');
+      List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      for (SpanElement span in spanList) {
+        span.classes.add('span-ondrag');
+      }
       if (!file.isDirectory) {
         ed.editorDiv.classes.add('editor-ondrag');
       }
@@ -175,7 +176,10 @@ class UpDroidExplorer {
     
     d.onDragEnd.listen((event) {
       recycle.classes.remove('recycle-ondrag');
-      ed.editorDiv.classes.remove('editor-ondrag');
+      List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      for (SpanElement span in spanList) {
+        span.classes.remove('span-ondrag');
+      }
     });
   }
   

@@ -114,10 +114,8 @@ class UpDroidExplorer {
   
       d.onDrop.listen((e) {
         var currentPath = e.draggableElement.dataset['path'];
-        print('current path: $currentPath');
         var newPath = '${span.parent.dataset['path']}/${e.draggableElement.id}';
-        print('new path: $newPath');
-        //ws.send('[[EXPLORER_MOVE]]' + currentPath + [[PATH]] + newPath);
+        ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
       });
     }
   }

@@ -70,6 +70,20 @@ void handleWebSocket(WebSocket socket, Directory dir) {
           dirToRename.rename(renameArgs[1]);
         }
         break;
+      
+      // Currently implemented in the same way as RENAME as there is no
+      // direct API for MOVE.
+      case 'EXPLORER_MOVE':
+        List<String> renameArgs = cm.body().split(' ');
+        
+        if (!FileSystemEntity.isDirectorySync(renameArgs[0])) {
+          var fileToRename = new File(renameArgs[0]);
+          fileToRename.rename(renameArgs[1]);
+        } else {
+          var dirToRename = new Directory(renameArgs[0]);
+          dirToRename.rename(renameArgs[1]);
+        }
+        break;
 
       case 'EXPLORER_DELETE':
         var path = cm.body();

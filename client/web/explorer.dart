@@ -112,6 +112,40 @@ class UpDroidExplorer {
     for (SimpleFile file in files) {
       LIElement li = generateLiHtml(file);
       
+      // Listen for a click to rename the file.
+      li.onClick.listen((e) {
+        if (!li.className.contains('editing')) {
+          li.classes.add('editing');
+          
+          // Save the text in case editing is cancelled. This does not save
+          // the glyphicon, so it will need to be recreated once editing is done.
+          var currentName = li.id;
+          var currentPath = li.dataset['path'];
+          li.text = '';
+          
+          SpanElement span = new SpanElement();
+          var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
+          span.classes.addAll(['glyphicon', glyphType]);
+          li.children.add(span);
+          InputElement input = new InputElement();
+
+          // TODO: need to make field width scale to the user's input.
+          // Using a 'contenteditable' <span> instead of an <input> is a possible option.
+          input.width = 100;
+          
+          input.onKeyUp.listen((e) {
+            var keyEvent = new KeyEvent.wrap(e);
+            if (keyEvent.keyCode == KeyCode.ENTER) {
+              var newPath = currentPath.replaceFirst(currentName, input.value);
+              ws.send('[[EXPLORER_RENAME]]' + currentPath + ' ' + newPath);
+            }
+          });
+          
+          li.children.add(input);
+        }
+
+      });
+      
       Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
       
       // Dragging through nested dropzones appears to be glitchy

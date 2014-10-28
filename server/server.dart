@@ -104,9 +104,8 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         break;
         
       case 'CONSOLE_COMMAND':
-        // It's a Console command.
         log.info('Client sent: $s');
-        List args = parseCommandInput(s);
+        List args = parseCommandInput(cm.body());
         Process.run(args[0], args[1]).then((ProcessResult results) {
           socket.add('[[CONSOLE_COMMAND]]' + results.stdout);
         });

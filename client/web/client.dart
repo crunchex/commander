@@ -60,7 +60,7 @@ void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplo
         break;
         
       case 'CONSOLE_COMMAND':
-        cs.updateOutputField(e.data);
+        cs.updateOutputField(cm.body());
         break;
         
       default:

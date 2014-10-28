@@ -113,7 +113,7 @@ class UpDroidExplorer {
       LIElement li = generateLiHtml(file);
       
       // Listen for a click to rename the file.
-      li.onClick.listen((e) {
+      li.onDoubleClick.listen((e) {
         if (!li.className.contains('editing')) {
           li.classes.add('editing');
           

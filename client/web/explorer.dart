@@ -100,6 +100,57 @@ class UpDroidExplorer {
     return li;
   }
   
+  /// Handles file renaming with a double-click event.
+  void renameEventHandler(LIElement li, SimpleFile file) {
+    if (!li.className.contains('editing')) {
+      li.classes.add('editing');
+      
+      // Save the text in case editing is cancelled. This does not save
+      // the glyphicon, so it will need to be recreated once editing is done.
+      var currentName = li.id;
+      var currentPath = li.dataset['path'];
+      li.text = '';
+      
+      SpanElement span = new SpanElement();
+      var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
+      span.classes.addAll(['glyphicon', glyphType]);
+      li.children.add(span);
+      InputElement input = new InputElement();
+
+      // TODO: need to make field width scale to the user's input.
+      // Using a 'contenteditable' <span> instead of an <input> is a possible option.
+      input.width = 100;
+      
+      input.onKeyUp.listen((e) {
+        var keyEvent = new KeyEvent.wrap(e);
+        if (keyEvent.keyCode == KeyCode.ENTER) {
+          var newPath = currentPath.replaceFirst(currentName, input.value);
+          ws.send('[[EXPLORER_RENAME]]' + currentPath + ' ' + newPath);
+        }
+      });
+      
+      li.children.add(input);
+    }
+  }
+  
+  /// Sets up drag-and-drop for the [LIElement] to handle file open and delete.
+  void dragDropSetup(LIElement li, SimpleFile file) {
+    Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
+    
+    // Dragging through nested dropzones appears to be glitchy.
+    d.onDragStart.listen((event) {
+      recycle.classes.add('recycle-ondrag');
+      if (!file.isDirectory) {
+        ed.editorDiv.classes.add('editor-ondrag');
+      }
+    });
+    
+    d.onDragEnd.listen((event) {
+      recycle.classes.remove('recycle-ondrag');
+      ed.editorDiv.classes.remove('editor-ondrag');
+    });
+  }
+  
   /// Redraws all file explorer views.
   void syncExplorer(String data) {
     var files = fileList(data);
@@ -112,54 +163,11 @@ class UpDroidExplorer {
     for (SimpleFile file in files) {
       LIElement li = generateLiHtml(file);
       
-      // Listen for a click to rename the file.
-      li.onDoubleClick.listen((e) {
-        if (!li.className.contains('editing')) {
-          li.classes.add('editing');
-          
-          // Save the text in case editing is cancelled. This does not save
-          // the glyphicon, so it will need to be recreated once editing is done.
-          var currentName = li.id;
-          var currentPath = li.dataset['path'];
-          li.text = '';
-          
-          SpanElement span = new SpanElement();
-          var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
-          span.classes.addAll(['glyphicon', glyphType]);
-          li.children.add(span);
-          InputElement input = new InputElement();
-
-          // TODO: need to make field width scale to the user's input.
-          // Using a 'contenteditable' <span> instead of an <input> is a possible option.
-          input.width = 100;
-          
-          input.onKeyUp.listen((e) {
-            var keyEvent = new KeyEvent.wrap(e);
-            if (keyEvent.keyCode == KeyCode.ENTER) {
-              var newPath = currentPath.replaceFirst(currentName, input.value);
-              ws.send('[[EXPLORER_RENAME]]' + currentPath + ' ' + newPath);
-            }
-          });
-          
-          li.children.add(input);
-        }
-
-      });
+      // Register double-click event handler for file renaming.
+      li.onDoubleClick.listen((e) => renameEventHandler(li, file));
       
-      Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
-      
-      // Dragging through nested dropzones appears to be glitchy
-      d.onDragStart.listen((event) {
-        recycle.classes.add('recycle-ondrag');
-        if (!file.isDirectory) {
-          ed.editorDiv.classes.add('editor-ondrag');
-        }
-      });
-      
-      d.onDragEnd.listen((event) {
-        recycle.classes.remove('recycle-ondrag');
-        ed.editorDiv.classes.remove('editor-ondrag');
-      });
+      // Set up drag and drop for file open & delete.
+      dragDropSetup(li, file);
       
       UListElement dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
       dirElement.children.add(li);

@@ -122,11 +122,16 @@ class UpDroidExplorer {
       input.width = 100;
       input.placeholder = file.name;
       
+      // TODO: Fix this - does not work for some reason.
+      input.focus();
+      
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
           var newPath = currentPath.replaceFirst(currentName, input.value);
           ws.send('[[EXPLORER_RENAME]]' + currentPath + ' ' + newPath);
+        } else {
+          //input.size = auto;
         }
       });
       
@@ -136,6 +141,8 @@ class UpDroidExplorer {
   
   /// Sets up drag-and-drop for the [LIElement] to handle file open and delete.
   void dragDropSetup(LIElement li, SimpleFile file) {
+    // Create a new draggable using the current element as
+    // the visual element (avatar) being dragged.
     Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
     
     // Dragging through nested dropzones appears to be glitchy.

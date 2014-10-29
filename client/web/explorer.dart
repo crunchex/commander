@@ -8,7 +8,9 @@ class UpDroidExplorer {
   UpDroidEditor ed;
   String absolutePathPrefix;
 
+  HRElement rootline;
   ParagraphElement recycle;
+  Dropzone dzRootLine;
   Dropzone dzRecycle;
   Dropzone dzEditor;
   
@@ -22,11 +24,23 @@ class UpDroidExplorer {
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
     
+    rootline = querySelector('#file-explorer-hr');
+    dzRootLine = new Dropzone(rootline);
+    
     registerExplorerEventHandlers();
   }
   
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
+    dzRootLine.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
+    dzRootLine.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
+    
+    dzRootLine.onDrop.listen((e) {
+      var currentPath = e.draggableElement.dataset['path'];
+      var newPath = '$absolutePathPrefix${e.draggableElement.id}';
+      ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+    });
+    
     dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));
     dzRecycle.onDragLeave.listen((e) => recycle.classes.remove('recycle-entered'));
     
@@ -167,6 +181,7 @@ class UpDroidExplorer {
     
     // Dragging through nested dropzones appears to be glitchy.
     d.onDragStart.listen((event) {
+      rootline.classes.add('file-explorer-hr-ondrag');
       recycle.classes.add('recycle-ondrag');
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       for (SpanElement span in spanList) {
@@ -178,6 +193,7 @@ class UpDroidExplorer {
     });
     
     d.onDragEnd.listen((event) {
+      rootline.classes.remove('file-explorer-hr-ondrag');
       recycle.classes.remove('recycle-ondrag');
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       for (SpanElement span in spanList) {

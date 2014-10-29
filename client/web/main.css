@@ -137,8 +137,23 @@ body {
 #file-explorer-title {
   margin-top: 0px;
   margin-bottom: 20px;
-  text-align: center;
+  text-align: left;
   font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+}
+
+#file-explorer-hr {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.file-explorer-hr-ondrag {
+  border-top-width: 2px;
+  border-color: #268bd2;
+}
+
+.file-explorer-hr-entered {
+  border-top-width: 2px;
+  border-color: #ffffff;
 }
 
 .editor {

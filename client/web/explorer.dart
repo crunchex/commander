@@ -150,9 +150,6 @@ class UpDroidExplorer {
       var currentPath = li.dataset['path'];
       
       InputElement input = new InputElement();
-      // TODO: need to make field width scale to the user's input.
-      // Using a 'contenteditable' <span> instead of an <input> is a possible option.
-      input.width = 100;
       input.placeholder = file.name;
       
       // TODO: Fix this - does not work for some reason.
@@ -164,6 +161,8 @@ class UpDroidExplorer {
           var newPath = currentPath.replaceFirst(currentName, input.value);
           ws.send('[[EXPLORER_RENAME]]' + currentPath + ' ' + newPath);
         } else {
+          // TODO: need to make field width scale to the user's input.
+          // Using a 'contenteditable' <span> instead of an <input> is a possible option.
           //input.size = auto;
         }
       });

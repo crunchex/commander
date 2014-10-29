@@ -33,8 +33,8 @@ body {
   border-color: #ccc;
 }
 
-.glyphicon {
-  margin-right: 4px;
+.filename {
+  margin-left: 6px;
 }
 
 .span-ondrag {
@@ -156,8 +156,8 @@ body {
   border-color: #ffffff;
 }
 
-span input {
-  margin-left: 4px;
+li input {
+  margin-left: 6px;
 }
 
 .editor {

@@ -96,17 +96,19 @@ class UpDroidExplorer {
       ..draggable = true
       ..classes.add('explorer-li');
     
-    SpanElement span = new SpanElement();
-    
+    // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
     var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
     glyphicon.classes.addAll(['glyphicon', glyphType]);
     dropSetup(glyphicon, file);
-    span.children.add(glyphicon);
+    li.children.add(glyphicon);
 
-    span.appendHtml(' ${file.name}');
-    
-    li.children.add(span);
+    // Hold the text inline with the glyphicon
+    SpanElement filename = new SpanElement();
+    filename
+        ..classes.add('filename')
+        ..text = file.name;
+    li.children.add(filename);
     
     if (file.isDirectory) {
       UListElement ul = new UListElement();
@@ -147,16 +149,6 @@ class UpDroidExplorer {
       var currentName = li.id;
       var currentPath = li.dataset['path'];
       
-      // Create a wrapper span for the glyphicon and input to insert into li.
-      SpanElement span = new SpanElement();
-      
-      // Recreate the glphyicon because it's hard to replace just the text portion of
-      // the top level li.
-      SpanElement glyphicon = new SpanElement();
-      var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
-      glyphicon.classes.addAll(['glyphicon', glyphType]);
-      span.children.add(glyphicon);
-      
       InputElement input = new InputElement();
       // TODO: need to make field width scale to the user's input.
       // Using a 'contenteditable' <span> instead of an <input> is a possible option.
@@ -176,9 +168,8 @@ class UpDroidExplorer {
         }
       });
       
-      span.children.add(input);
-      
-      li.children[0] = span;
+      // Replace child 1 (span filename) with input.
+      li.children[1] = input;
     }
   }
   

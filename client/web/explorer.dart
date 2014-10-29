@@ -8,7 +8,9 @@ class UpDroidExplorer {
   UpDroidEditor ed;
   String absolutePathPrefix;
 
+  HRElement rootline;
   ParagraphElement recycle;
+  Dropzone dzRootLine;
   Dropzone dzRecycle;
   Dropzone dzEditor;
   
@@ -22,11 +24,23 @@ class UpDroidExplorer {
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
     
+    rootline = querySelector('#file-explorer-hr');
+    dzRootLine = new Dropzone(rootline);
+    
     registerExplorerEventHandlers();
   }
   
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
+    dzRootLine.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
+    dzRootLine.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
+    
+    dzRootLine.onDrop.listen((e) {
+      var currentPath = e.draggableElement.dataset['path'];
+      var newPath = '$absolutePathPrefix${e.draggableElement.id}';
+      ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+    });
+    
     dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));
     dzRecycle.onDragLeave.listen((e) => recycle.classes.remove('recycle-entered'));
     
@@ -85,6 +99,7 @@ class UpDroidExplorer {
     SpanElement span = new SpanElement();
     var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
     span.classes.addAll(['glyphicon', glyphType]);
+    dropSetup(span, file);
     li.children.add(span);
     
     li.appendHtml(' ${file.name}');
@@ -98,6 +113,25 @@ class UpDroidExplorer {
     }
     
     return li;
+  }
+  
+  /// Sets up a [Dropzone] for the [SpanElement] to handle file moves.
+  void dropSetup(SpanElement span, SimpleFile file) {
+    if (file.isDirectory) {
+      Dropzone d = new Dropzone(span);
+      
+      d.onDragEnter.listen((e) => span.classes.add('span-entered'));
+      d.onDragLeave.listen((e) => span.classes.remove('span-entered'));
+  
+      d.onDrop.listen((e) {
+        var currentPath = e.draggableElement.dataset['path'];
+        var newPath = '${span.parent.dataset['path']}/${e.draggableElement.id}';
+        // Avoid an exception thrown when the new name already exists.
+        if (currentPath != span.parent.dataset['path']) {
+          ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+        }
+      });
+    }
   }
   
   /// Handles file renaming with a double-click event.
@@ -139,23 +173,32 @@ class UpDroidExplorer {
     }
   }
   
-  /// Sets up drag-and-drop for the [LIElement] to handle file open and delete.
-  void dragDropSetup(LIElement li, SimpleFile file) {
+  /// Sets up a [Draggable] for the [LIElement] to handle file open and delete.
+  void dragSetup(LIElement li, SimpleFile file) {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
     Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
     
     // Dragging through nested dropzones appears to be glitchy.
     d.onDragStart.listen((event) {
+      rootline.classes.add('file-explorer-hr-ondrag');
       recycle.classes.add('recycle-ondrag');
+      List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      for (SpanElement span in spanList) {
+        span.classes.add('span-ondrag');
+      }
       if (!file.isDirectory) {
         ed.editorDiv.classes.add('editor-ondrag');
       }
     });
     
     d.onDragEnd.listen((event) {
+      rootline.classes.remove('file-explorer-hr-ondrag');
       recycle.classes.remove('recycle-ondrag');
-      ed.editorDiv.classes.remove('editor-ondrag');
+      List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      for (SpanElement span in spanList) {
+        span.classes.remove('span-ondrag');
+      }
     });
   }
   
@@ -180,7 +223,7 @@ class UpDroidExplorer {
       });
       
       // Set up drag and drop for file open & delete.
-      dragDropSetup(li, file);
+      dragSetup(li, file);
       
       UListElement dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
       dirElement.children.add(li);

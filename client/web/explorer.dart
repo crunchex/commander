@@ -85,8 +85,8 @@ class UpDroidExplorer {
     return files;
   }
   
-  /// Returns a generated [LIElement] with inner HTML based on the [SimpleFile]'s
-  /// contents.
+  /// Returns a generated [LIElement] with inner HTML based on
+  /// the [SimpleFile]'s contents.
   LIElement generateLiHtml(file) {
     LIElement li = new LIElement();
     li
@@ -97,12 +97,16 @@ class UpDroidExplorer {
       ..classes.add('explorer-li');
     
     SpanElement span = new SpanElement();
-    var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
-    span.classes.addAll(['glyphicon', glyphType]);
-    dropSetup(span, file);
-    li.children.add(span);
     
-    li.appendHtml(' ${file.name}');
+    SpanElement glyphicon = new SpanElement();
+    var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
+    glyphicon.classes.addAll(['glyphicon', glyphType]);
+    dropSetup(glyphicon, file);
+    span.children.add(glyphicon);
+
+    span.appendHtml(' ${file.name}');
+    
+    li.children.add(span);
     
     if (file.isDirectory) {
       UListElement ul = new UListElement();
@@ -139,18 +143,21 @@ class UpDroidExplorer {
     if (!li.className.contains('editing')) {
       li.classes.add('editing');
       
-      // Save the text in case editing is cancelled. This does not save
-      // the glyphicon, so it will need to be recreated once editing is done.
+      // Save the text in case editing is cancelled.
       var currentName = li.id;
       var currentPath = li.dataset['path'];
-      li.text = '';
       
+      // Create a wrapper span for the glyphicon and input to insert into li.
       SpanElement span = new SpanElement();
+      
+      // Recreate the glphyicon because it's hard to replace just the text portion of
+      // the top level li.
+      SpanElement glyphicon = new SpanElement();
       var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
-      span.classes.addAll(['glyphicon', glyphType]);
-      li.children.add(span);
+      glyphicon.classes.addAll(['glyphicon', glyphType]);
+      span.children.add(glyphicon);
+      
       InputElement input = new InputElement();
-
       // TODO: need to make field width scale to the user's input.
       // Using a 'contenteditable' <span> instead of an <input> is a possible option.
       input.width = 100;
@@ -169,7 +176,9 @@ class UpDroidExplorer {
         }
       });
       
-      li.children.add(input);
+      span.children.add(input);
+      
+      li.children[0] = span;
     }
   }
   
@@ -218,8 +227,7 @@ class UpDroidExplorer {
       li.onDoubleClick.listen((e) {
         renameEventHandler(li, file);
         // To prevent the rename event from propagating up the directory tree.
-        // Not sure what the difference is between this and stopPropagation().
-        e.stopImmediatePropagation();
+        e.stopPropagation();
       });
       
       // Set up drag and drop for file open & delete.

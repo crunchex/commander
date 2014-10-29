@@ -219,7 +219,7 @@ class UpDroidExplorer {
       // Set up drag and drop for file open & delete.
       dragSetup(li, file);
       
-      UListElement dirElement = (file.parentDir == 'root') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
+      UListElement dirElement = (file.parentDir == '') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
       dirElement.children.add(li);
     }
   }
@@ -259,7 +259,7 @@ class SimpleFile {
     if (pathList.length > 1) {
       parentDir = pathList[pathList.length - 2];
     } else {
-      parentDir = 'root';
+      parentDir = '';
     }
   }
 }

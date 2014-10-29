@@ -145,10 +145,6 @@ class UpDroidExplorer {
     if (!li.className.contains('editing')) {
       li.classes.add('editing');
       
-      // Save the text in case editing is cancelled.
-      var currentName = li.id;
-      var currentPath = li.dataset['path'];
-      
       InputElement input = new InputElement();
       input.placeholder = file.name;
       
@@ -158,8 +154,8 @@ class UpDroidExplorer {
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
-          var newPath = currentPath.replaceFirst(currentName, input.value);
-          ws.send('[[EXPLORER_RENAME]]' + currentPath + ' ' + newPath);
+          var newPath = file.path.replaceFirst(file.name, input.value);
+          ws.send('[[EXPLORER_RENAME]]' + file.path + ' ' + newPath);
         } else {
           // TODO: need to make field width scale to the user's input.
           // Using a 'contenteditable' <span> instead of an <input> is a possible option.

@@ -194,6 +194,9 @@ class UpDroidExplorer {
       for (SpanElement span in spanList) {
         span.classes.remove('span-ondrag');
       }
+      if (!file.isDirectory) {
+        ed.editorDiv.classes.remove('editor-ondrag');
+      }
     });
   }
   

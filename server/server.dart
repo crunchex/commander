@@ -1,44 +1,16 @@
 #!/usr/bin/env dart
 
 import 'dart:io';
-import 'dart:async';
 import 'package:logging/logging.dart';
 import 'package:logging_handlers/server_logging_handlers.dart';
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 
 import 'terminal_commands.dart';
+import 'lib/server_helper.dart' as help;
 
-final Logger log = new Logger('server');
-
-/// Recursively traverses the given directory path and asynchronously
-/// returns a list of filesystem entities.
-Future<List<FileSystemEntity>> getDirContents(Directory dir) {
-  var files = <FileSystemEntity>[];
-  var completer = new Completer();
-  var lister = dir.list(recursive: true);
-  lister.listen ( 
-      (file) => files.add(file),
-      // Should also register onError.
-      onDone:   () => completer.complete(files)
-      );
-  return completer.future;
-}
-
-/// Container class that extracts the header (denoted with double brackets)
-/// and body from the raw text of a [WebSocket] message.
-class CommanderMessage {
-  final String s;
-  
-  CommanderMessage(this.s);
-  
-  String header() {
-    var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
-    return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
-  }
-  
-  String body() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
-}
+Logger log;
+DirectoryWatcher watcher;
 
 /// Handler for the [WebSocket]. Performs various actions depending on requests
 /// it receives or local events that it detects.
@@ -46,21 +18,21 @@ void handleWebSocket(WebSocket socket, Directory dir) {
   log.info('Client connected!');
   
   socket.listen((String s) {
-    CommanderMessage cm = new CommanderMessage(s);
-    var switchConditional = cm.header();
-    switch (switchConditional) {
+    help.UpDroidMessage um = new help.UpDroidMessage(s);
+    
+    switch (um.header) {
       case 'EXPLORER_DIRECTORY_PATH':
         socket.add('[[EXPLORER_DIRECTORY_PATH]]' + dir.path);
         
         // Since it is assumed DirectoryPath is only requested on open,
         // also send the initial directory list.
-        getDirContents(dir).then((files) {
+        help.getDirectory(dir).then((files) {
           socket.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
         });
         break;
         
       case 'EXPLORER_RENAME':
-        List<String> renameArgs = cm.body().split(' ');
+        List<String> renameArgs = um.body.split(' ');
         
         if (!FileSystemEntity.isDirectorySync(renameArgs[0])) {
           var fileToRename = new File(renameArgs[0]);
@@ -74,7 +46,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
       // Currently implemented in the same way as RENAME as there is no
       // direct API for MOVE.
       case 'EXPLORER_MOVE':
-        List<String> renameArgs = cm.body().split(' ');
+        List<String> renameArgs = um.body.split(' ');
         
         if (!FileSystemEntity.isDirectorySync(renameArgs[0])) {
           var fileToRename = new File(renameArgs[0]);
@@ -86,7 +58,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         break;
 
       case 'EXPLORER_DELETE':
-        var path = cm.body();
+        var path = um.body;
               
         // Can't simply just create a FileSystemEntity and delete it, since
         // it is an abstract class. This is a dumb way to create the proper
@@ -101,7 +73,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         break;
         
       case 'EDITOR_OPEN':
-        var path = cm.body();
+        var path = um.body;
 
         var fileToOpen = new File(path);
         fileToOpen.readAsString().then((String contents) {
@@ -111,7 +83,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         
       case 'EDITOR_SAVE':
         // List[0] = data, List[1] = path.
-        List<String> data = cm.body().split('[[PATH]]');
+        List<String> data = um.body.split('[[PATH]]');
 
         var fileToSave = new File(data[1]);
         fileToSave.writeAsString(data[0]);
@@ -119,36 +91,39 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         
       case 'CONSOLE_COMMAND':
         log.info('Client sent: $s');
-        List args = parseCommandInput(cm.body());
+        List args = parseCommandInput(um.body);
         Process.run(args[0], args[1]).then((ProcessResult results) {
           socket.add('[[CONSOLE_COMMAND]]' + results.stdout);
         });
         break;
         
       default:
-        log.severe('Message received without commander header');
+        log.severe('Message received without updroid header');
     }
   }, onDone: () {
     log.info('Client disconnected');  
   });
 
-  var watcher = new DirectoryWatcher(dir.path);
-  watcher.events.listen((WatchEvent e) => getDirContents(dir).then((files) {
-    socket.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
-  }));
+  watcher.events.listen((e) => help.formattedFsUpdate(socket, e));
 }
 
 void main(List<String> args) {
-  var dir = Directory.current;
+  // Set default dir as current working directory.
+  Directory dir = Directory.current;
+  
+  // Set up logging.
+  log = new Logger('server');
   Logger.root.onRecord.listen(new SyncFileLoggingHandler("server.log"));
   
-  // Allow the user to specify what directory to use for the Commander's
-  // server-side filesystem.
+  // Create an args parser to override the workspace directory if one is supplied.
   var parser = new ArgParser();
   parser.addOption('directory', abbr: 'd', defaultsTo: Directory.current.toString(), callback: (directory) {
     dir = new Directory(directory);
   });
-  var results = parser.parse(args);
+  parser.parse(args);
+
+  // Initialize the DirectoryWatcher.
+  watcher = new DirectoryWatcher(dir.path);
   
   // Set up an HTTP webserver and listen for standard page requests or upgraded
   // [WebSocket] requests.

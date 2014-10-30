@@ -18,13 +18,36 @@ body {
   margin-bottom: 60px;
 }
 
-.navbar-right {
-  padding-right: 10px;
+html, body {
+  min-width: 1280px;
+  width: auto !important;
 }
 
-.navbar-nav > li > a {
-  padding-top: 27px;
-  padding-bottom: 2px;
+.navbar-collapse.collapse {
+  display: block !important;
+}
+
+.navbar-nav>li, .navbar-nav {
+  float: left !important;
+}
+
+.navbar-left {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+  margin-left: 15px !important;
+}
+
+.navbar-nav.navbar-right:last-child {
+  margin-right: 15px !important;
+  margin-bottom: 0px !important;
+}
+
+.navbar-right {
+  float: right !important;
+}
+
+#updroid {
+  height: 40px;
 }
 
 .btn-default {
@@ -105,25 +128,6 @@ body {
   bottom: 0px;
   right: 10px;
   font-size: 10px;
-}
-
-#navbar-brand {
-  position: relative;
-  padding: 0px;
-}
-
-#updroid {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 65px;
-}
-
-#commander {
-  position: absolute;
-  bottom: -7px;
-  left: 76px;
-  font: 19px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
 }
 
 #explorer-top .btn {

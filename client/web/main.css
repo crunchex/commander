@@ -68,6 +68,16 @@ html, body {
   color: #ffffff;
 }
 
+#new {
+  float: right;
+  padding: 2px 4px 2px 4px;
+  text-align: center;
+  color: #333333;
+  border: 1px solid #dddddd;
+  font-family: "Source Sans Pro",Calibri,Candara,Arial,sans-serif;
+  font-size: 15px;
+}
+
 .explorer-ul-top > .explorer-li {
     margin-left: -38px;
 }
@@ -78,6 +88,65 @@ html, body {
 
 .explorer {
   list-style-type: none;
+}
+
+#explorer-top .btn {
+  background-color: transparent;  
+}
+
+#explorer-top .btn:hover {
+  color: #268bd2;
+}
+
+#file-explorer-title {
+  margin-top: 0px;
+  margin-bottom: 20px;
+  text-align: center;
+  vertical-align: middle;
+  font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+}
+
+#file-explorer-title #folder {
+  margin-left: 4px;
+}
+
+#file-explorer-hr {
+  margin-top: 15px;
+  margin-bottom: 8px;
+}
+
+.file-explorer-hr-ondrag {
+  border-top-width: 2px;
+  border-color: #268bd2;
+}
+
+.file-explorer-hr-entered {
+  border-top-width: 2px;
+  border-color: #ffffff;
+}
+
+li input {
+  margin-left: 6px;
+  width: 50px;
+}
+
+#recycle {
+  margin-top: 20px;
+  margin-bottom: 0px;
+  padding: 2px;
+  text-align: center;
+  color: #333333;
+  border: 1px solid #dddddd;
+}
+
+#recycle.recycle-ondrag {
+  color: #268bd2;
+  border-color: #268bd2;
+}
+
+#recycle.recycle-entered {
+  color: #ffffff;
+  border-color: #ffffff;
 }
 
 .column-content .nav-tabs {
@@ -93,6 +162,8 @@ html, body {
   border-width: 0px 0px 1px 0px;
   padding: 5px 10px 5px 10px;
 }
+
+
 
 .inner-tabs .dropdown-toggle:hover {
   border-color: #dddddd;
@@ -112,57 +183,6 @@ html, body {
   border-width: 0px 0px 1px 0px;
   border-color: #dddddd;
   background-color: transparent;
-}
-
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 60px;
-  background-color: #fff;
-}
-
-.text-muted {
-  position: absolute;
-  bottom: 0px;
-  right: 10px;
-  font-size: 10px;
-}
-
-#explorer-top .btn {
-  background-color: transparent;  
-}
-
-#explorer-top .btn:hover {
-  color: #268bd2;
-}
-
-#file-explorer-title {
-  margin-top: 0px;
-  margin-bottom: 20px;
-  text-align: left;
-  font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
-}
-
-#file-explorer-hr {
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
-.file-explorer-hr-ondrag {
-  border-top-width: 2px;
-  border-color: #268bd2;
-}
-
-.file-explorer-hr-entered {
-  border-top-width: 2px;
-  border-color: #ffffff;
-}
-
-li input {
-  margin-left: 6px;
-  width: 50px;
 }
 
 .editor {
@@ -185,25 +205,6 @@ li input {
 
 #input-group {
   border: 1px solid #dddddd;
-}
-
-#recycle {
-  margin-top: 20px;
-  margin-bottom: 0px;
-  padding: 2px;
-  text-align: center;
-  color: #333333;
-  border: 1px solid #dddddd;
-}
-
-#recycle.recycle-ondrag {
-  color: #268bd2;
-  border-color: #268bd2;
-}
-
-#recycle.recycle-entered {
-  color: #ffffff;
-  border-color: #ffffff;
 }
 
 #row-main {
@@ -231,4 +232,20 @@ li input {
    overflow-y: auto;
    background-color: transparent;
    color: #93a1a1;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #fff;
+}
+
+.text-muted {
+  position: absolute;
+  bottom: 0px;
+  right: 10px;
+  font-size: 10px;
 }

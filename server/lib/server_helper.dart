@@ -32,10 +32,10 @@ return completer.future;
 /// Container class that extracts the header (denoted with double brackets)
 /// and body from the raw text of a formatted [WebSocket] message received
 /// from the UpDroid client.
-class CommanderMessage {
+class UpDroidMessage {
   final String s;
   
-  CommanderMessage(this.s);
+  UpDroidMessage(this.s);
   
   String get header => createHeader();
   String get body => createBody();

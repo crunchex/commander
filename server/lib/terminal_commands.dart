@@ -1,3 +1,5 @@
+library console_parser;
+
 import 'package:tokenizr/tokenizr.dart';
 
 class Command extends Token {

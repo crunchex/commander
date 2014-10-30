@@ -6,7 +6,7 @@ import 'package:logging_handlers/server_logging_handlers.dart';
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 
-import 'lib/terminal_commands.dart';
+import 'lib/console_parser.dart';
 import 'lib/server_helper.dart' as help;
 
 Logger log;

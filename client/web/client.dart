@@ -5,6 +5,7 @@ import 'package:bootjack/bootjack.dart';
 import 'package:ace/ace.dart';
 import 'package:ace/proxy.dart';
 import 'package:dnd/dnd.dart';
+import 'lib/updroid_message.dart';
 
 part 'explorer.dart';
 part 'editor.dart';
@@ -69,23 +70,4 @@ void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplo
   ws.onClose.listen((Event e) {
     cs.updateOutputField('Disconnected from updroid.');
   });
-}
-
-/// Container class that extracts the header (denoted with double brackets)
-/// and body from the raw text of a formatted [WebSocket] message received
-/// from the UpDroid server.
-class UpDroidMessage {
-final String s;
-
-UpDroidMessage(this.s);
-
-String get header => createHeader();
-String get body => createBody();
-
-String createHeader() {
-  var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
-  return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
-}
-
-String createBody() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
 }

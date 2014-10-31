@@ -66,8 +66,17 @@ class UpDroidEditor {
       ..theme = new Theme.named(Theme.SOLARIZED_DARK);
   }
   
+  void openTextHandler(String raw) {
+    UpDroidMessage um = new UpDroidMessage(raw);
+    openText(um.body);
+  }
+  
   /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
+    ws.onMessage
+        .where((value) => value.toString().startsWith('[[EDITOR_FILE_TEXT]])'))
+        .listen((value) => openTextHandler(value.toString()));
+    
     saveButton.onClick.listen((e) => saveText());
     
     newButton.onClick.listen((e) {

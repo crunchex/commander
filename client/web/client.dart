@@ -11,17 +11,15 @@ part 'explorer.dart';
 part 'editor.dart';
 part 'console.dart';
 
+const String EXPLORER_DIRECTORY_PATH = '[[EXPLORER_DIRECTORY_PATH]]';
+
 void main() {
   setUpBootstrap();
   
+  // Create the server-client [WebSocket].
   WebSocket ws = new WebSocket('ws://localhost:8080/ws');
-  
-  UpDroidEditor ed = new UpDroidEditor(ws, 1);
-  
-  UpDroidExplorer fe = new UpDroidExplorer(ws, ed);
-  UpDroidConsole cs = new UpDroidConsole(ws);
-  
-  registerWebSocketEventHandlers(ws, ed, fe, cs);
+
+  registerWebSocketEventHandlers(ws);
 }
 
 /// Activates Bootjack features.
@@ -33,31 +31,29 @@ void setUpBootstrap() {
   Transition.use();
 }
 
+/// Initializes the main Commander classes.
+void initializeClasses(String raw, WebSocket ws) {
+  UpDroidMessage um = new UpDroidMessage(raw);
+  
+  UpDroidEditor ed = new UpDroidEditor(ws, 1);
+  UpDroidExplorer fe = new UpDroidExplorer(ws, ed);
+  UpDroidConsole cs = new UpDroidConsole(ws);
+  
+  fe.absolutePathPrefix = um.body;
+  ed.absolutePathPrefix = um.body;
+}
+
 /// Sets up external event handlers for the various Commander classes. These
 /// are mostly listening events for [WebSocket] messages.
-void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplorer fe, UpDroidConsole cs) {
+void registerWebSocketEventHandlers(WebSocket ws) {
   ws.onOpen.listen((Event e) {
       //cs.updateOutputField('Connected to updroid.');
-      ws.send('[[EXPLORER_DIRECTORY_PATH]]');
-    });
-
-  ws.onMessage.listen((MessageEvent e) {
-    UpDroidMessage um = new UpDroidMessage(e.data);
-    
-    switch (um.header) {
-      case 'EXPLORER_DIRECTORY_LIST':
-        fe.syncExplorer(um.body);
-        break;
-        
-      case 'EXPLORER_DIRECTORY_PATH':
-        fe.absolutePathPrefix = um.body;
-        ed.absolutePathPrefix = um.body;
-        break;
-        
-      default:
-        print('Message received without commander header');
-    }
+      ws.send(EXPLORER_DIRECTORY_PATH);
   });
+  
+  ws.onMessage
+      .where((value) => value.toString().startsWith(EXPLORER_DIRECTORY_PATH))
+      .listen((value) => initializeClasses(value.toString(), ws));
 
   ws.onClose.listen((Event e) {
     //cs.updateOutputField('Disconnected from updroid.');

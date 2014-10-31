@@ -4,6 +4,8 @@ part of client;
 /// side and all associated views. It also facilitates file operation requests
 /// to the server side.
 class UpDroidExplorer {
+  static const String EXPLORER_DIRECTORY_LIST = '[[EXPLORER_DIRECTORY_LIST]]';
+  
   WebSocket ws;
   UpDroidEditor ed;
   String absolutePathPrefix;
@@ -32,6 +34,10 @@ class UpDroidExplorer {
   
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
+    ws.onMessage
+        .where((value) => value.toString().startsWith(EXPLORER_DIRECTORY_LIST))
+        .listen((value) => syncExplorer(value.toString()));
+    
     dzRootLine.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
     dzRootLine.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
     
@@ -201,7 +207,10 @@ class UpDroidExplorer {
   }
   
   /// Redraws all file explorer views.
-  void syncExplorer(String data) {
+  void syncExplorer(String raw) {
+    UpDroidMessage um = new UpDroidMessage(raw);
+    var data = um.body;
+    
     var files = fileList(data);
     
     // Set the explorer list to empty for a full refresh.

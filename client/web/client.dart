@@ -11,8 +11,6 @@ part 'editor.dart';
 part 'console.dart';
 
 void main() {
-  print("Client has started!");
-
   setUpBootstrap();
   
   WebSocket ws = new WebSocket('ws://localhost:8080/ws');
@@ -38,29 +36,29 @@ void setUpBootstrap() {
 /// are mostly listening events for [WebSocket] messages.
 void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplorer fe, UpDroidConsole cs) {
   ws.onOpen.listen((Event e) {
-      cs.updateOutputField('Connected to updroid!');
+      cs.updateOutputField('Connected to updroid.');
       ws.send('[[EXPLORER_DIRECTORY_PATH]]');
     });
 
   ws.onMessage.listen((MessageEvent e) {
-    CommanderMessage cm = new CommanderMessage(e.data);
+    UpDroidMessage um = new UpDroidMessage(e.data);
     
-    switch (cm.header()) {
+    switch (um.header) {
       case 'EXPLORER_DIRECTORY_LIST':
-        fe.syncExplorer(cm.body());
+        fe.syncExplorer(um.body);
         break;
         
       case 'EXPLORER_DIRECTORY_PATH':
-        fe.absolutePathPrefix = cm.body();
-        ed.absolutePathPrefix = cm.body();
+        fe.absolutePathPrefix = um.body;
+        ed.absolutePathPrefix = um.body;
         break;
         
       case 'EDITOR_FILE_TEXT':
-        ed.openText(cm.body());
+        ed.openText(um.body);
         break;
         
       case 'CONSOLE_COMMAND':
-        cs.updateOutputField(cm.body());
+        cs.updateOutputField(um.body);
         break;
         
       default:
@@ -69,21 +67,25 @@ void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplo
   });
 
   ws.onClose.listen((Event e) {
-    cs.updateOutputField('Disconnected from updroid...');
+    cs.updateOutputField('Disconnected from updroid.');
   });
 }
 
 /// Container class that extracts the header (denoted with double brackets)
-/// and body from the raw text of a [WebSocket] message.
-class CommanderMessage {
-  final String s;
-  
-  CommanderMessage(this.s);
-  
-  String header() {
-    var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
-    return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
-  }
-  
-  String body() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
+/// and body from the raw text of a formatted [WebSocket] message received
+/// from the UpDroid server.
+class UpDroidMessage {
+final String s;
+
+UpDroidMessage(this.s);
+
+String get header => createHeader();
+String get body => createBody();
+
+String createHeader() {
+  var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
+  return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
+}
+
+String createBody() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
 }

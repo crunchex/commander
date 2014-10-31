@@ -18,3 +18,12 @@ class UpDroidMessage {
   
   String createBody() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
 }
+
+/// A class for the intra-client message passing.
+///   dest: the class that the message is meant for
+///   type: the type of message (e.g. 'command')
+///   body: the body of the message
+class CommanderMessage {
+  String dest, type, body;
+  CommanderMessage(this.dest, this.type, this.body);
+}

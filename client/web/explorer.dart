@@ -7,7 +7,7 @@ class UpDroidExplorer {
   static const String EXPLORER_DIRECTORY_LIST = '[[EXPLORER_DIRECTORY_LIST]]';
   
   WebSocket ws;
-  UpDroidEditor ed;
+  UpDroidEditor upEditor;
   String absolutePathPrefix;
 
   HRElement rootline;
@@ -18,7 +18,7 @@ class UpDroidExplorer {
   
   UpDroidExplorer(WebSocket ws, String path, UpDroidEditor ed) {
     this.ws = ws;
-    this.ed = ed;
+    this.upEditor = ed;
     absolutePathPrefix = path;
 
     dzEditor = new Dropzone(ed.editorDiv);
@@ -63,17 +63,17 @@ class UpDroidExplorer {
     dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        ed.editorDiv.classes.add('editor-entered');
+        upEditor.editorDiv.classes.add('editor-entered');
       }
     });
     
-    dzEditor.onDragLeave.listen((e) => ed.editorDiv.classes.remove('editor-entered'));
+    dzEditor.onDragLeave.listen((e) => upEditor.editorDiv.classes.remove('editor-entered'));
     
     dzEditor.onDrop.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        ed.openFile = e.draggableElement.dataset['path'];
-        ws.send('[[EDITOR_OPEN]]' + ed.openFile);
+        upEditor.openFile = e.draggableElement.dataset['path'];
+        ws.send('[[EDITOR_OPEN]]' + upEditor.openFile);
       }
     });
   }
@@ -193,7 +193,7 @@ class UpDroidExplorer {
         span.classes.add('span-ondrag');
       }
       if (!file.isDirectory) {
-        ed.editorDiv.classes.add('editor-ondrag');
+        upEditor.editorDiv.classes.add('editor-ondrag');
       }
     });
     
@@ -205,7 +205,7 @@ class UpDroidExplorer {
         span.classes.remove('span-ondrag');
       }
       if (!file.isDirectory) {
-        ed.editorDiv.classes.remove('editor-ondrag');
+        upEditor.editorDiv.classes.remove('editor-ondrag');
       }
     });
   }

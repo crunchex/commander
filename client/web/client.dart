@@ -22,7 +22,7 @@ void main() {
   
   // Create the intra-client message stream.
   // The classes use this to communicate with each other.
-  StreamController<String> cs = new StreamController<String>();
+  StreamController<CommanderMessage> cs = new StreamController<CommanderMessage>.broadcast();
 
   registerWebSocketEventHandlers(ws, cs);
 }
@@ -37,7 +37,7 @@ void setUpBootstrap() {
 }
 
 /// Initializes the main Commander classes.
-void initializeClasses(String raw, WebSocket ws, StreamController<String> cs) {
+void initializeClasses(String raw, WebSocket ws, StreamController<CommanderMessage> cs) {
   UpDroidMessage um = new UpDroidMessage(raw);
   
   UpDroidEditor editor = new UpDroidEditor(ws, um.body, 1);
@@ -47,10 +47,10 @@ void initializeClasses(String raw, WebSocket ws, StreamController<String> cs) {
 
 /// Sets up external event handlers for the various Commander classes. These
 /// are mostly listening events for [WebSocket] messages.
-void registerWebSocketEventHandlers(WebSocket ws, StreamController<String> cs) {
+void registerWebSocketEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
   ws.onOpen.listen((Event e) {
-      cs.add('[[CONSOLE_OUTPUT]]' + 'Connected to updroid.');
-      ws.send(EXPLORER_DIRECTORY_PATH);
+    cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', 'Connected to updroid.'));
+    ws.send(EXPLORER_DIRECTORY_PATH);
   });
   
   ws.onMessage
@@ -58,6 +58,6 @@ void registerWebSocketEventHandlers(WebSocket ws, StreamController<String> cs) {
       .listen((value) => initializeClasses(value.data, ws, cs));
 
   ws.onClose.listen((Event e) {
-    cs.add('[[CONSOLE_OUTPUT]]' + 'Disconnected from updroid.');
+    cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', 'Disconnected from updroid.'));
   });
 }

@@ -5,10 +5,9 @@ part of client;
 /// It is not meant to be a complete terminal emulator like xterm.
 class UpDroidConsole {
   static const String CONSOLE_COMMAND = '[[CONSOLE_COMMAND]]';
-  static const String CONSOLE_OUTPUT = '[[CONSOLE_OUTPUT]]';
   
   WebSocket ws;
-  StreamController<String> cs;
+  StreamController<CommanderMessage> cs;
   
   DivElement inputGroup;
   TextInputElement input;
@@ -16,7 +15,7 @@ class UpDroidConsole {
   AnchorElement consoleButton;
   AnchorElement themeButton;
   
-  UpDroidConsole(WebSocket ws, StreamController<String> cs) {
+  UpDroidConsole(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
     this.cs = cs;
     inputGroup = querySelector('#input-group');
@@ -26,6 +25,11 @@ class UpDroidConsole {
     themeButton = querySelector('.button-console-theme');
     
     registerConsoleEventHandlers();
+    
+    // This is a hack to account for the fact that Console is set up
+    // after the initial connection is made and thus, misses the first
+    // message.
+    updateOutputHandler('Connected to updroid.');
   }
   
   /// Toggles between a Solarized dark and light theme.
@@ -41,13 +45,21 @@ class UpDroidConsole {
     }
   }
   
-  /// Updates the output field based on string messages passed in over the
-  /// [WebSocket]. Everything coming in here should be the result of passing a
-  /// command over the input, since everything else would have been filtered
-  /// out with the message headers.
-  void updateOutputHandler(String raw) {
-    UpDroidMessage um = new UpDroidMessage(raw);
-    output.appendText('up> ${um.body}');
+  /// Process messages that Console has picked up according to the type.
+  void processMessage(CommanderMessage m) {
+    switch (m.type) {
+      case 'OUTPUT':
+        updateOutputHandler(m.body);
+        break;
+        
+      default:
+        print('Console error: unrecognized message type.');
+    }
+  }
+  
+  /// Updates the output field based on string messages passed in.
+  void updateOutputHandler(String s) {
+    output.appendText('up> $s');
     output.appendHtml('<br/>');
 
     // Autoscroll the new messages as they come in.
@@ -61,8 +73,8 @@ class UpDroidConsole {
         .listen((value) => updateOutputHandler(value.data));
     
     cs.stream
-        .where((value) => value.startsWith(CONSOLE_OUTPUT))
-        .listen((value) => updateOutputHandler(value));
+        .where((m) => m.dest == 'CONSOLE')
+        .listen((m) => processMessage(m));
     
     input.onChange.listen((e) {
       ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());

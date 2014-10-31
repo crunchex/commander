@@ -12,8 +12,8 @@ class UpDroidMessage {
   String get body => createBody();
   
   String createHeader() {
-  var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
-  return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
+    var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
+    return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
   }
   
   String createBody() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');

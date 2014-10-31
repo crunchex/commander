@@ -28,6 +28,8 @@ if __name__ == '__main__':
 /// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
 /// for the editor and an additional menu bar with some filesystem operations.
 class UpDroidEditor {
+  static const String EDITOR_FILE_TEXT = '[[EDITOR_FILE_TEXT]]';
+  
   WebSocket ws;
   String absolutePathPrefix;
 
@@ -68,13 +70,13 @@ class UpDroidEditor {
   
   void openTextHandler(String raw) {
     UpDroidMessage um = new UpDroidMessage(raw);
-    openText(um.body);
+    aceEditor.setValue(um.body);
   }
   
   /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
     ws.onMessage
-        .where((value) => value.toString().startsWith('[[EDITOR_FILE_TEXT]])'))
+        .where((value) => value.toString().startsWith(EDITOR_FILE_TEXT))
         .listen((value) => openTextHandler(value.toString()));
     
     saveButton.onClick.listen((e) => saveText());
@@ -108,6 +110,5 @@ class UpDroidEditor {
   }
   
   // Helper methods for filesystem operations.
-  String openText(String text) => aceEditor.setValue(text);
   void saveText() => ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
 }

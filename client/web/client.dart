@@ -37,7 +37,7 @@ void setUpBootstrap() {
 /// are mostly listening events for [WebSocket] messages.
 void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplorer fe, UpDroidConsole cs) {
   ws.onOpen.listen((Event e) {
-      cs.updateOutputField('Connected to updroid.');
+      //cs.updateOutputField('Connected to updroid.');
       ws.send('[[EXPLORER_DIRECTORY_PATH]]');
     });
 
@@ -54,20 +54,12 @@ void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplo
         ed.absolutePathPrefix = um.body;
         break;
         
-      case 'EDITOR_FILE_TEXT':
-        ed.openText(um.body);
-        break;
-        
-      case 'CONSOLE_COMMAND':
-        cs.updateOutputField(um.body);
-        break;
-        
       default:
         print('Message received without commander header');
     }
   });
 
   ws.onClose.listen((Event e) {
-    cs.updateOutputField('Disconnected from updroid.');
+    //cs.updateOutputField('Disconnected from updroid.');
   });
 }

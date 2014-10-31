@@ -54,8 +54,8 @@ class UpDroidConsole {
   /// Sets up the event handlers for the console.
   void registerConsoleEventHandlers() {
     ws.onMessage
-        .where((value) => value.toString().startsWith(CONSOLE_COMMAND))
-        .listen((value) => updateOutputHandler(value.toString()));
+        .where((value) => value.data.startsWith(CONSOLE_COMMAND))
+        .listen((value) => updateOutputHandler(value.data));
     
     input.onChange.listen((e) {
       ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());

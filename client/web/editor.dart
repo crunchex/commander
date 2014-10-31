@@ -43,8 +43,10 @@ class UpDroidEditor {
   Editor aceEditor;
   String openFile;
   
-  UpDroidEditor(WebSocket ws, int editorID) {
+  UpDroidEditor(WebSocket ws, String path, int editorID) {
     this.ws = ws;
+    absolutePathPrefix = path;
+    
     editorDiv = querySelector('#editor-$editorID');
     
     saveButton = querySelector('#column-${editorID} .button-save');
@@ -76,8 +78,8 @@ class UpDroidEditor {
   /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
     ws.onMessage
-        .where((value) => value.toString().startsWith(EDITOR_FILE_TEXT))
-        .listen((value) => openTextHandler(value.toString()));
+        .where((value) => value.data.startsWith(EDITOR_FILE_TEXT))
+        .listen((value) => openTextHandler(value.data));
     
     saveButton.onClick.listen((e) => saveText());
     

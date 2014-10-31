@@ -5,13 +5,13 @@ import 'server_helper.dart' as help;
 import 'console_parser.dart';
 
 void sendDirectory(WebSocket s, Directory dir) {
-  help.formattedMessage(s, 'EXPLORER_DIRECTORY_PATH', dir.path);
-  
-  // Since it is assumed DirectoryPath is only requested on open,
-  // also send the initial directory list.
   help.getDirectory(dir).then((files) {
     s.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
   });
+}
+
+void sendPath(WebSocket s, Directory dir) {
+  help.formattedMessage(s, 'EXPLORER_DIRECTORY_PATH', dir.path);
 }
 
 void sendFileContents(WebSocket s, String path) {

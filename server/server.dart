@@ -22,6 +22,10 @@ void handleWebSocket(WebSocket socket, Directory dir) {
     
     switch (um.header) {
       case 'EXPLORER_DIRECTORY_PATH':
+        sendPath(socket, dir);
+        break;
+        
+      case 'EXPLORER_DIRECTORY_LIST':
         sendDirectory(socket, dir);
         break;
 

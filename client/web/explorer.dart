@@ -16,10 +16,10 @@ class UpDroidExplorer {
   Dropzone dzRecycle;
   Dropzone dzEditor;
   
-  UpDroidExplorer(WebSocket ws, UpDroidEditor ed) {
+  UpDroidExplorer(WebSocket ws, String path, UpDroidEditor ed) {
     this.ws = ws;
     this.ed = ed;
-    absolutePathPrefix = '';
+    absolutePathPrefix = path;
 
     dzEditor = new Dropzone(ed.editorDiv);
     
@@ -30,13 +30,17 @@ class UpDroidExplorer {
     dzRootLine = new Dropzone(rootline);
     
     registerExplorerEventHandlers();
+    
+    // Let the server know Explorer is up and ready to receive
+    // the directory list.
+    ws.send(EXPLORER_DIRECTORY_LIST);
   }
   
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
     ws.onMessage
-        .where((value) => value.toString().startsWith(EXPLORER_DIRECTORY_LIST))
-        .listen((value) => syncExplorer(value.toString()));
+        .where((value) => value.data.startsWith(EXPLORER_DIRECTORY_LIST))
+        .listen((value) => syncExplorer(value.data));
     
     dzRootLine.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
     dzRootLine.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));

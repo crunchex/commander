@@ -40,8 +40,8 @@ void setUpBootstrap() {
 void initializeClasses(String raw, WebSocket ws, StreamController<CommanderMessage> cs) {
   UpDroidMessage um = new UpDroidMessage(raw);
   
-  UpDroidEditor editor = new UpDroidEditor(ws, um.body, 1);
-  UpDroidExplorer explorer = new UpDroidExplorer(ws, um.body, editor);
+  UpDroidEditor editor = new UpDroidEditor(ws, cs, um.body, 1);
+  UpDroidExplorer explorer = new UpDroidExplorer(ws, cs, um.body);
   UpDroidConsole console = new UpDroidConsole(ws, cs);
 }
 
@@ -49,7 +49,7 @@ void initializeClasses(String raw, WebSocket ws, StreamController<CommanderMessa
 /// are mostly listening events for [WebSocket] messages.
 void registerWebSocketEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
   ws.onOpen.listen((Event e) {
-    cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', 'Connected to updroid.'));
+    cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', body: 'Connected to updroid.'));
     ws.send(EXPLORER_DIRECTORY_PATH);
   });
   
@@ -58,6 +58,6 @@ void registerWebSocketEventHandlers(WebSocket ws, StreamController<CommanderMess
       .listen((value) => initializeClasses(value.data, ws, cs));
 
   ws.onClose.listen((Event e) {
-    cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', 'Disconnected from updroid.'));
+    cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', body: 'Disconnected from updroid.'));
   });
 }

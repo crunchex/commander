@@ -25,5 +25,5 @@ class UpDroidMessage {
 ///   body: the body of the message
 class CommanderMessage {
   String dest, type, body;
-  CommanderMessage(this.dest, this.type, this.body);
+  CommanderMessage(this.dest, this.type, {this.body});
 }

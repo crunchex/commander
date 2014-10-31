@@ -31,6 +31,7 @@ class UpDroidEditor {
   static const String EDITOR_FILE_TEXT = '[[EDITOR_FILE_TEXT]]';
   
   WebSocket ws;
+  StreamController<CommanderMessage> cs;
   String absolutePathPrefix;
 
   AnchorElement saveButton;
@@ -43,8 +44,9 @@ class UpDroidEditor {
   Editor aceEditor;
   String openFile;
   
-  UpDroidEditor(WebSocket ws, String path, int editorID) {
+  UpDroidEditor(WebSocket ws, StreamController<CommanderMessage> cs, String path, int editorID) {
     this.ws = ws;
+    this.cs = cs;
     absolutePathPrefix = path;
     
     editorDiv = querySelector('#editor-$editorID');
@@ -70,6 +72,35 @@ class UpDroidEditor {
       ..theme = new Theme.named(Theme.SOLARIZED_DARK);
   }
   
+  /// Process messages that Console has picked up according to the type.
+  void processMessage(CommanderMessage m) {
+    switch (m.type) {
+      case 'CLASS_ADD':
+        classAdd(m.body);
+        break;
+        
+      case 'CLASS_REMOVE':
+        classRemove(m.body);
+        break;
+        
+      case 'OPEN_FILE':
+        openFile = m.body;
+        ws.send('[[EDITOR_OPEN]]' + openFile);
+        break;
+        
+      default:
+        print('Console error: unrecognized message type.');
+    }
+  }
+  
+  void classAdd(String s) {
+    editorDiv.classes.add(s);
+  }
+  
+  void classRemove(String s) {
+    editorDiv.classes.remove(s);
+  }
+  
   void openTextHandler(String raw) {
     UpDroidMessage um = new UpDroidMessage(raw);
     aceEditor.setValue(um.body);
@@ -80,6 +111,10 @@ class UpDroidEditor {
     ws.onMessage
         .where((value) => value.data.startsWith(EDITOR_FILE_TEXT))
         .listen((value) => openTextHandler(value.data));
+    
+    cs.stream
+            .where((m) => m.dest == 'EDITOR')
+            .listen((m) => processMessage(m));
     
     saveButton.onClick.listen((e) => saveText());
     

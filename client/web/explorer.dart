@@ -7,21 +7,25 @@ class UpDroidExplorer {
   static const String EXPLORER_DIRECTORY_LIST = '[[EXPLORER_DIRECTORY_LIST]]';
   
   WebSocket ws;
-  UpDroidEditor upEditor;
+  StreamController<CommanderMessage> cs;
+  
   String absolutePathPrefix;
 
+  DivElement editorDiv;
   HRElement rootline;
   ParagraphElement recycle;
+  
   Dropzone dzRootLine;
   Dropzone dzRecycle;
   Dropzone dzEditor;
   
-  UpDroidExplorer(WebSocket ws, String path, UpDroidEditor ed) {
+  UpDroidExplorer(WebSocket ws, StreamController<CommanderMessage> cs, String path) {
     this.ws = ws;
-    this.upEditor = ed;
+    this.cs = cs;
     absolutePathPrefix = path;
 
-    dzEditor = new Dropzone(ed.editorDiv);
+    editorDiv = querySelector('#editor-1');
+    dzEditor = new Dropzone(editorDiv);
     
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
@@ -63,17 +67,16 @@ class UpDroidExplorer {
     dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        upEditor.editorDiv.classes.add('editor-entered');
+        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
       }
     });
     
-    dzEditor.onDragLeave.listen((e) => upEditor.editorDiv.classes.remove('editor-entered'));
+    dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
     
     dzEditor.onDrop.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        upEditor.openFile = e.draggableElement.dataset['path'];
-        ws.send('[[EDITOR_OPEN]]' + upEditor.openFile);
+        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
       }
     });
   }
@@ -193,7 +196,7 @@ class UpDroidExplorer {
         span.classes.add('span-ondrag');
       }
       if (!file.isDirectory) {
-        upEditor.editorDiv.classes.add('editor-ondrag');
+        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
       }
     });
     
@@ -205,7 +208,7 @@ class UpDroidExplorer {
         span.classes.remove('span-ondrag');
       }
       if (!file.isDirectory) {
-        upEditor.editorDiv.classes.remove('editor-ondrag');
+        cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
       }
     });
   }

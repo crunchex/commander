@@ -5,6 +5,8 @@ part of client;
 /// to the server side.
 class UpDroidExplorer {
   static const String EXPLORER_DIRECTORY_LIST = '[[EXPLORER_DIRECTORY_LIST]]';
+  static const String EXPLORER_ADD = '[[EXPLORER_ADD]]';
+  static const String EXPLORER_REMOVE = '[[EXPLORER_REMOVE]]';
   
   WebSocket ws;
   StreamController<CommanderMessage> cs;
@@ -44,7 +46,15 @@ class UpDroidExplorer {
   registerExplorerEventHandlers() {
     ws.onMessage
         .where((event) => event.data.startsWith(EXPLORER_DIRECTORY_LIST))
-        .listen((event) => syncExplorer(event.data));
+        .listen((event) => generateDirectoryList(event.data));
+
+    ws.onMessage
+        .where((event) => event.data.startsWith(EXPLORER_ADD))
+        .listen((event) => addUpdate(event.data));
+    
+    ws.onMessage
+        .where((event) => event.data.startsWith(EXPLORER_REMOVE))
+        .listen((event) => removeUpdate(event.data));
     
     dzRootLine.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
     dzRootLine.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
@@ -92,7 +102,7 @@ class UpDroidExplorer {
     
     // Build SimpleFile list our of raw strings.
     for (String entity in entities) {
-      files.add(new SimpleFile(entity, absolutePathPrefix));
+      files.add(new SimpleFile.fromDirectoryList(entity, absolutePathPrefix));
     }
     
     return files;
@@ -213,8 +223,47 @@ class UpDroidExplorer {
     });
   }
   
+  /// Handles an Explorer add update for a single file.
+  void addUpdate(String raw) {
+    UpDroidMessage um = new UpDroidMessage(raw);
+    SimpleFile file = new SimpleFile.fromPath(um.body, absolutePathPrefix);
+    
+    setUpFile(file);
+  }
+  
+  /// Handles an Explorer remove update for a single file.
+  void removeUpdate(String raw) {
+    UpDroidMessage um = new UpDroidMessage(raw);
+    SimpleFile file = new SimpleFile.fromPath(um.body, absolutePathPrefix);
+    
+    UListElement ul = querySelector('#explorer-ul-${file.parentDir}');
+    for (Element el in ul.nodes) {
+      if (el.id == file.name) {
+        ul.nodes.remove(el);
+      }
+    }
+  }
+  
+  /// Sets up a new HTML element from a SimpleFile.
+  setUpFile(SimpleFile file) {
+    LIElement li = generateLiHtml(file);
+    
+    // Register double-click event handler for file renaming.
+    li.onDoubleClick.listen((e) {
+      renameEventHandler(li, file);
+      // To prevent the rename event from propagating up the directory tree.
+      e.stopPropagation();
+    });
+    
+    // Set up drag and drop for file open & delete.
+    dragSetup(li, file);
+    
+    UListElement dirElement = (file.parentDir == '') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
+    dirElement.children.add(li);
+  }
+  
   /// Redraws all file explorer views.
-  void syncExplorer(String raw) {
+  void generateDirectoryList(String raw) {
     UpDroidMessage um = new UpDroidMessage(raw);
     var data = um.body;
     
@@ -224,22 +273,8 @@ class UpDroidExplorer {
     UListElement explorer = querySelector('#explorer-top');
     explorer.innerHtml = '';
 
-    // Generate the HTML for the File Explorer.
     for (SimpleFile file in files) {
-      LIElement li = generateLiHtml(file);
-      
-      // Register double-click event handler for file renaming.
-      li.onDoubleClick.listen((e) {
-        renameEventHandler(li, file);
-        // To prevent the rename event from propagating up the directory tree.
-        e.stopPropagation();
-      });
-      
-      // Set up drag and drop for file open & delete.
-      dragSetup(li, file);
-      
-      UListElement dirElement = (file.parentDir == '') ? querySelector('#explorer-top') : querySelector('#explorer-ul-${file.parentDir}');
-      dirElement.children.add(li);
+      setUpFile(file);
     }
   }
 }
@@ -248,16 +283,20 @@ class UpDroidExplorer {
 /// the server over [WebSocket]. Primarily used for generating the HTML views
 /// in the file explorer that represent the filesystem.
 class SimpleFile {
-  String raw;
-  String path;
-  bool isDirectory;
   String name;
   String parentDir;
+  String path;
+  bool isDirectory;
   
-  SimpleFile(String raw, String prefix) {
-    this.raw = raw;
+  SimpleFile.fromDirectoryList(String raw, String prefix) {
     String workingString = stripFormatting(raw, prefix);
     getData(workingString);
+  }
+  
+  SimpleFile.fromPath(String raw, String prefix) {
+    path = raw;
+    isDirectory = false;
+    getData(raw.replaceFirst(prefix, ''));
   }
   
   String stripFormatting(String raw, String prefix) {
@@ -265,9 +304,7 @@ class SimpleFile {
     isDirectory = raw.startsWith('Directory: ') ? true : false;
     raw = raw.replaceFirst(new RegExp(r'(Directory: |File: )'), '');
     
-    // Save the absolute path.
     path = raw;
-    
     raw = raw.replaceFirst(prefix, '');
     return raw;
   }

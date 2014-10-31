@@ -15,7 +15,7 @@ void formattedMessage(WebSocket socket, String header, String body) {
 void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var split = e.toString().split(' ');
   var header = split[0].toUpperCase();
-  var formatted = '[[$header]]' + split[1];
+  var formatted = '[[EXPLORER_$header]]' + split[1];
   socket.add(formatted);
 }
 

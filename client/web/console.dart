@@ -5,8 +5,10 @@ part of client;
 /// It is not meant to be a complete terminal emulator like xterm.
 class UpDroidConsole {
   static const String CONSOLE_COMMAND = '[[CONSOLE_COMMAND]]';
+  static const String CONSOLE_OUTPUT = '[[CONSOLE_OUTPUT]]';
   
   WebSocket ws;
+  StreamController<String> cs;
   
   DivElement inputGroup;
   TextInputElement input;
@@ -14,8 +16,9 @@ class UpDroidConsole {
   AnchorElement consoleButton;
   AnchorElement themeButton;
   
-  UpDroidConsole(WebSocket ws) {
+  UpDroidConsole(WebSocket ws, StreamController<String> cs) {
     this.ws = ws;
+    this.cs = cs;
     inputGroup = querySelector('#input-group');
     input = querySelector('#input');
     output = querySelector('#output');
@@ -56,6 +59,10 @@ class UpDroidConsole {
     ws.onMessage
         .where((value) => value.data.startsWith(CONSOLE_COMMAND))
         .listen((value) => updateOutputHandler(value.data));
+    
+    cs.stream
+        .where((value) => value.startsWith(CONSOLE_OUTPUT))
+        .listen((value) => updateOutputHandler(value));
     
     input.onChange.listen((e) {
       ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());

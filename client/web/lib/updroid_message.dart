@@ -1,7 +1,5 @@
 library updroid_message;
 
-import 'dart:async';
-
 /// Container class that extracts the header (denoted with double brackets)
 /// and body from the raw text of a formatted [WebSocket] message received
 /// from the UpDroid server.

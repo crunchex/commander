@@ -43,8 +43,8 @@ class UpDroidExplorer {
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
     ws.onMessage
-        .where((value) => value.data.startsWith(EXPLORER_DIRECTORY_LIST))
-        .listen((value) => syncExplorer(value.data));
+        .where((event) => event.data.startsWith(EXPLORER_DIRECTORY_LIST))
+        .listen((event) => syncExplorer(event.data));
     
     dzRootLine.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
     dzRootLine.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));

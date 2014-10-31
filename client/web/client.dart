@@ -24,7 +24,7 @@ void main() {
   // The classes use this to communicate with each other.
   StreamController<CommanderMessage> cs = new StreamController<CommanderMessage>.broadcast();
 
-  registerWebSocketEventHandlers(ws, cs);
+  registerEventHandlers(ws, cs);
 }
 
 /// Activates Bootjack features.
@@ -47,15 +47,15 @@ void initializeClasses(String raw, WebSocket ws, StreamController<CommanderMessa
 
 /// Sets up external event handlers for the various Commander classes. These
 /// are mostly listening events for [WebSocket] messages.
-void registerWebSocketEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
+void registerEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
   ws.onOpen.listen((Event e) {
     cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', body: 'Connected to updroid.'));
     ws.send(EXPLORER_DIRECTORY_PATH);
   });
   
   ws.onMessage
-      .where((value) => value.data.startsWith(EXPLORER_DIRECTORY_PATH))
-      .listen((value) => initializeClasses(value.data, ws, cs));
+      .where((event) => event.data.startsWith(EXPLORER_DIRECTORY_PATH))
+      .listen((event) => initializeClasses(event.data, ws, cs));
 
   ws.onClose.listen((Event e) {
     cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', body: 'Disconnected from updroid.'));

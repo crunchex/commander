@@ -109,12 +109,12 @@ class UpDroidEditor {
   /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
     ws.onMessage
-        .where((value) => value.data.startsWith(EDITOR_FILE_TEXT))
-        .listen((value) => openTextHandler(value.data));
+        .where((event) => event.data.startsWith(EDITOR_FILE_TEXT))
+        .listen((event) => openTextHandler(event.data));
     
     cs.stream
-            .where((m) => m.dest == 'EDITOR')
-            .listen((m) => processMessage(m));
+        .where((m) => m.dest == 'EDITOR')
+        .listen((m) => processMessage(m));
     
     saveButton.onClick.listen((e) => saveText());
     

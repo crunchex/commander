@@ -4,6 +4,11 @@ import 'dart:io';
 import 'dart:async';
 import 'package:watcher/watcher.dart';
 
+/// Convenience method for a formatted socket message
+void formattedMessage(WebSocket socket, String header, String body) {
+  socket.add('[[$header]]$body');
+}
+
 /// Convenience method for adding a formatted filesystem update to the socket
 /// stream.
 ///   ex. add /home/user/tmp => [[ADD]]/home/user/tmp

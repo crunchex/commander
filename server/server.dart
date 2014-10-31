@@ -6,8 +6,8 @@ import 'package:logging_handlers/server_logging_handlers.dart';
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 
-import 'lib/console_parser.dart';
 import 'lib/server_helper.dart' as help;
+import 'lib/client_responses.dart';
 
 Logger log;
 DirectoryWatcher watcher;
@@ -22,83 +22,38 @@ void handleWebSocket(WebSocket socket, Directory dir) {
     
     switch (um.header) {
       case 'EXPLORER_DIRECTORY_PATH':
-        socket.add('[[EXPLORER_DIRECTORY_PATH]]' + dir.path);
-        
-        // Since it is assumed DirectoryPath is only requested on open,
-        // also send the initial directory list.
-        help.getDirectory(dir).then((files) {
-          socket.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
-        });
+        sendDirectory(socket, dir);
         break;
-        
+
       case 'EXPLORER_RENAME':
-        List<String> renameArgs = um.body.split(' ');
-        
-        if (!FileSystemEntity.isDirectorySync(renameArgs[0])) {
-          var fileToRename = new File(renameArgs[0]);
-          fileToRename.rename(renameArgs[1]);
-        } else {
-          var dirToRename = new Directory(renameArgs[0]);
-          dirToRename.rename(renameArgs[1]);
-        }
+        fsRename(um.body);
         break;
-      
-      // Currently implemented in the same way as RENAME as there is no
-      // direct API for MOVE.
+
       case 'EXPLORER_MOVE':
-        List<String> renameArgs = um.body.split(' ');
-        
-        if (!FileSystemEntity.isDirectorySync(renameArgs[0])) {
-          var fileToRename = new File(renameArgs[0]);
-          fileToRename.rename(renameArgs[1]);
-        } else {
-          var dirToRename = new Directory(renameArgs[0]);
-          dirToRename.rename(renameArgs[1]);
-        }
+        // Currently implemented in the same way as RENAME as there is no
+        // direct API for MOVE.
+        fsRename(um.body);
         break;
 
       case 'EXPLORER_DELETE':
-        var path = um.body;
-              
-        // Can't simply just create a FileSystemEntity and delete it, since
-        // it is an abstract class. This is a dumb way to create the proper
-        // entity class.
-        try {
-          var dirToDelete = new Directory(path);
-          dirToDelete.delete(recursive:true);
-        } catch (e) {
-          var fileToDelete = new File(path);
-          fileToDelete.delete();
-        }
+        fsDelete(um.body);
         break;
         
       case 'EDITOR_OPEN':
-        var path = um.body;
-
-        var fileToOpen = new File(path);
-        fileToOpen.readAsString().then((String contents) {
-          socket.add('[[EDITOR_FILE_TEXT]]' + contents);
-        });
+        sendFileContents(socket, um.body);
         break;
         
       case 'EDITOR_SAVE':
-        // List[0] = data, List[1] = path.
-        List<String> data = um.body.split('[[PATH]]');
-
-        var fileToSave = new File(data[1]);
-        fileToSave.writeAsString(data[0]);
+        saveFile(um.body);
         break;
         
       case 'CONSOLE_COMMAND':
         log.info('Client sent: $s');
-        List args = parseCommandInput(um.body);
-        Process.run(args[0], args[1]).then((ProcessResult results) {
-          socket.add('[[CONSOLE_COMMAND]]' + results.stdout);
-        });
+        processCommand(socket, um.body);
         break;
         
       default:
-        log.severe('Message received without updroid header');
+        log.severe('Message received without updroid header.');
     }
   }, onDone: () {
     log.info('Client disconnected');  

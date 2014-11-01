@@ -68,9 +68,9 @@ class UpDroidConsole {
 
   /// Sets up the event handlers for the console.
   void registerConsoleEventHandlers() {
-    ws.onMessage
-        .where((event) => event.data.startsWith(CONSOLE_COMMAND))
-        .listen((event) => updateOutputHandler(event.data));
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == CONSOLE_COMMAND)
+        .listen((um) => updateOutputHandler(um.body));
     
     cs.stream
         .where((m) => m.dest == 'CONSOLE')

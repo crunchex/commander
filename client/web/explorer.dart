@@ -4,10 +4,6 @@ part of client;
 /// side and all associated views. It also facilitates file operation requests
 /// to the server side.
 class UpDroidExplorer {
-  static const String EXPLORER_DIRECTORY_LIST = '[[EXPLORER_DIRECTORY_LIST]]';
-  static const String EXPLORER_ADD = '[[EXPLORER_ADD]]';
-  static const String EXPLORER_REMOVE = '[[EXPLORER_REMOVE]]';
-  
   WebSocket ws;
   StreamController<CommanderMessage> cs;
   
@@ -39,22 +35,22 @@ class UpDroidExplorer {
     
     // Let the server know Explorer is up and ready to receive
     // the directory list.
-    ws.send(EXPLORER_DIRECTORY_LIST);
+    ws.send('[[EXPLORER_DIRECTORY_LIST]]');
   }
   
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
-    ws.onMessage
-        .where((event) => event.data.startsWith(EXPLORER_DIRECTORY_LIST))
-        .listen((event) => generateDirectoryList(event.data));
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'EXPLORER_DIRECTORY_LIST')
+        .listen((um) => generateDirectoryList(um.body));
 
-    ws.onMessage
-        .where((event) => event.data.startsWith(EXPLORER_ADD))
-        .listen((event) => addUpdate(event.data));
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'EXPLORER_ADD')
+        .listen((um) => addUpdate(um.body));
     
-    ws.onMessage
-        .where((event) => event.data.startsWith(EXPLORER_REMOVE))
-        .listen((event) => removeUpdate(event.data));
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'EXPLORER_REMOVE')
+        .listen((um) => removeUpdate(um.body));
     
     dzRootLine.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
     dzRootLine.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
@@ -224,17 +220,11 @@ class UpDroidExplorer {
   }
   
   /// Handles an Explorer add update for a single file.
-  void addUpdate(String raw) {
-    UpDroidMessage um = new UpDroidMessage(raw);
-    SimpleFile file = new SimpleFile.fromPath(um.body, absolutePathPrefix);
-    
-    setUpFile(file);
-  }
+  void addUpdate(String raw) => newElementFromFile(new SimpleFile.fromPath(raw, absolutePathPrefix));
   
   /// Handles an Explorer remove update for a single file.
   void removeUpdate(String raw) {
-    UpDroidMessage um = new UpDroidMessage(raw);
-    SimpleFile file = new SimpleFile.fromPath(um.body, absolutePathPrefix);
+    SimpleFile file = new SimpleFile.fromPath(raw, absolutePathPrefix);
     
     UListElement ul = querySelector('#explorer-ul-${file.parentDir}');
     for (Element el in ul.nodes) {
@@ -245,7 +235,7 @@ class UpDroidExplorer {
   }
   
   /// Sets up a new HTML element from a SimpleFile.
-  setUpFile(SimpleFile file) {
+  newElementFromFile(SimpleFile file) {
     LIElement li = generateLiHtml(file);
     
     // Register double-click event handler for file renaming.
@@ -263,18 +253,15 @@ class UpDroidExplorer {
   }
   
   /// Redraws all file explorer views.
-  void generateDirectoryList(String raw) {
-    UpDroidMessage um = new UpDroidMessage(raw);
-    var data = um.body;
-    
-    var files = fileList(data);
+  void generateDirectoryList(String raw) { 
+    var files = fileList(raw);
     
     // Set the explorer list to empty for a full refresh.
     UListElement explorer = querySelector('#explorer-top');
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {
-      setUpFile(file);
+      newElementFromFile(file);
     }
   }
 }

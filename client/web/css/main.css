@@ -1,11 +1,11 @@
 @font-face {
   font-family: RobotoCondensed-Light;
-  src: url(RobotoCondensed-Light.ttf);
+  src: url(../assets/RobotoCondensed-Light.ttf);
 }
 
 @font-face {
   font-family: RobotoCondensed-Regular;
-  src: url(RobotoCondensed-Regular.ttf);
+  src: url(../assets/RobotoCondensed-Regular.ttf);
 }
 
 html {

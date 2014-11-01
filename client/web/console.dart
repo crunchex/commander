@@ -4,8 +4,6 @@ part of client;
 /// user to pass in white-listed commands to the server and view their output.
 /// It is not meant to be a complete terminal emulator like xterm.
 class UpDroidConsole {
-  static const String CONSOLE_COMMAND = '[[CONSOLE_COMMAND]]';
-  
   WebSocket ws;
   StreamController<CommanderMessage> cs;
   
@@ -18,6 +16,7 @@ class UpDroidConsole {
   UpDroidConsole(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
     this.cs = cs;
+
     inputGroup = querySelector('#input-group');
     input = querySelector('#input');
     output = querySelector('#output');
@@ -69,7 +68,7 @@ class UpDroidConsole {
   /// Sets up the event handlers for the console.
   void registerConsoleEventHandlers() {
     ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == CONSOLE_COMMAND)
+        .where((um) => um.header == 'CONSOLE_COMMAND')
         .listen((um) => updateOutputHandler(um.body));
     
     cs.stream

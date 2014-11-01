@@ -6,8 +6,7 @@ part of client;
 class UpDroidExplorer {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
-  
-  String absolutePathPrefix;
+  String workspacePath;
 
   DivElement editorDiv;
   HRElement rootline;
@@ -17,10 +16,10 @@ class UpDroidExplorer {
   Dropzone dzRecycle;
   Dropzone dzEditor;
   
-  UpDroidExplorer(WebSocket ws, StreamController<CommanderMessage> cs, String path) {
+  UpDroidExplorer(WebSocket ws, StreamController<CommanderMessage> cs, String workspacePath) {
     this.ws = ws;
     this.cs = cs;
-    absolutePathPrefix = path;
+    this.workspacePath = workspacePath;
 
     editorDiv = querySelector('#editor-1');
     dzEditor = new Dropzone(editorDiv);
@@ -57,7 +56,7 @@ class UpDroidExplorer {
     
     dzRootLine.onDrop.listen((e) {
       var currentPath = e.draggableElement.dataset['path'];
-      var newPath = '$absolutePathPrefix${e.draggableElement.id}';
+      var newPath = '$workspacePath${e.draggableElement.id}';
       ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
     });
     
@@ -98,7 +97,7 @@ class UpDroidExplorer {
     
     // Build SimpleFile list our of raw strings.
     for (String entity in entities) {
-      files.add(new SimpleFile.fromDirectoryList(entity, absolutePathPrefix));
+      files.add(new SimpleFile.fromDirectoryList(entity, workspacePath));
     }
     
     return files;
@@ -224,18 +223,13 @@ class UpDroidExplorer {
   }
   
   /// Handles an Explorer add update for a single file.
-  void addUpdate(String raw) => newElementFromFile(new SimpleFile.fromPath(raw, absolutePathPrefix));
+  void addUpdate(String path) => newElementFromFile(new SimpleFile.fromPath(path, workspacePath));
   
   /// Handles an Explorer remove update for a single file.
-  void removeUpdate(String raw) {
-    SimpleFile file = new SimpleFile.fromPath(raw, absolutePathPrefix);
-    
-    UListElement ul = querySelector('#explorer-ul-${file.parentDir}');
-    for (Element el in ul.nodes) {
-      if (el.id == file.name) {
-        ul.nodes.remove(el);
-      }
-    }
+  void removeUpdate(String path) {
+    LIElement li = querySelector("[data-path='$path']");
+    UListElement ul = li.parent;
+    ul.children.remove(li);
   }
   
   /// Sets up a new HTML element from a SimpleFile.

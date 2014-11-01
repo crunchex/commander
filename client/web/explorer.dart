@@ -175,6 +175,10 @@ class UpDroidExplorer {
         if (keyEvent.keyCode == KeyCode.ENTER) {
           var newPath = file.path.replaceFirst(file.name, input.value);
           ws.send('[[EXPLORER_RENAME]]' + file.path + ' ' + newPath);
+          
+          // Remove this element once editing is complete, as the new one will soon appear.
+          UListElement ul = li.parent;
+          ul.children.remove(li);
         } else {
           // TODO: need to make field width scale to the user's input.
           // Using a 'contenteditable' <span> instead of an <input> is a possible option.

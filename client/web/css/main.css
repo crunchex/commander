@@ -217,11 +217,17 @@ li input {
 }
 
 #input {
-  height: 30px;
+  height: 28px;
   font-size: 14px;
-  border: 0px solid;
+  box-shadow: none;
+  border: none;
   background-color: transparent;
   color: #268bd2;
+}
+
+#input:focus {
+  box-shadow: none;
+  border: none;
 }
 
 #output {

@@ -70,6 +70,30 @@ class UpDroidConsole {
     // Autoscroll the new messages as they come in.
     console.scrollTop = console.scrollHeight;
   }
+  
+  /// Copies the prompt and user's command and adds them to the console.
+  void copyCommand(String cmd) {
+    SpanElement userInput = new SpanElement();
+    
+    SpanElement prompt = new SpanElement();
+    prompt
+        ..text = '[up, droid!] '
+        ..classes.add('prompt');
+    
+    SpanElement command = new SpanElement();
+    command
+        ..text = cmd
+        ..classes.add('user-command');
+    
+    userInput.children.add(prompt);
+    userInput.children.add(command);
+    
+    console.children.insert(console.children.length - 1, userInput);
+    console.children.insert(console.children.length - 1, new BRElement());
+    
+    // Autoscroll the new messages as they come in.
+    console.scrollTop = console.scrollHeight;
+  }
 
   /// Sets up the event handlers for the console.
   void registerConsoleEventHandlers() {
@@ -83,6 +107,7 @@ class UpDroidConsole {
     
     input.onChange.listen((e) {
       ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());
+      copyCommand(input.value.trim());
       input.value = "";
     });
     

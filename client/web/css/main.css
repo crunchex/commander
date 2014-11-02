@@ -219,13 +219,16 @@ li input {
   overflow-y: auto;
 }
 
-#prompt {
+.prompt {
   color: #859900;
+}
+
+.user-command {
+  color: #268bd2; 
 }
 
 #input {
   width: 388px;
-  color: #268bd2;
   background-color: transparent;
   outline: none !important;
   border: none !important;

@@ -74,7 +74,7 @@ html, body {
   text-align: center;
   color: #333333;
   border: 1px solid #dddddd;
-  font-family: "Source Sans Pro",Calibri,Candara,Arial,sans-serif;
+  font-family: "Source Sans Pro", Calibri, Candara, Arial, sans-serif;
   font-size: 15px;
 }
 
@@ -213,6 +213,8 @@ li input {
   padding: 5px;
   border: 1px solid #dddddd;
   background-color: #002b36;
+  font-size: 12px;
+  font-family: "Lucida Console", Monaco, monospace;
   color: #93a1a1;
   overflow-y: auto;
 }
@@ -222,6 +224,7 @@ li input {
 }
 
 #input {
+  width: 388px;
   color: #268bd2;
   background-color: transparent;
   outline: none !important;

@@ -91,10 +91,7 @@ class UpDroidConsole {
       e.preventDefault();
     });
     
-    consoleButton.onClick.listen((e) {
-      // This is broken. It's supposed to move the cursor focus over to
-      // the input field when a user selects the Console tab.
-      input.focus();
-    });
+    consoleButton.onClick.listen((e) => input.focus());
+    console.onClick.listen((e) => input.focus());
   }
 }

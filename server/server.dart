@@ -28,6 +28,10 @@ void handleWebSocket(WebSocket socket, Directory dir) {
       case 'EXPLORER_DIRECTORY_LIST':
         sendDirectory(socket, dir);
         break;
+        
+      case 'EXPLORER_NEW_FILE':
+        fsNewFile(um.body);
+        break;
 
       case 'EXPLORER_RENAME':
         fsRename(um.body);

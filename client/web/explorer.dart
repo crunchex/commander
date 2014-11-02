@@ -66,9 +66,15 @@ class UpDroidExplorer {
     dzRootLine.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
     
     dzRootLine.onDrop.listen((e) {
-      var currentPath = e.draggableElement.dataset['path'];
-      var newPath = '$workspacePath${e.draggableElement.id}';
-      ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+      if (e.draggableElement.className.contains('explorer-li')) {
+        // The draggable is an existing file/folder.
+        var currentPath = e.draggableElement.dataset['path'];
+        var newPath = '$workspacePath${e.draggableElement.id}';
+        ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+      } else {
+        // The draggable is a new file.
+        ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath + 'untitled.cc');
+      }
     });
     
     dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));
@@ -159,11 +165,17 @@ class UpDroidExplorer {
       d.onDragLeave.listen((e) => span.classes.remove('span-entered'));
   
       d.onDrop.listen((e) {
-        var currentPath = e.draggableElement.dataset['path'];
-        var newPath = '${span.parent.dataset['path']}/${e.draggableElement.id}';
-        // Avoid an exception thrown when the new name already exists.
-        if (currentPath != span.parent.dataset['path']) {
-          ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+        if (e.draggableElement.className.contains('explorer-li')) {
+          // The draggable is an existing file/folder.
+          var currentPath = e.draggableElement.dataset['path'];
+          var newPath = '${span.parent.dataset['path']}/${e.draggableElement.id}';
+          // Avoid an exception thrown when the new name already exists.
+          if (currentPath != span.parent.dataset['path']) {
+            ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+          }
+        } else {
+          // The draggable is a new file.
+          ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path'] + '/untitled.cc');
         }
       });
     }

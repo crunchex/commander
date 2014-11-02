@@ -29,6 +29,11 @@ void saveFile(String args) {
   fileToSave.writeAsString(argsList[0]);
 }
 
+void fsNewFile(String path) {
+  var newFile = new File(path);
+  newFile.create();
+}
+
 void fsRename(String rename) {
   List<String> renameList = rename.split(' ');
   

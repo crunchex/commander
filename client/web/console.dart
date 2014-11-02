@@ -6,10 +6,10 @@ part of client;
 class UpDroidConsole {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
-  
-  DivElement inputGroup;
+
+  DivElement console;
+  SpanElement prompt;
   TextInputElement input;
-  ParagraphElement output;
   AnchorElement consoleButton;
   AnchorElement themeButton;
   
@@ -17,9 +17,9 @@ class UpDroidConsole {
     this.ws = ws;
     this.cs = cs;
 
-    inputGroup = querySelector('#input-group');
+    console = querySelector('#console');
+    prompt = querySelector('#prompt');
     input = querySelector('#input');
-    output = querySelector('#output');
     consoleButton = querySelector('#button-console');
     themeButton = querySelector('.button-console-theme');
     
@@ -33,14 +33,16 @@ class UpDroidConsole {
   
   /// Toggles between a Solarized dark and light theme.
   void toggleTheme() {
-    if (inputGroup.style.backgroundColor == 'rgb(238, 232, 213)') {
-      inputGroup.style.backgroundColor = '#002b36'; // base-green
-      input.style.color = '#268bd2';  // blue
-      output.style.color = '#93a1a1'; // light-grey
+    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+      console.style.backgroundColor = '#002b36'; // base-green
+      querySelectorAll('.pre-output').style.color = '#93a1a1'; // light-grey
+      querySelectorAll('.prompt').style.color = '#859900'; // green
+      querySelectorAll('.user-command').style.color = '#268bd2';  // blue
     } else {
-      inputGroup.style.backgroundColor = '#eee8d5'; // base-tan
-      input.style.color = '#dc322f';  // red
-      output.style.color = '#586e75'; // dark-grey
+      console.style.backgroundColor = '#eee8d5'; // base-tan
+      querySelectorAll('.pre-output').style.color = '#586e75'; // dark-grey
+      querySelectorAll('.prompt').style.color = '#b58900'; // yellow
+      querySelectorAll('.user-command').style.color = '#dc322f';  // red
     }
   }
   
@@ -58,11 +60,52 @@ class UpDroidConsole {
   
   /// Updates the output field based on string messages passed in.
   void updateOutputHandler(String s) {
-    output.appendText('up> $s');
-    output.appendHtml('<br/>');
+    // Generate the new line.
+    PreElement newLine = new PreElement();
+    newLine
+        ..text = s
+        ..classes.add('pre-output');
+    
+    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+      newLine.style.color = '#586e75';
+    }
+    
+    console.children.insert(console.children.length - 1, newLine);
 
     // Autoscroll the new messages as they come in.
-    output.scrollTop = output.scrollHeight;
+    console.scrollTop = console.scrollHeight;
+  }
+  
+  /// Copies the prompt and user's command and adds them to the console.
+  void copyCommand(String cmd) {
+    SpanElement userInput = new SpanElement();
+    
+    SpanElement prompt = new SpanElement();
+    prompt
+        ..text = '[up, droid!] '
+        ..classes.add('prompt');
+    
+    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+      prompt.style.color = '#b58900';
+    }
+    
+    SpanElement command = new SpanElement();
+    command
+        ..text = cmd
+        ..classes.add('user-command');
+    
+    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+      command.style.color = '#dc322f';
+    }
+    
+    userInput.children.add(prompt);
+    userInput.children.add(command);
+    
+    console.children.insert(console.children.length - 1, userInput);
+    console.children.insert(console.children.length - 1, new BRElement());
+    
+    // Autoscroll the new messages as they come in.
+    console.scrollTop = console.scrollHeight;
   }
 
   /// Sets up the event handlers for the console.
@@ -77,6 +120,7 @@ class UpDroidConsole {
     
     input.onChange.listen((e) {
       ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());
+      copyCommand(input.value.trim());
       input.value = "";
     });
     
@@ -85,10 +129,7 @@ class UpDroidConsole {
       e.preventDefault();
     });
     
-    consoleButton.onClick.listen((e) {
-      // This is broken. It's supposed to move the cursor focus over to
-      // the input field when a user selects the Console tab.
-      input.focus();
-    });
+    consoleButton.onClick.listen((e) => input.focus());
+    console.onClick.listen((e) => input.focus());
   }
 }

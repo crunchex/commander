@@ -74,7 +74,7 @@ html, body {
   text-align: center;
   color: #333333;
   border: 1px solid #dddddd;
-  font-family: "Source Sans Pro",Calibri,Candara,Arial,sans-serif;
+  font-family: "Source Sans Pro", Calibri, Candara, Arial, sans-serif;
   font-size: 15px;
 }
 
@@ -203,35 +203,47 @@ li input {
   border: 1px solid #dddddd;
 }
 
-#input-group {
-  border: 1px solid #dddddd;
-}
-
 #row-main {
   height: 100%;
 }
 
-#input-group {
+#console {
   width: 100%;
+  height: 500px;
+  padding: 5px;
+  border: 1px solid #dddddd;
   background-color: #002b36;
+  font-size: 12px;
+  font-family: "Lucida Console", Monaco, monospace;
+  color: #93a1a1;
+  overflow-y: auto;
+}
+
+.pre-output {
+  padding: 0px;
+  margin: 0px;
+  border: none;
+  background-color: transparent;
+  font-size: 12px;
+  font-family: "Lucida Console", Monaco, monospace;
+  color: #93a1a1;
+}
+
+.prompt {
+  color: #859900;
+}
+
+.user-command {
+  color: #268bd2; 
 }
 
 #input {
-  height: 30px;
-  font-size: 14px;
-  border: 0px solid;
+  width: 388px;
+  padding: 0px;
   background-color: transparent;
-  color: #268bd2;
-}
-
-#output {
-   width: 100%;
-   height: 459px;
-   padding: 10px;
-   font-size: 14px;
-   overflow-y: auto;
-   background-color: transparent;
-   color: #93a1a1;
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .footer {

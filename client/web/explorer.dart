@@ -9,8 +9,13 @@ class UpDroidExplorer {
   String workspacePath;
 
   DivElement editorDiv;
+  SpanElement newFile;
+  SpanElement newFolder;
   HRElement rootline;
   ParagraphElement recycle;
+  
+  Draggable dragNewFile;
+  Draggable dragNewFolder;
   
   Dropzone dzRootLine;
   Dropzone dzRecycle;
@@ -20,15 +25,21 @@ class UpDroidExplorer {
     this.ws = ws;
     this.cs = cs;
     this.workspacePath = workspacePath;
-
-    editorDiv = querySelector('#editor-1');
-    dzEditor = new Dropzone(editorDiv);
+    
+    newFile = querySelector('#file');
+    newFileDragSetup();
+    
+    newFolder = querySelector('#folder');
+    newFolderDragSetup();
+    
+    rootline = querySelector('#file-explorer-hr');
+    dzRootLine = new Dropzone(rootline);
     
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
     
-    rootline = querySelector('#file-explorer-hr');
-    dzRootLine = new Dropzone(rootline);
+    editorDiv = querySelector('#editor-1');
+    dzEditor = new Dropzone(editorDiv);
     
     registerExplorerEventHandlers();
     
@@ -190,7 +201,57 @@ class UpDroidExplorer {
     }
   }
   
-  /// Sets up a [Draggable] for the [LIElement] to handle file open and delete.
+  /// Sets up a [Draggable] for the [newFile] to handle the drag event.
+  void newFileDragSetup() {
+    // Create a new draggable using the current element as
+    // the visual element (avatar) being dragged.
+    Draggable d = new Draggable(newFile, avatarHandler: new AvatarHandler.clone());
+    
+    // Highlight valid dropzones: rootline, editor, any workspace folder.
+    d.onDragStart.listen((event) {
+      rootline.classes.add('file-explorer-hr-ondrag');
+      cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
+      List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      for (SpanElement span in spanList) {
+        span.classes.add('span-ondrag');
+      }   
+    });
+    
+    d.onDragEnd.listen((event) {
+      rootline.classes.remove('file-explorer-hr-ondrag');
+      cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
+      List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      for (SpanElement span in spanList) {
+        span.classes.remove('span-ondrag');
+      }
+    });
+  }
+  
+  /// Sets up a [Draggable] for the [newFolder] to handle the drag event.
+  void newFolderDragSetup() {
+    // Create a new draggable using the current element as
+    // the visual element (avatar) being dragged.
+    Draggable d = new Draggable(newFolder, avatarHandler: new AvatarHandler.clone());
+    
+    // Highlight valid dropzones: rootline, any workspace folder.
+    d.onDragStart.listen((event) {
+      rootline.classes.add('file-explorer-hr-ondrag');
+      List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      for (SpanElement span in spanList) {
+        span.classes.add('span-ondrag');
+      }   
+    });
+    
+    d.onDragEnd.listen((event) {
+      rootline.classes.remove('file-explorer-hr-ondrag');
+      List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      for (SpanElement span in spanList) {
+        span.classes.remove('span-ondrag');
+      }
+    });
+  }
+  
+  /// Sets up a [Draggable] for the existing [LIElement] to handle file open and delete.
   void dragSetup(LIElement li, SimpleFile file) {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.

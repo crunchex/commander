@@ -71,9 +71,10 @@ class UpDroidExplorer {
         var currentPath = e.draggableElement.dataset['path'];
         var newPath = '$workspacePath${e.draggableElement.id}';
         ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
-      } else {
-        // The draggable is a new file.
+      } else if (e.draggableElement.id == 'file'){
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath + 'untitled.cc');
+      } else {
+        ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + 'untitled');
       }
     });
     
@@ -173,9 +174,10 @@ class UpDroidExplorer {
           if (currentPath != span.parent.dataset['path']) {
             ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
           }
-        } else {
-          // The draggable is a new file.
+        } else if (e.draggableElement.id == 'file') {
           ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path'] + '/untitled.cc');
+        } else {
+          ws.send('[[EXPLORER_NEW_FOLDER]]' + span.parent.dataset['path'] + '/untitled');
         }
       });
     }

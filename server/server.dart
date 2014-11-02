@@ -32,6 +32,13 @@ void handleWebSocket(WebSocket socket, Directory dir) {
       case 'EXPLORER_NEW_FILE':
         fsNewFile(um.body);
         break;
+        
+      case 'EXPLORER_NEW_FOLDER':
+        fsNewFolder(um.body);
+        // Empty folders don't trigger an incremental update, so we need to
+        // refresh the entire workspace.
+        sendDirectory(socket, dir);
+        break;
 
       case 'EXPLORER_RENAME':
         fsRename(um.body);

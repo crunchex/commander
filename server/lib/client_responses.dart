@@ -34,6 +34,11 @@ void fsNewFile(String path) {
   newFile.create();
 }
 
+void fsNewFolder(String path) {
+  var newFolder = new Directory(path);
+  newFolder.createSync();
+}
+
 void fsRename(String rename) {
   List<String> renameList = rename.split(' ');
   

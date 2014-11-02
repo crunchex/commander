@@ -6,7 +6,7 @@ part of client;
 class UpDroidConsole {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
-  
+
   DivElement console;
   SpanElement prompt;
   TextInputElement input;
@@ -35,14 +35,14 @@ class UpDroidConsole {
   void toggleTheme() {
     if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
       console.style.backgroundColor = '#002b36'; // base-green
-      console.style.color = '#93a1a1'; // light-grey
-      prompt.style.color = '#859900';
-      input.style.color = '#268bd2';  // blue
+      querySelectorAll('.pre-output').style.color = '#93a1a1'; // light-grey
+      querySelectorAll('.prompt').style.color = '#859900'; // green
+      querySelectorAll('.user-command').style.color = '#268bd2';  // blue
     } else {
       console.style.backgroundColor = '#eee8d5'; // base-tan
-      console.style.color = '#586e75'; // dark-grey
-      prompt.style.color = '#b58900';
-      input.style.color = '#dc322f';  // red
+      querySelectorAll('.pre-output').style.color = '#586e75'; // dark-grey
+      querySelectorAll('.prompt').style.color = '#b58900'; // yellow
+      querySelectorAll('.user-command').style.color = '#dc322f';  // red
     }
   }
   
@@ -62,10 +62,15 @@ class UpDroidConsole {
   void updateOutputHandler(String s) {
     // Generate the new line.
     PreElement newLine = new PreElement();
-    newLine.text = s;
+    newLine
+        ..text = s
+        ..classes.add('pre-output');
+    
+    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+      newLine.style.color = '#586e75';
+    }
     
     console.children.insert(console.children.length - 1, newLine);
-    //console.children.insert(console.children.length - 1, new BRElement());
 
     // Autoscroll the new messages as they come in.
     console.scrollTop = console.scrollHeight;
@@ -80,10 +85,18 @@ class UpDroidConsole {
         ..text = '[up, droid!] '
         ..classes.add('prompt');
     
+    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+      prompt.style.color = '#b58900';
+    }
+    
     SpanElement command = new SpanElement();
     command
         ..text = cmd
         ..classes.add('user-command');
+    
+    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+      command.style.color = '#dc322f';
+    }
     
     userInput.children.add(prompt);
     userInput.children.add(command);

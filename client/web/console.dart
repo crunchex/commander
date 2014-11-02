@@ -8,8 +8,8 @@ class UpDroidConsole {
   StreamController<CommanderMessage> cs;
   
   DivElement console;
+  SpanElement prompt;
   TextInputElement input;
-  ParagraphElement output;
   AnchorElement consoleButton;
   AnchorElement themeButton;
   
@@ -18,6 +18,7 @@ class UpDroidConsole {
     this.cs = cs;
 
     console = querySelector('#console');
+    prompt = querySelector('#prompt');
     input = querySelector('#input');
     consoleButton = querySelector('#button-console');
     themeButton = querySelector('.button-console-theme');
@@ -35,10 +36,12 @@ class UpDroidConsole {
     if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
       console.style.backgroundColor = '#002b36'; // base-green
       console.style.color = '#93a1a1'; // light-grey
+      prompt.style.color = '#859900';
       input.style.color = '#268bd2';  // blue
     } else {
       console.style.backgroundColor = '#eee8d5'; // base-tan
       console.style.color = '#586e75'; // dark-grey
+      prompt.style.color = '#b58900';
       input.style.color = '#dc322f';  // red
     }
   }

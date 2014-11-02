@@ -219,6 +219,16 @@ li input {
   overflow-y: auto;
 }
 
+pre {
+  padding: 0px;
+  margin: 0px;
+  border: none;
+  background-color: transparent;
+  font-size: 12px;
+  font-family: "Lucida Console", Monaco, monospace;
+  color: #93a1a1;
+}
+
 .prompt {
   color: #859900;
 }

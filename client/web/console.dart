@@ -61,11 +61,11 @@ class UpDroidConsole {
   /// Updates the output field based on string messages passed in.
   void updateOutputHandler(String s) {
     // Generate the new line.
-    SpanElement newLine = new SpanElement();
+    PreElement newLine = new PreElement();
     newLine.text = s;
     
     console.children.insert(console.children.length - 1, newLine);
-    console.children.insert(console.children.length - 1, new BRElement());
+    //console.children.insert(console.children.length - 1, new BRElement());
 
     // Autoscroll the new messages as they come in.
     console.scrollTop = console.scrollHeight;

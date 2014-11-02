@@ -7,7 +7,7 @@ class UpDroidConsole {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
   
-  DivElement inputGroup;
+  DivElement console;
   TextInputElement input;
   ParagraphElement output;
   AnchorElement consoleButton;
@@ -17,9 +17,8 @@ class UpDroidConsole {
     this.ws = ws;
     this.cs = cs;
 
-    inputGroup = querySelector('#input-group');
+    console = querySelector('#console');
     input = querySelector('#input');
-    output = querySelector('#output');
     consoleButton = querySelector('#button-console');
     themeButton = querySelector('.button-console-theme');
     
@@ -33,14 +32,14 @@ class UpDroidConsole {
   
   /// Toggles between a Solarized dark and light theme.
   void toggleTheme() {
-    if (inputGroup.style.backgroundColor == 'rgb(238, 232, 213)') {
-      inputGroup.style.backgroundColor = '#002b36'; // base-green
+    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+      console.style.backgroundColor = '#002b36'; // base-green
+      console.style.color = '#93a1a1'; // light-grey
       input.style.color = '#268bd2';  // blue
-      output.style.color = '#93a1a1'; // light-grey
     } else {
-      inputGroup.style.backgroundColor = '#eee8d5'; // base-tan
+      console.style.backgroundColor = '#eee8d5'; // base-tan
+      console.style.color = '#586e75'; // dark-grey
       input.style.color = '#dc322f';  // red
-      output.style.color = '#586e75'; // dark-grey
     }
   }
   
@@ -58,11 +57,15 @@ class UpDroidConsole {
   
   /// Updates the output field based on string messages passed in.
   void updateOutputHandler(String s) {
-    output.appendText('up> $s');
-    output.appendHtml('<br/>');
+    // Generate the new line.
+    SpanElement newLine = new SpanElement();
+    newLine.text = s;
+    
+    console.children.insert(console.children.length - 1, newLine);
+    console.children.insert(console.children.length - 1, new BRElement());
 
     // Autoscroll the new messages as they come in.
-    output.scrollTop = output.scrollHeight;
+    console.scrollTop = console.scrollHeight;
   }
 
   /// Sets up the event handlers for the console.

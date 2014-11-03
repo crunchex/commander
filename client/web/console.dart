@@ -13,9 +13,13 @@ class UpDroidConsole {
   AnchorElement consoleButton;
   AnchorElement themeButton;
   
+  bool lightTheme;
+  
   UpDroidConsole(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
     this.cs = cs;
+    
+    lightTheme = false;
 
     console = querySelector('#console');
     prompt = querySelector('#prompt');
@@ -33,16 +37,18 @@ class UpDroidConsole {
   
   /// Toggles between a Solarized dark and light theme.
   void toggleTheme() {
-    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+    if (lightTheme) {
       console.style.backgroundColor = '#002b36'; // base-green
       querySelectorAll('.pre-output').style.color = '#93a1a1'; // light-grey
       querySelectorAll('.prompt').style.color = '#859900'; // green
       querySelectorAll('.user-command').style.color = '#268bd2';  // blue
+      lightTheme = false;
     } else {
-      console.style.backgroundColor = '#eee8d5'; // base-tan
+      console.style.backgroundColor = '#fdf6e3'; // base-tan
       querySelectorAll('.pre-output').style.color = '#586e75'; // dark-grey
       querySelectorAll('.prompt').style.color = '#b58900'; // yellow
       querySelectorAll('.user-command').style.color = '#dc322f';  // red
+      lightTheme = true;
     }
   }
   
@@ -66,7 +72,7 @@ class UpDroidConsole {
         ..text = s
         ..classes.add('pre-output');
     
-    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+    if (lightTheme) {
       newLine.style.color = '#586e75';
     }
     
@@ -85,7 +91,7 @@ class UpDroidConsole {
         ..text = '[up, droid!] '
         ..classes.add('prompt');
     
-    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+    if (lightTheme) {
       prompt.style.color = '#b58900';
     }
     
@@ -94,7 +100,7 @@ class UpDroidConsole {
         ..text = cmd
         ..classes.add('user-command');
     
-    if (console.style.backgroundColor == 'rgb(238, 232, 213)') {
+    if (lightTheme) {
       command.style.color = '#dc322f';
     }
     

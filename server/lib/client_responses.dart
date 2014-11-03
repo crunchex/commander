@@ -2,7 +2,6 @@ library client_responses;
 
 import 'dart:io';
 import 'server_helper.dart' as help;
-import 'console_parser.dart';
 
 void sendDirectory(WebSocket s, Directory dir) {
   help.getDirectory(dir).then((files) {
@@ -65,8 +64,10 @@ void fsDelete(String path) {
 }
 
 void processCommand(WebSocket s, String command, Directory dir) {
-  List args = parseCommandInput(command);
-  Process.run(args[0], args[1], workingDirectory: dir.path).then((ProcessResult results) {
+  List splitCommand = command.split(' ');
+  String executable = splitCommand[0];
+  List args = (splitCommand.length > 1) ? splitCommand.getRange(1, splitCommand.length).toList() : [];
+  Process.run(executable, args, workingDirectory: dir.path).then((ProcessResult results) {
     s.add('[[CONSOLE_COMMAND]]' + results.stdout);
   });
 }

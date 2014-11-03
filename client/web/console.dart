@@ -125,9 +125,19 @@ class UpDroidConsole {
         .listen((m) => processMessage(m));
     
     input.onChange.listen((e) {
-      ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());
-      copyCommand(input.value.trim());
-      input.value = "";
+
+    });
+    
+    input.onKeyUp.listen((e) {
+      var keyEvent = new KeyEvent.wrap(e);
+      if (keyEvent.keyCode == KeyCode.ENTER) {
+        RegExp allWhitespace = new RegExp(r'^[\s]*$');
+        if (!input.value.contains(allWhitespace)) {
+          ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());
+        }
+        copyCommand(input.value.trim());
+        input.value = "";
+      }
     });
     
     themeButton.onClick.listen((e) {

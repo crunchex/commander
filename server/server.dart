@@ -64,7 +64,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         
       case 'CONSOLE_COMMAND':
         log.info('Client sent: $s');
-        processCommand(socket, um.body);
+        processCommand(socket, um.body, dir);
         break;
         
       default:

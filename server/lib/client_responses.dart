@@ -64,9 +64,9 @@ void fsDelete(String path) {
   }
 }
 
-void processCommand(WebSocket s, String command) {
+void processCommand(WebSocket s, String command, Directory dir) {
   List args = parseCommandInput(command);
-  Process.run(args[0], args[1]).then((ProcessResult results) {
+  Process.run(args[0], args[1], workingDirectory: dir.path).then((ProcessResult results) {
     s.add('[[CONSOLE_COMMAND]]' + results.stdout);
   });
 }

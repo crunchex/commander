@@ -30,7 +30,7 @@ void setUpBootstrap() {
   Tab.use();
   Button.use();
   Dropdown.use();
-  Modal.use();
+  //Modal.use();
   Transition.use();
 }
 

@@ -41,6 +41,7 @@ class UpDroidEditor {
   
   Editor aceEditor;
   String openFile;
+  String originalContents;
   
   UpDroidEditor(WebSocket ws, StreamController<CommanderMessage> cs, String path, int editorID) {
     this.ws = ws;
@@ -99,7 +100,10 @@ class UpDroidEditor {
     editorDiv.classes.remove(s);
   }
   
-  String openTextHandler(String data) => aceEditor.setValue(data);
+  void openTextHandler(String data) {
+    originalContents = data;
+    aceEditor.setValue(data);
+  }
   
   /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
@@ -114,20 +118,23 @@ class UpDroidEditor {
     saveButton.onClick.listen((e) => saveText());
     
     newButton.onClick.listen((e) {
-      ParagraphElement p = querySelector('#modal-save-text');
-      p.appendText('You have made more changes since the last save. Save these changes?');
+      if (aceEditor.value != originalContents) {
+        DivElement modal = querySelector('#myModal');
+        Modal m = new Modal(modal);
+        m.show();
+      } else {
+        newFile();
+      }
+
+      e.preventDefault();
     });
     
     modalSaveButton.onClick.listen((e) {
       saveText();
-      openFile = absolutePathPrefix + 'untitled.cc';
-      aceEditor.setValue(ROS_TALKER, 1);
+      newFile();
     });
     
-    modalDiscardButton.onClick.listen((e) {
-      openFile = absolutePathPrefix + 'untitled.cc';
-      aceEditor.setValue(ROS_TALKER, 1);
-    });
+    modalDiscardButton.onClick.listen((e) => newFile());
     
     themeButton.onClick.listen((e) {
       if (aceEditor.theme.name == 'solarized_dark') {
@@ -142,5 +149,13 @@ class UpDroidEditor {
   }
   
   // Helper methods for filesystem operations.
-  void saveText() => ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
+  void saveText() {
+    ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
+    originalContents = aceEditor.value;
+  }
+  
+  void newFile() {
+    openFile = absolutePathPrefix + 'untitled.cc';
+    aceEditor.setValue(ROS_TALKER, 1);
+  }
 }

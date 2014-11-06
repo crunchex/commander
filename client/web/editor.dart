@@ -73,50 +73,29 @@ class UpDroidEditor {
     originalContents = aceEditor.value;
   }
   
-  /// Process messages that Console has picked up according to the type.
-  void processMessage(CommanderMessage m) {
-    switch (m.type) {
-      case 'CLASS_ADD':
-        classAdd(m.body);
-        break;
-        
-      case 'CLASS_REMOVE':
-        classRemove(m.body);
-        break;
-        
-      case 'OPEN_FILE':
-        openFile = m.body;
-        ws.send('[[EDITOR_OPEN]]' + openFile);
-        break;
-        
-      default:
-        print('Console error: unrecognized message type.');
-    }
-  }
-  
-  void classAdd(String s) {
-    editorDiv.classes.add(s);
-  }
-  
-  void classRemove(String s) {
-    editorDiv.classes.remove(s);
-  }
-  
-  void openTextHandler(String data) {
-    originalContents = data;
-    aceEditor.setValue(data);
-  }
-  
   /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
+    cs.stream
+        .where((m) => m.dest == 'EDITOR' && m.type == 'CLASS_ADD')
+        .listen((m) => classAdd(m.body));
+    
+    cs.stream
+            .where((m) => m.dest == 'EDITOR' && m.type == 'CLASS_REMOVE')
+            .listen((m) => classRemove(m.body));
+    
+    // Editor receives command from Explorer to request file contents from the server.
+    cs.stream
+            .where((m) => m.dest == 'EDITOR' && m.type == 'OPEN_FILE')
+            .listen((m) {
+              openFile = m.body;
+              ws.send('[[EDITOR_OPEN]]' + openFile);
+            });
+              
+    // Editor receives the open file contents from the server.
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EDITOR_FILE_TEXT')
         .listen((um) => openTextHandler(um.body));
-    
-    cs.stream
-        .where((m) => m.dest == 'EDITOR')
-        .listen((m) => processMessage(m));
-    
+
     saveButton.onClick.listen((e) => saveText());
     
     newButton.onClick.listen((e) {
@@ -151,6 +130,19 @@ class UpDroidEditor {
   }
   
   // Helper methods for filesystem operations.
+  void classAdd(String s) {
+    editorDiv.classes.add(s);
+  }
+  
+  void classRemove(String s) {
+    editorDiv.classes.remove(s);
+  }
+  
+  void openTextHandler(String data) {
+    originalContents = data;
+    aceEditor.setValue(data);
+  }
+  
   void saveText() {
     ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
     originalContents = aceEditor.value;

@@ -40,8 +40,10 @@ class UpDroidEditor {
   DivElement editorDiv;
   
   Editor aceEditor;
-  String openFile;
+  String openFilePath;
   String originalContents;
+  
+  bool shouldSave;
   
   UpDroidEditor(WebSocket ws, StreamController<CommanderMessage> cs, String path, int editorID) {
     this.ws = ws;
@@ -70,7 +72,7 @@ class UpDroidEditor {
       ..fontSize = 14
       ..theme = new Theme.named(Theme.SOLARIZED_DARK);
     
-    resetSavePoint(aceEditor.value);
+    resetSavePoint();
   }
   
   /// Sets up event handlers for the editor's menu buttons.
@@ -80,42 +82,61 @@ class UpDroidEditor {
         .listen((m) => classAdd(m.body));
     
     cs.stream
-            .where((m) => m.dest == 'EDITOR' && m.type == 'CLASS_REMOVE')
-            .listen((m) => classRemove(m.body));
+        .where((m) => m.dest == 'EDITOR' && m.type == 'CLASS_REMOVE')
+        .listen((m) => classRemove(m.body));
     
     // Editor receives command from Explorer to request file contents from the server.
     cs.stream
-            .where((m) => m.dest == 'EDITOR' && m.type == 'OPEN_FILE')
-            .listen((m) {
-              openFile = m.body;
-              ws.send('[[EDITOR_OPEN]]' + openFile);
-            });
+        .where((m) => m.dest == 'EDITOR' && m.type == 'OPEN_FILE')
+        .listen((m) {
+          ws.send('[[EDITOR_OPEN]]' + m.body);
+        });
               
     // Editor receives the open file contents from the server.
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EDITOR_FILE_TEXT')
-        .listen((um) => openTextHandler(um.body));
-
-    saveButton.onClick.listen((e) => saveText());
+        .listen((um) {
+          var returnedData = um.body.split('[[CONTENTS]]');
+          var newText = returnedData[1];
+          if (noUnsavedChanges()) {
+            openFilePath = returnedData[0];
+            setEditorText(newText);
+          } else {
+            presentModal();
+            modalSaveButton.onClick.listen((e) {
+              saveText();
+              openFilePath = returnedData[0];
+              setEditorText(newText);
+            });
+            modalDiscardButton.onClick.listen((e) {
+              openFilePath = returnedData[0];
+              setEditorText(newText);
+            });
+          }
+        });
     
     newButton.onClick.listen((e) {
-      if (aceEditor.value != originalContents) {
-        DivElement modal = querySelector('#myModal');
-        Modal m = new Modal(modal);
-        m.show();
+      var newText = ROS_TALKER;
+      if (noUnsavedChanges()) {
+        openFilePath = absolutePathPrefix + 'untitled.cc';
+        setEditorText(newText);
       } else {
-        newFile();
+        presentModal();
+        modalSaveButton.onClick.listen((e) {
+          saveText();
+          openFilePath = absolutePathPrefix + 'untitled.cc';
+          setEditorText(newText);
+        });
+        modalDiscardButton.onClick.listen((e) {
+          openFilePath = absolutePathPrefix + 'untitled.cc';
+          setEditorText(newText);
+        });
       }
 
       e.preventDefault();
     });
-    
-    modalSaveButton.onClick.listen((e) {
-      saveText();
-      newFile();
-    });
-    
-    modalDiscardButton.onClick.listen((e) => newFile());
+
+    saveButton.onClick.listen((e) => saveText());
     
     themeButton.onClick.listen((e) {
       if (aceEditor.theme.name == 'solarized_dark') {
@@ -137,21 +158,23 @@ class UpDroidEditor {
   void classRemove(String s) {
     editorDiv.classes.remove(s);
   }
+
+  setEditorText(String newText) {
+    aceEditor.setValue(newText, 1);
+    resetSavePoint();
+  }
   
-  void openTextHandler(String openText) {
-    resetSavePoint(openText);
-    aceEditor.setValue(openText, 1);
+  void presentModal() {
+    DivElement modal = querySelector('#myModal');
+    Modal m = new Modal(modal);
+    m.show();
   }
   
   void saveText() {
-    ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
-    resetSavePoint(aceEditor.value);
+    ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFilePath);
+    resetSavePoint();
   }
   
-  void newFile() {
-    openFile = absolutePathPrefix + 'untitled.cc';
-    aceEditor.setValue(ROS_TALKER, 1);
-  }
-  
-  String resetSavePoint(String value) => originalContents = value;
+  bool noUnsavedChanges() => aceEditor.value == originalContents;
+  String resetSavePoint() => originalContents = aceEditor.value;
 }

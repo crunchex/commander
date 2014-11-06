@@ -16,7 +16,7 @@ void sendPath(WebSocket s, Directory dir) {
 void sendFileContents(WebSocket s, String path) {
   var fileToOpen = new File(path);
   fileToOpen.readAsString().then((String contents) {
-    s.add('[[EDITOR_FILE_TEXT]]' + contents);
+    s.add('[[EDITOR_FILE_TEXT]]' + path + '[[CONTENTS]]' + contents);
   });
 }
 

@@ -70,7 +70,7 @@ class UpDroidEditor {
       ..fontSize = 14
       ..theme = new Theme.named(Theme.SOLARIZED_DARK);
     
-    originalContents = aceEditor.value;
+    resetSavePoint(aceEditor.value);
   }
   
   /// Sets up event handlers for the editor's menu buttons.
@@ -138,18 +138,20 @@ class UpDroidEditor {
     editorDiv.classes.remove(s);
   }
   
-  void openTextHandler(String data) {
-    originalContents = data;
-    aceEditor.setValue(data);
+  void openTextHandler(String openText) {
+    resetSavePoint(openText);
+    aceEditor.setValue(openText);
   }
   
   void saveText() {
     ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
-    originalContents = aceEditor.value;
+    resetSavePoint(aceEditor.value);
   }
   
   void newFile() {
     openFile = absolutePathPrefix + 'untitled.cc';
     aceEditor.setValue(ROS_TALKER, 1);
   }
+  
+  String resetSavePoint(String value) => originalContents = value;
 }

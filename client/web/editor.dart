@@ -69,6 +69,8 @@ class UpDroidEditor {
       ..session.mode = new Mode.named(Mode.PYTHON)
       ..fontSize = 14
       ..theme = new Theme.named(Theme.SOLARIZED_DARK);
+    
+    originalContents = aceEditor.value;
   }
   
   /// Process messages that Console has picked up according to the type.

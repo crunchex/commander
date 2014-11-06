@@ -140,7 +140,7 @@ class UpDroidEditor {
   
   void openTextHandler(String openText) {
     resetSavePoint(openText);
-    aceEditor.setValue(openText);
+    aceEditor.setValue(openText, 1);
   }
   
   void saveText() {

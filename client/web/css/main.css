@@ -293,6 +293,10 @@ li input {
   box-shadow: none !important;
 }
 
+.popover {
+    width: 500px;
+}
+
 .footer {
   position: absolute;
   bottom: 0;

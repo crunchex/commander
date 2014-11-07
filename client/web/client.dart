@@ -32,6 +32,8 @@ void setUpBootstrap() {
   Dropdown.use();
   //Modal.use();
   Transition.use();
+  
+  Popover.wire(querySelector('#console-help.dropdown-toggle'));
 }
 
 /// Initializes the main Commander classes.

@@ -141,6 +141,9 @@ class UpDroidEditor {
     openFilePath = newPath;
     aceEditor.setValue(newText, 1);
     resetSavePoint();
+    
+    // Set focus to the interactive area so the user can typing immediately.
+    aceEditor.focus();
   }
   
   /// Shows the modal for unsaved changes.

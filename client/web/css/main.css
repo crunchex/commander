@@ -246,6 +246,53 @@ li input {
   box-shadow: none !important;
 }
 
+.modal-content {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.modal-header {
+  padding: 5px;
+}
+
+.modal-header h3 {
+  padding-left: 10px;
+  font: 26px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+  
+}
+
+.modal-body {
+  padding: 10px;
+}
+
+.modal-body p {
+  padding-left: 20px;
+}
+
+.modal-footer {
+  padding: 5px;
+}
+
+.btn-warning {
+  padding: 5px 9px 5px 9px;
+  background-color: rgb(245, 245, 245);
+  border-color: #e3e3e3;
+  color: rgb(51, 51, 51);
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.btn-warning:hover {
+  background-color: #e3e3e3;
+  border-color: #e3e3e3;
+  color: rgb(51, 51, 51);
+}
+
+.btn-primary {
+  padding: 5px 9px 5px 9px;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .footer {
   position: absolute;
   bottom: 0;

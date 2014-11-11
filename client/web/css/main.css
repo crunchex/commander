@@ -312,3 +312,15 @@ li input {
   right: 10px;
   font-size: 10px;
 }
+
+.explorer-li{
+  cursor: pointer;
+}
+
+#folder{
+  cursor: pointer;
+}
+
+#file{
+  cursor: pointer;
+}

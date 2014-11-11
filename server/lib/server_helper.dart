@@ -9,13 +9,31 @@ void formattedMessage(WebSocket socket, String header, String body) {
   socket.add('[[$header]]$body');
 }
 
+/// Helper method to grab file name in case of spaces
+
+String fNameGrabber(List<String> split){
+  var fName = "";
+  if(split.length > 2){
+    for(var i = 1; i < split.length; i++){
+      fName += split[i];
+      if(i != (split.length - 1)){
+        fName += r"\ ";
+      }
+    }
+  }
+  else{
+    fName = split[1];
+  }
+  return fName;
+}
+
 /// Convenience method for adding a formatted filesystem update to the socket
 /// stream.
 ///   ex. add /home/user/tmp => [[ADD]]/home/user/tmp
 void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var split = e.toString().split(' ');
   var header = split[0].toUpperCase();
-  var formatted = '[[EXPLORER_$header]]' + split[1];
+  var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
   socket.add(formatted);
 }
 

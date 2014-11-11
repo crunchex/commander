@@ -1,5 +1,7 @@
 #!/usr/bin/env dart
 
+// hi
+
 import 'dart:io';
 import 'dart:async';
 import 'package:logging/logging.dart';

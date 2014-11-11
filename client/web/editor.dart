@@ -1,5 +1,7 @@
 part of client;
 
+// Template for a new file.
+// TODO: make this contain boilerplate ROS code
 const String ROS_TALKER =
 r'''
 #!/usr/bin/env python
@@ -23,11 +25,14 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException: pass
 ''';
 
+/// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
+/// for the editor and an additional menu bar with some filesystem operations.
 class UpDroidEditor {
   WebSocket ws;
-  int id;
+  StreamController<CommanderMessage> cs;
   String absolutePathPrefix;
 
+  DivElement editorDiv;
   AnchorElement saveButton;
   AnchorElement newButton;
   AnchorElement themeButton;
@@ -35,61 +40,128 @@ class UpDroidEditor {
   ButtonElement modalDiscardButton;
   
   Editor aceEditor;
-  String openFile;
-  
-  UpDroidEditor(WebSocket ws, int id) {
+  String openFilePath;
+  String originalContents;
+
+  UpDroidEditor(WebSocket ws, StreamController<CommanderMessage> cs, String path, int editorID) {
     this.ws = ws;
-    saveButton = querySelector('#button-save');
-    newButton = querySelector('#button-new');
-    themeButton = querySelector('#button-editor-theme');
-    modalSaveButton = querySelector('#modal-save');
-    modalDiscardButton = querySelector('#modal-discard');
+    this.cs = cs;
+    absolutePathPrefix = path;
+    
+    editorDiv = querySelector('#editor-$editorID');
+    
+    saveButton = querySelector('#column-${editorID} .button-save');
+    newButton = querySelector('#column-${editorID} .button-new');
+    themeButton = querySelector('#column-${editorID} .button-editor-theme');
+    modalSaveButton = querySelector('.modal-save');
+    modalDiscardButton = querySelector('.modal-discard');
     
     setUpEditor();
     registerEditorEventHandlers();
   }
 
+  /// Sets up the editor and styles.
   void setUpEditor() {
     implementation = ACE_PROXY_IMPLEMENTATION;
     
-    aceEditor = edit(querySelector('#editor'));
+    aceEditor = edit(editorDiv);
     aceEditor
       ..session.mode = new Mode.named(Mode.PYTHON)
       ..fontSize = 14
       ..theme = new Theme.named(Theme.SOLARIZED_DARK);
+    
+    resetSavePoint();
   }
   
+  /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
-    saveButton.onClick.listen((e) => saveText());
+    cs.stream
+        .where((m) => m.dest == 'EDITOR' && m.type == 'CLASS_ADD')
+        .listen((m) => editorDiv.classes.add(m.body));
+    
+    cs.stream
+        .where((m) => m.dest == 'EDITOR' && m.type == 'CLASS_REMOVE')
+        .listen((m) => editorDiv.classes.remove(m.body));
+    
+    // Editor receives command from Explorer to request file contents from the server.
+    cs.stream
+        .where((m) => m.dest == 'EDITOR' && m.type == 'OPEN_FILE')
+        .listen((m) {
+          ws.send('[[EDITOR_OPEN]]' + m.body);
+        });
+              
+    // Editor receives the open file contents from the server.
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'EDITOR_FILE_TEXT')
+        .listen((um) {
+          var returnedData = um.body.split('[[CONTENTS]]');
+          var newPath = returnedData[0];
+          var newText = returnedData[1];
+          handleNewText(newPath, newText);
+        });
     
     newButton.onClick.listen((e) {
-      ParagraphElement p = querySelector('#modal-save-text');
-      p.appendText('You have made more changes since the last save. Save these changes?');
+      var newPath = absolutePathPrefix + 'untitled.cc';
+      var newText = ROS_TALKER;
+      handleNewText(newPath, newText);
+
+      // Stops the button from sending the page to the top (href=#).
+      e.preventDefault();
     });
-    
-    modalSaveButton.onClick.listen((e) {
-      saveText();
-      openFile = absolutePathPrefix + 'untitled.cc';
-      aceEditor.setValue(ROS_TALKER, 1);
-    });
-    
-    modalDiscardButton.onClick.listen((e) {
-      openFile = absolutePathPrefix + 'untitled.cc';
-      aceEditor.setValue(ROS_TALKER, 1);
-    });
+
+    saveButton.onClick.listen((e) => saveText());
     
     themeButton.onClick.listen((e) {
-      if (aceEditor.theme.name == 'solarized_dark') {
-        aceEditor.theme = new Theme.named(Theme.SOLARIZED_LIGHT);
-      } else {
-        aceEditor.theme = new Theme.named(Theme.SOLARIZED_DARK);
-      }
+      String newTheme = (aceEditor.theme.name == 'solarized_dark') ? Theme.SOLARIZED_LIGHT : Theme.SOLARIZED_DARK;
+      aceEditor.theme = new Theme.named(newTheme);
       
       // Stops the button from sending the page to the top (href=#).
       e.preventDefault();
     });
   }
   
-  String openText(String text) => aceEditor.setValue(text);
-  void saveText() => ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFile);
+  /// Handles changes to the Editor model, new files and opening files.
+  handleNewText(String newPath, String newText) {
+    if (noUnsavedChanges()) {
+      setEditorText(newPath, newText);
+    } else {
+      presentModal();
+      modalSaveButton.onClick.listen((e) {
+        saveText();
+        setEditorText(newPath, newText);
+      });
+      modalDiscardButton.onClick.listen((e) {
+        setEditorText(newPath, newText);
+      });
+    }
+  }
+  
+  /// Sets the Editor's text with [newText], updates [openFilePath], and resets the save point.
+  setEditorText(String newPath, String newText) {
+    openFilePath = newPath;
+    aceEditor.setValue(newText, 1);
+    resetSavePoint();
+    
+    // Set focus to the interactive area so the user can typing immediately.
+    aceEditor.focus();
+  }
+  
+  /// Shows the modal for unsaved changes.
+  void presentModal() {
+    DivElement modal = querySelector('#myModal');
+    Modal m = new Modal(modal);
+    m.show();
+  }
+  
+  /// Sends the file path and contents to the server to be saved to disk.
+  void saveText() {
+    ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFilePath);
+    resetSavePoint();
+  }
+  
+  /// Compares the Editor's current text with text at the last save point.
+  bool noUnsavedChanges() => aceEditor.value == originalContents;
+  
+  /// Resets the save point based on the Editor's current text.
+  String resetSavePoint() => originalContents = aceEditor.value;
 }

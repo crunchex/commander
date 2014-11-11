@@ -1,82 +1,59 @@
 library client;
 
 import 'dart:html';
+import 'dart:async';
 import 'package:bootjack/bootjack.dart';
 import 'package:ace/ace.dart';
 import 'package:ace/proxy.dart';
 import 'package:dnd/dnd.dart';
+import 'lib/updroid_message.dart';
 
 part 'explorer.dart';
 part 'editor.dart';
 part 'console.dart';
 
 void main() {
-  print("Client has started!");
-
   setUpBootstrap();
   
+  // Create the server-client [WebSocket].
   WebSocket ws = new WebSocket('ws://localhost:8080/ws');
-  UpDroidEditor ed = new UpDroidEditor(ws, 1);
-  UpDroidExplorer fe = new UpDroidExplorer(ws, ed);
-  UpDroidConsole cs = new UpDroidConsole(ws);
   
-  registerWebSocketEventHandlers(ws, ed, fe, cs);
+  // Create the intra-client message stream.
+  // The classes use this to communicate with each other.
+  StreamController<CommanderMessage> cs = new StreamController<CommanderMessage>.broadcast();
+
+  registerEventHandlers(ws, cs);
 }
 
+/// Activates Bootjack features.
 void setUpBootstrap() {
   Tab.use();
   Button.use();
   Dropdown.use();
-  Modal.use();
-  //Transition.use();
+  //Modal.use();
+  Transition.use();
+  
+  Popover.wire(querySelector('#console-help.dropdown-toggle'));
 }
 
-void registerWebSocketEventHandlers(WebSocket ws, UpDroidEditor ed, UpDroidExplorer fe, UpDroidConsole cs) {
-  ws.onOpen.listen((Event e) {
-      cs.updateOutputField('Connected to updroid!');
-      ws.send('[[EXPLORER_DIRECTORY_PATH]]');
-    });
-
-  ws.onMessage.listen((MessageEvent e) {
-    CommanderMessage cm = new CommanderMessage(e.data);
-    
-    switch (cm.header()) {
-      case 'EXPLORER_DIRECTORY_LIST':
-        fe.updateFileExplorer(cm.body());
-        break;
-        
-      case 'EXPLORER_DIRECTORY_PATH':
-        fe.absolutePathPrefix = cm.body();
-        ed.absolutePathPrefix = cm.body();
-        break;
-        
-      case 'EDITOR_FILE_TEXT':
-        ed.openText(cm.body());
-        break;
-        
-      case 'CONSOLE_COMMAND':
-        cs.updateOutputField(e.data);
-        break;
-        
-      default:
-        print('Message received without commander header');
-    }
-  });
-
-  ws.onClose.listen((Event e) {
-    cs.updateOutputField('Disconnected from updroid...');
-  });
+/// Initializes the main Commander classes.
+void initializeClasses(String workspacePath, WebSocket ws, StreamController<CommanderMessage> cs) {
+  UpDroidEditor editor = new UpDroidEditor(ws, cs, workspacePath, 1);
+  UpDroidExplorer explorer = new UpDroidExplorer(ws, cs, workspacePath);
+  UpDroidConsole console = new UpDroidConsole(ws, cs);
 }
 
-class CommanderMessage {
-  final String s;
+/// Sets up external event handlers for the various Commander classes. These
+/// are mostly listening events for [WebSocket] messages.
+void registerEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
+  ws.onOpen.listen((um) {
+    cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', body: 'Connected to updroid.'));
+    ws.send('[[EXPLORER_DIRECTORY_PATH]]');
+  });
   
-  CommanderMessage(this.s);
-  
-  String header() {
-    var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
-    return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
-  }
-  
-  String body() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
+  ws.onMessage.transform(updroidTransformer)
+      .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
+      .listen((um) => initializeClasses(um.body, ws, cs));
+
+  ws.onClose.listen((event) => cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', body: 'Disconnected from updroid.')));
 }

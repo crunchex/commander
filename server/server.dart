@@ -1,7 +1,5 @@
 #!/usr/bin/env dart
 
-// hi
-
 import 'dart:io';
 import 'package:logging/logging.dart';
 import 'package:logging_handlers/server_logging_handlers.dart';

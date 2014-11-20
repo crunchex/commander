@@ -6,6 +6,7 @@ import 'server_helper.dart' as help;
 void sendDirectory(WebSocket s, Directory dir) {
   help.getDirectory(dir).then((files) {
     s.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
+    print("directory sent");
   });
 }
 
@@ -57,6 +58,7 @@ void fsDelete(String path) {
   try {
     var dirToDelete = new Directory(path);
     dirToDelete.delete(recursive:true);
+    print(dirToDelete);
   } catch (e) {
     var fileToDelete = new File(path);
     fileToDelete.delete();

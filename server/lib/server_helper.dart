@@ -33,8 +33,8 @@ String fNameGrabber(List<String> split){
 void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var split = e.toString().split(' ');
   var header = split[0].toUpperCase();
-  print(fNameGrabber(split));
   var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
+  print(formatted);
   socket.add(formatted);
 }
 

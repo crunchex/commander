@@ -34,7 +34,6 @@ void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var split = e.toString().split(' ');
   var header = split[0].toUpperCase();
   var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
-  print(formatted);
   socket.add(formatted);
 }
 

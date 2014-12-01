@@ -51,8 +51,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         break;
 
       case 'EXPLORER_DELETE':
-        fsDelete(um.body);
-        sendDirectory(socket, dir);
+        fsDelete(um.body, socket, dir);
         break;
         
       case 'EDITOR_OPEN':

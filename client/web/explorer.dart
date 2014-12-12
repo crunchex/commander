@@ -72,9 +72,9 @@ class UpDroidExplorer {
         var newPath = '$workspacePath${e.draggableElement.id}';
         ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
       } else if (e.draggableElement.id == 'file'){
-        ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath + 'untitled.cc');
+        ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath + '/untitled.cc');
       } else {
-        ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + 'untitled');
+        ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
       }
     });
     
@@ -126,7 +126,7 @@ class UpDroidExplorer {
   LIElement generateLiHtml(file) {
     LIElement li = new LIElement();
     li
-      ..id = file.name
+      ..dataset['name'] = file.name
       ..dataset['path'] = file.path
       ..dataset['isDir'] = file.isDirectory.toString()
       ..draggable = true

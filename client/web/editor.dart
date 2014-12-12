@@ -101,7 +101,7 @@ class UpDroidEditor {
         });
     
     newButton.onClick.listen((e) {
-      var newPath = absolutePathPrefix + 'untitled.cc';
+      var newPath = absolutePathPrefix + '/untitled.cc';
       var newText = ROS_TALKER;
       handleNewText(newPath, newText);
 

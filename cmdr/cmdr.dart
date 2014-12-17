@@ -1,6 +1,7 @@
 #!/usr/bin/env dart
 
 import 'dart:io';
+import 'package:http_server/http_server.dart' show VirtualDirectory;
 import 'package:logging/logging.dart';
 import 'package:logging_handlers/server_logging_handlers.dart';
 import 'package:args/args.dart';
@@ -77,9 +78,24 @@ void handleWebSocket(WebSocket socket, Directory dir) {
   watcher.events.listen((e) => help.formattedFsUpdate(socket, e));
 }
 
+// Setting up Virtual Directory
+
+VirtualDirectory virDir;
+
+void directoryHandler(dir, request) {
+  var indexUri = new Uri.file(dir.path).resolve('index.html');
+  virDir.serveFile(new File(indexUri.toFilePath()), request);
+}
+
 void main(List<String> args) {
   // Set default dir as current working directory.
   Directory dir = Directory.current;
+  
+  // Creating Virtual Directory
+  virDir = new VirtualDirectory(Platform.script.resolve('/Users/donghuynh/git/commander/gui/build/web').toFilePath())
+      ..allowDirectoryListing = true
+      ..directoryHandler = directoryHandler
+      ..followLinks = true;
   
   // Set up logging.
   log = new Logger('server');
@@ -91,7 +107,7 @@ void main(List<String> args) {
     dir = new Directory(directory);
   });
   parser.parse(args);
-
+ 
   // Initialize the DirectoryWatcher.
   watcher = new DirectoryWatcher(dir.path);
   
@@ -109,6 +125,7 @@ void main(List<String> args) {
       } else {
         log.info("Regular ${request.method} request for: ${request.uri.path}");
         // TODO: serve regular HTTP requests such as GET pages, etc.
+        virDir.serveRequest(request);
       }
     });
   });

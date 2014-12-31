@@ -149,7 +149,7 @@ class UpDroidExplorer {
     if (file.isDirectory) {
       UListElement ul = new UListElement();
       ul
-        ..id = 'explorer-ul-${file.name}'
+        ..dataset['name'] = 'explorer-ul-${file.name}'
         ..dataset['path'] = file.path
         ..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
@@ -365,7 +365,7 @@ class UpDroidExplorer {
       dirElement.children.add(li);
     }
     else{
-      dirElement = querySelector("#explorer-ul-${file.parentDir}[data-path='$truePath'");  // fixpoint
+      dirElement = querySelector("[data-name=explorer-ul-${file.parentDir}][data-path='$truePath']");  // fixpoint
         dirElement.children.add(li);
     }
   }

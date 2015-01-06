@@ -72,7 +72,7 @@ class UpDroidExplorer {
         var newPath = '$workspacePath${e.draggableElement.id}';
         ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
       } else if (e.draggableElement.id == 'file'){
-        ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath + '/untitled.cc');
+        ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath + '/untitled.cc');   
       } else {
         ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
       }
@@ -121,12 +121,24 @@ class UpDroidExplorer {
     return files;
   }
   
+  // Helper function removs spaces from path and file name
+  
+  String removeSpaces(String raw){
+    var result = '';
+    List<String> split = raw.split(' ');
+    for(var i=0; i< (split.length); i++){
+      result += split[i];
+    }
+    return result;
+  }
+  
+  
   /// Returns a generated [LIElement] with inner HTML based on
   /// the [SimpleFile]'s contents.
   LIElement generateLiHtml(file) {
     LIElement li = new LIElement();
     li
-      ..dataset['name'] = file.name
+      ..dataset['name'] = removeSpaces(file.name)
       ..dataset['path'] = file.path
       ..dataset['isDir'] = file.isDirectory.toString()
       ..draggable = true
@@ -149,8 +161,8 @@ class UpDroidExplorer {
     if (file.isDirectory) {
       UListElement ul = new UListElement();
       ul
-        ..dataset['name'] = 'explorer-ul-${file.name}'
-        ..dataset['path'] = file.path
+        ..dataset['name'] = 'explorer-ul-${removeSpaces(file.name)}'
+        ..dataset['path'] = removeSpaces(file.path)
         ..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
     }
@@ -170,13 +182,13 @@ class UpDroidExplorer {
         if (e.draggableElement.className.contains('explorer-li')) {
           // The draggable is an existing file/folder.
           var currentPath = e.draggableElement.dataset['path'];
-          var newPath = '${span.parent.dataset['path']}/${e.draggableElement.id}';
+          var newPath = '${span.parent.dataset['path']}/${e.draggableElement.dataset['name']}';
           // Avoid an exception thrown when the new name already exists.
           if (currentPath != span.parent.dataset['path']) {
             ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
           }
         } else if (e.draggableElement.id == 'file') {
-          ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path'] + '/untitled.cc');
+          ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path'] + '/untitled.cc');   
         } else {
           ws.send('[[EXPLORER_NEW_FOLDER]]' + span.parent.dataset['path'] + '/untitled');
         }
@@ -212,10 +224,6 @@ class UpDroidExplorer {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
           var newPath = filePathGrab(file) + input.value;    // fixpoint, replaceFirst creates error when file name matches part of parent directory's name
-          
-          // Test
-          print(newPath);
-          print(input.value);
           
           ws.send('[[EXPLORER_RENAME]]' + file.path + ' ' + newPath);
           
@@ -319,6 +327,9 @@ class UpDroidExplorer {
   /// Handles an Explorer add update for a single file.
   void addUpdate(String path) => newElementFromFile(new SimpleFile.fromPath(path, workspacePath));
   
+  
+  // fixpoint
+  
   /// Handles an Explorer remove update for a single file.
   
   void removeUpdate(String path) {
@@ -365,7 +376,14 @@ class UpDroidExplorer {
       dirElement.children.add(li);
     }
     else{
-      dirElement = querySelector("[data-name=explorer-ul-${file.parentDir}][data-path='$truePath']");  // fixpoint
+      var validPath = removeSpaces(truePath);
+      var validParent = removeSpaces(file.parentDir.replaceAll(r'\', ''));
+      dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");  // fixpoint
+        if(dirElement == null){
+          print("dir element null");
+        }
+        print("valid parent: " + validParent);
+        print("valid path: " + validPath);
         dirElement.children.add(li);
     }
   }
@@ -399,7 +417,7 @@ class SimpleFile {
   }
   
   SimpleFile.fromPath(String raw, String prefix) {
-    path = raw;
+    path = raw.replaceAll(r'\', '');
     isDirectory = false;
     getData(raw.replaceFirst(prefix, ''));
   }
@@ -417,7 +435,8 @@ class SimpleFile {
   void getData(String fullPath) {
     List<String> pathList = fullPath.split('/');
     name = pathList[pathList.length - 1];
-    if (pathList.length > 1) {
+    if (pathList.length >
+    1) {
       parentDir = pathList[pathList.length - 2];
     } else {
       parentDir = '';

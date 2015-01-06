@@ -59,7 +59,7 @@ void fsRename(String rename) {
   }
 }
 
-void fsDelete(String path, WebSocket socket, Directory dir) {
+void fsDelete(String path, WebSocket socket) {
   // Can't simply just create a FileSystemEntity and delete it, since
   // it is an abstract class. This is a dumb way to create the proper
   // entity class.

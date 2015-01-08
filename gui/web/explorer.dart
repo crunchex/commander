@@ -185,7 +185,7 @@ class UpDroidExplorer {
           var newPath = '${span.parent.dataset['path']}/${e.draggableElement.dataset['name']}';
           // Avoid an exception thrown when the new name already exists.
           if (currentPath != span.parent.dataset['path']) {
-            ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+            ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
           }
         } else if (e.draggableElement.id == 'file') {
           ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path'] + '/untitled.cc');   
@@ -223,9 +223,9 @@ class UpDroidExplorer {
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
-          var newPath = filePathGrab(file) + input.value;    // fixpoint, replaceFirst creates error when file name matches part of parent directory's name
+          var newPath = filePathGrab(file) + input.value;    
           
-          ws.send('[[EXPLORER_RENAME]]' + file.path + ' ' + newPath);
+          ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
           
           // Remove this element once editing is complete, as the new one will soon appear.
           UListElement ul = li.parent;
@@ -380,10 +380,7 @@ class UpDroidExplorer {
       var validParent = removeSpaces(file.parentDir.replaceAll(r'\', ''));
       dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");  // fixpoint
         if(dirElement == null){
-          print("dir element null");
         }
-        print("valid parent: " + validParent);
-        print("valid path: " + validPath);
         dirElement.children.add(li);
     }
   }

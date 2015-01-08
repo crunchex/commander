@@ -46,7 +46,7 @@ void fsNewFolder(String path) {
 void fsRename(String rename) {
   print(rename);
   
-  List<String> renameList = rename.split(' ');
+  List<String> renameList = rename.split(':divider:');
   
   print(renameList);
   

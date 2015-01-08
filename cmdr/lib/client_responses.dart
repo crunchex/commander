@@ -38,8 +38,17 @@ void fsNewFolder(String path) {
   newFolder.createSync();
 }
 
+// fixpoint
+// Need to make it able to grab files with spaces
+
+// file1 file2
+
 void fsRename(String rename) {
+  print(rename);
+  
   List<String> renameList = rename.split(' ');
+  
+  print(renameList);
   
   if (!FileSystemEntity.isDirectorySync(renameList[0])) {
     var fileToRename = new File(renameList[0]);
@@ -50,13 +59,15 @@ void fsRename(String rename) {
   }
 }
 
-void fsDelete(String path) {
+void fsDelete(String path, WebSocket socket) {
   // Can't simply just create a FileSystemEntity and delete it, since
   // it is an abstract class. This is a dumb way to create the proper
   // entity class.
   try {
     var dirToDelete = new Directory(path);
-    dirToDelete.delete(recursive:true);
+    dirToDelete.delete(recursive:true).then((path){
+    //  sendDirectory(socket, dir);
+    });
   } catch (e) {
     var fileToDelete = new File(path);
     fileToDelete.delete();

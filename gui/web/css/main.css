@@ -78,7 +78,7 @@ html, body {
   font-size: 15px;
 }
 
-.explorer-ul-top > .explorer-li {
+#explorer-top > .explorer-li {
     margin-left: -38px;
 }
 
@@ -197,6 +197,10 @@ li input {
 
 .editor.editor-entered {
   border-color: #ffffff;
+}
+
+.editing{
+  width: 200%;
 }
 
 .tab-content {

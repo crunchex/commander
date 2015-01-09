@@ -17,7 +17,7 @@ String fNameGrabber(List<String> split){
     for(var i = 1; i < split.length; i++){
       fName += split[i];
       if(i != (split.length - 1)){
-        fName += r"\ ";
+        fName += " ";
       }
     }
   }
@@ -35,7 +35,6 @@ void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var header = split[0].toUpperCase();
   var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
   socket.add(formatted);
-  print(formatted);
 }
 
 /// Recursively traverses the given directory path and asynchronously

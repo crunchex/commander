@@ -3,6 +3,26 @@ library server_helper;
 import 'dart:io';
 import 'dart:async';
 import 'package:watcher/watcher.dart';
+import 'package:logging/logging.dart';
+import 'package:logging_handlers/server_logging_handlers.dart';
+
+Logger log;
+bool debugFlag;
+
+void enableDebug(bool b) {
+  if (b) {
+    log = new Logger('server');
+    Logger.root.onRecord.listen(new SyncFileLoggingHandler("server.log"));
+    debugFlag = b;
+  }
+}
+
+
+void debug(string logstring) {
+  if (debugFlag) {
+   log.info(logstring);
+  }
+}
 
 /// Convenience method for a formatted socket message
 void formattedMessage(WebSocket socket, String header, String body) {

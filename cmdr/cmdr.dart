@@ -92,7 +92,7 @@ void main(List<String> args) {
   Directory dir = Directory.current;
   
   // Creating Virtual Directory
-  virDir = new VirtualDirectory(Platform.script.resolve('/Users/donghuynh/git/commander/gui/build/web').toFilePath())
+  virDir = new VirtualDirectory(Platform.script.resolve('/etc/updroid/web').toFilePath())
       ..allowDirectoryListing = true
       ..directoryHandler = directoryHandler
       ..followLinks = true;

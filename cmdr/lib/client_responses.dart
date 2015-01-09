@@ -44,11 +44,8 @@ void fsNewFolder(String path) {
 // file1 file2
 
 void fsRename(String rename) {
-  print(rename);
   
-  List<String> renameList = rename.split(' ');
-  
-  print(renameList);
+  List<String> renameList = rename.split(':divider:');
   
   if (!FileSystemEntity.isDirectorySync(renameList[0])) {
     var fileToRename = new File(renameList[0]);

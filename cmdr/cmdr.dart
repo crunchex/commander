@@ -2,21 +2,19 @@
 
 import 'dart:io';
 import 'package:http_server/http_server.dart' show VirtualDirectory;
-import 'package:logging/logging.dart';
-import 'package:logging_handlers/server_logging_handlers.dart';
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 
 import 'lib/server_helper.dart' as help;
 import 'lib/client_responses.dart';
 
-Logger log;
 DirectoryWatcher watcher;
+bool debugFlag = false;
 
 /// Handler for the [WebSocket]. Performs various actions depending on requests
 /// it receives or local events that it detects.
 void handleWebSocket(WebSocket socket, Directory dir) {
-  log.info('Client connected!');
+  help.debug('Client connected!');
   
   socket.listen((String s) {
     help.UpDroidMessage um = new help.UpDroidMessage(s);
@@ -64,15 +62,18 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         break;
         
       case 'CONSOLE_COMMAND':
-        log.info('Client sent: $s');
+        help.debug('Client sent: $s');
         processCommand(socket, um.body, dir);
         break;
         
       default:
-        log.severe('Message received without updroid header.');
+        
+        // To Do: create a severe case for debug wrapper
+        
+        // log.severe('Message received without updroid header.');
     }
   }, onDone: () {
-    log.info('Client disconnected');  
+    help.debug('Client disconnected');  
   });
 
   watcher.events.listen((e) => help.formattedFsUpdate(socket, e));
@@ -92,14 +93,13 @@ void main(List<String> args) {
   Directory dir = Directory.current;
   
   // Creating Virtual Directory
-  virDir = new VirtualDirectory(Platform.script.resolve('/Users/donghuynh/git/commander/gui/build/web').toFilePath())
+  virDir = new VirtualDirectory(Platform.script.resolve('/etc/updroid/web').toFilePath())
       ..allowDirectoryListing = true
       ..directoryHandler = directoryHandler
       ..followLinks = true;
   
   // Set up logging.
-  log = new Logger('server');
-  Logger.root.onRecord.listen(new SyncFileLoggingHandler("server.log"));
+  help.enableDebug(debugFlag);
   
   // Create an args parser to override the workspace directory if one is supplied.
   var parser = new ArgParser();
@@ -114,16 +114,16 @@ void main(List<String> args) {
   // Set up an HTTP webserver and listen for standard page requests or upgraded
   // [WebSocket] requests.
   HttpServer.bind(InternetAddress.ANY_IP_V4, 8080).then((HttpServer server) {
-    log.info("HttpServer listening on port:${server.port}...");
+    help.debug("HttpServer listening on port:${server.port}...");
     server.listen((HttpRequest request) {
       // WebSocket requests are considered "upgraded" HTTP requests.
       if (WebSocketTransformer.isUpgradeRequest(request)) {
-        log.info("Upgraded ${request.method} request for: ${request.uri.path}");
+        help.debug("Upgraded ${request.method} request for: ${request.uri.path}");
         WebSocketTransformer.upgrade(request).then((WebSocket ws) {
           handleWebSocket(ws, dir);
         });
       } else {
-        log.info("Regular ${request.method} request for: ${request.uri.path}");
+        help.debug("Regular ${request.method} request for: ${request.uri.path}");
         // TODO: serve regular HTTP requests such as GET pages, etc.
         virDir.serveRequest(request);
       }

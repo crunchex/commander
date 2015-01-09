@@ -44,11 +44,11 @@ void fsNewFolder(String path) {
 // file1 file2
 
 void fsRename(String rename) {
-  print(rename);
+  help.debug(rename);
   
   List<String> renameList = rename.split(' ');
   
-  print(renameList);
+  help.debug(renameList);
   
   if (!FileSystemEntity.isDirectorySync(renameList[0])) {
     var fileToRename = new File(renameList[0]);

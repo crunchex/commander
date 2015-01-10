@@ -18,7 +18,7 @@ void enableDebug(bool b) {
 }
 
 
-void debug(string logstring) {
+void debug(String logstring) {
   if (debugFlag) {
    log.info(logstring);
   }
@@ -37,7 +37,7 @@ String fNameGrabber(List<String> split){
     for(var i = 1; i < split.length; i++){
       fName += split[i];
       if(i != (split.length - 1)){
-        fName += r"\ ";
+        fName += r" ";
       }
     }
   }

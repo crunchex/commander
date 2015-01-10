@@ -46,9 +46,9 @@ void fsNewFolder(String path) {
 void fsRename(String rename) {
   help.debug(rename);
   
-  List<String> renameList = rename.split(' ');
+  List<String> renameList = rename.split(':divider:');
   
-  help.debug(renameList);
+  help.debug(renameList.toString());
   
   if (!FileSystemEntity.isDirectorySync(renameList[0])) {
     var fileToRename = new File(renameList[0]);

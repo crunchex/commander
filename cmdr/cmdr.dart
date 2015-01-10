@@ -67,7 +67,10 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         break;
         
       default:
-        log.severe('Message received without updroid header.');
+        
+        // To Do: create a severe case for debug wrapper
+        
+        // log.severe('Message received without updroid header.');
     }
   }, onDone: () {
     help.debug('Client disconnected');  

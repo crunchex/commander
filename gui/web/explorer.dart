@@ -69,8 +69,8 @@ class UpDroidExplorer {
       if (e.draggableElement.className.contains('explorer-li')) {
         // The draggable is an existing file/folder.
         var currentPath = e.draggableElement.dataset['path'];
-        var newPath = '$workspacePath${e.draggableElement.id}';
-        ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+        var newPath = '$workspacePath/${e.draggableElement.dataset['trueName']}';
+        ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
       } else if (e.draggableElement.id == 'file'){
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath + '/untitled.cc');   
       } else {
@@ -139,6 +139,7 @@ class UpDroidExplorer {
     LIElement li = new LIElement();
     li
       ..dataset['name'] = removeSpaces(file.name)
+      ..dataset['trueName'] = (file.name)
       ..dataset['path'] = file.path
       ..dataset['isDir'] = file.isDirectory.toString()
       ..draggable = true
@@ -182,10 +183,10 @@ class UpDroidExplorer {
         if (e.draggableElement.className.contains('explorer-li')) {
           // The draggable is an existing file/folder.
           var currentPath = e.draggableElement.dataset['path'];
-          var newPath = '${span.parent.dataset['path']}/${e.draggableElement.dataset['name']}';
+          var newPath = '${span.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}';
           // Avoid an exception thrown when the new name already exists.
           if (currentPath != span.parent.dataset['path']) {
-            ws.send('[[EXPLORER_MOVE]]' + currentPath + ' ' + newPath);
+            ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
           }
         } else if (e.draggableElement.id == 'file') {
           ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path'] + '/untitled.cc');   
@@ -223,9 +224,9 @@ class UpDroidExplorer {
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
-          var newPath = filePathGrab(file) + input.value;    // fixpoint, replaceFirst creates error when file name matches part of parent directory's name
+          var newPath = filePathGrab(file) + input.value;
           
-          ws.send('[[EXPLORER_RENAME]]' + file.path + ' ' + newPath);
+          ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
           
           // Remove this element once editing is complete, as the new one will soon appear.
           UListElement ul = li.parent;
@@ -335,8 +336,14 @@ class UpDroidExplorer {
   void removeUpdate(String path) {
     LIElement li = querySelector("[data-path='$path']");
     
+    // Case to deal with removeUpdate grabbing null objects when items are renamed
+    if(li == null){  
+    }
+    
+    else{
     UListElement ul = li.parent;
     ul.children.remove(li);
+    }
   }
   
   /// Helper function grabs correct parent directory path
@@ -377,13 +384,8 @@ class UpDroidExplorer {
     }
     else{
       var validPath = removeSpaces(truePath);
-      var validParent = removeSpaces(file.parentDir.replaceAll(r'\', ''));
-      dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");  // fixpoint
-        if(dirElement == null){
-          print("dir element null");
-        }
-        print("valid parent: " + validParent);
-        print("valid path: " + validPath);
+      var validParent = removeSpaces(file.parentDir);
+      dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
         dirElement.children.add(li);
     }
   }

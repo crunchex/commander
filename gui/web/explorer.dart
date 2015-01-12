@@ -376,17 +376,18 @@ class UpDroidExplorer {
     
     // Set up drag and drop for file open & delete.
     dragSetup(li, file);
-    
-    UListElement dirElement;
-    if(file.parentDir == ''){
-      dirElement = querySelector('#explorer-top');
-      dirElement.children.add(li);
-    }
-    else{
+    if(!li.dataset['name'].startsWith('.')){
+      UListElement dirElement;
       var validPath = removeSpaces(truePath);
       var validParent = removeSpaces(file.parentDir);
-      dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
-        dirElement.children.add(li);
+          if(file.parentDir == ''){
+            dirElement = querySelector('#explorer-top');
+            dirElement.children.add(li);
+          }
+          else if(!validPath.contains('/.')){
+            dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
+              dirElement.children.add(li);
+          }  
     }
   }
   

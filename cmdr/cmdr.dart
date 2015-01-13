@@ -103,7 +103,7 @@ void main(List<String> args) {
   
   // Create an args parser to override the workspace directory if one is supplied.
   var parser = new ArgParser();
-  parser.addOption('directory', abbr: 'd', defaultsTo: Directory.current.toString(), callback: (directory) {
+  parser.addOption('directory', abbr: 'd', defaultsTo: Directory.current.path, callback: (directory) {
     dir = new Directory(directory);
   });
   parser.parse(args);

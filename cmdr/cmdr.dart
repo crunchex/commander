@@ -9,6 +9,7 @@ import 'lib/server_helper.dart' as help;
 import 'lib/client_responses.dart';
 
 DirectoryWatcher watcher;
+String guiPath = '/etc/updroid/web';
 bool debugFlag = false;
 
 /// Handler for the [WebSocket]. Performs various actions depending on requests
@@ -93,7 +94,7 @@ void main(List<String> args) {
   Directory dir = Directory.current;
   
   // Creating Virtual Directory
-  virDir = new VirtualDirectory(Platform.script.resolve('/etc/updroid/web').toFilePath())
+  virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
       ..allowDirectoryListing = true
       ..directoryHandler = directoryHandler
       ..followLinks = true;

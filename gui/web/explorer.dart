@@ -229,8 +229,20 @@ class UpDroidExplorer {
           ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
           
           // Remove this element once editing is complete, as the new one will soon appear.
-          UListElement ul = li.parent;
-          ul.children.remove(li);
+          if(file.path != newPath){
+            UListElement ul = li.parent;
+                      ul.children.remove(li);
+          }
+          if(file.path == newPath){
+            li.classes.remove('editing');
+            li.children.remove(input);
+            SpanElement filename = new SpanElement();
+                filename
+                    ..classes.add('filename')
+                    ..text = file.name;
+                li.children.add(filename);
+          }
+          
         } else {
           // TODO: need to make field width scale to the user's input.
           // Using a 'contenteditable' <span> instead of an <input> is a possible option.
@@ -327,9 +339,6 @@ class UpDroidExplorer {
   
   /// Handles an Explorer add update for a single file.
   void addUpdate(String path) => newElementFromFile(new SimpleFile.fromPath(path, workspacePath));
-  
-  
-  // fixpoint
   
   /// Handles an Explorer remove update for a single file.
   

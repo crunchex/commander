@@ -38,11 +38,6 @@ void fsNewFolder(String path) {
   newFolder.createSync();
 }
 
-// fixpoint
-// Need to make it able to grab files with spaces
-
-// file1 file2
-
 void fsRename(String rename) {
   help.debug(rename);
   

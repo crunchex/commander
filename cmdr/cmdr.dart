@@ -9,6 +9,8 @@ import 'lib/server_helper.dart' as help;
 import 'lib/client_responses.dart';
 
 DirectoryWatcher watcher;
+String defaultWorkspacePath = '/home/user/workspace';
+String guiPath = '/etc/updroid/web';
 bool debugFlag = false;
 
 /// Handler for the [WebSocket]. Performs various actions depending on requests
@@ -89,11 +91,8 @@ void directoryHandler(dir, request) {
 }
 
 void main(List<String> args) {
-  // Set default dir as current working directory.
-  Directory dir = Directory.current;
-  
   // Creating Virtual Directory
-  virDir = new VirtualDirectory(Platform.script.resolve('/etc/updroid/web').toFilePath())
+  virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
       ..allowDirectoryListing = true
       ..directoryHandler = directoryHandler
       ..followLinks = true;
@@ -101,12 +100,14 @@ void main(List<String> args) {
   // Set up logging.
   help.enableDebug(debugFlag);
   
-  // Create an args parser to override the workspace directory if one is supplied.
+  // Create an args parser.
   var parser = new ArgParser();
-  parser.addOption('directory', abbr: 'd', defaultsTo: Directory.current.toString(), callback: (directory) {
-    dir = new Directory(directory);
-  });
-  parser.parse(args);
+
+  // Add the 'gui' command and an option to override the default workspace.
+  var command = parser.addCommand('gui');
+  command.addOption('workspace', abbr: 'w', defaultsTo: defaultWorkspacePath);
+  var results = parser.parse(args);
+  Directory dir = new Directory(results.command['workspace']);
  
   // Initialize the DirectoryWatcher.
   watcher = new DirectoryWatcher(dir.path);

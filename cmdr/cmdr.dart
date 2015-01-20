@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:http_server/http_server.dart' show VirtualDirectory;
+import 'dart:async';
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 
@@ -17,6 +18,7 @@ bool debugFlag = false;
 /// it receives or local events that it detects.
 void handleWebSocket(WebSocket socket, Directory dir) {
   help.debug('Client connected!');
+  StreamController<String> processInput = new StreamController<String>.broadcast();
   
   socket.listen((String s) {
     help.UpDroidMessage um = new help.UpDroidMessage(s);
@@ -65,7 +67,11 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         
       case 'CONSOLE_COMMAND':
         help.debug('Client sent: $s');
-        processCommand(socket, um.body, dir);
+        processCommand(socket, processInput, um.body, dir);
+        break;
+        
+      case 'CONSOLE_INPUT':
+        passInput(processInput, um.body);
         break;
         
       default:

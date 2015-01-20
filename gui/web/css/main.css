@@ -235,6 +235,12 @@ li input {
 
 .prompt {
   color: #859900;
+  display: inline;
+}
+
+.prompt-hidden {
+  color: #859900;
+  display: none;
 }
 
 .user-command {

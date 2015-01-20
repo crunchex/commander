@@ -1,6 +1,8 @@
 library client_responses;
 
 import 'dart:io';
+import 'dart:convert';
+import 'dart:async';
 import 'server_helper.dart' as help;
 
 void sendDirectory(WebSocket s, Directory dir) {
@@ -74,11 +76,21 @@ void fsDelete(String path, WebSocket socket) {
   }
 }
 
-void processCommand(WebSocket s, String command, Directory dir) {
+void processCommand(WebSocket s, StreamController<String> inputStream, String command, Directory dir) {
   List splitCommand = command.split(' ');
   String executable = splitCommand[0];
   List args = (splitCommand.length > 1) ? splitCommand.getRange(1, splitCommand.length).toList() : [];
-  Process.run(executable, args, workingDirectory: dir.path).then((ProcessResult results) {
-    s.add('[[CONSOLE_COMMAND]]' + results.stdout);
-  });
+  Process.start(executable, args, workingDirectory: dir.path).then((Process process) {
+    process.stdout
+      .transform(UTF8.decoder)
+      .listen((data) {
+        s.add('[[CONSOLE_OUTPUT]]' + data);
+      });
+    process.stdin.addStream(inputStream.stream.transform(UTF8.encoder));
+    process.exitCode.then((exitCode) => s.add('[[CONSOLE_EXIT]]' + exitCode.toString()));
+    });
+}
+
+void passInput(StreamController<String> inputStream, String input) {
+  inputStream.add(input);
 }

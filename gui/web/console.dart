@@ -81,11 +81,8 @@ class UpDroidConsole {
     PreElement newLine = new PreElement();
     newLine
         ..text = s
-        ..classes.add('pre-output');
-    
-    if (lightTheme) {
-      newLine.style.color = '#586e75';
-    }
+        ..classes.add('pre-output')
+        ..style.color = lightTheme ? '#586e75' : '#93a1a1';
     
     console.children.insert(console.children.length - 1, newLine);
 
@@ -124,6 +121,23 @@ class UpDroidConsole {
     completer.complete(cmd);
     return completer.future;
   }
+  
+  /// Handles when a user enters new input or runs a new command.
+  void processInput() {
+    if (processRunning) {
+      ws.send('[[CONSOLE_INPUT]]' + input.value.trim() + '\n');
+      input.value = "";
+      return;
+    }
+    
+    copyCommand(input.value.trim()).then((cmd) {
+      prompt.classes.add('prompt-hidden');
+      prompt.classes.remove('prompt');
+      input.value = "";
+      ws.send('[[CONSOLE_COMMAND]]' + cmd);
+      processRunning = true;
+    });
+  }
 
   /// Sets up the event handlers for the console.
   void registerConsoleEventHandlers() {
@@ -144,27 +158,12 @@ class UpDroidConsole {
         .where((m) => m.dest == 'CONSOLE')
         .listen((m) => processMessage(m));
     
-    input.onChange.listen((e) {
-
-    });
-    
     input.onKeyUp.listen((e) {
       var keyEvent = new KeyEvent.wrap(e);
       if (keyEvent.keyCode == KeyCode.ENTER) {
         RegExp allWhitespace = new RegExp(r'^[\s]*$');
         if (!input.value.contains(allWhitespace)) {
-          if (processRunning) {
-            ws.send('[[CONSOLE_INPUT]]' + input.value.trim() + '\n');
-            input.value = "";
-          } else {
-            copyCommand(input.value.trim()).then((cmd) {
-              prompt.classes.add('prompt-hidden');
-              prompt.classes.remove('prompt');
-              input.value = "";
-              ws.send('[[CONSOLE_COMMAND]]' + cmd);
-              processRunning = true;
-            });
-          }
+          processInput();
         }
       }
     });

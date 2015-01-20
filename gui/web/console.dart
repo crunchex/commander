@@ -1,4 +1,4 @@
-part of client;
+part of updroid_client;
 
 const String CONSOLE_HELP_TEXT =
 r'''
@@ -44,6 +44,7 @@ class UpDroidConsole {
     // after the initial connection is made and thus, misses the first
     // message.
     updateOutputHandler('Connected to updroid.');
+    cs.add(new CommanderMessage('CLIENT', 'CONSOLE_READY'));
   }
   
   /// Toggles between a Solarized dark and light theme.

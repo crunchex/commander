@@ -1,4 +1,4 @@
-part of client;
+part of updroid_client;
 
 // Template for a new file.
 // TODO: make this contain boilerplate ROS code

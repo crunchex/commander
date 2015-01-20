@@ -1,4 +1,4 @@
-part of client;
+part of updroid_client;
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests

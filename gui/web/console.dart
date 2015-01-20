@@ -39,11 +39,7 @@ class UpDroidConsole {
     themeButton = querySelector('.button-console-theme');
     
     registerConsoleEventHandlers();
-    
-    // This is a hack to account for the fact that Console is set up
-    // after the initial connection is made and thus, misses the first
-    // message.
-    updateOutputHandler('Connected to updroid.');
+
     cs.add(new CommanderMessage('CLIENT', 'CONSOLE_READY'));
   }
   
@@ -67,12 +63,20 @@ class UpDroidConsole {
   /// Process messages that Console has picked up according to the type.
   void processMessage(CommanderMessage m) {
     switch (m.type) {
+      case 'CONNECTED':
+        updateOutputHandler('Connected to updroid!');
+        break;
+        
+      case 'DISCONNECTED':
+        updateOutputHandler('Updroid disconnected.');
+        break;
+
       case 'OUTPUT':
         updateOutputHandler(m.body);
         break;
         
       default:
-        print('Console error: unrecognized message type.');
+        print('Console error: unrecognized message type: ' + m.type);
     }
   }
   
@@ -156,7 +160,7 @@ class UpDroidConsole {
         });
     
     cs.stream
-        .where((m) => m.dest == 'CONSOLE')
+        .where((m) => m.dest == 'CONSOLE' || m.dest == 'ALL')
         .listen((m) => processMessage(m));
     
     input.onKeyUp.listen((e) {

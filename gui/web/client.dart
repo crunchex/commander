@@ -17,33 +17,51 @@ class UpDroidClient {
   UpDroidExplorer explorer;
   UpDroidConsole console;
   
+  WebSocket ws;
+  StreamController<CommanderMessage> cs;
+  
+  String status;
+  
   UpDroidClient() {
-    // Create the server-client [WebSocket].
-    WebSocket ws = new WebSocket('ws://localhost:8080/ws');
-    
+    this.status = 'DISCONNECTED';
+
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.
-    StreamController<CommanderMessage> cs = new StreamController<CommanderMessage>.broadcast();
-
+    this.cs = new StreamController<CommanderMessage>.broadcast();
+    
+    // Create the server-client [WebSocket].
+    this.ws = new WebSocket('ws://localhost:8080/ws');
+    
     registerEventHandlers(ws, cs);
+    initializeClasses(ws, cs);
   }
   
   /// Initializes the main Commander classes.
-  void initializeClasses(String workspacePath, WebSocket ws, StreamController<CommanderMessage> cs) {
-    editor = new UpDroidEditor(ws, cs, workspacePath, 1);
-    explorer = new UpDroidExplorer(ws, cs, workspacePath);
+  void initializeClasses(WebSocket ws, StreamController<CommanderMessage> cs) {
+    editor = new UpDroidEditor(ws, cs);
+    explorer = new UpDroidExplorer(ws, cs);
     console = new UpDroidConsole(ws, cs);
   }
   
-  /// Process messages that Console has picked up according to the type.
+  /// Process messages according to the type.
   void processMessage(CommanderMessage m) {
+    // The classes still need to be informed of connection status individually
+    // because they are initialized after first 'CONNECTED' broadcast.
+    // Subsequent connection notifications can be grouped together.
     switch (m.type) {
       case 'CONSOLE_READY':
-        console.updateOutputHandler(m.body);
+        //cs.add(new CommanderMessage('CONSOLE', status));
         break;
         
+      case 'EXPLORER_READY':
+        //cs.add(new CommanderMessage('EXPLORER', status));
+        break;
+        
+      case 'EDITOR_READY':
+        break;
+
       default:
-        print('Console error: unrecognized message type.');
+        print('Client error: unrecognized message type: ' + m.type);
     }
   }
   
@@ -51,15 +69,14 @@ class UpDroidClient {
   /// are mostly listening events for [WebSocket] messages.
   void registerEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
     ws.onOpen.listen((um) {
-      cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', body: 'Connected to updroid.'));
-      ws.send('[[EXPLORER_DIRECTORY_PATH]]');
+      status = 'CONNECTED';
+      cs.add(new CommanderMessage('ALL', status));
     });
-    
-    ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
-        .listen((um) => initializeClasses(um.body, ws, cs));
   
-    ws.onClose.listen((event) => cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', body: 'Disconnected from updroid.')));
+    ws.onClose.listen((event) {
+      status = 'DISCONNECTED';
+      cs.add(new CommanderMessage('ALL', status));
+    });
     
     cs.stream
         .where((m) => m.dest == 'CLIENT')

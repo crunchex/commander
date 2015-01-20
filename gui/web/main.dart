@@ -5,7 +5,6 @@ import 'client.dart';
 
 void main() {
   setUpBootstrap();
-  
   UpDroidClient client = new UpDroidClient();
 }
 

@@ -43,21 +43,22 @@ class UpDroidEditor {
   String openFilePath;
   String originalContents;
 
-  UpDroidEditor(WebSocket ws, StreamController<CommanderMessage> cs, String path, int editorID) {
+  UpDroidEditor(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
     this.cs = cs;
-    absolutePathPrefix = path;
     
-    editorDiv = querySelector('#editor-$editorID');
+    editorDiv = querySelector('#editor');
     
-    saveButton = querySelector('#column-${editorID} .button-save');
-    newButton = querySelector('#column-${editorID} .button-new');
-    themeButton = querySelector('#column-${editorID} .button-editor-theme');
+    saveButton = querySelector('#column-1 .button-save');
+    newButton = querySelector('#column-1 .button-new');
+    themeButton = querySelector('#column-1 .button-editor-theme');
     modalSaveButton = querySelector('.modal-save');
     modalDiscardButton = querySelector('.modal-discard');
     
     setUpEditor();
     registerEditorEventHandlers();
+    
+    cs.add(new CommanderMessage('CLIENT', 'EDITOR_READY'));
   }
 
   /// Sets up the editor and styles.
@@ -99,6 +100,10 @@ class UpDroidEditor {
           var newText = returnedData[1];
           handleNewText(newPath, newText);
         });
+    
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
+        .listen((um) => absolutePathPrefix = um.body);
     
     newButton.onClick.listen((e) {
       var newPath = absolutePathPrefix + '/untitled.cc';

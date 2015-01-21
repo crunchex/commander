@@ -80,7 +80,8 @@ void processCommand(WebSocket s, StreamController<String> inputStream, String co
   List splitCommand = command.split(' ');
   String executable = splitCommand[0];
   List args = (splitCommand.length > 1) ? splitCommand.getRange(1, splitCommand.length).toList() : [];
-  Process.start(executable, args, workingDirectory: dir.path).then((Process process) {
+
+  Process.start('/usr/bin/stdbuf', ["--output=L", executable], workingDirectory: dir.path).then((Process process) {
     process.stdout
       .transform(UTF8.decoder)
       .listen((data) {
@@ -88,7 +89,7 @@ void processCommand(WebSocket s, StreamController<String> inputStream, String co
       });
     process.stdin.addStream(inputStream.stream.transform(UTF8.encoder));
     process.exitCode.then((exitCode) => s.add('[[CONSOLE_EXIT]]' + exitCode.toString()));
-    });
+  });
 }
 
 void passInput(StreamController<String> inputStream, String input) {

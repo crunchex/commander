@@ -21,9 +21,11 @@ class UpDroidClient {
   StreamController<CommanderMessage> cs;
   
   String status;
+  bool encounteredError;
   
   UpDroidClient() {
     this.status = 'DISCONNECTED';
+    this.encounteredError = false;
 
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.
@@ -31,14 +33,10 @@ class UpDroidClient {
     
     // Create the server <-> client [WebSocket].
     // Port 12065 is the default port that UpDroid uses.
-    initWebSocket(12065);
+    initWebSocket('ws://localhost:12065/ws');
     
     registerEventHandlers(ws, cs);
     initializeClasses(ws, cs);
-  }
-  
-  void initWebSocket(port) {
-    ws = new WebSocket('ws://localhost:' + port.toString() + '/ws');
   }
   
   /// Initializes the main Commander classes.
@@ -70,19 +68,36 @@ class UpDroidClient {
     }
   }
   
-  /// Sets up external event handlers for the various Commander classes. These
-  /// are mostly listening events for [WebSocket] messages.
-  void registerEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
-    ws.onOpen.listen((um) {
+  void initWebSocket(String url, [int retrySeconds = 2]) {
+    bool encounteredError = false;
+
+    ws = new WebSocket(url);
+    
+    ws.onOpen.listen((e) {
       status = 'CONNECTED';
       cs.add(new CommanderMessage('ALL', status));
     });
-  
-    ws.onClose.listen((event) {
+    
+    ws.onClose.listen((e) {
       status = 'DISCONNECTED';
       cs.add(new CommanderMessage('ALL', status));
+      if (!encounteredError) {
+        new Timer(new Duration(seconds:retrySeconds), () => initWebSocket(url, retrySeconds * 2));
+      }
+      encounteredError = true;
     });
     
+    ws.onError.listen((e) {
+      if (!encounteredError) {
+        new Timer(new Duration(seconds:retrySeconds), () => initWebSocket(url, retrySeconds * 2));
+      }
+      encounteredError = true;
+    });
+  }
+  
+  /// Sets up external event handlers for the various Commander classes. These
+  /// are mostly listening events for [WebSocket] messages.
+  void registerEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
     cs.stream
         .where((m) => m.dest == 'CLIENT')
         .listen((m) => processMessage(m));

@@ -110,8 +110,12 @@ html, body {
   margin-left: 4px;
 }
 
+#file-explorer-hr-container {
+  height: 24px;
+}
+
 #file-explorer-hr {
-  margin-top: 15px;
+  margin-top: 16px;
   margin-bottom: 8px;
 }
 

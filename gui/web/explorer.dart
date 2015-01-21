@@ -12,12 +12,13 @@ class UpDroidExplorer {
   SpanElement newFile;
   SpanElement newFolder;
   HRElement rootline;
+  SpanElement rootlineContainer;
   ParagraphElement recycle;
   
   Draggable dragNewFile;
   Draggable dragNewFolder;
-  
-  Dropzone dzRootLine;
+
+  Dropzone dzRootLineContainer;
   Dropzone dzRecycle;
   Dropzone dzEditor;
   
@@ -30,9 +31,10 @@ class UpDroidExplorer {
     
     newFolder = querySelector('#folder');
     newFolderDragSetup();
-    
+
     rootline = querySelector('#file-explorer-hr');
-    dzRootLine = new Dropzone(rootline);
+    rootlineContainer = querySelector('#file-explorer-hr-container');
+    dzRootLineContainer = new Dropzone(rootlineContainer);
     
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
@@ -85,10 +87,10 @@ class UpDroidExplorer {
         .where((um) => um.header == 'EXPLORER_REMOVE')
         .listen((um) => removeUpdate(um.body));
     
-    dzRootLine.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
-    dzRootLine.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
+    dzRootLineContainer.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
+    dzRootLineContainer.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
     
-    dzRootLine.onDrop.listen((e) {
+    dzRootLineContainer.onDrop.listen((e) {
       if (e.draggableElement.className.contains('explorer-li')) {
         // The draggable is an existing file/folder.
         var currentPath = e.draggableElement.dataset['path'];

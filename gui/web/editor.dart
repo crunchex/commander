@@ -74,22 +74,31 @@ class UpDroidEditor {
     resetSavePoint();
   }
   
+  /// Process messages according to the type.
+  void processMessage(CommanderMessage m) {
+    switch (m.type) {
+      case 'CLASS_ADD':
+        editorDiv.classes.add(m.body);
+        break;
+        
+      case 'CLASS_REMOVE':
+        editorDiv.classes.remove(m.body);
+        break;
+        
+      case 'OPEN_FILE':
+        ws.send('[[EDITOR_OPEN]]' + m.body);
+        break;
+
+      default:
+        print('Client error: unrecognized message type: ' + m.type);
+    }
+  }
+  
   /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
     cs.stream
-        .where((m) => m.dest == 'EDITOR' && m.type == 'CLASS_ADD')
-        .listen((m) => editorDiv.classes.add(m.body));
-    
-    cs.stream
-        .where((m) => m.dest == 'EDITOR' && m.type == 'CLASS_REMOVE')
-        .listen((m) => editorDiv.classes.remove(m.body));
-    
-    // Editor receives command from Explorer to request file contents from the server.
-    cs.stream
-        .where((m) => m.dest == 'EDITOR' && m.type == 'OPEN_FILE')
-        .listen((m) {
-          ws.send('[[EDITOR_OPEN]]' + m.body);
-        });
+        .where((m) => m.dest == 'EDITOR')
+        .listen((m) => processMessage(m));
               
     // Editor receives the open file contents from the server.
     ws.onMessage.transform(updroidTransformer)

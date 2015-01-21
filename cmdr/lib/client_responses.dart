@@ -31,7 +31,16 @@ void saveFile(String args) {
 }
 
 void fsNewFile(String path) {
-  var newFile = new File(path);
+  String fullPath = path + '/untitled.py';
+  File newFile = new File(fullPath);
+  
+  int untitledNum = 0;
+  while (newFile.existsSync()) {
+    untitledNum++;
+    fullPath = path + '/untitled' + untitledNum.toString() + '.py';
+    newFile = new File(fullPath); 
+  }
+
   newFile.create();
 }
 

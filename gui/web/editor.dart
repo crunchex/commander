@@ -114,10 +114,17 @@ class UpDroidEditor {
         .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
         .listen((um) => absolutePathPrefix = um.body);
     
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'EDITOR_NEW_FILENAME')
+        .listen((um) {
+          var newText = ROS_TALKER;
+          var newPath = absolutePathPrefix + '/' + um.body;
+          handleNewText(newPath, newText);
+        });
+    
     newButton.onClick.listen((e) {
-      var newPath = absolutePathPrefix + '/untitled.cc';
-      var newText = ROS_TALKER;
-      handleNewText(newPath, newText);
+      // Editor needs to request an available filename (e.g. untitled.py, untitled1.py, etc.)
+      ws.send('[[EDITOR_REQUEST_FILENAME]]' + absolutePathPrefix);
 
       // Stops the button from sending the page to the top (href=#).
       e.preventDefault();

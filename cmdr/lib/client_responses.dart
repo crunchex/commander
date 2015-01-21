@@ -30,6 +30,20 @@ void saveFile(String args) {
   fileToSave.writeAsString(argsList[0]);
 }
 
+void requestFilename(WebSocket s, String path) {
+  String filename = 'untitled.py';
+  File newFile = new File(path + '/' + filename);
+  
+  int untitledNum = 0;
+  while (newFile.existsSync()) {
+    untitledNum++;
+    filename = 'untitled' + untitledNum.toString() + '.py';
+    newFile = new File(path + '/' + filename); 
+  }
+  
+  s.add('[[EDITOR_NEW_FILENAME]]' + filename);
+}
+
 void fsNewFile(String path) {
   String fullPath = path + '/untitled.py';
   File newFile = new File(fullPath);

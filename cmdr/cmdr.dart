@@ -96,6 +96,27 @@ void directoryHandler(dir, request) {
   virDir.serveFile(new File(indexUri.toFilePath()), request);
 }
 
+void initWebSocket(dir) {
+  // Set up an HTTP webserver and listen for standard page requests or upgraded
+  // [WebSocket] requests.
+  HttpServer.bind(InternetAddress.ANY_IP_V4, 12065).then((HttpServer server) {
+    help.debug("HttpServer listening on port:${server.port}...");
+    server.listen((HttpRequest request) {
+      // WebSocket requests are considered "upgraded" HTTP requests.
+      if (WebSocketTransformer.isUpgradeRequest(request)) {
+        help.debug("Upgraded ${request.method} request for: ${request.uri.path}");
+        WebSocketTransformer.upgrade(request).then((WebSocket ws) {
+          handleWebSocket(ws, dir);
+        });
+      } else {
+        help.debug("Regular ${request.method} request for: ${request.uri.path}");
+        // TODO: serve regular HTTP requests such as GET pages, etc.
+        virDir.serveRequest(request);
+      }
+    });
+  });
+}
+
 void main(List<String> args) {
   // Creating Virtual Directory
   virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
@@ -118,22 +139,5 @@ void main(List<String> args) {
   // Initialize the DirectoryWatcher.
   watcher = new DirectoryWatcher(dir.path);
   
-  // Set up an HTTP webserver and listen for standard page requests or upgraded
-  // [WebSocket] requests.
-  HttpServer.bind(InternetAddress.ANY_IP_V4, 8080).then((HttpServer server) {
-    help.debug("HttpServer listening on port:${server.port}...");
-    server.listen((HttpRequest request) {
-      // WebSocket requests are considered "upgraded" HTTP requests.
-      if (WebSocketTransformer.isUpgradeRequest(request)) {
-        help.debug("Upgraded ${request.method} request for: ${request.uri.path}");
-        WebSocketTransformer.upgrade(request).then((WebSocket ws) {
-          handleWebSocket(ws, dir);
-        });
-      } else {
-        help.debug("Regular ${request.method} request for: ${request.uri.path}");
-        // TODO: serve regular HTTP requests such as GET pages, etc.
-        virDir.serveRequest(request);
-      }
-    });
-  });
+  initWebSocket(dir);
 }

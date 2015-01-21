@@ -29,11 +29,16 @@ class UpDroidClient {
     // The classes use this to communicate with each other.
     this.cs = new StreamController<CommanderMessage>.broadcast();
     
-    // Create the server-client [WebSocket].
-    this.ws = new WebSocket('ws://localhost:8080/ws');
+    // Create the server <-> client [WebSocket].
+    // Port 12065 is the default port that UpDroid uses.
+    initWebSocket(12065);
     
     registerEventHandlers(ws, cs);
     initializeClasses(ws, cs);
+  }
+  
+  void initWebSocket(port) {
+    ws = new WebSocket('ws://localhost:' + port.toString() + '/ws');
   }
   
   /// Initializes the main Commander classes.

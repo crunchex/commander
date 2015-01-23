@@ -65,6 +65,10 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         saveFile(um.body);
         break;
         
+      case 'EDITOR_REQUEST_FILENAME':
+        requestFilename(socket, um.body);
+        break;
+        
       case 'CONSOLE_COMMAND':
         help.debug('Client sent: $s');
         processCommand(socket, processInput, um.body, dir);

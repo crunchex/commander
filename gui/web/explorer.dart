@@ -167,6 +167,7 @@ class UpDroidExplorer {
       ..dataset['trueName'] = (file.name)
       ..dataset['path'] = file.path
       ..dataset['isDir'] = file.isDirectory.toString()
+      ..dataset['hiding'] = 'false'
       ..draggable = true
       ..classes.add('explorer-li');
     
@@ -191,6 +192,16 @@ class UpDroidExplorer {
         ..dataset['path'] = removeSpaces(file.path)
         ..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
+      
+      glyphicon.onDoubleClick.listen((e) {
+        if (glyphicon.dataset['hiding'] == 'false') {
+          ul.classes.add('explorer-hidden');
+          glyphicon.dataset['hiding'] = 'true';
+        } else {
+          ul.classes.remove('explorer-hidden');
+          glyphicon.dataset['hiding'] = 'false';
+        }
+      });
     }
     
     return li;
@@ -393,7 +404,7 @@ class UpDroidExplorer {
     String truePath = pathGrab(li);
 
     // Register double-click event handler for file renaming.
-    li.onDoubleClick.listen((e) {
+    li.children[1].onDoubleClick.listen((e) {
       renameEventHandler(li, file);
       // To prevent the rename event from propagating up the directory tree.
       e.stopPropagation();

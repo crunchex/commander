@@ -362,8 +362,21 @@ class UpDroidExplorer {
   }
   
   /// Handles an Explorer add update for a single file.
-  void addUpdate(String path) => newElementFromFile(new SimpleFile.fromPath(path, workspacePath));
-  
+  void addUpdate(String path) {
+    SimpleFile sFile = new SimpleFile.fromPath(path, workspacePath, false);
+    var parentPath = filePathGrab(sFile);
+    parentPath = parentPath.substring(1, parentPath.length - 1);
+    
+    // Try to detect the parent, and if it doesn't exist then create the element for it.
+    LIElement li = querySelector("[data-path='$parentPath']");
+    if (li == null) {
+      print('parent not found at: $parentPath');
+      //new SimpleFile.fromPath(parentPath, workspacePath, true);
+      newElementFromFile(new SimpleFile.fromPath(parentPath, workspacePath, true)).then((result) {
+        //newElementFromFile(sFile);
+      });
+    }
+  }
   
   // fixpoint
   
@@ -399,7 +412,10 @@ class UpDroidExplorer {
   
   
   /// Sets up a new HTML element from a SimpleFile.
-  newElementFromFile(SimpleFile file) {
+  Future newElementFromFile(SimpleFile file) {
+    Completer completer = new Completer();
+    completer.complete(true);
+
     LIElement li = generateLiHtml(file);
     String truePath = pathGrab(li);
 
@@ -414,6 +430,7 @@ class UpDroidExplorer {
     dragSetup(li, file);
     
     UListElement dirElement;
+    print(file.parentDir);
     if(file.parentDir == ''){
       dirElement = querySelector('#explorer-top');
       dirElement.children.add(li);
@@ -424,6 +441,8 @@ class UpDroidExplorer {
       dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
         dirElement.children.add(li);
     }
+    
+    return completer.future;
   }
   
   /// Redraws all file explorer views.
@@ -450,14 +469,23 @@ class SimpleFile {
   bool isDirectory;
   
   SimpleFile.fromDirectoryList(String raw, String prefix) {
+    print('raw: ' + raw);
+    print('prefix: ' + prefix);
     String workingString = stripFormatting(raw, prefix);
+    print('workingString: ' + workingString);
     getData(workingString);
   }
   
-  SimpleFile.fromPath(String raw, String prefix) {
+  SimpleFile.fromPath(String raw, String prefix, bool isDir) {
+    print('raw: ' + raw);
+    print('prefix: ' + prefix);
+    
+    // What is this for??
     path = raw.replaceAll(r'\', '');
-    isDirectory = false;
-    getData(raw.replaceFirst(prefix, ''));
+    print('path: ' + path);
+    isDirectory = isDir;
+    raw = raw.replaceFirst(prefix, '');
+    getData(raw);
   }
   
   String stripFormatting(String raw, String prefix) {
@@ -472,12 +500,13 @@ class SimpleFile {
   
   void getData(String fullPath) {
     List<String> pathList = fullPath.split('/');
+    print(pathList.toString() + ' is ' + pathList.length.toString());
     name = pathList[pathList.length - 1];
-    if (pathList.length >
-    1) {
+    if (pathList.length > 1) {
       parentDir = pathList[pathList.length - 2];
     } else {
       parentDir = '';
     }
+    print('parentDir: ' + parentDir);
   }
 }

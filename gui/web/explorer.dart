@@ -12,7 +12,7 @@ class UpDroidExplorer {
   SpanElement newFile;
   SpanElement newFolder;
   HRElement rootline;
-  SpanElement rootlineContainer;
+  DivElement rootlineContainer;
   ParagraphElement recycle;
   
   Draggable dragNewFile;

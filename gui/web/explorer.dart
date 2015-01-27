@@ -1,4 +1,4 @@
-part of client;
+part of updroid_client;
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests
@@ -12,44 +12,69 @@ class UpDroidExplorer {
   SpanElement newFile;
   SpanElement newFolder;
   HRElement rootline;
+  SpanElement rootlineContainer;
   ParagraphElement recycle;
   
   Draggable dragNewFile;
   Draggable dragNewFolder;
-  
-  Dropzone dzRootLine;
+
+  Dropzone dzRootLineContainer;
   Dropzone dzRecycle;
   Dropzone dzEditor;
   
-  UpDroidExplorer(WebSocket ws, StreamController<CommanderMessage> cs, String workspacePath) {
+  UpDroidExplorer(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
     this.cs = cs;
-    this.workspacePath = workspacePath;
     
     newFile = querySelector('#file');
     newFileDragSetup();
     
     newFolder = querySelector('#folder');
     newFolderDragSetup();
-    
+
     rootline = querySelector('#file-explorer-hr');
-    dzRootLine = new Dropzone(rootline);
+    rootlineContainer = querySelector('#file-explorer-hr-container');
+    dzRootLineContainer = new Dropzone(rootlineContainer);
     
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
     
-    editorDiv = querySelector('#editor-1');
+    editorDiv = querySelector('#editor');
     dzEditor = new Dropzone(editorDiv);
     
     registerExplorerEventHandlers();
-    
-    // Let the server know Explorer is up and ready to receive
-    // the directory list.
-    ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+
+    cs.add(new CommanderMessage('CLIENT', 'EXPLORER_READY'));
+  }
+  
+  /// Process messages according to the type.
+  void processMessage(CommanderMessage m) {
+    switch (m.type) {
+      case 'CONNECTED':
+        ws.send('[[EXPLORER_DIRECTORY_PATH]]');
+        break;
+      
+      case 'DISCONNECTED':
+        break;
+        
+      default:
+        print('Explorer error: unrecognized message type: ' + m.type);
+    }
   }
   
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
+    cs.stream
+        .where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL')
+        .listen((m) => processMessage(m));
+    
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
+        .listen((um) {
+          workspacePath = um.body;
+          ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+        });
+
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EXPLORER_DIRECTORY_LIST')
         .listen((um) => generateDirectoryList(um.body));
@@ -62,17 +87,17 @@ class UpDroidExplorer {
         .where((um) => um.header == 'EXPLORER_REMOVE')
         .listen((um) => removeUpdate(um.body));
     
-    dzRootLine.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
-    dzRootLine.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
+    dzRootLineContainer.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
+    dzRootLineContainer.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
     
-    dzRootLine.onDrop.listen((e) {
+    dzRootLineContainer.onDrop.listen((e) {
       if (e.draggableElement.className.contains('explorer-li')) {
         // The draggable is an existing file/folder.
         var currentPath = e.draggableElement.dataset['path'];
         var newPath = '$workspacePath/${e.draggableElement.dataset['trueName']}';
         ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
       } else if (e.draggableElement.id == 'file'){
-        ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath + '/untitled.cc');   
+        ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);   
       } else {
         ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
       }
@@ -189,7 +214,7 @@ class UpDroidExplorer {
             ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
           }
         } else if (e.draggableElement.id == 'file') {
-          ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path'] + '/untitled.cc');   
+          ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path']);   
         } else {
           ws.send('[[EXPLORER_NEW_FOLDER]]' + span.parent.dataset['path'] + '/untitled');
         }

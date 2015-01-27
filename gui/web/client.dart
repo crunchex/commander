@@ -1,9 +1,9 @@
-library client;
+library updroid_client;
 
 import 'dart:html';
 import 'dart:async';
-import 'package:bootjack/bootjack.dart';
 import 'package:ace/ace.dart';
+import 'package:bootjack/bootjack.dart';
 import 'package:ace/proxy.dart';
 import 'package:dnd/dnd.dart';
 import 'lib/updroid_message.dart';
@@ -12,48 +12,94 @@ part 'explorer.dart';
 part 'editor.dart';
 part 'console.dart';
 
-void main() {
-  setUpBootstrap();
+class UpDroidClient {
+  UpDroidEditor editor;
+  UpDroidExplorer explorer;
+  UpDroidConsole console;
   
-  // Create the server-client [WebSocket].
-  WebSocket ws = new WebSocket('ws://localhost:8080/ws');
+  WebSocket ws;
+  StreamController<CommanderMessage> cs;
   
-  // Create the intra-client message stream.
-  // The classes use this to communicate with each other.
-  StreamController<CommanderMessage> cs = new StreamController<CommanderMessage>.broadcast();
-
-  registerEventHandlers(ws, cs);
-}
-
-/// Activates Bootjack features.
-void setUpBootstrap() {
-  Tab.use();
-  Button.use();
-  Dropdown.use();
-  //Modal.use();
-  Transition.use();
+  String status;
+  bool encounteredError;
   
-  Popover.wire(querySelector('#console-help.dropdown-toggle'));
-}
+  UpDroidClient() {
+    this.status = 'DISCONNECTED';
+    this.encounteredError = false;
 
-/// Initializes the main Commander classes.
-void initializeClasses(String workspacePath, WebSocket ws, StreamController<CommanderMessage> cs) {
-  UpDroidEditor editor = new UpDroidEditor(ws, cs, workspacePath, 1);
-  UpDroidExplorer explorer = new UpDroidExplorer(ws, cs, workspacePath);
-  UpDroidConsole console = new UpDroidConsole(ws, cs);
-}
-
-/// Sets up external event handlers for the various Commander classes. These
-/// are mostly listening events for [WebSocket] messages.
-void registerEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
-  ws.onOpen.listen((um) {
-    cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', body: 'Connected to updroid.'));
-    ws.send('[[EXPLORER_DIRECTORY_PATH]]');
-  });
+    // Create the intra-client message stream.
+    // The classes use this to communicate with each other.
+    this.cs = new StreamController<CommanderMessage>.broadcast();
+    
+    // Create the server <-> client [WebSocket].
+    // Port 12065 is the default port that UpDroid uses.
+    initWebSocket('ws://localhost:12065/ws');
+    
+    registerEventHandlers(ws, cs);
+    initializeClasses(ws, cs);
+  }
   
-  ws.onMessage.transform(updroidTransformer)
-      .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
-      .listen((um) => initializeClasses(um.body, ws, cs));
+  /// Initializes the main Commander classes.
+  void initializeClasses(WebSocket ws, StreamController<CommanderMessage> cs) {
+    editor = new UpDroidEditor(ws, cs);
+    explorer = new UpDroidExplorer(ws, cs);
+    console = new UpDroidConsole(ws, cs);
+  }
+  
+  /// Process messages according to the type.
+  void processMessage(CommanderMessage m) {
+    // The classes still need to be informed of connection status individually
+    // because they are initialized after first 'CONNECTED' broadcast.
+    // Subsequent connection notifications can be grouped together.
+    switch (m.type) {
+      case 'CONSOLE_READY':
+        //cs.add(new CommanderMessage('CONSOLE', status));
+        break;
+        
+      case 'EXPLORER_READY':
+        //cs.add(new CommanderMessage('EXPLORER', status));
+        break;
+        
+      case 'EDITOR_READY':
+        break;
 
-  ws.onClose.listen((event) => cs.add(new CommanderMessage('CONSOLE', 'OUTPUT', body: 'Disconnected from updroid.')));
+      default:
+        print('Client error: unrecognized message type: ' + m.type);
+    }
+  }
+  
+  void initWebSocket(String url, [int retrySeconds = 2]) {
+    bool encounteredError = false;
+
+    ws = new WebSocket(url);
+    
+    ws.onOpen.listen((e) {
+      status = 'CONNECTED';
+      cs.add(new CommanderMessage('ALL', status));
+    });
+    
+    ws.onClose.listen((e) {
+      status = 'DISCONNECTED';
+      cs.add(new CommanderMessage('ALL', status));
+      if (!encounteredError) {
+        new Timer(new Duration(seconds:retrySeconds), () => initWebSocket(url, retrySeconds * 2));
+      }
+      encounteredError = true;
+    });
+    
+    ws.onError.listen((e) {
+      if (!encounteredError) {
+        new Timer(new Duration(seconds:retrySeconds), () => initWebSocket(url, retrySeconds * 2));
+      }
+      encounteredError = true;
+    });
+  }
+  
+  /// Sets up external event handlers for the various Commander classes. These
+  /// are mostly listening events for [WebSocket] messages.
+  void registerEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
+    cs.stream
+        .where((m) => m.dest == 'CLIENT')
+        .listen((m) => processMessage(m));
+  }
 }

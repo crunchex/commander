@@ -1,6 +1,8 @@
 library client_responses;
 
 import 'dart:io';
+import 'dart:convert';
+import 'dart:async';
 import 'server_helper.dart' as help;
 
 void sendDirectory(WebSocket s, Directory dir) {
@@ -28,8 +30,31 @@ void saveFile(String args) {
   fileToSave.writeAsString(argsList[0]);
 }
 
+void requestFilename(WebSocket s, String path) {
+  String filename = 'untitled.py';
+  File newFile = new File(path + '/' + filename);
+  
+  int untitledNum = 0;
+  while (newFile.existsSync()) {
+    untitledNum++;
+    filename = 'untitled' + untitledNum.toString() + '.py';
+    newFile = new File(path + '/' + filename); 
+  }
+  
+  s.add('[[EDITOR_NEW_FILENAME]]' + filename);
+}
+
 void fsNewFile(String path) {
-  var newFile = new File(path);
+  String fullPath = path + '/untitled.py';
+  File newFile = new File(fullPath);
+  
+  int untitledNum = 0;
+  while (newFile.existsSync()) {
+    untitledNum++;
+    fullPath = path + '/untitled' + untitledNum.toString() + '.py';
+    newFile = new File(fullPath); 
+  }
+
   newFile.create();
 }
 
@@ -74,11 +99,22 @@ void fsDelete(String path, WebSocket socket) {
   }
 }
 
-void processCommand(WebSocket s, String command, Directory dir) {
+void processCommand(WebSocket s, StreamController<String> inputStream, String command, Directory dir) {
   List splitCommand = command.split(' ');
   String executable = splitCommand[0];
   List args = (splitCommand.length > 1) ? splitCommand.getRange(1, splitCommand.length).toList() : [];
-  Process.run(executable, args, workingDirectory: dir.path).then((ProcessResult results) {
-    s.add('[[CONSOLE_COMMAND]]' + results.stdout);
+
+  Process.start('/usr/bin/stdbuf', ["--output=L", executable], workingDirectory: dir.path).then((Process process) {
+    process.stdout
+      .transform(UTF8.decoder)
+      .listen((data) {
+        s.add('[[CONSOLE_OUTPUT]]' + data);
+      });
+    process.stdin.addStream(inputStream.stream.transform(UTF8.encoder));
+    process.exitCode.then((exitCode) => s.add('[[CONSOLE_EXIT]]' + exitCode.toString()));
   });
+}
+
+void passInput(StreamController<String> inputStream, String input) {
+  inputStream.add(input);
 }

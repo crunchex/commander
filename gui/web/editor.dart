@@ -1,4 +1,4 @@
-part of client;
+part of updroid_client;
 
 // Template for a new file.
 // TODO: make this contain boilerplate ROS code
@@ -43,21 +43,22 @@ class UpDroidEditor {
   String openFilePath;
   String originalContents;
 
-  UpDroidEditor(WebSocket ws, StreamController<CommanderMessage> cs, String path, int editorID) {
+  UpDroidEditor(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
     this.cs = cs;
-    absolutePathPrefix = path;
     
-    editorDiv = querySelector('#editor-$editorID');
+    editorDiv = querySelector('#editor');
     
-    saveButton = querySelector('#column-${editorID} .button-save');
-    newButton = querySelector('#column-${editorID} .button-new');
-    themeButton = querySelector('#column-${editorID} .button-editor-theme');
+    saveButton = querySelector('#column-1 .button-save');
+    newButton = querySelector('#column-1 .button-new');
+    themeButton = querySelector('#column-1 .button-editor-theme');
     modalSaveButton = querySelector('.modal-save');
     modalDiscardButton = querySelector('.modal-discard');
     
     setUpEditor();
     registerEditorEventHandlers();
+    
+    cs.add(new CommanderMessage('CLIENT', 'EDITOR_READY'));
   }
 
   /// Sets up the editor and styles.
@@ -73,22 +74,31 @@ class UpDroidEditor {
     resetSavePoint();
   }
   
+  /// Process messages according to the type.
+  void processMessage(CommanderMessage m) {
+    switch (m.type) {
+      case 'CLASS_ADD':
+        editorDiv.classes.add(m.body);
+        break;
+        
+      case 'CLASS_REMOVE':
+        editorDiv.classes.remove(m.body);
+        break;
+        
+      case 'OPEN_FILE':
+        ws.send('[[EDITOR_OPEN]]' + m.body);
+        break;
+
+      default:
+        print('Client error: unrecognized message type: ' + m.type);
+    }
+  }
+  
   /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
     cs.stream
-        .where((m) => m.dest == 'EDITOR' && m.type == 'CLASS_ADD')
-        .listen((m) => editorDiv.classes.add(m.body));
-    
-    cs.stream
-        .where((m) => m.dest == 'EDITOR' && m.type == 'CLASS_REMOVE')
-        .listen((m) => editorDiv.classes.remove(m.body));
-    
-    // Editor receives command from Explorer to request file contents from the server.
-    cs.stream
-        .where((m) => m.dest == 'EDITOR' && m.type == 'OPEN_FILE')
-        .listen((m) {
-          ws.send('[[EDITOR_OPEN]]' + m.body);
-        });
+        .where((m) => m.dest == 'EDITOR')
+        .listen((m) => processMessage(m));
               
     // Editor receives the open file contents from the server.
     ws.onMessage.transform(updroidTransformer)
@@ -100,10 +110,21 @@ class UpDroidEditor {
           handleNewText(newPath, newText);
         });
     
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
+        .listen((um) => absolutePathPrefix = um.body);
+    
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'EDITOR_NEW_FILENAME')
+        .listen((um) {
+          var newText = ROS_TALKER;
+          var newPath = absolutePathPrefix + '/' + um.body;
+          handleNewText(newPath, newText);
+        });
+    
     newButton.onClick.listen((e) {
-      var newPath = absolutePathPrefix + '/untitled.cc';
-      var newText = ROS_TALKER;
-      handleNewText(newPath, newText);
+      // Editor needs to request an available filename (e.g. untitled.py, untitled1.py, etc.)
+      ws.send('[[EDITOR_REQUEST_FILENAME]]' + absolutePathPrefix);
 
       // Stops the button from sending the page to the top (href=#).
       e.preventDefault();

@@ -1,4 +1,4 @@
-part of client;
+part of updroid_client;
 
 const String CONSOLE_HELP_TEXT =
 r'''
@@ -18,17 +18,19 @@ class UpDroidConsole {
 
   DivElement console;
   SpanElement prompt;
-  TextInputElement input;
+  InputElement input;
   AnchorElement consoleButton;
   AnchorElement themeButton;
   
   bool lightTheme;
+  bool processRunning;
   
   UpDroidConsole(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
     this.cs = cs;
     
     lightTheme = false;
+    processRunning = false;
 
     console = querySelector('#console');
     prompt = querySelector('#prompt');
@@ -37,11 +39,8 @@ class UpDroidConsole {
     themeButton = querySelector('.button-console-theme');
     
     registerConsoleEventHandlers();
-    
-    // This is a hack to account for the fact that Console is set up
-    // after the initial connection is made and thus, misses the first
-    // message.
-    updateOutputHandler('Connected to updroid.');
+
+    cs.add(new CommanderMessage('CLIENT', 'CONSOLE_READY'));
   }
   
   /// Toggles between a Solarized dark and light theme.
@@ -64,12 +63,20 @@ class UpDroidConsole {
   /// Process messages that Console has picked up according to the type.
   void processMessage(CommanderMessage m) {
     switch (m.type) {
+      case 'CONNECTED':
+        updateOutputHandler('Connected to updroid!');
+        break;
+        
+      case 'DISCONNECTED':
+        updateOutputHandler('Updroid disconnected.');
+        break;
+
       case 'OUTPUT':
         updateOutputHandler(m.body);
         break;
         
       default:
-        print('Console error: unrecognized message type.');
+        print('Console error: unrecognized message type: ' + m.type);
     }
   }
   
@@ -79,11 +86,8 @@ class UpDroidConsole {
     PreElement newLine = new PreElement();
     newLine
         ..text = s
-        ..classes.add('pre-output');
-    
-    if (lightTheme) {
-      newLine.style.color = '#586e75';
-    }
+        ..classes.add('pre-output')
+        ..style.color = lightTheme ? '#586e75' : '#93a1a1';
     
     console.children.insert(console.children.length - 1, newLine);
 
@@ -91,61 +95,81 @@ class UpDroidConsole {
     console.scrollTop = console.scrollHeight;
   }
   
-  /// Copies the prompt and user's command and adds them to the console.
-  void copyCommand(String cmd) {
-    SpanElement userInput = new SpanElement();
+  /// Copies the prompt and user's command and inserts them above the current output.
+  /// This is simply to mimic how a real terminal works.
+  Future copyCommand(String cmd) {
+    Completer completer = new Completer();
     
+    SpanElement userInput = new SpanElement();
+
     SpanElement prompt = new SpanElement();
     prompt
         ..text = '[up, droid!] '
-        ..classes.add('prompt');
-    
-    if (lightTheme) {
-      prompt.style.color = '#b58900';
-    }
+        ..classes.add('prompt')
+        ..style.color = lightTheme ? '#b58900' : '#859900';
     
     SpanElement command = new SpanElement();
     command
         ..text = cmd
-        ..classes.add('user-command');
-    
-    if (lightTheme) {
-      command.style.color = '#dc322f';
-    }
+        ..classes.add('user-command')
+        ..style.color = lightTheme ? '#dc322f' : '#268bd2';
     
     userInput.children.add(prompt);
     userInput.children.add(command);
-    
+
     console.children.insert(console.children.length - 1, userInput);
     console.children.insert(console.children.length - 1, new BRElement());
     
     // Autoscroll the new messages as they come in.
     console.scrollTop = console.scrollHeight;
+    
+    completer.complete(cmd);
+    return completer.future;
+  }
+  
+  /// Handles when a user enters new input or runs a new command.
+  void processInput() {
+    if (processRunning) {
+      ws.send('[[CONSOLE_INPUT]]' + input.value.trim() + '\n');
+      input.value = "";
+      return;
+    }
+    
+    copyCommand(input.value.trim()).then((cmd) {
+      prompt.classes.add('prompt-hidden');
+      prompt.classes.remove('prompt');
+      input.value = "";
+      ws.send('[[CONSOLE_COMMAND]]' + cmd);
+      processRunning = true;
+    });
   }
 
   /// Sets up the event handlers for the console.
   void registerConsoleEventHandlers() {
     ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'CONSOLE_COMMAND')
+        .where((um) => um.header == 'CONSOLE_OUTPUT')
         .listen((um) => updateOutputHandler(um.body));
     
-    cs.stream
-        .where((m) => m.dest == 'CONSOLE')
-        .listen((m) => processMessage(m));
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'CONSOLE_EXIT')
+        .listen((um) {
+            //updateOutputHandler('Process exited with code: ' + um.body);
+            prompt.classes.remove('prompt-hidden');
+            prompt.classes.add('prompt');
+            processRunning = false;
+        });
     
-    input.onChange.listen((e) {
-
-    });
+    cs.stream
+        .where((m) => m.dest == 'CONSOLE' || m.dest == 'ALL')
+        .listen((m) => processMessage(m));
     
     input.onKeyUp.listen((e) {
       var keyEvent = new KeyEvent.wrap(e);
       if (keyEvent.keyCode == KeyCode.ENTER) {
         RegExp allWhitespace = new RegExp(r'^[\s]*$');
         if (!input.value.contains(allWhitespace)) {
-          ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());
+          processInput();
         }
-        copyCommand(input.value.trim());
-        input.value = "";
       }
     });
     

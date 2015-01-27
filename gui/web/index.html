@@ -32,7 +32,7 @@
               <span id="file" class="glyphicon glyphicon-file"></span>
             </span>
           </span>
-          <hr id="file-explorer-hr"></hr>
+          <div id="file-explorer-hr-container"><hr id="file-explorer-hr"></hr></div> 
           <ul id="explorer-top" class="explorer"></ul>
           <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span></p>
         </div>
@@ -62,7 +62,7 @@
             
             <div class="tab-content">
               <div id="tab-editor" class="tab-pane active">
-                <div id="editor-1" class="editor"></div>
+                <div id="editor" class="editor"></div>
               </div>
             </div>
           </div>
@@ -86,12 +86,12 @@
                   <li><a href="#" class="button-console-theme">Theme</a></li>
                 </ul>
               </li>
-              <li class="dropdown"><a id="console-help" href="#" class="dropdown-toggle" data-toggle="popover" data-content="Console only accepts commands that are non-interactive and command-line based.">Help</a></li>
+              <li class="dropdown"><a id="console-help" href="#" class="dropdown-toggle" data-toggle="popover" data-content="Console only accepts commands that are command-line based. Curses-style programs, like vim, are not yet supported.">Help</a></li>
             </ul>
             
             <div class="tab-content">
               <div id="console">
-                  <span><span id="prompt" class="prompt">[up, droid!] <input id="input" class="user-command"></span></span>   
+                  <span><span id="prompt" class="prompt">[up, droid!] </span><input id="input" class="user-command"></span>   
               </div>
             </div>
           </div>
@@ -127,7 +127,7 @@
 
   <script type="text/javascript" src="./packages/ace/src/js/ace.js"></script>
   <script type="text/javascript" src="./packages/ace/src/js/ext-language_tools.js"></script>
-  <script type="application/dart" src="client.dart"></script>
+  <script type="application/dart" src="main.dart"></script>
   <script src="./packages/browser/dart.js"></script>
 
 </body>

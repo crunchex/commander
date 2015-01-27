@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:http_server/http_server.dart' show VirtualDirectory;
+import 'dart:async';
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 
@@ -17,6 +18,7 @@ bool debugFlag = false;
 /// it receives or local events that it detects.
 void handleWebSocket(WebSocket socket, Directory dir) {
   help.debug('Client connected!');
+  StreamController<String> processInput = new StreamController<String>.broadcast();
   
   socket.listen((String s) {
     help.UpDroidMessage um = new help.UpDroidMessage(s);
@@ -63,9 +65,17 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         saveFile(um.body);
         break;
         
+      case 'EDITOR_REQUEST_FILENAME':
+        requestFilename(socket, um.body);
+        break;
+        
       case 'CONSOLE_COMMAND':
         help.debug('Client sent: $s');
-        processCommand(socket, um.body, dir);
+        processCommand(socket, processInput, um.body, dir);
+        break;
+        
+      case 'CONSOLE_INPUT':
+        passInput(processInput, um.body);
         break;
         
       default:
@@ -90,6 +100,27 @@ void directoryHandler(dir, request) {
   virDir.serveFile(new File(indexUri.toFilePath()), request);
 }
 
+void initWebSocket(dir) {
+  // Set up an HTTP webserver and listen for standard page requests or upgraded
+  // [WebSocket] requests.
+  HttpServer.bind(InternetAddress.ANY_IP_V4, 12065).then((HttpServer server) {
+    help.debug("HttpServer listening on port:${server.port}...");
+    server.listen((HttpRequest request) {
+      // WebSocket requests are considered "upgraded" HTTP requests.
+      if (WebSocketTransformer.isUpgradeRequest(request)) {
+        help.debug("Upgraded ${request.method} request for: ${request.uri.path}");
+        WebSocketTransformer.upgrade(request).then((WebSocket ws) {
+          handleWebSocket(ws, dir);
+        });
+      } else {
+        help.debug("Regular ${request.method} request for: ${request.uri.path}");
+        // TODO: serve regular HTTP requests such as GET pages, etc.
+        virDir.serveRequest(request);
+      }
+    });
+  });
+}
+
 void main(List<String> args) {
   // Creating Virtual Directory
   virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
@@ -112,22 +143,5 @@ void main(List<String> args) {
   // Initialize the DirectoryWatcher.
   watcher = new DirectoryWatcher(dir.path);
   
-  // Set up an HTTP webserver and listen for standard page requests or upgraded
-  // [WebSocket] requests.
-  HttpServer.bind(InternetAddress.ANY_IP_V4, 8080).then((HttpServer server) {
-    help.debug("HttpServer listening on port:${server.port}...");
-    server.listen((HttpRequest request) {
-      // WebSocket requests are considered "upgraded" HTTP requests.
-      if (WebSocketTransformer.isUpgradeRequest(request)) {
-        help.debug("Upgraded ${request.method} request for: ${request.uri.path}");
-        WebSocketTransformer.upgrade(request).then((WebSocket ws) {
-          handleWebSocket(ws, dir);
-        });
-      } else {
-        help.debug("Regular ${request.method} request for: ${request.uri.path}");
-        // TODO: serve regular HTTP requests such as GET pages, etc.
-        virDir.serveRequest(request);
-      }
-    });
-  });
+  initWebSocket(dir);
 }

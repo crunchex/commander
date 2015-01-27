@@ -22,6 +22,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
   
   socket.listen((String s) {
     help.UpDroidMessage um = new help.UpDroidMessage(s);
+    help.debug(s);
     
     switch (um.header) {
       case 'EXPLORER_DIRECTORY_PATH':

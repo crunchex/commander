@@ -331,6 +331,10 @@ li input {
   cursor: pointer;
 }
 
+.explorer-hidden {
+  display: none;
+}
+
 #folder{
   cursor: pointer;
 }

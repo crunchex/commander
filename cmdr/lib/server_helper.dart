@@ -71,12 +71,6 @@ void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
   debug('Outgoing: ' + formatted, 0);
   socket.add(formatted);
-<<<<<<< HEAD
-  print(formatted);
-  
-  debug(formatted);  // Very helpful message for debugging explorer
-=======
->>>>>>> aadf1ad00ea767f424a35a293d77dc93519dbe84
 }
 
 /// Recursively traverses the given directory path and asynchronously

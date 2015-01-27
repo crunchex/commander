@@ -374,9 +374,6 @@ class UpDroidExplorer {
   }
   
   /// Handles an Explorer add update for a single file.
-<<<<<<< HEAD
-  void addUpdate(String path) => newElementFromFile(new SimpleFile.fromPath(path, workspacePath));
-=======
   void addUpdate(String path) {
     SimpleFile sFile = new SimpleFile.fromPath(path, workspacePath, false);
     var parentPath = filePathGrab(sFile);
@@ -394,7 +391,6 @@ class UpDroidExplorer {
   }
   
   // fixpoint
->>>>>>> aadf1ad00ea767f424a35a293d77dc93519dbe84
   
   /// Handles an Explorer remove update for a single file.
   
@@ -444,10 +440,6 @@ class UpDroidExplorer {
     
     // Set up drag and drop for file open & delete.
     dragSetup(li, file);
-<<<<<<< HEAD
-    if(!li.dataset['name'].startsWith('.')){
-      UListElement dirElement;
-=======
     
     UListElement dirElement;
     print(file.parentDir);
@@ -456,17 +448,10 @@ class UpDroidExplorer {
       dirElement.children.add(li);
     }
     else{
->>>>>>> aadf1ad00ea767f424a35a293d77dc93519dbe84
       var validPath = removeSpaces(truePath);
       var validParent = removeSpaces(file.parentDir);
-          if(file.parentDir == ''){
-            dirElement = querySelector('#explorer-top');
-            dirElement.children.add(li);
-          }
-          else if(!validPath.contains('/.')){
-            dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
-              dirElement.children.add(li);
-          }  
+      dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
+        dirElement.children.add(li);
     }
     
     return completer.future;

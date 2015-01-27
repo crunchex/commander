@@ -9,6 +9,7 @@ import 'package:logging_handlers/server_logging_handlers.dart';
 Logger log;
 bool debugFlag;
 
+/// Enables/disables debug logging for the server_helper library.
 void enableDebug(bool b) {
   if (b) {
     log = new Logger('server');
@@ -17,20 +18,34 @@ void enableDebug(bool b) {
   }
 }
 
-
-void debug(String logstring) {
-  if (debugFlag) {
-   log.info(logstring);
+/// Wrapper for varying log/debug levels. [logstring] is the debug message.
+/// [level] is an int 0-1 from least severe to most.
+void debug(String logstring, int level) {
+  if (!debugFlag) {
+    return;
+  }
+  
+  switch (level) {
+    case 0:
+      log.info(logstring);
+      break;
+      
+    case 1:
+      log.severe(logstring);
+      break;
+      
+    default:
+      log.severe('Debug level not specified - fix this!');
+      log.severe(logstring);
   }
 }
 
-/// Convenience method for a formatted socket message
+/// Convenience method for a formatted socket message.
 void formattedMessage(WebSocket socket, String header, String body) {
   socket.add('[[$header]]$body');
 }
 
-/// Helper method to grab file name in case of spaces
-
+/// Helper method to grab file name in case of spaces.
 String fNameGrabber(List<String> split){
   var fName = "";
   if(split.length > 2){
@@ -54,10 +69,14 @@ void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var split = e.toString().split(' ');
   var header = split[0].toUpperCase();
   var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
+  debug('Outgoing: ' + formatted, 0);
   socket.add(formatted);
+<<<<<<< HEAD
   print(formatted);
   
   debug(formatted);  // Very helpful message for debugging explorer
+=======
+>>>>>>> aadf1ad00ea767f424a35a293d77dc93519dbe84
 }
 
 /// Recursively traverses the given directory path and asynchronously

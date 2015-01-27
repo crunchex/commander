@@ -164,11 +164,27 @@ class UpDroidConsole {
         .listen((m) => processMessage(m));
     
     input.onKeyUp.listen((e) {
+      
+      // Whitelist to prevent server crashing commands
+      List<String> whitelist = ['pwd', 'ls', 'cd', 'mkdir', 'rm', 'touch', 'cat', 'open', 'echo', 'cmdr'];
+      bool validCommand = false;
+      String command;
+      
       var keyEvent = new KeyEvent.wrap(e);
       if (keyEvent.keyCode == KeyCode.ENTER) {
         RegExp allWhitespace = new RegExp(r'^[\s]*$');
         if (!input.value.contains(allWhitespace)) {
-          processInput();
+          for(String item in whitelist){
+            if(input.value.trim().startsWith(item)){
+              validCommand = true;
+            }
+          }
+          if(validCommand == true){
+            ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());  
+          }
+          else{
+            print("invalid command sent");
+          }
         }
       }
     });

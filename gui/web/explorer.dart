@@ -377,16 +377,21 @@ class UpDroidExplorer {
   void addUpdate(String path) {
     SimpleFile sFile = new SimpleFile.fromPath(path, workspacePath, false);
     var parentPath = filePathGrab(sFile);
+    parentPath = parentPath.substring(0, (parentPath.length - 1));
     print(parentPath);
     
     // Try to detect the parent, and if it doesn't exist then create the element for it.
     LIElement li = querySelector("[data-path='$parentPath']");
+    print(parentPath);
     if (li == null) {
       print('parent not found at: $parentPath');
       //new SimpleFile.fromPath(parentPath, workspacePath, true);
       newElementFromFile(new SimpleFile.fromPath(parentPath, workspacePath, true)).then((result) {
-        //newElementFromFile(sFile);
+        newElementFromFile(sFile);
       });
+    }
+    else{
+      newElementFromFile(sFile);
     }
   }
   

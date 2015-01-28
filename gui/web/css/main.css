@@ -111,12 +111,10 @@ html, body {
 }
 
 #file-explorer-hr-container {
-  height: 24px;
 }
 
 #file-explorer-hr {
-  margin-top: 16px;
-  margin-bottom: 8px;
+  margin: 0 0 5px 0;
 }
 
 .file-explorer-hr-ondrag {

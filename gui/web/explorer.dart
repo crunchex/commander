@@ -269,6 +269,7 @@ class UpDroidExplorer {
             UListElement ul = li.parent;
                       ul.children.remove(li);
           }
+          // Put the element back in the case that rename is canceled
           if(file.path == newPath){
             li.classes.remove('editing');
             li.children.remove(input);
@@ -378,21 +379,25 @@ class UpDroidExplorer {
     SimpleFile sFile = new SimpleFile.fromPath(path, workspacePath, false);
     var parentPath = filePathGrab(sFile);
     parentPath = parentPath.substring(0, (parentPath.length - 1));
-    print(parentPath);
     
     // Try to detect the parent, and if it doesn't exist then create the element for it.
     LIElement li = querySelector("[data-path='$parentPath']");
-    print(parentPath);
-    if (li == null) {
-      print('parent not found at: $parentPath');
-      //new SimpleFile.fromPath(parentPath, workspacePath, true);
-      newElementFromFile(new SimpleFile.fromPath(parentPath, workspacePath, true)).then((result) {
-        newElementFromFile(sFile);
-      });
+    String curPath = '/';
+    
+    // Iterate through the path checking to see if the folder exists
+    var split = parentPath.replaceFirst(workspacePath, '').split('/');
+    for(int i = 1; i< split.length; i++){
+      curPath += split[i];
+      LIElement curLi = querySelector('[data-path="$workspacePath$curPath"]');
+      if (curLi == null) {
+        newElementFromFile(new SimpleFile.fromPath(workspacePath + curPath, workspacePath, true)).then((result) {
+            });
+          }
+      if(i != split.length - 1){
+        curPath += '/';
+      }
     }
-    else{
-      newElementFromFile(sFile);
-    }
+    newElementFromFile(sFile);
   }
   
   // fixpoint

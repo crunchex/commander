@@ -59,7 +59,17 @@ void fsNewFile(String path) {
 }
 
 void fsNewFolder(String path) {
-  var newFolder = new Directory(path);
+  String fullPath = path;
+  Directory newFolder = new Directory(fullPath);
+  
+  int untitledNum = 0;
+  while(newFolder.existsSync()) {
+    untitledNum++;
+    fullPath = path + untitledNum.toString();
+    print(fullPath);
+    newFolder = new Directory(fullPath);
+  }
+  
   newFolder.createSync();
 }
 

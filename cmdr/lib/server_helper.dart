@@ -43,6 +43,8 @@ void debug(String logstring, int level) {
 /// Convenience method for a formatted socket message.
 void formattedMessage(WebSocket socket, String header, String body) {
   socket.add('[[$header]]$body');
+  String msg = '[[$header]]$body';
+  print(msg);
 }
 
 /// Helper method to grab file name in case of spaces.

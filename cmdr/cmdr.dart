@@ -13,7 +13,7 @@ VirtualDirectory virDir;
 DirectoryWatcher watcher;
 
 String defaultWorkspacePath = '/home/user/workspace';
-String defaultGuiPath = '/Users/donghuynh/git/commander/gui/web';
+String defaultGuiPath = '/etc/updroid/web';
 bool defaultDebugFlag = false;
 
 /// Handler for the [WebSocket]. Performs various actions depending on requests

@@ -93,9 +93,14 @@ class UpDroidExplorer {
     dzRootLineContainer.onDrop.listen((e) {
       if (e.draggableElement.className.contains('explorer-li')) {
         // The draggable is an existing file/folder.
+        
         var currentPath = e.draggableElement.dataset['path'];
+        LIElement item = querySelector('[data-path="$currentPath"]');
         var newPath = '$workspacePath/${e.draggableElement.dataset['trueName']}';
-        ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+        if(newPath != currentPath){
+          ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);  
+          item.remove();
+        }
       } else if (e.draggableElement.id == 'file'){
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);   
       } else {
@@ -149,12 +154,8 @@ class UpDroidExplorer {
   // Helper function removs spaces from path and file name
   
   String removeSpaces(String raw){
-    var result = '';
-    List<String> split = raw.split(' ');
-    for(var i=0; i< (split.length); i++){
-      result += split[i];
-    }
-    return result;
+    raw = raw.replaceAll(' ', '');
+    return raw;
   }
   
   
@@ -215,14 +216,18 @@ class UpDroidExplorer {
       d.onDragEnter.listen((e) => span.classes.add('span-entered'));
       d.onDragLeave.listen((e) => span.classes.remove('span-entered'));
   
+      //TODO: weird shit happening here yo
+      
       d.onDrop.listen((e) {
         if (e.draggableElement.className.contains('explorer-li')) {
           // The draggable is an existing file/folder.
           var currentPath = e.draggableElement.dataset['path'];
           var newPath = '${span.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}';
+          LIElement item = querySelector('[data-path="$currentPath"]');
           // Avoid an exception thrown when the new name already exists.
-          if (currentPath != span.parent.dataset['path']) {
+          if (currentPath != newPath && currentPath != span.parent.dataset['path'] + '/' + e.draggableElement.dataset['trueName']) {
             ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+            item.remove();
           }
         } else if (e.draggableElement.id == 'file') {
           ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path']);   
@@ -241,7 +246,9 @@ class UpDroidExplorer {
     List split = raw.split('/');
     for(var i=0; i<(split.length -1); i++){
       result += split[i];
-      result += "/";
+      if(i != split.length -2){
+        result += "/";  
+      }
     }
     return result;
   }
@@ -260,7 +267,7 @@ class UpDroidExplorer {
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
-          var newPath = filePathGrab(file) + input.value;
+          var newPath = filePathGrab(file) + '/' + input.value;
           
           ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
           
@@ -378,7 +385,6 @@ class UpDroidExplorer {
   void addUpdate(String path) {
     SimpleFile sFile = new SimpleFile.fromPath(path, workspacePath, false);
     var parentPath = filePathGrab(sFile);
-    parentPath = parentPath.substring(0, (parentPath.length - 1));
     
     // Try to detect the parent, and if it doesn't exist then create the element for it.
     LIElement li = querySelector("[data-path='$parentPath']");

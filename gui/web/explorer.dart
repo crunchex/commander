@@ -249,14 +249,11 @@ class UpDroidExplorer {
           }
           
           // Avoid an exception thrown when the new name already exists or dragging to same folder.
+          // Avoid error when dragging to a nested folder
           
-          if (currentPath != newPath && duplicate == null) {
+          if (currentPath != newPath && duplicate == null && !span.parent.dataset['path'].contains(e.draggableElement.dataset['path']) ) {
             ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
             item.remove();
-          }
-          
-          // Avoid error on dragging to a nested folder
-          if(span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])){
           }
           
           // TODO: add alert for duplicate file name

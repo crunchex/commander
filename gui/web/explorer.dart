@@ -92,15 +92,31 @@ class UpDroidExplorer {
     
     dzRootLineContainer.onDrop.listen((e) {
       if (e.draggableElement.className.contains('explorer-li')) {
+        
+        
         // The draggable is an existing file/folder.
         
         var currentPath = e.draggableElement.dataset['path'];
         LIElement item = querySelector('[data-path="$currentPath"]');
         var newPath = '$workspacePath/${e.draggableElement.dataset['trueName']}';
-        if(newPath != currentPath){
+        
+       // Check for duplicate file name
+       LIElement duplicate = querySelector('[data-path="$workspacePath/${e.draggableElement.dataset['trueName']}"]');
+       bool alert = false;
+       if(duplicate != null){
+         alert = true;
+       }
+       
+       if(newPath != currentPath  && duplicate == null){
           ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);  
           item.remove();
         }
+       
+       // TODO: add duplicate file alert
+       
+       if(alert == true){
+       }
+       
       } else if (e.draggableElement.id == 'file'){
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);   
       } else {
@@ -224,11 +240,29 @@ class UpDroidExplorer {
           var currentPath = e.draggableElement.dataset['path'];
           var newPath = '${span.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}';
           LIElement item = querySelector('[data-path="$currentPath"]');
-          // Avoid an exception thrown when the new name already exists.
-          if (currentPath != newPath && currentPath != span.parent.dataset['path'] + '/' + e.draggableElement.dataset['trueName']) {
+          
+          // Check for duplicate file name
+          LIElement duplicate = querySelector('[data-path="${span.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}"]');
+          bool alert = false;
+          if(duplicate != null){
+            alert = true;
+          }
+          
+          // Avoid an exception thrown when the new name already exists or dragging to same folder.
+          
+          if (currentPath != newPath && duplicate == null) {
             ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
             item.remove();
           }
+          
+          // Avoid error on dragging to a nested folder
+          if(span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])){
+          }
+          
+          // TODO: add alert for duplicate file name
+          if(alert == true){
+          }
+          
         } else if (e.draggableElement.id == 'file') {
           ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path']);   
         } else {

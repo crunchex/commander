@@ -231,6 +231,24 @@ class UpDroidExplorer {
     return li;
   }
   
+  bool checkContents(HtmlElement ele){
+    var result = false;
+    var finished = false;
+    var children;
+    if(ele.hasChildNodes()){
+      var ul = ele.childNodes;
+      children = ul[ul.length-1].childNodes;
+    }
+    for(var item in children){
+      if(item.dataset['isDir'] == 'true'){
+        checkContents(item);
+        print('folder detected');
+      }
+    }
+    print(children);
+    return result;
+  }
+  
   /// Sets up a [Dropzone] for the [SpanElement] to handle file moves.
   void dropSetup(SpanElement span, SimpleFile file) {
     if (file.isDirectory) {
@@ -245,6 +263,7 @@ class UpDroidExplorer {
           var currentPath = e.draggableElement.dataset['path'];
           var newPath = '${span.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}';
           LIElement item = querySelector('[data-path="$currentPath"]');
+          checkContents(item);
           
           // Check for duplicate file name
           LIElement duplicate = querySelector('[data-path="${span.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}"]');
@@ -256,10 +275,9 @@ class UpDroidExplorer {
           // The draggable is an empty folder
           // TODO: Fix this
           
-          print(newPath.replaceFirst(workspacePath, ''));
-          
           if(e.draggableElement.dataset['isDir'] == 'true' && item.lastChild.hasChildNodes() == false){
-            newElementFromFile(new SimpleFile.fromPath(span.parent.dataset['path'] + '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
+            newElementFromFile(new SimpleFile.fromPath(span.parent.dataset['path'] + 
+                '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
           }
           
           
@@ -323,6 +341,7 @@ class UpDroidExplorer {
                       ul.children.remove(li);
           }
           
+          // TODO: Doesn't work if empty folder contains an empty folder
           // Create a folder icon if the item renamed was an empty folder
           
           if(file.isDirectory == true && li.lastChild.hasChildNodes() == false){

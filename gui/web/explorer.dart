@@ -129,6 +129,13 @@ class UpDroidExplorer {
     
     dzRecycle.onDrop.listen((e) {
       var path = e.draggableElement.dataset['path'];
+      
+      // Draggable is an empty folder
+      if(e.draggableElement.dataset['isDir'] == 'true'){
+        LIElement selectedFolder = querySelector('[data-path="${e.draggableElement.dataset['path']}"');
+        selectedFolder.remove();
+      }
+      
       ws.send('[[EXPLORER_DELETE]]' + path);
     });
     
@@ -167,7 +174,7 @@ class UpDroidExplorer {
     return files;
   }
   
-  // Helper function removs spaces from path and file name
+  // Helper function removes spaces from path and file name
   
   String removeSpaces(String raw){
     raw = raw.replaceAll(' ', '');
@@ -231,8 +238,6 @@ class UpDroidExplorer {
       
       d.onDragEnter.listen((e) => span.classes.add('span-entered'));
       d.onDragLeave.listen((e) => span.classes.remove('span-entered'));
-  
-      //TODO: weird shit happening here yo
       
       d.onDrop.listen((e) {
         if (e.draggableElement.className.contains('explorer-li')) {
@@ -248,10 +253,20 @@ class UpDroidExplorer {
             alert = true;
           }
           
+          // The draggable is an empty folder
+          // TODO: Fix this
+          
+          print(newPath.replaceFirst(workspacePath, ''));
+          
+          if(e.draggableElement.dataset['isDir'] == 'true' && item.lastChild.hasChildNodes() == false){
+            newElementFromFile(new SimpleFile.fromPath(span.parent.dataset['path'] + '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
+          }
+          
+          
           // Avoid an exception thrown when the new name already exists or dragging to same folder.
           // Avoid error when dragging to a nested folder
           
-          if (currentPath != newPath && duplicate == null && !span.parent.dataset['path'].contains(e.draggableElement.dataset['path']) ) {
+          if (currentPath != newPath && duplicate == null  && !span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])) {
             ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
             item.remove();
           }
@@ -307,6 +322,15 @@ class UpDroidExplorer {
             UListElement ul = li.parent;
                       ul.children.remove(li);
           }
+          
+          // Create a folder icon if the item renamed was an empty folder
+          
+          if(file.isDirectory == true && li.lastChild.hasChildNodes() == false){
+            newElementFromFile(new SimpleFile.fromPath(newPath, workspacePath, true));
+          }
+          
+          //TODO: Refine this function
+          
           // Put the element back in the case that rename is canceled
           if(file.path == newPath){
             li.classes.remove('editing');

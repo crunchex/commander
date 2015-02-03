@@ -66,7 +66,6 @@ void fsNewFolder(String path) {
   while(newFolder.existsSync()) {
     untitledNum++;
     fullPath = path + untitledNum.toString();
-    print(fullPath);
     newFolder = new Directory(fullPath);
   }
   

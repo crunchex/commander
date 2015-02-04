@@ -12,7 +12,7 @@ class UpDroidExplorer {
   SpanElement newFile;
   SpanElement newFolder;
   HRElement rootline;
-  SpanElement rootlineContainer;
+  DivElement rootlineContainer;
   ParagraphElement recycle;
   
   Draggable dragNewFile;
@@ -92,10 +92,31 @@ class UpDroidExplorer {
     
     dzRootLineContainer.onDrop.listen((e) {
       if (e.draggableElement.className.contains('explorer-li')) {
+        
+        
         // The draggable is an existing file/folder.
+        
         var currentPath = e.draggableElement.dataset['path'];
+        LIElement item = querySelector('[data-path="$currentPath"]');
         var newPath = '$workspacePath/${e.draggableElement.dataset['trueName']}';
-        ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+        
+       // Check for duplicate file name
+       LIElement duplicate = querySelector('[data-path="$workspacePath/${e.draggableElement.dataset['trueName']}"]');
+       bool alert = false;
+       if(duplicate != null){
+         alert = true;
+       }
+       
+       if(newPath != currentPath  && duplicate == null){
+          ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);  
+          item.remove();
+        }
+       
+       // TODO: add duplicate file alert
+       
+       if(alert == true){
+       }
+       
       } else if (e.draggableElement.id == 'file'){
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);   
       } else {
@@ -149,12 +170,8 @@ class UpDroidExplorer {
   // Helper function removs spaces from path and file name
   
   String removeSpaces(String raw){
-    var result = '';
-    List<String> split = raw.split(' ');
-    for(var i=0; i< (split.length); i++){
-      result += split[i];
-    }
-    return result;
+    raw = raw.replaceAll(' ', '');
+    return raw;
   }
   
   
@@ -215,15 +232,34 @@ class UpDroidExplorer {
       d.onDragEnter.listen((e) => span.classes.add('span-entered'));
       d.onDragLeave.listen((e) => span.classes.remove('span-entered'));
   
+      //TODO: weird shit happening here yo
+      
       d.onDrop.listen((e) {
         if (e.draggableElement.className.contains('explorer-li')) {
           // The draggable is an existing file/folder.
           var currentPath = e.draggableElement.dataset['path'];
           var newPath = '${span.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}';
-          // Avoid an exception thrown when the new name already exists.
-          if (currentPath != span.parent.dataset['path']) {
-            ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+          LIElement item = querySelector('[data-path="$currentPath"]');
+          
+          // Check for duplicate file name
+          LIElement duplicate = querySelector('[data-path="${span.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}"]');
+          bool alert = false;
+          if(duplicate != null){
+            alert = true;
           }
+          
+          // Avoid an exception thrown when the new name already exists or dragging to same folder.
+          // Avoid error when dragging to a nested folder
+          
+          if (currentPath != newPath && duplicate == null && !span.parent.dataset['path'].contains(e.draggableElement.dataset['path']) ) {
+            ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+            item.remove();
+          }
+          
+          // TODO: add alert for duplicate file name
+          if(alert == true){
+          }
+          
         } else if (e.draggableElement.id == 'file') {
           ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.dataset['path']);   
         } else {
@@ -241,7 +277,9 @@ class UpDroidExplorer {
     List split = raw.split('/');
     for(var i=0; i<(split.length -1); i++){
       result += split[i];
-      result += "/";
+      if(i != split.length -2){
+        result += "/";  
+      }
     }
     return result;
   }
@@ -260,13 +298,26 @@ class UpDroidExplorer {
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
-          var newPath = filePathGrab(file) + input.value;
+          var newPath = filePathGrab(file) + '/' + input.value;
           
           ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
           
           // Remove this element once editing is complete, as the new one will soon appear.
-          UListElement ul = li.parent;
-          ul.children.remove(li);
+          if(file.path != newPath){
+            UListElement ul = li.parent;
+                      ul.children.remove(li);
+          }
+          // Put the element back in the case that rename is canceled
+          if(file.path == newPath){
+            li.classes.remove('editing');
+            li.children.remove(input);
+            SpanElement filename = new SpanElement();
+                filename
+                    ..classes.add('filename')
+                    ..text = file.name;
+                li.children.add(filename);
+          }
+          
         } else {
           // TODO: need to make field width scale to the user's input.
           // Using a 'contenteditable' <span> instead of an <input> is a possible option.
@@ -365,17 +416,25 @@ class UpDroidExplorer {
   void addUpdate(String path) {
     SimpleFile sFile = new SimpleFile.fromPath(path, workspacePath, false);
     var parentPath = filePathGrab(sFile);
-    parentPath = parentPath.substring(1, parentPath.length - 1);
     
     // Try to detect the parent, and if it doesn't exist then create the element for it.
     LIElement li = querySelector("[data-path='$parentPath']");
-    if (li == null) {
-      print('parent not found at: $parentPath');
-      //new SimpleFile.fromPath(parentPath, workspacePath, true);
-      newElementFromFile(new SimpleFile.fromPath(parentPath, workspacePath, true)).then((result) {
-        //newElementFromFile(sFile);
-      });
+    String curPath = '/';
+    
+    // Iterate through the path checking to see if the folder exists
+    var split = parentPath.replaceFirst(workspacePath, '').split('/');
+    for(int i = 1; i< split.length; i++){
+      curPath += split[i];
+      LIElement curLi = querySelector('[data-path="$workspacePath$curPath"]');
+      if (curLi == null) {
+        newElementFromFile(new SimpleFile.fromPath(workspacePath + curPath, workspacePath, true)).then((result) {
+            });
+          }
+      if(i != split.length - 1){
+        curPath += '/';
+      }
     }
+    newElementFromFile(sFile);
   }
   
   // fixpoint
@@ -430,7 +489,6 @@ class UpDroidExplorer {
     dragSetup(li, file);
     
     UListElement dirElement;
-    print(file.parentDir);
     if(file.parentDir == ''){
       dirElement = querySelector('#explorer-top');
       dirElement.children.add(li);
@@ -469,20 +527,14 @@ class SimpleFile {
   bool isDirectory;
   
   SimpleFile.fromDirectoryList(String raw, String prefix) {
-    print('raw: ' + raw);
-    print('prefix: ' + prefix);
     String workingString = stripFormatting(raw, prefix);
-    print('workingString: ' + workingString);
     getData(workingString);
   }
   
   SimpleFile.fromPath(String raw, String prefix, bool isDir) {
-    print('raw: ' + raw);
-    print('prefix: ' + prefix);
     
     // What is this for??
     path = raw.replaceAll(r'\', '');
-    print('path: ' + path);
     isDirectory = isDir;
     raw = raw.replaceFirst(prefix, '');
     getData(raw);
@@ -500,13 +552,11 @@ class SimpleFile {
   
   void getData(String fullPath) {
     List<String> pathList = fullPath.split('/');
-    print(pathList.toString() + ' is ' + pathList.length.toString());
     name = pathList[pathList.length - 1];
     if (pathList.length > 1) {
       parentDir = pathList[pathList.length - 2];
     } else {
       parentDir = '';
     }
-    print('parentDir: ' + parentDir);
   }
 }

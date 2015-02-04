@@ -59,14 +59,19 @@ void fsNewFile(String path) {
 }
 
 void fsNewFolder(String path) {
-  var newFolder = new Directory(path);
+  String fullPath = path;
+  Directory newFolder = new Directory(fullPath);
+  
+  int untitledNum = 0;
+  while(newFolder.existsSync()) {
+    untitledNum++;
+    fullPath = path + untitledNum.toString();
+    print(fullPath);
+    newFolder = new Directory(fullPath);
+  }
+  
   newFolder.createSync();
 }
-
-// fixpoint
-// Need to make it able to grab files with spaces
-
-// file1 file2
 
 void fsRename(String rename) {
   List<String> renameList = rename.split(':divider:');

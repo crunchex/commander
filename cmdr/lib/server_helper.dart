@@ -43,6 +43,8 @@ void debug(String logstring, int level) {
 /// Convenience method for a formatted socket message.
 void formattedMessage(WebSocket socket, String header, String body) {
   socket.add('[[$header]]$body');
+  String msg = '[[$header]]$body';
+  print(msg);
 }
 
 /// Helper method to grab file name in case of spaces.
@@ -52,7 +54,7 @@ String fNameGrabber(List<String> split){
     for(var i = 1; i < split.length; i++){
       fName += split[i];
       if(i != (split.length - 1)){
-        fName += r" ";
+        fName += " ";
       }
     }
   }
@@ -71,6 +73,7 @@ void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
   debug('Outgoing: ' + formatted, 0);
   socket.add(formatted);
+  print(formatted);
 }
 
 /// Recursively traverses the given directory path and asynchronously

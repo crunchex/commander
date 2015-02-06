@@ -11,6 +11,12 @@ void sendDirectory(WebSocket s, Directory dir) {
   });
 }
 
+void refreshDirectory(WebSocket s, Directory dir) {
+  help.getDirectory(dir).then((files) {
+    s.add('[[EXPLORER_DIRECTORY_REFRESH]]' + files.toString());
+  });
+}
+
 void sendPath(WebSocket s, Directory dir) {
   help.formattedMessage(s, 'EXPLORER_DIRECTORY_PATH', dir.path);
 }

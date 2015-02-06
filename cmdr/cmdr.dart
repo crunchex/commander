@@ -35,6 +35,10 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         sendDirectory(socket, dir);
         break;
         
+      case 'EXPLORER_DIRECTORY_REFRESH':
+        refreshDirectory(socket, dir);
+        break;
+        
       case 'EXPLORER_NEW_FILE':
         fsNewFile(um.body);
         break;

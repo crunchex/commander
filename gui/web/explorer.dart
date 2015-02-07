@@ -117,6 +117,7 @@ class UpDroidExplorer {
                      
                      if (currentPath != newPath && duplicate == null) {
                                if(item.lastChild.hasChildNodes() == false){
+                                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                                  newElementFromFile(new SimpleFile.fromPath(workspacePath + 
                                     '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
                                  item.remove();
@@ -305,9 +306,10 @@ class UpDroidExplorer {
               
               if (currentPath != newPath && duplicate == null  && !span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])) {
                         if(item.lastChild.hasChildNodes() == false){
+                          ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                          item.remove();
                           newElementFromFile(new SimpleFile.fromPath(span.parent.dataset['path'] + 
                              '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
-                          item.remove();
                         }
                         else if(checkContents(item) == true){
                           ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
@@ -378,7 +380,17 @@ class UpDroidExplorer {
         if (keyEvent.keyCode == KeyCode.ENTER) {
           var newPath = filePathGrab(file) + '/' + input.value;
           
-          ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
+          LIElement duplicate = querySelector("[data-path='$newPath']");
+          if(duplicate == null){
+            ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);  
+          }
+          
+          // TODO: Create a overwrite option in case of existing file name
+          
+          if(duplicate != null){
+            window.alert("File name already exists");
+            ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+          }
           
           // Remove this element once editing is complete, as the new one will soon appear.
           if(file.path != newPath){
@@ -386,28 +398,23 @@ class UpDroidExplorer {
                       ul.children.remove(li);
           }
           
+       // Put the element back in the case that rename is canceled
+       
+         if(file.path == newPath){
+           li.remove();
+           if(file.isDirectory == true){
+             ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+           }
+         }
+          
           if(refresh == true){
             ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
           }
           
-          // TODO: Doesn't work if empty folder contains an empty folder
           // Create a folder icon if the item renamed was an empty folder
           
           if(file.isDirectory == true && li.lastChild.hasChildNodes() == false){
             newElementFromFile(new SimpleFile.fromPath(newPath, workspacePath, true));
-          }
-          
-          //TODO: Refine this function
-          
-          // Put the element back in the case that rename is canceled
-          if(file.path == newPath){
-            li.classes.remove('editing');
-            li.children.remove(input);
-            SpanElement filename = new SpanElement();
-                filename
-                    ..classes.add('filename')
-                    ..text = file.name;
-                li.children.add(filename);
           }
           
         } else {

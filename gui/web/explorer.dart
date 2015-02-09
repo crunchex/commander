@@ -35,7 +35,6 @@ class UpDroidExplorer {
     rootline = querySelector('#file-explorer-hr');
     rootlineContainer = querySelector('#file-explorer-hr-container');
     dzRootLineContainer = new Dropzone(rootlineContainer);
-    
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
     
@@ -108,10 +107,9 @@ class UpDroidExplorer {
        LIElement duplicate = querySelector('[data-path="$workspacePath/${e.draggableElement.dataset['trueName']}"]');
        bool alert = false;
        
-       // TODO: figure out why alert isnt popping up
        if(duplicate != null){
          alert = true;
-         window.alert("cant drop here");
+         window.alert("Cannot move here, filename already exists");
        }
        
        if(e.draggableElement.dataset['isDir'] == 'true'){
@@ -328,8 +326,8 @@ class UpDroidExplorer {
               }
             }
           
-          // TODO: add alert for duplicate file name
           if(alert == true){
+            window.alert("Cannot move here, file name already exists.");
           }
           
         } else if (e.draggableElement.id == 'file') {
@@ -368,10 +366,10 @@ class UpDroidExplorer {
       li.classes.add('editing');
       
       InputElement input = new InputElement();
-      input.placeholder = '';
+      input.value = '${li.dataset['trueName']}';
+      input.select();
       
-      // TODO: Fix this - does not work for some reason.
-      input.focus();
+      // TODO: this only works in Chromium
       
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
@@ -386,8 +384,13 @@ class UpDroidExplorer {
           // TODO: Create a overwrite option in case of existing file name
           
           if(duplicate != null){
-            window.alert("File name already exists");
-            ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+            if(duplicate == li){
+              ws.send('[[EXPLORER_DIRECTORY_LIST]]');  
+            }
+            else{
+              window.alert("File name already exists");
+              ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+            }
           }
           
           // Remove this element once editing is complete, as the new one will soon appear.

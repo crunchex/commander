@@ -588,15 +588,16 @@ class UpDroidExplorer {
     dragSetup(li, file);
     
     UListElement dirElement;
-    if(file.parentDir == ''){
+    if(file.parentDir == '' && !file.path.contains('/.')){
+      
       dirElement = querySelector('#explorer-top');
       dirElement.children.add(li);
     }
-    else{
+    else if(!file.path.contains('/.')){
       var validPath = removeSpaces(truePath);
       var validParent = removeSpaces(file.parentDir);
       dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
-        dirElement.children.add(li);
+        dirElement.children.add(li);  
     }
     
     return completer.future;

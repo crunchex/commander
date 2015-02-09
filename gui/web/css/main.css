@@ -325,6 +325,10 @@ li input {
   font-size: 10px;
 }
 
+#explorer-container{
+  padding: none;
+}
+
 .explorer-li{
   cursor: pointer;
 }

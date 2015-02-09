@@ -107,15 +107,18 @@ class UpDroidExplorer {
        // Check for duplicate file name
        LIElement duplicate = querySelector('[data-path="$workspacePath/${e.draggableElement.dataset['trueName']}"]');
        bool alert = false;
+       
+       // TODO: figure out why alert isnt popping up
        if(duplicate != null){
          alert = true;
+         window.alert("cant drop here");
        }
        
        if(e.draggableElement.dataset['isDir'] == 'true'){
                      
                      // Avoid an exception thrown when the new name already exists or dragging to same folder.
                      
-                     if (currentPath != newPath && duplicate == null) {
+                     if (currentPath != newPath && alert == false) {
                                if(item.lastChild.hasChildNodes() == false){
                                  ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                                  newElementFromFile(new SimpleFile.fromPath(workspacePath + 
@@ -135,15 +138,10 @@ class UpDroidExplorer {
                  }
                    
                    else{
-                     if (currentPath != newPath && duplicate == null){
+                     if (currentPath != newPath && alert == false){
                            ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                      }
                    }
-       
-       // TODO: add duplicate file alert
-       
-       if(alert == true){
-       }
        
       } else if (e.draggableElement.id == 'file'){
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);   

@@ -22,6 +22,7 @@ class UpDroidConsole {
   AnchorElement themeButton;
   
   bool lightTheme;
+  bool consoleSelected;
   
   UpDroidConsole(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
@@ -30,6 +31,7 @@ class UpDroidConsole {
     utf8Decoder = new Utf8Decoder();
     
     lightTheme = false;
+    consoleSelected = false;
 
     console = querySelector('#console');
     consoleButton = querySelector('#button-console');
@@ -90,8 +92,18 @@ class UpDroidConsole {
       }
     });
     
-    // for debug
-    console.onClick.listen((e) => print('selected!'));
+    // TODO: figure out a way to deselect the console.
+    console.onClick.listen((e) {
+      consoleSelected = true;
+    });
+    
+    window.onMouseWheel.listen((wheelEvent) {
+      if (consoleSelected) {
+        // Scrolling should target only the console.
+        wheelEvent.preventDefault();
+        print('scroll!' + wheelEvent.deltaY.toString());
+      }
+    });
     
     themeButton.onClick.listen((e) {
       toggleTheme();

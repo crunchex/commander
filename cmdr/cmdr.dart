@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:http_server/http_server.dart' show VirtualDirectory;
 import 'dart:async';
+import 'dart:convert';
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 
@@ -11,6 +12,7 @@ import 'lib/client_responses.dart';
 
 VirtualDirectory virDir;
 DirectoryWatcher watcher;
+Utf8Encoder utf8Encoder;
 
 String defaultWorkspacePath = '/home/user/workspace';
 String defaultGuiPath = '/etc/updroid/web';
@@ -21,6 +23,12 @@ bool defaultDebugFlag = false;
 void handleWebSocket(WebSocket socket, Directory dir) {
   help.debug('Client connected!', 0);
   StreamController<String> processInput = new StreamController<String>.broadcast();
+  
+  IOSink shellStdin;
+  Process.start('bash', []).then((Process shell) {
+    shell.stdout.listen((data) => socket.add('[[CONSOLE_OUTPUT]]' + data));
+    shellStdin = shell.stdin;
+  });
   
   socket.listen((String s) {
     help.UpDroidMessage um = new help.UpDroidMessage(s);
@@ -81,7 +89,9 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         break;
         
       case 'CONSOLE_INPUT':
-        passInput(processInput, um.body);
+        //passInput(processInput, um.body);
+        print(um.body);
+        shellStdin.add(utf8Encoder.convert(um.body));
         break;  
         
       default:
@@ -141,6 +151,9 @@ void main(List<String> args) {
   // Initialize the DirectoryWatcher.
   Directory dir = new Directory(results.command['workspace']);
   watcher = new DirectoryWatcher(dir.path);
+  
+  // Initialize the UTF8Encoder.
+  utf8Encoder = new Utf8Encoder();
   
   initServer(dir);
 }

@@ -72,25 +72,31 @@ class UpDroidConsole {
         print('Console error: unrecognized message type: ' + m.type);
     }
   }
+  
+  void handleInput(KeyboardEvent e) {
+    int key = e.keyCode;
+
+    // Carriage Return (13) => New Line (10).
+    if (key == 13) {
+      key = 10;
+    }
+    
+    // Alpha keys return Uppercase keyCodes for some reason.
+    String lowercase = UTF8.decode([key]).toLowerCase();
+    ws.send('[[CONSOLE_INPUT]]' + UTF8.encode(lowercase)[0].toString());
+  }
 
   /// Sets up the event handlers for the console.
   void registerConsoleEventHandlers() {
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'CONSOLE_OUTPUT')
-        .listen((um) => print(utf8Decoder.convert(um.body)));
+        .listen((um) => print(um.body));
     
     cs.stream
         .where((m) => m.dest == 'CONSOLE' || m.dest == 'ALL')
         .listen((m) => processMessage(m));
-    
-    console.onKeyUp.listen((e) {
-      print(e.keyCode.toString());
-      ws.send('[[CONSOLE_INPUT]]' + e.keyCode);
-      
-      if (e.ctrlKey && e.keyCode == 67) {
-        print('Ctrl-C');
-      }
-    });
+
+    console.onKeyUp.listen((e) => handleInput(e));
     
     // TODO: figure out a way to deselect the console.
     console.onClick.listen((e) {

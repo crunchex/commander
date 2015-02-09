@@ -26,8 +26,11 @@ void handleWebSocket(WebSocket socket, Directory dir) {
   
   IOSink shellStdin;
   Process.start('bash', []).then((Process shell) {
-    shell.stdout.listen((data) => socket.add('[[CONSOLE_OUTPUT]]' + data));
     shellStdin = shell.stdin;
+    shell.stdout.listen((data) {
+      print('outgoing' + data.toString());
+      socket.add('[[CONSOLE_OUTPUT]]' + data.toString());
+    });
   });
   
   socket.listen((String s) {
@@ -89,9 +92,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         break;
         
       case 'CONSOLE_INPUT':
-        //passInput(processInput, um.body);
-        print(um.body);
-        shellStdin.add(utf8Encoder.convert(um.body));
+        shellStdin.add([int.parse(um.body)]);
         break;  
         
       default:

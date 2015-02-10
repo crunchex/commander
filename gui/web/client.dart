@@ -9,6 +9,7 @@ import 'package:ace/proxy.dart';
 import 'package:dnd/dnd.dart';
 import 'lib/updroid_message.dart';
 import 'lib/console_helper.dart';
+import 'lib/terminal.dart';
 
 part 'explorer.dart';
 part 'editor.dart';

@@ -5,15 +5,24 @@ import 'dart:async';
 
 class Terminal {
   DivElement div;
-  Stream stdin, stdout;
-  int charWidth, charHeight;
-  List cursorXY;
+  int _charWidth, _charHeight;
+  List _cursorXY;
   
-  Terminal (this.div, this.stdin, this.stdout) {
-    charWidth = 10;
-    charHeight = 13;
+  StreamController stdout;
+  
+  Terminal (this.div) {
+    _charWidth = 10;
+    _charHeight = 13;
+
+    stdout = new StreamController<List<int>>();
+    
+    registerEventHandlers();
   }
   
-  int get cols => div.borderEdge.width ~/ charWidth;
-  int get rows => div.borderEdge.height ~/ charHeight;
+  int get _cols => div.borderEdge.width ~/ _charWidth;
+  int get _rows => div.borderEdge.height ~/ _charHeight;
+  
+  void registerEventHandlers() {
+    stdout.stream.listen((data) => print(data));
+  }
 }

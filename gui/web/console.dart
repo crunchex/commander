@@ -15,6 +15,7 @@ Programs that are curses-based, such as htop, will not work.
 class UpDroidConsole {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
+  Terminal term;
   Utf8Decoder utf8Decoder;
 
   DivElement console;
@@ -28,6 +29,7 @@ class UpDroidConsole {
     this.ws = ws;
     this.cs = cs;
     
+    term = new Terminal(console);
     utf8Decoder = new Utf8Decoder();
     
     lightTheme = false;
@@ -99,8 +101,8 @@ class UpDroidConsole {
   void registerConsoleEventHandlers() {
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'CONSOLE_OUTPUT')
-        .listen((um) => print(um.body));
-    
+        .listen((um) => term.stdout.add(um.body));
+
     cs.stream
         .where((m) => m.dest == 'CONSOLE' || m.dest == 'ALL')
         .listen((m) => processMessage(m));

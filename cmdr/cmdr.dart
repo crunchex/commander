@@ -26,8 +26,10 @@ void handleWebSocket(WebSocket socket, Directory dir) {
   Process.start('bash', []).then((Process shell) {
     shellStdin = shell.stdin;
     shell.stdout.listen((data) {
-      print('outgoing' + data.toString());
-      socket.add('[[CONSOLE_OUTPUT]]' + data.toString());
+      for (String code in data) {
+        print(code.toString());
+        socket.add('[[CONSOLE_OUTPUT]]' + code.toString());
+      }
     });
   });
   

@@ -591,7 +591,7 @@ class UpDroidExplorer {
     UListElement dirElement;
     if(file.parentDir == '' && !file.path.contains('/.')){
       
-      dirElement = querySelector('#explorer-top');
+      dirElement = querySelector('#explorer-body');
       dirElement.children.add(li);
     }
     else if(!file.path.contains('/.')){
@@ -609,7 +609,7 @@ class UpDroidExplorer {
     var files = fileList(raw);
     
     // Set the explorer list to empty for a full refresh.
-    UListElement explorer = querySelector('#explorer-top');
+    UListElement explorer = querySelector('#explorer-body');
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {

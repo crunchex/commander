@@ -78,7 +78,7 @@ html, body {
   font-size: 15px;
 }
 
-#explorer-top > .explorer-li {
+#explorer-body > .explorer-li {
     margin-left: -38px;
 }
 
@@ -90,11 +90,11 @@ html, body {
   list-style-type: none;
 }
 
-#explorer-top .btn {
+#explorer-body .btn {
   background-color: transparent;  
 }
 
-#explorer-top .btn:hover {
+#explorer-body .btn:hover {
   color: #268bd2;
 }
 

@@ -5,6 +5,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'console_helper.dart';
 
+/// A class for rendering a terminal emulator in a [DivElement] (param).
+/// [stdout] needs to receive individual UTF8 integers and will handle
+/// them appropriately.
 class Terminal {
   DivElement div;
   int _charWidth, _charHeight;

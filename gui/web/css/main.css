@@ -69,7 +69,7 @@ html, body {
 }
 
 #new {
-  float: right;
+  display: inline-block;
   padding: 2px 4px 2px 4px;
   text-align: center;
   color: #333333;
@@ -98,9 +98,13 @@ html, body {
   color: #268bd2;
 }
 
+#title-container{
+  text-align: center;
+}
+
 #file-explorer-title {
   margin-top: 0px;
-  margin-bottom: 20px;
+  padding: 0 0 1em;
   text-align: center;
   vertical-align: middle;
   font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;

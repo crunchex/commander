@@ -1,9 +1,8 @@
 #!/usr/bin/env dart
 
 import 'dart:io';
-import 'package:http_server/http_server.dart' show VirtualDirectory;
 import 'dart:async';
-import 'dart:convert';
+import 'package:http_server/http_server.dart' show VirtualDirectory;
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 
@@ -12,7 +11,6 @@ import 'lib/client_responses.dart';
 
 VirtualDirectory virDir;
 DirectoryWatcher watcher;
-Utf8Encoder utf8Encoder;
 
 String defaultWorkspacePath = '/home/user/workspace';
 String defaultGuiPath = '/etc/updroid/web';
@@ -152,9 +150,6 @@ void main(List<String> args) {
   // Initialize the DirectoryWatcher.
   Directory dir = new Directory(results.command['workspace']);
   watcher = new DirectoryWatcher(dir.path);
-  
-  // Initialize the UTF8Encoder.
-  utf8Encoder = new Utf8Encoder();
   
   initServer(dir);
 }

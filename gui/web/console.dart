@@ -16,7 +16,6 @@ class UpDroidConsole {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
   Terminal term;
-  Utf8Decoder utf8Decoder;
 
   DivElement console;
   AnchorElement consoleButton;
@@ -30,7 +29,6 @@ class UpDroidConsole {
     this.cs = cs;
     
     term = new Terminal(console);
-    utf8Decoder = new Utf8Decoder();
     
     lightTheme = false;
     consoleSelected = false;

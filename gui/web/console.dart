@@ -73,7 +73,7 @@ class UpDroidConsole {
     }
   }
   
-  void handleInput(KeyboardEvent e) {
+  void handleInput(KeyEvent e) {
     int key = e.keyCode;
 
     // Carriage Return (13) => New Line (10).
@@ -81,9 +81,18 @@ class UpDroidConsole {
       key = 10;
     }
     
-    // Alpha keys return Uppercase keyCodes for some reason.
-    String lowercase = UTF8.decode([key]).toLowerCase();
-    ws.send('[[CONSOLE_INPUT]]' + UTF8.encode(lowercase)[0].toString());
+    // Apply the Shift modifier if applicable.
+    if (!e.shiftKey) {
+      if (MODIFIABLE_KEYS.containsKey(key)) {
+        key = MODIFIABLE_KEYS[key];
+      }
+    }
+    
+    // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
+    if (key != 16 && key != 17 && key != 91 && key != 18) {
+      print(key);
+      ws.send('[[CONSOLE_INPUT]]' + key.toString());
+    }
   }
 
   /// Sets up the event handlers for the console.

@@ -8,6 +8,7 @@ import 'package:bootjack/bootjack.dart';
 import 'package:ace/proxy.dart';
 import 'package:dnd/dnd.dart';
 import 'lib/updroid_message.dart';
+import 'lib/console_helper.dart';
 
 part 'explorer.dart';
 part 'editor.dart';

@@ -5,6 +5,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'console_helper.dart';
 
+const bool debug = true;
+
 /// A class for rendering a terminal emulator in a [DivElement] (param).
 /// [stdout] needs to receive individual UTF8 integers and will handle
 /// them appropriately.
@@ -34,7 +36,7 @@ class Terminal {
   int get _rows => div.borderEdge.height ~/ _charHeight;
   
   void registerEventHandlers() {
-    stdout.stream.listen((output) => handleOutput(output));
+    stdout.stream.listen((output) => (debug) ? print(output) : handleOutput(output));
   }
   
   /// Takes the raw stdout from shell per individual UTF8 int (as a string)
@@ -50,4 +52,6 @@ class Terminal {
     print(UTF8.decode(_outString));
     _outString = [];
   }
+  
+  
 }

@@ -24,7 +24,9 @@ void handleWebSocket(WebSocket socket, Directory dir) {
   StreamController<String> processInput = new StreamController<String>.broadcast();
   
   IOSink shellStdin;
+  Process bash;
   Process.start('bash', ['-i']).then((Process shell) {
+    bash = shell;
     shellStdin = shell.stdin;
     shell.stdout.listen((data) {
       for (String code in data) {
@@ -106,7 +108,13 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         help.debug('Message received without updroid header.', 1);
     }
   }, onDone: () {
-    help.debug('Client disconnected', 0);  
+    help.debug('Client disconnected... killing shell process', 0);
+    // Kill the shell process.
+    bash.kill();
+  }, onError: () {
+    help.debug('Socket error... killing shell process', 1);
+    // Kill the shell process.
+    bash.kill();
   });
   
   watcher.events.listen((e) => help.formattedFsUpdate(socket, e));

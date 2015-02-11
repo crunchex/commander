@@ -102,9 +102,13 @@ html, body {
   text-align: center;
 }
 
+#title-container li{
+  list-style-type: none;;
+}
+
 #file-explorer-title {
-  margin-top: 0px;
-  padding: 0 0 1em;
+  display: inline-block;
+  margin-bottom: 10px;
   text-align: center;
   vertical-align: middle;
   font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;

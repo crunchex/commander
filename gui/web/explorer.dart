@@ -148,6 +148,14 @@ class UpDroidExplorer {
       }
     });
     
+    newFolder.onDoubleClick.listen((e){
+      ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
+    });
+    
+    newFile.onDoubleClick.listen((e){
+      ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
+    });
+    
     dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));
     dzRecycle.onDragLeave.listen((e) => recycle.classes.remove('recycle-entered'));
     

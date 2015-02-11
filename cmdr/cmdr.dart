@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
 import 'package:http_server/http_server.dart' show VirtualDirectory;
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
@@ -23,7 +24,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
   StreamController<String> processInput = new StreamController<String>.broadcast();
   
   IOSink shellStdin;
-  Process.start('bash', []).then((Process shell) {
+  Process.start('bash', ['-i']).then((Process shell) {
     shellStdin = shell.stdin;
     shell.stdout.listen((data) {
       for (String code in data) {
@@ -31,6 +32,12 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         socket.add('[[CONSOLE_OUTPUT]]' + code.toString());
       }
     });
+    
+    // Set up with an initial command.
+//    List<int> command = UTF8.encode("echo \$PS1\n");
+//    for (int code in command) {
+//      shell.stdin.add([code]);
+//    }
   });
   
   socket.listen((String s) {

@@ -5,7 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'console_helper.dart';
 
-const bool debug = true;
+const bool debug = false;
 
 /// A class for rendering a terminal emulator in a [DivElement] (param).
 /// [stdout] needs to receive individual UTF8 integers and will handle
@@ -53,5 +53,7 @@ class Terminal {
     _outString = [];
   }
   
-  
+  void drawString(String str) {
+    
+  }
 }

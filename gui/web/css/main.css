@@ -189,7 +189,7 @@ li input {
 
 .editor {
   width: 100%;
-  height: 500px; 
+  height: 450px; 
   border: 1px solid #dddddd;
 }
 
@@ -215,7 +215,7 @@ li input {
 
 #console {
   width: 100%;
-  height: 500px;
+  height: 450px;
   padding: 5px;
   border: 1px solid #dddddd;
   background-color: #002b36;
@@ -325,7 +325,14 @@ li input {
   font-size: 10px;
 }
 
+#explorer-container{
+  max-height: 500px;
+  overflow: auto;
+  padding: none;
+}
+
 .explorer-li{
+  min-width: 120px;
   cursor: pointer;
 }
 

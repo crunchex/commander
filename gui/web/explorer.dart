@@ -35,7 +35,6 @@ class UpDroidExplorer {
     rootline = querySelector('#file-explorer-hr');
     rootlineContainer = querySelector('#file-explorer-hr-container');
     dzRootLineContainer = new Dropzone(rootlineContainer);
-    
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
     
@@ -107,16 +106,19 @@ class UpDroidExplorer {
        // Check for duplicate file name
        LIElement duplicate = querySelector('[data-path="$workspacePath/${e.draggableElement.dataset['trueName']}"]');
        bool alert = false;
+       
        if(duplicate != null){
          alert = true;
+         window.alert("Cannot move here, filename already exists");
        }
        
        if(e.draggableElement.dataset['isDir'] == 'true'){
                      
                      // Avoid an exception thrown when the new name already exists or dragging to same folder.
                      
-                     if (currentPath != newPath && duplicate == null) {
+                     if (currentPath != newPath && alert == false) {
                                if(item.lastChild.hasChildNodes() == false){
+                                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                                  newElementFromFile(new SimpleFile.fromPath(workspacePath + 
                                     '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
                                  item.remove();
@@ -134,15 +136,10 @@ class UpDroidExplorer {
                  }
                    
                    else{
-                     if (currentPath != newPath && duplicate == null){
+                     if (currentPath != newPath && alert == false){
                            ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                      }
                    }
-       
-       // TODO: add duplicate file alert
-       
-       if(alert == true){
-       }
        
       } else if (e.draggableElement.id == 'file'){
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);   
@@ -305,9 +302,10 @@ class UpDroidExplorer {
               
               if (currentPath != newPath && duplicate == null  && !span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])) {
                         if(item.lastChild.hasChildNodes() == false){
+                          ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                          item.remove();
                           newElementFromFile(new SimpleFile.fromPath(span.parent.dataset['path'] + 
                              '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
-                          item.remove();
                         }
                         else if(checkContents(item) == true){
                           ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
@@ -328,8 +326,8 @@ class UpDroidExplorer {
               }
             }
           
-          // TODO: add alert for duplicate file name
           if(alert == true){
+            window.alert("Cannot move here, file name already exists.");
           }
           
         } else if (e.draggableElement.id == 'file') {
@@ -368,17 +366,32 @@ class UpDroidExplorer {
       li.classes.add('editing');
       
       InputElement input = new InputElement();
-      input.placeholder = '';
+      input.value = '${li.dataset['trueName']}';
+      input.select();
       
-      // TODO: Fix this - does not work for some reason.
-      input.focus();
+      // TODO: this only works in Chromium
       
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
           var newPath = filePathGrab(file) + '/' + input.value;
           
-          ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
+          LIElement duplicate = querySelector("[data-path='$newPath']");
+          if(duplicate == null){
+            ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);  
+          }
+          
+          // TODO: Create a overwrite option in case of existing file name
+          
+          if(duplicate != null){
+            if(duplicate == li){
+              ws.send('[[EXPLORER_DIRECTORY_LIST]]');  
+            }
+            else{
+              window.alert("File name already exists");
+              ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+            }
+          }
           
           // Remove this element once editing is complete, as the new one will soon appear.
           if(file.path != newPath){
@@ -386,28 +399,23 @@ class UpDroidExplorer {
                       ul.children.remove(li);
           }
           
+       // Put the element back in the case that rename is canceled
+       
+         if(file.path == newPath){
+           li.remove();
+           if(file.isDirectory == true){
+             ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+           }
+         }
+          
           if(refresh == true){
             ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
           }
           
-          // TODO: Doesn't work if empty folder contains an empty folder
           // Create a folder icon if the item renamed was an empty folder
           
           if(file.isDirectory == true && li.lastChild.hasChildNodes() == false){
             newElementFromFile(new SimpleFile.fromPath(newPath, workspacePath, true));
-          }
-          
-          //TODO: Refine this function
-          
-          // Put the element back in the case that rename is canceled
-          if(file.path == newPath){
-            li.classes.remove('editing');
-            li.children.remove(input);
-            SpanElement filename = new SpanElement();
-                filename
-                    ..classes.add('filename')
-                    ..text = file.name;
-                li.children.add(filename);
           }
           
         } else {
@@ -581,15 +589,16 @@ class UpDroidExplorer {
     dragSetup(li, file);
     
     UListElement dirElement;
-    if(file.parentDir == ''){
+    if(file.parentDir == '' && !file.path.contains('/.')){
+      
       dirElement = querySelector('#explorer-top');
       dirElement.children.add(li);
     }
-    else{
+    else if(!file.path.contains('/.')){
       var validPath = removeSpaces(truePath);
       var validParent = removeSpaces(file.parentDir);
       dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
-        dirElement.children.add(li);
+        dirElement.children.add(li);  
     }
     
     return completer.future;

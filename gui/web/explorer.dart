@@ -334,7 +334,7 @@ class UpDroidExplorer {
               }
             }
           
-          if(alert == true){
+          if(alert == true && item != duplicate){
             window.alert("Cannot move here, file name already exists.");
           }
           

@@ -28,14 +28,14 @@ class UpDroidConsole {
     this.ws = ws;
     this.cs = cs;
     
-    term = new Terminal(console);
-    
     lightTheme = false;
     consoleSelected = false;
 
     console = querySelector('#console');
     consoleButton = querySelector('#button-console');
     themeButton = querySelector('.button-console-theme');
+    
+    term = new Terminal(console);
     
     registerConsoleEventHandlers();
 

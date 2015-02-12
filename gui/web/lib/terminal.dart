@@ -20,23 +20,40 @@ class Terminal {
   
   StreamController stdout;
   
-  Terminal (this.div) {
+  Terminal (DivElement div) {
     _charWidth = 10;
-    _charHeight = 13;
-    
+    _charHeight = 17;
+    _cursorXY = [0, 0];
+
+    this.div = div;
     _escapeCode = [];
     _outString = [];
 
     stdout = new StreamController<List<int>>();
     
     registerEventHandlers();
+    initDisplay();
   }
   
-  int get _cols => div.borderEdge.width ~/ _charWidth;
-  int get _rows => div.borderEdge.height ~/ _charHeight;
+  int get _cols => div.borderEdge.width ~/ _charWidth - 1;
+  int get _rows => div.borderEdge.height ~/ _charHeight - 1;
   
   void registerEventHandlers() {
     stdout.stream.listen((output) => (debug) ? print(output) : handleOutput(output));
+  }
+  
+  initDisplay() {
+    print('rows ' + _rows.toString());
+    for (var i = 0; i < _rows; i++) {
+      DivElement row = new DivElement();
+      row.classes.add('termrow');
+
+      for (var j = 0; j < _cols; j++) {
+        row.innerHtml += "&nbsp";
+      }
+      
+      div.children.add(row);
+    }
   }
   
   /// Takes the raw stdout from shell per individual UTF8 int (as a string)

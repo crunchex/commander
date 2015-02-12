@@ -73,7 +73,7 @@ class UpDroidConsole {
     }
   }
   
-  void handleInput(KeyEvent e) {
+  void handleInput(KeyboardEvent e) {
     int key = e.keyCode;
 
     // Carriage Return (13) => New Line (10).
@@ -110,9 +110,20 @@ class UpDroidConsole {
     // TODO: figure out a way to deselect the console.
     console.onClick.listen((e) {
       consoleSelected = true;
+      print(consoleSelected);
+    });
+    
+    window.onClick.listen((e) {
+      if (e.target.classes.contains('termrow') || e.target.id == 'console') {
+
+      } else {
+        consoleSelected = false;
+        print('click' + consoleSelected.toString());
+      }
     });
     
     window.onMouseWheel.listen((wheelEvent) {
+      print('wheel' + consoleSelected.toString());
       if (consoleSelected) {
         // Scrolling should target only the console.
         wheelEvent.preventDefault();

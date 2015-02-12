@@ -71,6 +71,10 @@ class Terminal {
   }
   
   void drawString(String str) {
-    
+    print('cursor x before: ' + _cursorXY[0]);
+    SpanElement strSpan = new SpanElement();
+    div.children[_cursorXY[0]].children.insert(0, strSpan);
+    _cursorXY[0]++;
+    print('cursor x after: ' + _cursorXY[0]);
   }
 }

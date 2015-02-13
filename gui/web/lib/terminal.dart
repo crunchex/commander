@@ -111,6 +111,7 @@ class Terminal {
     // Copy away the current text and remove.
     DivElement row = div.children[_cursorXY[1]];
     String tmp = row.innerHtml;
+    tmp = tmp.substring(str.length * 6);
     row.innerHtml = "";
 
     SpanElement strSpan = new SpanElement();

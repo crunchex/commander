@@ -30,16 +30,9 @@ void handleWebSocket(WebSocket socket, Directory dir) {
     shellStdin = shell.stdin;
     shell.stdout.listen((data) {
       for (String code in data) {
-        print(code.toString());
         socket.add('[[CONSOLE_OUTPUT]]' + code.toString());
       }
     });
-    
-    // Set up with an initial command.
-//    List<int> command = UTF8.encode("echo \$PS1\n");
-//    for (int code in command) {
-//      shell.stdin.add([code]);
-//    }
   });
   
   socket.listen((String s) {

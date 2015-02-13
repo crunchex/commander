@@ -85,7 +85,7 @@ class Terminal {
     
     _normalStrings.stream.listen((singleCode) {
       if (singleCode == '10' || singleCode == '13') {
-        print(UTF8.decode(_outString));
+        drawString(UTF8.decode(_outString));
         _outString = [];
         return;
       }
@@ -95,7 +95,6 @@ class Terminal {
   }
   
   initDisplay() {
-    print('rows ' + _rows.toString());
     for (var i = 0; i < _rows; i++) {
       DivElement row = new DivElement();
       row.classes.add('termrow');
@@ -108,32 +107,20 @@ class Terminal {
     }
   }
   
-  /// Takes the raw stdout from shell per individual UTF8 int (as a string)
-  /// and and handles it appropriately.
-  void handleOutput(String output) {
-    switch (output) {
-      case '27':
-        // Escape Sequence detected.
-        _escapeCode.add(int.parse(output));
-        break;
-      case '10':
-        // New Line detected.
-        
-    }
-    
-    // Do something with the string before resetting it.
-    String str = UTF8.decode(_outString);
-    print('str ' + str);
-    drawString(str);
-    _outString = [];
-  }
-  
   void drawString(String str) {
-    print('cursor x before: ' + _cursorXY[0]);
+    // Copy away the current text and remove.
+    DivElement row = div.children[_cursorXY[1]];
+    String tmp = row.innerHtml;
+    row.innerHtml = "";
+
     SpanElement strSpan = new SpanElement();
-    strSpan.innerHtml = str;
-    div.children[_cursorXY[0]].children.insert(0, strSpan);
-    _cursorXY[0]++;
-    print('cursor x after: ' + _cursorXY[0]);
+    strSpan.text = str;
+    
+    // Append the new span and reinsert the original text.
+    row.append(strSpan);
+    row.appendHtml(tmp);
+    
+    // Move the cursor one line down (Y).
+    _cursorXY[1]++;
   }
 }

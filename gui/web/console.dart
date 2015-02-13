@@ -90,7 +90,6 @@ class UpDroidConsole {
     
     // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
     if (key != 16 && key != 17 && key != 91 && key != 18) {
-      //print(key);
       ws.send('[[CONSOLE_INPUT]]' + key.toString());
     }
   }
@@ -110,7 +109,6 @@ class UpDroidConsole {
     // TODO: figure out a way to deselect the console.
     console.onClick.listen((e) {
       consoleSelected = true;
-      print(consoleSelected);
     });
     
     window.onClick.listen((e) {
@@ -118,16 +116,13 @@ class UpDroidConsole {
 
       } else {
         consoleSelected = false;
-        print('click' + consoleSelected.toString());
       }
     });
     
     window.onMouseWheel.listen((wheelEvent) {
-      print('wheel' + consoleSelected.toString());
       if (consoleSelected) {
         // Scrolling should target only the console.
         wheelEvent.preventDefault();
-        print('scroll!' + wheelEvent.deltaY.toString());
       }
     });
     

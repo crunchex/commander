@@ -44,7 +44,6 @@ void debug(String logstring, int level) {
 void formattedMessage(WebSocket socket, String header, String body) {
   socket.add('[[$header]]$body');
   String msg = '[[$header]]$body';
-  print(msg);
 }
 
 /// Helper method to grab file name in case of spaces.

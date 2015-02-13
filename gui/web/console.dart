@@ -90,7 +90,7 @@ class UpDroidConsole {
     
     // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
     if (key != 16 && key != 17 && key != 91 && key != 18) {
-      print(key);
+      //print(key);
       ws.send('[[CONSOLE_INPUT]]' + key.toString());
     }
   }

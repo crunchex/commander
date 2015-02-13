@@ -20,7 +20,7 @@ class InputMode {
 /// them appropriately.
 class Terminal {
   DivElement div;
-  int _charWidth, _charHeight;
+  int _charWidth, _charHeight, bufferIndex;
   List _cursorXY;
   
   // This should really be an enum.
@@ -28,6 +28,7 @@ class Terminal {
   
   List<int> _escapeCode;
   List<int> _outString;
+  List<SpanElement> _buffer;
   
   StreamController stdout;
   StreamController _escapeCodes;
@@ -38,10 +39,12 @@ class Terminal {
     _charWidth = 10;
     _charHeight = 17;
     _cursorXY = [0, 0];
+    bufferIndex = 0;
 
     this.div = div;
     _escapeCode = [];
     _outString = [];
+    _buffer = [];
 
     stdout = new StreamController<String>();
     _escapeCodes = new StreamController<String>();
@@ -85,8 +88,13 @@ class Terminal {
     
     _normalStrings.stream.listen((singleCode) {
       if (singleCode == '10' || singleCode == '13') {
-        drawString(UTF8.decode(_outString));
+        SpanElement newSpan = new SpanElement();
+        newSpan.text = UTF8.decode(_outString);
+        _buffer.add(newSpan);
         _outString = [];
+        
+        drawDisplay();
+        bufferIndex++;
         return;
       }
       
@@ -107,21 +115,34 @@ class Terminal {
     }
   }
   
-  void drawString(String str) {
-    // Copy away the current text and remove.
-    DivElement row = div.children[_cursorXY[1]];
-    String tmp = row.innerHtml;
-    tmp = tmp.substring(str.length * 6);
-    row.innerHtml = "";
+  /// Returns a long string of &nbsp, one per Terminal col.
+  String generateNbsp() {
+    String nbsp = '';
+    for (var i = 0; i < _cols; i++) {
+      nbsp = nbsp + '&nbsp;';
+    }
 
-    SpanElement strSpan = new SpanElement();
-    strSpan.text = str;
-    
-    // Append the new span and reinsert the original text.
-    row.append(strSpan);
-    row.appendHtml(tmp);
-    
-    // Move the cursor one line down (Y).
-    _cursorXY[1]++;
+    return nbsp;
+  }
+  
+  /// Updates the display in canonical mode based
+  /// on contents of the buffer.
+  void drawDisplay() {
+    int i = 0;
+    for (DivElement row in div.children) {
+      // Reset the row.
+      row.innerHtml = "";
+      
+      // Start with the standard long string of &nbsp, then trim
+      // to fit the SpanElement.
+      String nbsp = generateNbsp();
+      nbsp = nbsp.substring(_buffer[bufferIndex + i].text.length * 6);
+      
+      // Append the span from buffer and reinsert the original text after the span.
+      row.append(_buffer[bufferIndex + i]);
+      row.appendHtml(nbsp);
+      
+      i++;
+    }
   }
 }

@@ -76,7 +76,7 @@ class Terminal {
 
       switch (escapeString) {
         case '[0m':
-          print('escape recognized: ' + escapeString);
+          print('reset all: ' + escapeString);
           _inputSwitch = InputMode.normal;
           _escapeCode = [];
           break;

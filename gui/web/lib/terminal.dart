@@ -56,15 +56,41 @@ class Terminal {
   
   void registerEventHandlers() {
     stdout.stream.listen((out) {
-      if (debug) {
-        print(out);
+      // Escape detected.
+      if (out == '27') {
+        _inputSwitch = InputMode.escape;
         return;
       }
       
-      if (out == '27' || _inputSwitch == InputMode.escape) {
+      if (_inputSwitch == InputMode.escape) {
         _escapeCodes.add(out);
-        
+      } else if (_inputSwitch == InputMode.normal) {
+        _normalStrings.add(out);
       }
+
+    });
+    
+    _escapeCodes.stream.listen((singleCode) {
+      _escapeCode.add(int.parse(singleCode));
+      String escapeString = UTF8.decode(_escapeCode);
+
+      switch (escapeString) {
+        case '[0m':
+          print('escape recognized: ' + escapeString);
+          _inputSwitch = InputMode.normal;
+          _escapeCode = [];
+          break;
+      }
+    });
+    
+    _normalStrings.stream.listen((singleCode) {
+      if (singleCode == '10' || singleCode == '13') {
+        print(UTF8.decode(_outString));
+        _outString = [];
+        return;
+      }
+      
+      _outString.add(int.parse(singleCode));
     });
   }
   

@@ -21,6 +21,7 @@ class UpDroidExplorer {
   Dropzone dzRootLineContainer;
   Dropzone dzRecycle;
   Dropzone dzEditor;
+  StreamSubscription listener;
   
   UpDroidExplorer(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
@@ -107,7 +108,7 @@ class UpDroidExplorer {
        LIElement duplicate = querySelector('[data-path="$workspacePath/${e.draggableElement.dataset['trueName']}"]');
        bool alert = false;
        
-       if(duplicate != null){
+       if(duplicate != null && duplicate != item){
          alert = true;
          window.alert("Cannot move here, filename already exists");
        }
@@ -365,6 +366,7 @@ class UpDroidExplorer {
   /// Handles file renaming with a double-click event.
   void renameEventHandler(LIElement li, SimpleFile file) {
     bool refresh = false;
+    
     if(li.dataset['isDir'] == 'true'){
       if(checkContents(li) == true){
             refresh = true;
@@ -376,6 +378,15 @@ class UpDroidExplorer {
       InputElement input = new InputElement();
       input.value = '${li.dataset['trueName']}';
       input.select();
+      
+      Element outside = querySelector('.container-fluid');
+      
+      listener = outside.onClick.listen((e){
+        if(e.target != input){
+          ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+          listener.cancel();
+        }
+      });
       
       // TODO: this only works in Chromium
       
@@ -393,7 +404,7 @@ class UpDroidExplorer {
           
           if(duplicate != null){
             if(duplicate == li){
-              ws.send('[[EXPLORER_DIRECTORY_LIST]]');  
+              ws.send('[[EXPLORER_DIRECTORY_LIST]]');
             }
             else{
               window.alert("File name already exists");

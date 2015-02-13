@@ -50,14 +50,14 @@ class Terminal {
     _escapeCodes = new StreamController<String>();
     _normalStrings = new StreamController<String>();
     
-    registerEventHandlers();
-    initDisplay();
+    _registerEventHandlers();
+    _initDisplay();
   }
   
   int get _cols => div.borderEdge.width ~/ _charWidth - 1;
   int get _rows => div.borderEdge.height ~/ _charHeight - 1;
   
-  void registerEventHandlers() {
+  void _registerEventHandlers() {
     stdout.stream.listen((out) {
       // Escape detected.
       if (out == '27') {
@@ -102,7 +102,7 @@ class Terminal {
     });
   }
   
-  initDisplay() {
+  void _initDisplay() {
     for (var i = 0; i < _rows; i++) {
       DivElement row = new DivElement();
       row.classes.add('termrow');
@@ -116,7 +116,7 @@ class Terminal {
   }
   
   /// Returns a long string of &nbsp, one per Terminal col.
-  String generateNbsp() {
+  String _generateNbsp() {
     String nbsp = '';
     for (var i = 0; i < _cols; i++) {
       nbsp = nbsp + '&nbsp;';
@@ -135,7 +135,7 @@ class Terminal {
       
       // Start with the standard long string of &nbsp, then trim
       // to fit the SpanElement.
-      String nbsp = generateNbsp();
+      String nbsp = _generateNbsp();
       nbsp = nbsp.substring(_buffer[bufferIndex + i].text.length * 6);
       
       // Append the span from buffer and reinsert the original text after the span.

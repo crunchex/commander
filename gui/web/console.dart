@@ -113,27 +113,27 @@ class UpDroidConsole {
     
     window.onClick.listen((e) {
       if (e.target.classes.contains('termrow') || e.target.id == 'console') {
-
-      } else {
-        consoleSelected = false;
+        return;
       }
+
+      consoleSelected = false;
     });
     
     window.onMouseWheel.listen((wheelEvent) {
-      if (consoleSelected) {
-        // Scrolling should target only the console.
-        wheelEvent.preventDefault();
-        
-        if (wheelEvent.deltaY < 0) {
-          if (!term.atTop) {
-            term.bufferIndex--;
-            term.drawDisplay();
-          }
-        } else {
-          if (!term.atBottom) {
-            term.bufferIndex++;
-            term.drawDisplay();
-          }
+      if (!consoleSelected) return;
+
+      // Scrolling should target only the console.
+      wheelEvent.preventDefault();
+      
+      if (wheelEvent.deltaY < 0) {
+        if (!term.atTop) {
+          term.bufferIndex--;
+          term.drawDisplay();
+        }
+      } else {
+        if (!term.atBottom) {
+          term.bufferIndex++;
+          term.drawDisplay();
         }
       }
     });

@@ -131,8 +131,12 @@ class Terminal {
   /// Updates the display in canonical mode based
   /// on contents of the buffer.
   void drawDisplay() {
-    int i = 0;
-    for (DivElement row in div.children) {
+    for (int i = 0; i < div.children.length; i++) {
+      DivElement row = div.children[i];
+      
+      // Nothing in the buffer at this row.
+      if (i >= _buffer.length) continue;
+      
       // Reset the row.
       row.innerHtml = "";
       
@@ -144,8 +148,6 @@ class Terminal {
       // Append the span from buffer and reinsert the original text after the span.
       row.append(_buffer[bufferIndex + i]);
       row.appendHtml(nbsp);
-      
-      i++;
     }
   }
 }

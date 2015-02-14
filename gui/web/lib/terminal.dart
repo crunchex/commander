@@ -33,8 +33,11 @@ class Terminal {
   StreamController _escapeCodes;
   StreamController _normalStrings;
   
+  String _prompt;
+  
   Terminal (DivElement div) {
     _inputSwitch = InputMode.normal;
+    _prompt = 'up! > ';
     _charWidth = 10;
     _charHeight = 17;
     _cursorXY = [0, 0];
@@ -94,9 +97,16 @@ class Terminal {
         return;
       }
 
+      // Add the new string to buffer.
       SpanElement newSpan = new SpanElement();
       newSpan.text = UTF8.decode(_outString);
       _buffer.add(newSpan);
+      
+      // Add a new prompt.
+      SpanElement newPrompt = new SpanElement();
+      newPrompt.text = _prompt;
+      _buffer.add(newPrompt);
+      
       _outString = [];
       
       drawDisplay();

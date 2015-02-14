@@ -90,18 +90,18 @@ class Terminal {
     });
     
     _normalStrings.stream.listen((singleCode) {
-      if (singleCode == '10' || singleCode == '13') {
-        SpanElement newSpan = new SpanElement();
-        newSpan.text = UTF8.decode(_outString);
-        _buffer.add(newSpan);
-        _outString = [];
-        
-        drawDisplay();
-        bufferIndex++;
+      if (!(singleCode == '10' || singleCode == '13')) {
+        _outString.add(int.parse(singleCode));
         return;
       }
+
+      SpanElement newSpan = new SpanElement();
+      newSpan.text = UTF8.decode(_outString);
+      _buffer.add(newSpan);
+      _outString = [];
       
-      _outString.add(int.parse(singleCode));
+      drawDisplay();
+      bufferIndex++;
     });
   }
   

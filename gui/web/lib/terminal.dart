@@ -57,6 +57,9 @@ class Terminal {
   int get _cols => div.borderEdge.width ~/ _charWidth - 1;
   int get _rows => div.borderEdge.height ~/ _charHeight - 1;
   
+  bool get atTop => bufferIndex <= 0;
+  bool get atBottom => bufferIndex >= _buffer.length - _rows;
+  
   void _registerEventHandlers() {
     stdout.stream.listen((out) {
       // Escape detected.

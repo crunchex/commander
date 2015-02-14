@@ -123,6 +123,18 @@ class UpDroidConsole {
       if (consoleSelected) {
         // Scrolling should target only the console.
         wheelEvent.preventDefault();
+        
+        if (wheelEvent.deltaY < 0) {
+          if (!term.atTop) {
+            term.bufferIndex--;
+            term.drawDisplay();
+          }
+        } else {
+          if (!term.atBottom) {
+            term.bufferIndex++;
+            term.drawDisplay();
+          }
+        }
       }
     });
     

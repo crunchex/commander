@@ -2,7 +2,6 @@
 
 import 'dart:io';
 import 'dart:async';
-import 'dart:convert';
 import 'package:http_server/http_server.dart' show VirtualDirectory;
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';

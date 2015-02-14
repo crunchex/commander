@@ -3,7 +3,6 @@ library terminal;
 import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
-import 'console_helper.dart';
 
 const bool debug = false;
 

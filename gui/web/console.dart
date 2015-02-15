@@ -106,6 +106,10 @@ class UpDroidConsole {
 
     console.onKeyUp.listen((e) => handleInput(e));
     
+    console.onKeyDown.listen((e) {
+      if (e.keyCode == 8) e.preventDefault();
+    });
+    
     // TODO: figure out a way to deselect the console.
     console.onClick.listen((e) {
       consoleSelected = true;

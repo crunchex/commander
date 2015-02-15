@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
 import 'package:http_server/http_server.dart' show VirtualDirectory;
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
@@ -29,6 +30,14 @@ void handleWebSocket(WebSocket socket, Directory dir) {
     shellStdin = shell.stdin;
     shell.stdout.listen((data) {
       for (String code in data) {
+        help.debug(code, 0);
+        socket.add('[[CONSOLE_OUTPUT]]' + code.toString());
+      }
+    });
+    
+    shell.stderr.listen((data) {
+      for (String code in data) {
+        help.debug(code, 0);
         socket.add('[[CONSOLE_OUTPUT]]' + code.toString());
       }
     });

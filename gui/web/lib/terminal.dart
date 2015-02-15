@@ -33,11 +33,10 @@ class Terminal {
   StreamController _escapeCodes;
   StreamController _normalStrings;
   
-  String _prompt;
+  static const int ESC = 27;
   
   Terminal (DivElement div) {
     _inputSwitch = InputMode.normal;
-    _prompt = 'up! > ';
     _charWidth = 10;
     _charHeight = 17;
     _cursorXY = [0, 0];
@@ -49,8 +48,8 @@ class Terminal {
     _buffer = [];
 
     stdout = new StreamController<String>();
-    _escapeCodes = new StreamController<String>();
-    _normalStrings = new StreamController<String>();
+    _escapeCodes = new StreamController<int>();
+    _normalStrings = new StreamController<int>();
     
     _registerEventHandlers();
     _initDisplay();
@@ -64,36 +63,40 @@ class Terminal {
   
   void _registerEventHandlers() {
     stdout.stream.listen((out) {
+      int outInt = int.parse(out);
+
       // Escape detected.
-      if (out == '27') {
+      if (outInt == ESC) {
+        _escapeCodes.add(outInt);
         _inputSwitch = InputMode.escape;
         return;
       }
       
       if (_inputSwitch == InputMode.escape) {
-        _escapeCodes.add(out);
+        _escapeCodes.add(outInt);
       } else if (_inputSwitch == InputMode.normal) {
-        _normalStrings.add(out);
+        _normalStrings.add(outInt);
       }
-
     });
     
     _escapeCodes.stream.listen((singleCode) {
-      _escapeCode.add(int.parse(singleCode));
-      String escapeString = UTF8.decode(_escapeCode);
+      _escapeCode.add(singleCode);
 
-      switch (escapeString) {
-        case '[0m':
-          print('reset all: ' + escapeString);
-          _inputSwitch = InputMode.normal;
+      switch (singleCode) {
+        case 109: // <ESC>[{attr1};...;{attrn}m
+          _setAttributeMode(_escapeCode);
           _escapeCode = [];
-          break;
+          print('switching to normal mode!');
+          _inputSwitch = InputMode.normal;
+          break;    
       }
     });
     
     _normalStrings.stream.listen((singleCode) {
-      if (!(singleCode == '10' || singleCode == '13')) {
-        _outString.add(int.parse(singleCode));
+      _outString.add(singleCode);
+      
+      if (!(singleCode == 10 || singleCode == 13)) {
+        print('appending to normal string');
         return;
       }
 
@@ -101,17 +104,17 @@ class Terminal {
       SpanElement newSpan = new SpanElement();
       newSpan.text = UTF8.decode(_outString);
       _buffer.add(newSpan);
-      
-      // Add a new prompt.
-      SpanElement newPrompt = new SpanElement();
-      newPrompt.text = _prompt;
-      _buffer.add(newPrompt);
-      
       _outString = [];
       
+      if (!atBottom) {
+        bufferIndex++;
+      }
       drawDisplay();
-      bufferIndex++;
     });
+  }
+  
+  void _setAttributeMode(List<int> mode) {
+    print('setting attribute mode! ' + mode.toString());
   }
   
   void _initDisplay() {
@@ -143,7 +146,7 @@ class Terminal {
     for (int i = 0; i < div.children.length; i++) {
       DivElement row = div.children[i];
       
-      // Nothing in the buffer at this row.
+      // Nothing in the buffer at this row, skip rest.
       if (i >= _buffer.length) continue;
       
       // Reset the row.
@@ -152,6 +155,8 @@ class Terminal {
       // Start with the standard long string of &nbsp, then trim
       // to fit the SpanElement.
       String nbsp = _generateNbsp();
+      print('i: ' + i.toString());
+      print('buffer len: ' + _buffer.length.toString());
       nbsp = nbsp.substring(_buffer[bufferIndex + i].text.length * 6);
       
       // Append the span from buffer and reinsert the original text after the span.

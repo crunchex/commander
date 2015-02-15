@@ -29,17 +29,13 @@ void handleWebSocket(WebSocket socket, Directory dir) {
     bash = shell;
     shellStdin = shell.stdin;
     shell.stdout.listen((data) {
-      for (String code in data) {
-        help.debug(code, 0);
-        socket.add('[[CONSOLE_OUTPUT]]' + code.toString());
-      }
+      help.debug('outgoing: ' + data.toString(), 0);
+      socket.add('[[CONSOLE_OUTPUT]]' + JSON.encode(data));
     });
     
     shell.stderr.listen((data) {
-      for (String code in data) {
-        help.debug(code, 0);
-        socket.add('[[CONSOLE_OUTPUT]]' + code.toString());
-      }
+      help.debug('outgoing: ' + data.toString(), 0);
+      socket.add('[[CONSOLE_OUTPUT]]' + JSON.encode(data));
     });
   });
   

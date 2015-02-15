@@ -62,59 +62,58 @@ class Terminal {
   bool get atBottom => bufferIndex >= _buffer.length - _rows;
   
   void _registerEventHandlers() {
-    stdout.stream.listen((out) {
-      int outInt = int.parse(out);
+    stdout.stream.listen((String out) {
+      List<int> output = JSON.decode(out);
 
-      // Escape detected.
-      if (outInt == ESC) {
-        _escapeCodes.add(outInt);
-        _inputSwitch = InputMode.escape;
-        return;
+      for (int i = 0; i < output.length; i++) {
+        int code = output[i];
+        if (code == ESC) _inputSwitch = InputMode.escape;
+ 
+        // Append code
+        if (_inputSwitch == InputMode.escape) {
+          _escapeCode.add(code);
+        } else if (_inputSwitch == InputMode.normal) {
+          _outString.add(code);
+        }
+        
+        // Let this be the last loop if we're at the end of the message
+        // or the end of an escape sequence is detected.
+        if (_inputSwitch == InputMode.escape) {
+          if (_detectEscapeEnd(code)) {
+            _setAttributeMode();
+          }
+        } else if (_inputSwitch == InputMode.normal) {
+          if (i == output.length - 1 || code == 10) {
+            _handleOutString();
+          }
+        }
       }
-      
-      if (_inputSwitch == InputMode.escape) {
-        _escapeCodes.add(outInt);
-      } else if (_inputSwitch == InputMode.normal) {
-        _normalStrings.add(outInt);
-      }
-    });
-    
-    _escapeCodes.stream.listen((singleCode) {
-      _escapeCode.add(singleCode);
-
-      switch (singleCode) {
-        case 109: // <ESC>[{attr1};...;{attrn}m
-          _setAttributeMode(_escapeCode);
-          _escapeCode = [];
-          print('switching to normal mode!');
-          _inputSwitch = InputMode.normal;
-          break;    
-      }
-    });
-    
-    _normalStrings.stream.listen((singleCode) {
-      _outString.add(singleCode);
-      
-      if (!(singleCode == 10 || singleCode == 13)) {
-        print('appending to normal string');
-        return;
-      }
-
-      // Add the new string to buffer.
-      SpanElement newSpan = new SpanElement();
-      newSpan.text = UTF8.decode(_outString);
-      _buffer.add(newSpan);
-      _outString = [];
-      
-      if (!atBottom) {
-        bufferIndex++;
-      }
-      drawDisplay();
     });
   }
   
-  void _setAttributeMode(List<int> mode) {
-    print('setting attribute mode! ' + mode.toString());
+  bool _detectEscapeEnd(int code) {
+    if (code == 109) {
+      _inputSwitch = InputMode.normal;
+      return true;
+    }
+    return false;
+  }
+  
+  void _handleOutString() {
+    SpanElement newSpan = new SpanElement();
+    newSpan.text = UTF8.decode(_outString);
+    _buffer.add(newSpan);
+    _outString = [];
+    
+    if (!atBottom) {
+      bufferIndex++;
+    }
+    drawDisplay();
+  }
+  
+  void _setAttributeMode() {
+    print('setting attribute mode! ' + _escapeCode.toString());
+    _escapeCode = [];
   }
   
   void _initDisplay() {
@@ -155,8 +154,6 @@ class Terminal {
       // Start with the standard long string of &nbsp, then trim
       // to fit the SpanElement.
       String nbsp = _generateNbsp();
-      print('i: ' + i.toString());
-      print('buffer len: ' + _buffer.length.toString());
       nbsp = nbsp.substring(_buffer[bufferIndex + i].text.length * 6);
       
       // Append the span from buffer and reinsert the original text after the span.

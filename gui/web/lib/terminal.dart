@@ -83,6 +83,7 @@ class Terminal {
     });
   }
   
+  /// Returns true if the end of an escape sequence is detected.
   bool _detectEscapeEnd(int code) {
     if (code == 109) {
       _inputSwitch = InputMode.normal;
@@ -91,6 +92,8 @@ class Terminal {
     return false;
   }
   
+  /// Appends a new [SpanElement] with the contents of [_outString]
+  /// to the [_buffer] and updates the display.
   void _handleOutString() {
     SpanElement newSpan = new SpanElement();
     newSpan.text = UTF8.decode(_outString);
@@ -103,11 +106,13 @@ class Terminal {
     drawDisplay();
   }
   
+  /// Placeholder for handling an escape sequence.
   void _setAttributeMode() {
     print('setting attribute mode! ' + _escapeCode.toString());
     _escapeCode = [];
   }
   
+  /// Display initialization.
   void _initDisplay() {
     for (var i = 0; i < _rows; i++) {
       DivElement row = new DivElement();

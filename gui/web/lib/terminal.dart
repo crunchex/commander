@@ -9,7 +9,6 @@ const bool debug = false;
 /// A class for keeping track of inputHandling state.
 /// Stand-in for what should be an enum.
 class InputMode {
-  static int dump = 0;
   static int normal = 1;
   static int escape = 2;
 }
@@ -18,38 +17,31 @@ class InputMode {
 /// [stdout] needs to receive individual UTF8 integers and will handle
 /// them appropriately.
 class Terminal {
+  // Public
   DivElement div;
-  int _charWidth, _charHeight, bufferIndex;
-  List _cursorXY;
-  
-  // This should really be an enum.
-  int _inputSwitch;
-  
-  List<int> _escapeCode;
-  List<int> _outString;
-  List<SpanElement> _buffer;
-  
   StreamController stdout;
-  StreamController _escapeCodes;
-  StreamController _normalStrings;
+  int bufferIndex;
+
+  // Private
+  int _charWidth, _charHeight, _inputSwitch;
+  List<int> _cursorXY, _escapeCode,_outString;
+  List<SpanElement> _buffer;
   
   static const int ESC = 27;
   
   Terminal (DivElement div) {
-    _inputSwitch = InputMode.normal;
-    _charWidth = 10;
-    _charHeight = 17;
-    _cursorXY = [0, 0];
+    this.div = div;
+    stdout = new StreamController<String>();
     bufferIndex = 0;
 
-    this.div = div;
+    _charWidth = 10;
+    _charHeight = 17;
+    _inputSwitch = InputMode.normal;
+    _cursorXY = [0, 0];
+
     _escapeCode = [];
     _outString = [];
     _buffer = [];
-
-    stdout = new StreamController<String>();
-    _escapeCodes = new StreamController<int>();
-    _normalStrings = new StreamController<int>();
     
     _registerEventHandlers();
     _initDisplay();

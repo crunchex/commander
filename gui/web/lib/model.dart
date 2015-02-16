@@ -1,6 +1,35 @@
 part of terminal;
 
-/// The data model class for an individual glyph within Model.
+/// Represents the data model for [Terminal].
+class Model {
+  List<List> _model;
+  
+  Model (int numRows, int numCols) {
+    _model = new List(numRows);  
+    initModel(numCols);
+  }
+  
+  /// Returns the [Glyph] at x,y.
+  Glyph getGlyphAt(int x, int y) => _model[x][y];
+  
+  /// Sets a [Glyph] at location x,y.
+  void setGlyphAt(Glyph g, int x, int y) {
+    _model[x][y] = g;
+  }
+  
+  /// Initializes the internal model with a List of Lists.
+  /// Each location defaults to a Glyph.SPACE.
+  void initModel(int numCols) {
+    for (int x = 0; x < _model.length; x++) {
+      _model[x] = new List<Glyph>(numCols);
+      for (int y = 0; y < numCols; y++) {
+        _model[x][y] = new Glyph(Glyph.SPACE);
+      }
+    }
+  }
+}
+
+/// The data model class for an individual glyph within [Model].
 class Glyph {
   static const SPACE = '&nbsp;';
   static const AMP = '&amp;';
@@ -50,4 +79,8 @@ class Glyph {
     fgColor = COLORS[37];
     bgColor = COLORS[37];
   }
+}
+
+class Cursor extends Glyph {
+  Cursor () : super (Glyph.SPACE, blink:true);
 }

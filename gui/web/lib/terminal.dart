@@ -24,7 +24,7 @@ class Terminal {
 
   // Private
   int _charWidth, _charHeight, _inputSwitch;
-  List<int> _cursorXY, _escapeCode,_outString;
+  List<int> _cursorXY;
   List<SpanElement> _buffer;
   
   static const int ESC = 27;
@@ -38,9 +38,6 @@ class Terminal {
     _charHeight = 17;
     _inputSwitch = InputMode.normal;
     _cursorXY = [0, 0];
-
-    _escapeCode = [];
-    _outString = [];
     _buffer = [];
     
     _registerEventHandlers();
@@ -57,26 +54,29 @@ class Terminal {
     stdout.stream.listen((String out) {
       List<int> output = JSON.decode(out);
 
+      List<int> outString = [];
+      List<int> escapeSequence = [];
       for (int i = 0; i < output.length; i++) {
         int code = output[i];
         if (code == ESC) _inputSwitch = InputMode.escape;
  
         // Append code
         if (_inputSwitch == InputMode.escape) {
-          _escapeCode.add(code);
+          escapeSequence.add(code);
         } else if (_inputSwitch == InputMode.normal) {
-          _outString.add(code);
+          outString.add(code);
         }
         
         // Let this be the last loop if we're at the end of the message
         // or the end of an escape sequence is detected.
         if (_inputSwitch == InputMode.escape) {
           if (_detectEscapeEnd(code)) {
-            _setAttributeMode();
+            _setAttributeMode(escapeSequence);
           }
         } else if (_inputSwitch == InputMode.normal) {
           if (i == output.length - 1 || code == 10) {
-            _handleOutString();
+            _handleOutString(outString);
+            outString = [];
           }
         }
       }
@@ -94,22 +94,21 @@ class Terminal {
   
   /// Appends a new [SpanElement] with the contents of [_outString]
   /// to the [_buffer] and updates the display.
-  void _handleOutString() {
+  void _handleOutString(List<int> outString) {
     SpanElement newSpan = new SpanElement();
-    newSpan.text = UTF8.decode(_outString);
+    newSpan.text = UTF8.decode(outString);
     _buffer.add(newSpan);
-    _outString = [];
     
     if (!atBottom) {
       bufferIndex++;
     }
+
     drawDisplay();
   }
   
   /// Placeholder for handling an escape sequence.
-  void _setAttributeMode() {
-    print('setting attribute mode! ' + _escapeCode.toString());
-    _escapeCode = [];
+  void _setAttributeMode(List<int> escapeSequence) {
+    print('setting attribute mode! ' + escapeSequence.toString());
   }
   
   /// Display initialization.

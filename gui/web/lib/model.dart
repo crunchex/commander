@@ -20,9 +20,24 @@ class Glyph {
   bool bright, dim, underscore, blink, reverse, hidden;
   String value,fgColor, bgColor;
   
-  Glyph (this.value, [this.bright = false, this.dim = false, this.underscore = false,
-         this.blink = false, this.reverse = false, this.hidden = false,
-         this.fgColor = 'white', this.bgColor = 'white']);
+  Glyph (this.value, {this.bright: false, this.dim: false, this.underscore: false,
+         this.blink: false, this.reverse: false, this.hidden: false,
+         this.fgColor: 'white', this.bgColor: 'white'});
+  
+  String toString() {
+    Map properties = {
+      'value': value,
+      'bright': bright,
+      'dim': dim,
+      'underscore': underscore,
+      'blink': blink,
+      'reverse': reverse,
+      'hidden': hidden,
+      'fgColor': fgColor,
+      'bgColor': bgColor
+    };
+    return JSON.encode(properties);
+  }
   
   void resetAll() {
     bright = false;

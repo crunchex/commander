@@ -2,6 +2,7 @@ library updroid_client;
 
 import 'dart:html';
 import 'dart:async';
+import 'dart:convert';
 import 'package:ace/ace.dart';
 import 'package:bootjack/bootjack.dart';
 import 'package:ace/proxy.dart';

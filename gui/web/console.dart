@@ -23,6 +23,9 @@ class UpDroidConsole {
   
   bool lightTheme;
   bool consoleSelected;
+  bool inputDone;
+  
+  List<int> inputString;
   
   UpDroidConsole(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
@@ -30,6 +33,8 @@ class UpDroidConsole {
     
     lightTheme = false;
     consoleSelected = false;
+    inputDone = false;
+    inputString = [];
 
     console = querySelector('#console');
     consoleButton = querySelector('#button-console');
@@ -75,11 +80,6 @@ class UpDroidConsole {
   
   void handleInput(KeyboardEvent e) {
     int key = e.keyCode;
-
-    // Carriage Return (13) => New Line (10).
-    if (key == 13) {
-      key = 10;
-    }
     
     // Apply the Shift modifier if applicable.
     if (!e.shiftKey) {
@@ -87,10 +87,22 @@ class UpDroidConsole {
         key = MODIFIABLE_KEYS[key];
       }
     }
-    
+
+    // Carriage Return (13) => New Line (10).
+    if (key == 13) {
+      key = 10;
+      inputDone = true;
+    }
+
     // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
     if (key != 16 && key != 17 && key != 91 && key != 18) {
-      ws.send('[[CONSOLE_INPUT]]' + key.toString());
+      inputString.add(key);
+    }
+    
+    if (inputDone) {
+      ws.send('[[CONSOLE_INPUT]]' + JSON.encode(inputString));
+      inputString = [];
+      inputDone = false;
     }
   }
 

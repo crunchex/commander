@@ -98,7 +98,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         break;
         
       case 'CONSOLE_INPUT':
-        shellStdin.add([int.parse(um.body)]);
+        shellStdin.add(JSON.decode(um.body));
         break;  
         
       default:

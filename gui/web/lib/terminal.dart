@@ -4,6 +4,8 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
+part 'model.dart';
+
 const bool debug = false;
 
 /// A class for keeping track of inputHandling state.

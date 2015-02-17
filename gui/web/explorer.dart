@@ -21,7 +21,7 @@ class UpDroidExplorer {
   Dropzone dzRootLineContainer;
   Dropzone dzRecycle;
   Dropzone dzEditor;
-  StreamSubscription listener;
+  StreamSubscription outsideClickListener;
   
   UpDroidExplorer(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
@@ -382,10 +382,10 @@ class UpDroidExplorer {
       
       Element outside = querySelector('.container-fluid');
       
-      listener = outside.onClick.listen((e){
+      outsideClickListener = outside.onClick.listen((e){
         if(e.target != input){
           ws.send('[[EXPLORER_DIRECTORY_LIST]]');
-          listener.cancel();
+          outsideClickListener.cancel();
         }
       });
       

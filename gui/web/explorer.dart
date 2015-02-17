@@ -230,6 +230,8 @@ class UpDroidExplorer {
     
     // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
+    SpanElement glyph = new SpanElement();
+    glyph.classes.addAll(['glyphicon', 'glyphicon-folder-close']);
     var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
     glyphicon.classes.addAll(['glyphicon', glyphType]);
     dropSetup(glyphicon, file);
@@ -251,13 +253,15 @@ class UpDroidExplorer {
       li.children.add(ul);
       
       glyphicon.onDoubleClick.listen((e) {
-        if (glyphicon.dataset['hiding'] == 'false') {
           ul.classes.add('explorer-hidden');
-          glyphicon.dataset['hiding'] = 'true';
-        } else {
-          ul.classes.remove('explorer-hidden');
-          glyphicon.dataset['hiding'] = 'false';
-        }
+          glyphicon.replaceWith(glyph);
+          glyph.dataset['hiding'] = 'true'; 
+      });
+      
+      glyph.onDoubleClick.listen((e){
+        glyph.replaceWith(glyphicon);
+        glyphicon.dataset['hiding'] = 'false';
+        ul.classes.remove('explorer-hidden');
       });
     }
     

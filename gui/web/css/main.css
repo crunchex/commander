@@ -69,7 +69,7 @@ html, body {
 }
 
 #new {
-  float: right;
+  display: inline-block;
   padding: 2px 4px 2px 4px;
   text-align: center;
   color: #333333;
@@ -78,7 +78,7 @@ html, body {
   font-size: 15px;
 }
 
-#explorer-top > .explorer-li {
+#explorer-body > .explorer-li {
     margin-left: -38px;
 }
 
@@ -90,17 +90,25 @@ html, body {
   list-style-type: none;
 }
 
-#explorer-top .btn {
+#explorer-body .btn {
   background-color: transparent;  
 }
 
-#explorer-top .btn:hover {
+#explorer-body .btn:hover {
   color: #268bd2;
 }
 
+#title-container{
+  text-align: center;
+}
+
+#title-container li{
+  list-style-type: none;;
+}
+
 #file-explorer-title {
-  margin-top: 0px;
-  margin-bottom: 20px;
+  display: inline-block;
+  margin-bottom: 10px;
   text-align: center;
   vertical-align: middle;
   font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;

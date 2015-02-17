@@ -44,7 +44,6 @@ void debug(String logstring, int level) {
 void formattedMessage(WebSocket socket, String header, String body) {
   socket.add('[[$header]]$body');
   String msg = '[[$header]]$body';
-  print(msg);
 }
 
 /// Helper method to grab file name in case of spaces.
@@ -73,7 +72,6 @@ void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
   debug('Outgoing: ' + formatted, 0);
   socket.add(formatted);
-  print(formatted);
 }
 
 /// Recursively traverses the given directory path and asynchronously

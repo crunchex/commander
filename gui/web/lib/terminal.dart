@@ -28,6 +28,7 @@ class Terminal {
   int _charWidth, _charHeight, _inputSwitch;
   List<int> _cursorXY;
   List<SpanElement> _buffer;
+  Model _model;
   
   static const int ESC = 27;
   
@@ -41,9 +42,13 @@ class Terminal {
     _inputSwitch = InputMode.normal;
     _cursorXY = [0, 0];
     _buffer = [];
+    _model = new Model(_rows, _cols);
+    
+    print('cols: $_cols, rows: $_rows');
     
     _registerEventHandlers();
     _initDisplay();
+    refreshDisplay();
   }
   
   int get _cols => div.borderEdge.width ~/ _charWidth - 1;
@@ -97,15 +102,20 @@ class Terminal {
   /// Appends a new [SpanElement] with the contents of [_outString]
   /// to the [_buffer] and updates the display.
   void _handleOutString(List<int> outString) {
-    SpanElement newSpan = new SpanElement();
-    newSpan.text = UTF8.decode(outString);
-    _buffer.add(newSpan);
+    var codes = UTF8.decode(outString).codeUnits;
+    for (var code in codes) {
+       String char = new String.fromCharCode(code);
+       print('char: $char');
+       _model.setGlyphAt(new Glyph(char), _model.cursor[0], _model.cursor[1]);
+       _model.cursorNext();
+       print('cursor now at: ' + _model.cursor[0].toString() + ', ' + _model.cursor[1].toString());
+    }
     
     if (!atBottom) {
       bufferIndex++;
     }
 
-    drawDisplay();
+    refreshDisplay();
   }
   
   /// Placeholder for handling an escape sequence.
@@ -157,6 +167,17 @@ class Terminal {
       // Append the span from buffer and reinsert the original text after the span.
       row.append(_buffer[bufferIndex + i]);
       row.appendHtml(nbsp);
+    }
+  }
+  
+  void refreshDisplay() {
+    for (int x = 0; x < _rows; x++) {
+      String s = '';
+      for (int y = 0; y < _cols; y++) {
+        Glyph g = _model.getGlyphAt(x, y);
+        s += g.value;
+      }
+      div.children[x].innerHtml = s;
     }
   }
 }

@@ -144,12 +144,12 @@ class UpDroidConsole {
       if (wheelEvent.deltaY < 0) {
         if (!term.atTop) {
           term.bufferIndex--;
-          term.drawDisplay();
+          term.refreshDisplay();
         }
       } else {
         if (!term.atBottom) {
           term.bufferIndex++;
-          term.drawDisplay();
+          term.refreshDisplay();
         }
       }
     });

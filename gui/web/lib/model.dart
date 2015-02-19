@@ -3,9 +3,12 @@ part of terminal;
 /// Represents the data model for [Terminal].
 class Model {
   List<List> _model;
+  List cursor;
   
   Model (int numRows, int numCols) {
-    _model = new List(numRows);  
+    _model = new List(numRows);
+    cursor = [0, 0];
+
     initModel(numCols);
   }
   
@@ -15,6 +18,24 @@ class Model {
   /// Sets a [Glyph] at location x,y.
   void setGlyphAt(Glyph g, int x, int y) {
     _model[x][y] = g;
+  }
+  
+  void cursorNext() {
+    if (cursor[1] == _model.length - 1) {
+      cursor[1] = 0;
+      if (cursor[0] == _model[0].length - 1) {
+      cursor[0] = 0;
+      } else {
+        cursor[0]++;
+      }
+    } else {
+      cursor[1]++;
+    }
+  }
+  
+  void cursorNewLine() {
+    cursor[1] = 0;
+    cursor[0] = cursor[0] == _model.length - 1 ? 0 : cursor[0] + 1;
   }
   
   /// Initializes the internal model with a List of Lists.

@@ -180,10 +180,13 @@ class UpDroidConsole {
             }
           }
           if(validCommand == true){
-            ws.send('[[CONSOLE_COMMAND]]' + input.value.trim());  
+            processInput();  
           }
           else{
-            print("invalid command sent");
+           copyCommand(input.value.trim());
+            input.value = "";
+            ws.send('[[CONSOLE_INVALID]]');
+            input.value = "";
           }
         }
       }

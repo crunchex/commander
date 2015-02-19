@@ -21,7 +21,7 @@ class UpDroidExplorer {
   Dropzone dzRootLineContainer;
   Dropzone dzRecycle;
   Dropzone dzEditor;
-  StreamSubscription listener;
+  StreamSubscription outsideClickListener;
   
   UpDroidExplorer(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
@@ -224,12 +224,13 @@ class UpDroidExplorer {
       ..dataset['trueName'] = (file.name)
       ..dataset['path'] = file.path
       ..dataset['isDir'] = file.isDirectory.toString()
-      ..dataset['hiding'] = 'false'
       ..draggable = true
       ..classes.add('explorer-li');
     
     // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
+    SpanElement glyph = new SpanElement();
+    glyph.classes.addAll(['glyphicon', 'glyphicon-folder-close']);
     var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
     glyphicon.classes.addAll(['glyphicon', glyphType]);
     dropSetup(glyphicon, file);
@@ -251,13 +252,13 @@ class UpDroidExplorer {
       li.children.add(ul);
       
       glyphicon.onDoubleClick.listen((e) {
-        if (glyphicon.dataset['hiding'] == 'false') {
           ul.classes.add('explorer-hidden');
-          glyphicon.dataset['hiding'] = 'true';
-        } else {
-          ul.classes.remove('explorer-hidden');
-          glyphicon.dataset['hiding'] = 'false';
-        }
+          glyphicon.replaceWith(glyph);
+      });
+      
+      glyph.onDoubleClick.listen((e){
+        glyph.replaceWith(glyphicon);
+        ul.classes.remove('explorer-hidden');
       });
     }
     
@@ -381,10 +382,10 @@ class UpDroidExplorer {
       
       Element outside = querySelector('.container-fluid');
       
-      listener = outside.onClick.listen((e){
+      outsideClickListener = outside.onClick.listen((e){
         if(e.target != input){
           ws.send('[[EXPLORER_DIRECTORY_LIST]]');
-          listener.cancel();
+          outsideClickListener.cancel();
         }
       });
       

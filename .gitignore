@@ -16,3 +16,6 @@ pubspec.lock
 
 # Log files
 *.log
+
+# Mac OS X
+*.DS_Store

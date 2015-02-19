@@ -119,7 +119,6 @@ void processCommand(WebSocket s, StreamController<String> inputStream, String co
       .transform(UTF8.decoder)
       .listen((data) {
         s.add('[[CONSOLE_OUTPUT]]' + data);
-        print(data);
       });
     process.stdin.addStream(inputStream.stream.transform(UTF8.encoder));
     process.exitCode.then((exitCode) => s.add('[[CONSOLE_EXIT]]' + exitCode.toString()));

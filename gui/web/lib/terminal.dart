@@ -105,11 +105,21 @@ class Terminal {
     var codes = UTF8.decode(outString).codeUnits;
     for (var code in codes) {
        String char = new String.fromCharCode(code);
-       print('char: $char');
+       print('char: $char, code: ' + code.toString());
+       if (code == 10) {
+         _model.cursorNewLine();
+         continue;
+       }
+       
+       if (code == 13) {
+         // TODO: figure out what to do with the carriage return since it
+         // comes with the newline. Eat it for now.
+         continue;
+       }
+
        _model.setGlyphAt(new Glyph(char), _model.cursor.row, _model.cursor.col);
        _model.cursorNext();
-       print('cursor now at: ' + _model.cursor.row.toString() + ', ' + _model.cursor.col.toString());
-    }
+       }
     
     if (!atBottom) {
       bufferIndex++;

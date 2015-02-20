@@ -106,9 +106,9 @@ class Terminal {
     for (var code in codes) {
        String char = new String.fromCharCode(code);
        print('char: $char');
-       _model.setGlyphAt(new Glyph(char), _model.cursor[0], _model.cursor[1]);
+       _model.setGlyphAt(new Glyph(char), _model.cursor.row, _model.cursor.col);
        _model.cursorNext();
-       print('cursor now at: ' + _model.cursor[0].toString() + ', ' + _model.cursor[1].toString());
+       print('cursor now at: ' + _model.cursor.row.toString() + ', ' + _model.cursor.col.toString());
     }
     
     if (!atBottom) {
@@ -171,13 +171,13 @@ class Terminal {
   }
   
   void refreshDisplay() {
-    for (int x = 0; x < _rows; x++) {
+    for (int r = 0; r < _rows; r++) {
       String s = '';
-      for (int y = 0; y < _cols; y++) {
-        Glyph g = _model.getGlyphAt(x, y);
+      for (int c = 0; c < _cols; c++) {
+        Glyph g = _model.getGlyphAt(r, c);
         s += g.value;
       }
-      div.children[x].innerHtml = s;
+      div.children[r].innerHtml = s;
     }
   }
 }

@@ -1,50 +1,52 @@
 part of terminal;
 
+class Cursor {
+  int row = 0;
+  int col = 0;
+}
+
 /// Represents the data model for [Terminal].
 class Model {
-  List<List> _model;
-  List cursor;
+  List<List> _rows;
+  Cursor cursor;
   
   Model (int numRows, int numCols) {
-    _model = new List(numRows);
-    cursor = [0, 0];
+    _rows = new List(numRows);
+    cursor = new Cursor();
 
     initModel(numCols);
   }
   
-  /// Returns the [Glyph] at x,y.
-  Glyph getGlyphAt(int x, int y) => _model[x][y];
+  /// Returns the [Glyph] at row, col.
+  Glyph getGlyphAt(int row, int col) => _rows[row][col];
   
-  /// Sets a [Glyph] at location x,y.
-  void setGlyphAt(Glyph g, int x, int y) {
-    _model[x][y] = g;
+  /// Sets a [Glyph] at location row, col.
+  void setGlyphAt(Glyph g, int row, int col) {
+    _rows[row][col] = g;
+    print('setting glyph at: $row, $col');
   }
   
   void cursorNext() {
-    if (cursor[1] == _model.length - 1) {
-      cursor[1] = 0;
-      if (cursor[0] == _model[0].length - 1) {
-      cursor[0] = 0;
-      } else {
-        cursor[0]++;
-      }
-    } else {
-      cursor[1]++;
+    if (cursor.col < _rows[0].length) {
+      cursor.col++;
+      return;
     }
+    
+    cursorNewLine();
   }
   
   void cursorNewLine() {
-    cursor[1] = 0;
-    cursor[0] = cursor[0] == _model.length - 1 ? 0 : cursor[0] + 1;
+    cursor.row = (cursor.row < _rows.length) ? cursor.row + 1 : 0;
+    cursor.col = 0;
   }
   
   /// Initializes the internal model with a List of Lists.
   /// Each location defaults to a Glyph.SPACE.
   void initModel(int numCols) {
-    for (int x = 0; x < _model.length; x++) {
-      _model[x] = new List<Glyph>(numCols);
-      for (int y = 0; y < numCols; y++) {
-        _model[x][y] = new Glyph(Glyph.SPACE);
+    for (int r = 0; r < _rows.length; r++) {
+      _rows[r] = new List<Glyph>(numCols);
+      for (int c = 0; c < numCols; c++) {
+        _rows[r][c] = new Glyph(Glyph.SPACE);
       }
     }
   }
@@ -100,8 +102,4 @@ class Glyph {
     fgColor = COLORS[37];
     bgColor = COLORS[37];
   }
-}
-
-class Cursor extends Glyph {
-  Cursor () : super (Glyph.SPACE, blink:true);
 }

@@ -77,6 +77,7 @@ class Terminal {
         if (_inputSwitch == InputMode.escape) {
           if (_detectEscapeEnd(code)) {
             _setAttributeMode(escapeSequence);
+            escapeSequence = [];
           }
         } else if (_inputSwitch == InputMode.normal) {
           if (i == output.length - 1 || code == 10) {

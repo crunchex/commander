@@ -27,7 +27,7 @@ class Model {
   }
   
   void cursorNext() {
-    if (cursor.col < _rows[0].length) {
+    if (cursor.col < _rows[0].length - 1) {
       cursor.col++;
       return;
     }

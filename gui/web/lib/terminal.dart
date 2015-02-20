@@ -44,8 +44,6 @@ class Terminal {
     _buffer = [];
     _model = new Model(_rows, _cols);
     
-    print('cols: $_cols, rows: $_rows');
-    
     _registerEventHandlers();
     _initDisplay();
     refreshDisplay();
@@ -105,7 +103,6 @@ class Terminal {
     var codes = UTF8.decode(outString).codeUnits;
     for (var code in codes) {
        String char = new String.fromCharCode(code);
-       print('char: $char, code: ' + code.toString());
        if (code == 10) {
          _model.cursorNewLine();
          continue;

@@ -23,7 +23,6 @@ class Model {
   /// Sets a [Glyph] at location row, col.
   void setGlyphAt(Glyph g, int row, int col) {
     _rows[row][col] = g;
-    print('setting glyph at: $row, $col');
   }
   
   void cursorNext() {

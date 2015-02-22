@@ -125,34 +125,36 @@ class Terminal {
   
   /// Sets local [DisplayAttributes], given [escapeSequence].
   void _setAttributeMode(List<int> escapeSequence) {
+    String decodedSequence = UTF8.decode(escapeSequence);
+
     if (escapeSequence.contains('0;')) {
       _attributes.resetAll(); 
     }
     
-    if (escapeSequence.contains('1;')) _attributes.bright = true;
-    if (escapeSequence.contains('2;')) _attributes.dim = true;
-    if (escapeSequence.contains('4;')) _attributes.underscore = true;
-    if (escapeSequence.contains('5;')) _attributes.blink = true;
-    if (escapeSequence.contains('7;')) _attributes.reverse = true;
-    if (escapeSequence.contains('8;')) _attributes.hidden = true;
+    if (decodedSequence.contains(';1')) _attributes.bright = true;
+    if (decodedSequence.contains(';2')) _attributes.dim = true;
+    if (decodedSequence.contains(';4')) _attributes.underscore = true;
+    if (decodedSequence.contains(';5')) _attributes.blink = true;
+    if (decodedSequence.contains(';7')) _attributes.reverse = true;
+    if (decodedSequence.contains(';8')) _attributes.hidden = true;
 
-    if (escapeSequence.contains('30;')) _attributes.fgColor = DisplayAttributes.COLORS[30];
-    if (escapeSequence.contains('31;')) _attributes.fgColor = DisplayAttributes.COLORS[31];
-    if (escapeSequence.contains('32;')) _attributes.fgColor = DisplayAttributes.COLORS[32];
-    if (escapeSequence.contains('33;')) _attributes.fgColor = DisplayAttributes.COLORS[33];
-    if (escapeSequence.contains('34;')) _attributes.fgColor = DisplayAttributes.COLORS[34];
-    if (escapeSequence.contains('35;')) _attributes.fgColor = DisplayAttributes.COLORS[35];
-    if (escapeSequence.contains('36;')) _attributes.fgColor = DisplayAttributes.COLORS[36];
-    if (escapeSequence.contains('37;')) _attributes.fgColor = DisplayAttributes.COLORS[37];
+    if (decodedSequence.contains(';30')) _attributes.fgColor = DisplayAttributes.COLORS[30];
+    if (decodedSequence.contains(';31')) _attributes.fgColor = DisplayAttributes.COLORS[31];
+    if (decodedSequence.contains(';32')) _attributes.fgColor = DisplayAttributes.COLORS[32];
+    if (decodedSequence.contains(';33')) _attributes.fgColor = DisplayAttributes.COLORS[33];
+    if (decodedSequence.contains(';34')) _attributes.fgColor = DisplayAttributes.COLORS[34];
+    if (decodedSequence.contains(';35')) _attributes.fgColor = DisplayAttributes.COLORS[35];
+    if (decodedSequence.contains(';36')) _attributes.fgColor = DisplayAttributes.COLORS[36];
+    if (decodedSequence.contains(';37')) _attributes.fgColor = DisplayAttributes.COLORS[37];
 
-    if (escapeSequence.contains('30;')) _attributes.bgColor = DisplayAttributes.COLORS[30];
-    if (escapeSequence.contains('31;')) _attributes.bgColor = DisplayAttributes.COLORS[31];
-    if (escapeSequence.contains('32;')) _attributes.bgColor = DisplayAttributes.COLORS[32];
-    if (escapeSequence.contains('33;')) _attributes.bgColor = DisplayAttributes.COLORS[33];
-    if (escapeSequence.contains('34;')) _attributes.bgColor = DisplayAttributes.COLORS[34];
-    if (escapeSequence.contains('35;')) _attributes.bgColor = DisplayAttributes.COLORS[35];
-    if (escapeSequence.contains('36;')) _attributes.bgColor = DisplayAttributes.COLORS[36];
-    if (escapeSequence.contains('37;')) _attributes.bgColor = DisplayAttributes.COLORS[37];
+    if (decodedSequence.contains(';40')) _attributes.bgColor = DisplayAttributes.COLORS[30];
+    if (decodedSequence.contains(';41')) _attributes.bgColor = DisplayAttributes.COLORS[31];
+    if (decodedSequence.contains(';42')) _attributes.bgColor = DisplayAttributes.COLORS[32];
+    if (decodedSequence.contains(';43')) _attributes.bgColor = DisplayAttributes.COLORS[33];
+    if (decodedSequence.contains(';44')) _attributes.bgColor = DisplayAttributes.COLORS[34];
+    if (decodedSequence.contains(';45')) _attributes.bgColor = DisplayAttributes.COLORS[35];
+    if (decodedSequence.contains(';46')) _attributes.bgColor = DisplayAttributes.COLORS[36];
+    if (decodedSequence.contains(';47')) _attributes.bgColor = DisplayAttributes.COLORS[37];
   }
   
   DivElement generateRow(int r) {

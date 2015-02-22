@@ -41,7 +41,10 @@ class Model {
   }
   
   void cursorNewLine() {
-    cursor.row = (cursor.row < numRows - 1) ? cursor.row + 1 : 0;
+    if (cursor.row < numRows - 1) {
+      cursor.row++;
+    }
+    
     cursor.col = 0;
   }
   

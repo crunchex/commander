@@ -96,6 +96,10 @@ void handleWebSocket(WebSocket socket, Directory dir) {
       case 'CONSOLE_COMMAND':
         processCommand(socket, processInput, um.body, dir);
         break;
+      
+      case 'CONSOLE_INVALID':
+        sendErrorMessage(socket);
+        break;
         
       case 'CONSOLE_INPUT':
         shellStdin.add(JSON.decode(um.body));

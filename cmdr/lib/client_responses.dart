@@ -105,6 +105,10 @@ void fsDelete(String path, WebSocket socket) {
   }
 }
 
+void sendErrorMessage(WebSocket s) {
+  s.add('[[CONSOLE_OUTPUT]]' + "Invalid Command");
+}
+
 void processCommand(WebSocket s, StreamController<String> inputStream, String command, Directory dir) {
   List splitCommand = command.split(' ');
   String executable = splitCommand[0];

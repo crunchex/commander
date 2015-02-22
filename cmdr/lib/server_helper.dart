@@ -72,7 +72,6 @@ void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
   debug('Outgoing: ' + formatted, 0);
   socket.add(formatted);
-  print(formatted);
 }
 
 /// Recursively traverses the given directory path and asynchronously

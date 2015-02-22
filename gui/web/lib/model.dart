@@ -60,12 +60,7 @@ class Model {
   }
 }
 
-/// The data model class for an individual glyph within [Model].
-class Glyph {
-  static const SPACE = '&nbsp;';
-  static const AMP = '&amp;';
-  static const LT = '&lt;';
-  static const GT = '&gt;';
+class DisplayAttributes {
   static const COLORS = const {
     30: 'black',
     31: 'red',
@@ -78,15 +73,14 @@ class Glyph {
   };
 
   bool bright, dim, underscore, blink, reverse, hidden;
-  String value,fgColor, bgColor;
+  String fgColor, bgColor;
   
-  Glyph (this.value, {this.bright: false, this.dim: false, this.underscore: false,
+  DisplayAttributes ({this.bright: false, this.dim: false, this.underscore: false,
          this.blink: false, this.reverse: false, this.hidden: false,
          this.fgColor: 'white', this.bgColor: 'white'});
   
   String toString() {
     Map properties = {
-      'value': value,
       'bright': bright,
       'dim': dim,
       'underscore': underscore,
@@ -109,5 +103,34 @@ class Glyph {
     
     fgColor = COLORS[37];
     bgColor = COLORS[37];
+  }
+}
+
+/// The data model class for an individual glyph within [Model].
+class Glyph extends DisplayAttributes {
+  static const SPACE = '&nbsp;';
+  static const AMP = '&amp;';
+  static const LT = '&lt;';
+  static const GT = '&gt;';
+  
+  String value;
+  
+  Glyph (this.value, {bool bright: false, bool dim: false, bool underscore: false,
+         bool blink: false, bool reverse: false, bool hidden: false,
+         String fgColor: 'white', String bgColor: 'white'});
+  
+  String toString() {
+    Map properties = {
+      'value': value,
+      'bright': bright,
+      'dim': dim,
+      'underscore': underscore,
+      'blink': blink,
+      'reverse': reverse,
+      'hidden': hidden,
+      'fgColor': fgColor,
+      'bgColor': bgColor
+    };
+    return JSON.encode(properties);
   }
 }

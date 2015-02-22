@@ -130,6 +130,11 @@ class Glyph extends DisplayAttributes {
             && fgColor == other.fgColor
             && bgColor == other.bgColor);
   }
+
+  int get hashCode {
+    List members = [bright, dim, underscore, blink, reverse, hidden, fgColor, bgColor];
+    return hashObjects(members);
+  }
   
   String toString() {
     Map properties = {

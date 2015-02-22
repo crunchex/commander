@@ -14,11 +14,13 @@ class Model {
   List<List> _rows;
   Cursor cursor;
   
-  Model (int numRows, int numCols) {
-    _rows = new List(numRows);
+  int numRows, numCols;
+  
+  Model (this.numRows, this.numCols) {
     cursor = new Cursor();
+    _rows = [];
 
-    initModel(numCols);
+    initModel();
   }
   
   /// Returns the [Glyph] at row, col.
@@ -30,7 +32,7 @@ class Model {
   }
   
   void cursorNext() {
-    if (cursor.col < _rows[0].length - 1) {
+    if (cursor.col < numCols - 1) {
       cursor.col++;
       return;
     }
@@ -39,17 +41,17 @@ class Model {
   }
   
   void cursorNewLine() {
-    cursor.row = (cursor.row < _rows.length - 1) ? cursor.row + 1 : 0;
+    cursor.row = (cursor.row < numRows - 1) ? cursor.row + 1 : 0;
     cursor.col = 0;
   }
   
   /// Initializes the internal model with a List of Lists.
   /// Each location defaults to a Glyph.SPACE.
-  void initModel(int numCols) {
-    for (int r = 0; r < _rows.length; r++) {
-      _rows[r] = new List<Glyph>(numCols);
+  void initModel() {
+    for (int r = 0; r < numRows; r++) {
+      _rows.add(new List<Glyph>());
       for (int c = 0; c < numCols; c++) {
-        _rows[r][c] = new Glyph(Glyph.SPACE);
+        _rows[r].add(new Glyph(Glyph.SPACE));
       }
     }
   }

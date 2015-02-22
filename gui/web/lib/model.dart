@@ -3,6 +3,10 @@ part of terminal;
 class Cursor {
   int row = 0;
   int col = 0;
+  
+  String toString () {
+    return 'row: $row, col: $col';
+  }
 }
 
 /// Represents the data model for [Terminal].

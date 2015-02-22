@@ -25,7 +25,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
   
   IOSink shellStdin;
   Process bash;
-  Process.start('bash', ['-i']).then((Process shell) {
+  Process.start('bash', ['-i'], workingDirectory: dir.path).then((Process shell) {
     bash = shell;
     shellStdin = shell.stdin;
     shell.stdout.listen((data) {

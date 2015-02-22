@@ -63,14 +63,14 @@ class Model {
 /// Holds the current state of [Terminal] display attributes.
 class DisplayAttributes {
   static const COLORS = const {
-    30: 'black',
-    31: 'red',
-    32: 'green',
-    33: 'yellow',
-    34: 'blue',
-    35: 'magenta',
-    36: 'cyan',
-    37: 'white'
+    30: '#002b36',  // black
+    31: '#dc322f',  // red
+    32: '#859900',  // green
+    33: '#b58900',  // yellow
+    34: '#268bd2',  // blue
+    35: '#d33682',  // magenta
+    36: '#2aa198',  // cyan
+    37: '#93a1a1'   // white
   };
 
   bool bright, dim, underscore, blink, reverse, hidden;
@@ -78,7 +78,7 @@ class DisplayAttributes {
   
   DisplayAttributes ({this.bright: false, this.dim: false, this.underscore: false,
          this.blink: false, this.reverse: false, this.hidden: false,
-         this.fgColor: 'white', this.bgColor: 'white'});
+         this.fgColor: '#93a1a1', this.bgColor: '#002b36'});
   
   String toString() {
     Map properties = {
@@ -145,6 +145,4 @@ class Glyph extends DisplayAttributes {
     };
     return JSON.encode(properties);
   }
-  
-  
 }

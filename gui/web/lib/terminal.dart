@@ -161,8 +161,8 @@ class Terminal {
     for (int c = 0; c < _cols; c++) {
       Glyph g = _model.getGlyphAt(r, c);
 
-      span.style.color = '#93a1a1';
-      span.style.backgroundColor = '#002b36';
+      span.style.color = g.fgColor;
+      span.style.backgroundColor = g.bgColor;
       span.appendHtml(g.value);
     }
     row.append(span);

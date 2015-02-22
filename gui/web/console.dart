@@ -146,15 +146,9 @@ class UpDroidConsole {
       wheelEvent.preventDefault();
       
       if (wheelEvent.deltaY < 0) {
-        if (!term.atTop) {
-          term.bufferIndex--;
-          term.refreshDisplay();
-        }
+        // Mouse wheel up.
       } else {
-        if (!term.atBottom) {
-          term.bufferIndex++;
-          term.refreshDisplay();
-        }
+        // Mouse wheel down.
       }
     });
     

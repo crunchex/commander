@@ -2,17 +2,7 @@ library console_helper;
 
 // A map of Dart keyCodes (whatever they really are)
 // to UTF8 integers of their Shift equivalents.
-const MODIFIABLE_KEYS = const {
-  48: 41,   // 0 => )
-  49: 33,   // 1 => !
-  50: 64,   // 2 => @
-  51: 35,   // 3 => #
-  52: 36,   // 4 => $
-  53: 37,   // 5 => %
-  54: 94,   // 6 => ^
-  55: 38,   // 7 => &
-  56: 42,   // 8 => *
-  57: 40,   // 9 => (
+const NOSHIFT_KEYS = const {
   65: 97,   // A => a
   66: 98,   // B => b
   67: 99,   // C => c
@@ -50,6 +40,19 @@ const MODIFIABLE_KEYS = const {
   220: 124, // \ => |
   221: 125, // ] => }
   222: 34   // ' => "
+};
+
+const SHIFT_KEYS = const {
+  48: 41,   // 0 => )
+  49: 33,   // 1 => !
+  50: 64,   // 2 => @
+  51: 35,   // 3 => #
+  52: 36,   // 4 => $
+  53: 37,   // 5 => %
+  54: 94,   // 6 => ^
+  55: 38,   // 7 => &
+  56: 42,   // 8 => *
+  57: 40,   // 9 => (
 };
 
 const NON_MODIFIABLE_KEYS = const {

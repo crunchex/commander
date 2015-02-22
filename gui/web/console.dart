@@ -81,10 +81,14 @@ class UpDroidConsole {
   void handleInput(KeyboardEvent e) {
     int key = e.keyCode;
     
-    // Apply the Shift modifier if applicable.
+    // keyCode behaves very oddly.
     if (!e.shiftKey) {
-      if (MODIFIABLE_KEYS.containsKey(key)) {
-        key = MODIFIABLE_KEYS[key];
+      if (NOSHIFT_KEYS.containsKey(key)) {
+        key = NOSHIFT_KEYS[key];
+      }
+    } else {
+      if (SHIFT_KEYS.containsKey(key)) {
+        key = SHIFT_KEYS[key];
       }
     }
 

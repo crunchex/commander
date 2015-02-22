@@ -28,6 +28,7 @@ class Terminal {
   List<int> _cursorXY;
   List<SpanElement> _buffer;
   Model _model;
+  DisplayAttributes _attributes;
   
   static const int ESC = 27;
   
@@ -38,9 +39,9 @@ class Terminal {
     _charHeight = 14;
     _inputSwitch = InputMode.normal;
     _model = new Model(_rows, _cols);
+    _attributes = new DisplayAttributes();
     
     _registerEventHandlers();
-    _initDisplay();
   }
   
   int get _cols => div.borderEdge.width ~/ _charWidth - 1;
@@ -106,42 +107,77 @@ class Terminal {
         continue;
       }
 
-      _model.setGlyphAt(new Glyph(char), _model.cursor.row, _model.cursor.col);
+      Glyph g = new Glyph(char, bright: _attributes.bright,
+                                dim: _attributes.dim,
+                                underscore: _attributes.underscore,
+                                blink: _attributes.blink,
+                                reverse: _attributes.reverse,
+                                hidden: _attributes.hidden,
+                                fgColor: _attributes.fgColor,
+                                bgColor: _attributes.bgColor);
+      _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
       _model.cursorNext();
     }
 
     refreshDisplay();
   }
   
-  /// Placeholder for handling an escape sequence.
+  /// Sets local [DisplayAttributes], given [escapeSequence].
   void _setAttributeMode(List<int> escapeSequence) {
-    print('setting attribute mode! ' + escapeSequence.toString());
+    if (escapeSequence.contains('0;')) {
+      _attributes.resetAll(); 
+    }
+    
+    if (escapeSequence.contains('1;')) _attributes.bright = true;
+    if (escapeSequence.contains('2;')) _attributes.dim = true;
+    if (escapeSequence.contains('4;')) _attributes.underscore = true;
+    if (escapeSequence.contains('5;')) _attributes.blink = true;
+    if (escapeSequence.contains('7;')) _attributes.reverse = true;
+    if (escapeSequence.contains('8;')) _attributes.hidden = true;
+
+    if (escapeSequence.contains('30;')) _attributes.fgColor = DisplayAttributes.COLORS[30];
+    if (escapeSequence.contains('31;')) _attributes.fgColor = DisplayAttributes.COLORS[31];
+    if (escapeSequence.contains('32;')) _attributes.fgColor = DisplayAttributes.COLORS[32];
+    if (escapeSequence.contains('33;')) _attributes.fgColor = DisplayAttributes.COLORS[33];
+    if (escapeSequence.contains('34;')) _attributes.fgColor = DisplayAttributes.COLORS[34];
+    if (escapeSequence.contains('35;')) _attributes.fgColor = DisplayAttributes.COLORS[35];
+    if (escapeSequence.contains('36;')) _attributes.fgColor = DisplayAttributes.COLORS[36];
+    if (escapeSequence.contains('37;')) _attributes.fgColor = DisplayAttributes.COLORS[37];
+
+    if (escapeSequence.contains('30;')) _attributes.bgColor = DisplayAttributes.COLORS[30];
+    if (escapeSequence.contains('31;')) _attributes.bgColor = DisplayAttributes.COLORS[31];
+    if (escapeSequence.contains('32;')) _attributes.bgColor = DisplayAttributes.COLORS[32];
+    if (escapeSequence.contains('33;')) _attributes.bgColor = DisplayAttributes.COLORS[33];
+    if (escapeSequence.contains('34;')) _attributes.bgColor = DisplayAttributes.COLORS[34];
+    if (escapeSequence.contains('35;')) _attributes.bgColor = DisplayAttributes.COLORS[35];
+    if (escapeSequence.contains('36;')) _attributes.bgColor = DisplayAttributes.COLORS[36];
+    if (escapeSequence.contains('37;')) _attributes.bgColor = DisplayAttributes.COLORS[37];
   }
   
-  /// Display initialization.
-  void _initDisplay() {
-    for (var i = 0; i < _rows; i++) {
-      DivElement row = new DivElement();
-      row.classes.add('termrow');
+  DivElement generateRow(int r) {
+    DivElement row = new DivElement();
 
-      for (var j = 0; j < _cols; j++) {
-        row.innerHtml += "&nbsp";
-      }
-      
-      div.children.add(row);
+    SpanElement span = new SpanElement();
+    for (int c = 0; c < _cols; c++) {
+      Glyph g = _model.getGlyphAt(r, c);
+
+      span.style.color = '#93a1a1';
+      span.style.backgroundColor = '#002b36';
+      span.appendHtml(g.value);
     }
-
-    refreshDisplay();
+    row.append(span);
+    
+    return row;
   }
   
   void refreshDisplay() {
+    div.innerHtml = '';
+    
     for (int r = 0; r < _rows; r++) {
-      String s = '';
-      for (int c = 0; c < _cols; c++) {
-        Glyph g = _model.getGlyphAt(r, c);
-        s += g.value;
-      }
-      div.children[r].innerHtml = s;
+      DivElement row = generateRow(r);
+      row.classes.add('termrow');
+      
+      div.append(row);
     }
   }
 }

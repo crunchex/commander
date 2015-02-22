@@ -60,6 +60,7 @@ class Model {
   }
 }
 
+/// Holds the current state of [Terminal] display attributes.
 class DisplayAttributes {
   static const COLORS = const {
     30: 'black',
@@ -119,6 +120,17 @@ class Glyph extends DisplayAttributes {
          bool blink: false, bool reverse: false, bool hidden: false,
          String fgColor: 'white', String bgColor: 'white'});
   
+  operator ==(Glyph other) {
+    return (bright == other.bright
+            && dim == other.dim
+            && underscore == other.underscore
+            && blink == other.blink
+            && reverse == other.reverse
+            && hidden == other.hidden
+            && fgColor == other.fgColor
+            && bgColor == other.bgColor);
+  }
+  
   String toString() {
     Map properties = {
       'value': value,
@@ -133,4 +145,6 @@ class Glyph extends DisplayAttributes {
     };
     return JSON.encode(properties);
   }
+  
+  
 }

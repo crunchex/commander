@@ -37,8 +37,8 @@ class Terminal {
     stdout = new StreamController<String>();
     bufferIndex = 0;
 
-    _charWidth = 10;
-    _charHeight = 17;
+    _charWidth = 11;
+    _charHeight = 14;
     _inputSwitch = InputMode.normal;
     _cursorXY = [0, 0];
     _buffer = [];

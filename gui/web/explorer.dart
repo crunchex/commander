@@ -282,6 +282,22 @@ class UpDroidExplorer {
     return subFolder;
   }
   
+  // Helper function to check for illegal drops to nested directories
+  
+  bool checkNested(String firstPath, String secondPath){
+    var first = firstPath.split('/');
+    var second = secondPath.split('/');
+    int shortestPath;
+    bool valid = false;
+    first.length < second.length ? shortestPath = first.length : shortestPath = second.length;
+    for(int i = 0; i < shortestPath; i++) {
+      if(first[i] != second[i]) {
+        valid = true;
+      }
+    }
+    return valid;
+  }
+  
   /// Sets up a [Dropzone] for the [SpanElement] to handle file moves.
   void dropSetup(SpanElement span, SimpleFile file) {
     if (file.isDirectory) {
@@ -308,9 +324,13 @@ class UpDroidExplorer {
           
             if(e.draggableElement.dataset['isDir'] == 'true'){
               
+              bool send = true;
+              if (span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])) {
+                send = checkNested(span.parent.dataset['path'], e.draggableElement.dataset['path']);
+              }
               // Avoid an exception thrown when the new name already exists or dragging to same folder.
               
-              if (currentPath != newPath && duplicate == null  && !span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])) {
+              if (currentPath != newPath && duplicate == null && send == true) {
                         if(item.lastChild.hasChildNodes() == false){
                           ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                           item.remove();

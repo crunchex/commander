@@ -158,18 +158,34 @@ class Terminal {
   }
   
   DivElement generateRow(int r) {
+    Glyph prev, curr;
+
     DivElement row = new DivElement();
 
     SpanElement span = new SpanElement();
-    for (int c = 0; c < _cols; c++) {
-      Glyph g = _model.getGlyphAt(r, c);
+    prev = _model.getGlyphAt(r, 0);
 
-      span.style.color = g.fgColor;
-      span.style.backgroundColor = g.bgColor;
-      span.appendHtml(g.value);
+    span.style.color = prev.fgColor;
+    span.style.backgroundColor = prev.bgColor;
+    span.appendHtml(prev.value);
+
+    for (int c = 1; c < _cols; c++) {
+      curr = _model.getGlyphAt(r, c);
+
+      if (curr.fgColor == prev.fgColor) {
+        span.appendHtml(curr.value);
+      } else {
+        row.append(span);
+
+        span = new SpanElement();
+        span.style.color = curr.fgColor;
+        span.style.backgroundColor = curr.bgColor;
+        span.appendHtml(curr.value);
+      }
+
+      prev = curr;
     }
-    row.append(span);
-    
+
     return row;
   }
   

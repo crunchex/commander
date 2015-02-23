@@ -36,6 +36,7 @@ class UpDroidEditor {
   AnchorElement saveButton;
   AnchorElement newButton;
   AnchorElement themeButton;
+  AnchorElement newTab;
   ButtonElement modalSaveButton;
   ButtonElement modalDiscardButton;
   
@@ -48,7 +49,8 @@ class UpDroidEditor {
     this.cs = cs;
     
     editorDiv = querySelector('#editor');
-    
+    newTab = querySelector("#new-tab");
+        
     saveButton = querySelector('#column-1 .button-save');
     newButton = querySelector('#column-1 .button-new');
     themeButton = querySelector('#column-1 .button-editor-theme');

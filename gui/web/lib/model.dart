@@ -58,13 +58,42 @@ class Model {
       }
     }
   }
-  
-  void debugDisplay() {
+
+  /// Display the specified [member] for each [Glyph] in the model.
+  void debugDisplay(String member) {
     for (int r = 0; r < numRows; r++) {
       String s = '';
       for (int c = 0; c < numCols; c++) {
         Glyph g = _rows[r][c];
-        s += g.fgColor + ' ';
+        switch (member) {
+          case 'value':
+            s += '${g.value} ';
+            break;
+          case 'bright':
+            s += '${g.bright} ';
+            break;
+          case 'dim':
+            s += '${g.dim} ';
+            break;
+          case 'underscore':
+            s += '${g.underscore} ';
+            break;
+          case 'blink':
+            s += '${g.blink} ';
+            break;
+          case 'reverse':
+            s += '${g.reverse} ';
+            break;
+          case 'hidden':
+            s += '${g.hidden} ';
+            break;
+          case 'fgColor':
+            s += '${g.fgColor} ';
+            break;
+          case 'bgColor':
+            s += '${g.bgColor} ';
+            break;
+        }
       }
       print(s);
     }

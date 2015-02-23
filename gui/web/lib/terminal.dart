@@ -80,8 +80,8 @@ class Terminal {
     escape = escapeString.sublist(0, escapeString.lastIndexOf(109) + 1);
     string = escapeString.sublist(escapeString.lastIndexOf(109) + 1);
     _handleOutString(escape, string);
-    
-    _model.debugDisplay('fgColor');
+
+    refreshDisplay();
   }
   
   /// Appends a new [SpanElement] with the contents of [_outString]
@@ -160,20 +160,20 @@ class Terminal {
 
     span.style.color = prev.fgColor;
     span.style.backgroundColor = prev.bgColor;
-    span.appendHtml(prev.value);
+    span.text += prev.value;
 
     for (int c = 1; c < _cols; c++) {
       curr = _model.getGlyphAt(r, c);
-
-      if (curr.fgColor == prev.fgColor) {
-        span.appendHtml(curr.value);
-      } else {
+      
+      if (curr != prev || c == _cols - 1) {
         row.append(span);
 
         span = new SpanElement();
         span.style.color = curr.fgColor;
         span.style.backgroundColor = curr.bgColor;
-        span.appendHtml(curr.value);
+        span.text += curr.value;
+      } else {
+        span.text += curr.value;
       }
 
       prev = curr;
@@ -185,8 +185,9 @@ class Terminal {
   void refreshDisplay() {
     div.innerHtml = '';
     
+    DivElement row;
     for (int r = 0; r < _rows; r++) {
-      DivElement row = generateRow(r);
+      row = generateRow(r);
       row.classes.add('termrow');
       
       div.append(row);

@@ -102,6 +102,10 @@ class Terminal {
         // comes with the newline. Eat it for now.
         continue;
       }
+      
+      if (code == 32) {
+        char = Glyph.SPACE;
+      }
 
       Glyph g = new Glyph(char, bright: _attributes.bright,
                                 dim: _attributes.dim,

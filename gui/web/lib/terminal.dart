@@ -49,46 +49,37 @@ class Terminal {
   int get _rows => div.borderEdge.height ~/ _charHeight - 1;
   
   void _registerEventHandlers() {
-    stdout.stream.listen((String out) {
-      List<int> output = JSON.decode(out);
-
-      List<int> outString = [];
-      List<int> escapeSequence = [];
-      for (int i = 0; i < output.length; i++) {
-        int code = output[i];
-        if (code == ESC) _inputSwitch = InputMode.escape;
- 
-        // Append code
-        if (_inputSwitch == InputMode.escape) {
-          escapeSequence.add(code);
-        } else if (_inputSwitch == InputMode.normal) {
-          outString.add(code);
-        }
-        
-        // Let this be the last loop if we're at the end of the message
-        // or the end of an escape sequence is detected.
-        if (_inputSwitch == InputMode.escape) {
-          if (_detectEscapeEnd(code)) {
-            _setAttributeMode(escapeSequence);
-            escapeSequence = [];
-          }
-        } else if (_inputSwitch == InputMode.normal) {
-          if (i == output.length - 1 || code == 10) {
-            _handleOutString(outString);
-            outString = [];
-          }
-        }
-      }
-    });
+    stdout.stream.listen((String out) => processStdOut(JSON.decode(out)));
   }
   
-  /// Returns true if the end of an escape sequence is detected.
-  bool _detectEscapeEnd(int code) {
-    if (code == 109) {
-      _inputSwitch = InputMode.normal;
-      return true;
+  /// Splits a UTF8 string into substrings, split by preceding escape sequences.
+  void processStdOut(List<int> output) {
+    List<int> escapeString, escape, string;
+    int start, end;
+
+    while (true) {
+      start = output.indexOf(ESC);
+
+      List<int> subList = output.sublist(1);
+      if (!subList.contains(ESC)) break;
+
+      end = subList.indexOf(ESC) + 1;
+
+      escapeString = output.sublist(start, end);
+      escape = escapeString.sublist(0, escapeString.lastIndexOf(109) + 1);
+      string = escapeString.sublist(escapeString.lastIndexOf(109) + 1);
+      print('escape: $escape, string: $string');
+
+      for (int j in escapeString) {
+        output.remove(j);
+      }
     }
-    return false;
+
+    // Deal with the remaining string.
+    escapeString = output.sublist(start, end);
+    escape = escapeString.sublist(0, escapeString.lastIndexOf(109) + 1);
+    string = escapeString.sublist(escapeString.lastIndexOf(109) + 1);
+    print('escape: $escape, string: $string');
   }
   
   /// Appends a new [SpanElement] with the contents of [_outString]
@@ -123,38 +114,38 @@ class Terminal {
     refreshDisplay();
   }
   
-  /// Sets local [DisplayAttributes], given [escapeSequence].
-  void _setAttributeMode(List<int> escapeSequence) {
-    String decodedSequence = UTF8.decode(escapeSequence);
+  /// Sets local [DisplayAttributes], given [escape].
+  void _setAttributeMode(List<int> escape) {
+    String decodedEsc = UTF8.decode(escape);
 
-    if (escapeSequence.contains('0;')) {
+    if (escape.contains('0;')) {
       _attributes.resetAll(); 
     }
     
-    if (decodedSequence.contains(';1')) _attributes.bright = true;
-    if (decodedSequence.contains(';2')) _attributes.dim = true;
-    if (decodedSequence.contains(';4')) _attributes.underscore = true;
-    if (decodedSequence.contains(';5')) _attributes.blink = true;
-    if (decodedSequence.contains(';7')) _attributes.reverse = true;
-    if (decodedSequence.contains(';8')) _attributes.hidden = true;
+    if (decodedEsc.contains(';1')) _attributes.bright = true;
+    if (decodedEsc.contains(';2')) _attributes.dim = true;
+    if (decodedEsc.contains(';4')) _attributes.underscore = true;
+    if (decodedEsc.contains(';5')) _attributes.blink = true;
+    if (decodedEsc.contains(';7')) _attributes.reverse = true;
+    if (decodedEsc.contains(';8')) _attributes.hidden = true;
 
-    if (decodedSequence.contains(';30')) _attributes.fgColor = DisplayAttributes.COLORS[30];
-    if (decodedSequence.contains(';31')) _attributes.fgColor = DisplayAttributes.COLORS[31];
-    if (decodedSequence.contains(';32')) _attributes.fgColor = DisplayAttributes.COLORS[32];
-    if (decodedSequence.contains(';33')) _attributes.fgColor = DisplayAttributes.COLORS[33];
-    if (decodedSequence.contains(';34')) _attributes.fgColor = DisplayAttributes.COLORS[34];
-    if (decodedSequence.contains(';35')) _attributes.fgColor = DisplayAttributes.COLORS[35];
-    if (decodedSequence.contains(';36')) _attributes.fgColor = DisplayAttributes.COLORS[36];
-    if (decodedSequence.contains(';37')) _attributes.fgColor = DisplayAttributes.COLORS[37];
+    if (decodedEsc.contains(';30')) _attributes.fgColor = DisplayAttributes.COLORS[30];
+    if (decodedEsc.contains(';31')) _attributes.fgColor = DisplayAttributes.COLORS[31];
+    if (decodedEsc.contains(';32')) _attributes.fgColor = DisplayAttributes.COLORS[32];
+    if (decodedEsc.contains(';33')) _attributes.fgColor = DisplayAttributes.COLORS[33];
+    if (decodedEsc.contains(';34')) _attributes.fgColor = DisplayAttributes.COLORS[34];
+    if (decodedEsc.contains(';35')) _attributes.fgColor = DisplayAttributes.COLORS[35];
+    if (decodedEsc.contains(';36')) _attributes.fgColor = DisplayAttributes.COLORS[36];
+    if (decodedEsc.contains(';37')) _attributes.fgColor = DisplayAttributes.COLORS[37];
 
-    if (decodedSequence.contains(';40')) _attributes.bgColor = DisplayAttributes.COLORS[30];
-    if (decodedSequence.contains(';41')) _attributes.bgColor = DisplayAttributes.COLORS[31];
-    if (decodedSequence.contains(';42')) _attributes.bgColor = DisplayAttributes.COLORS[32];
-    if (decodedSequence.contains(';43')) _attributes.bgColor = DisplayAttributes.COLORS[33];
-    if (decodedSequence.contains(';44')) _attributes.bgColor = DisplayAttributes.COLORS[34];
-    if (decodedSequence.contains(';45')) _attributes.bgColor = DisplayAttributes.COLORS[35];
-    if (decodedSequence.contains(';46')) _attributes.bgColor = DisplayAttributes.COLORS[36];
-    if (decodedSequence.contains(';47')) _attributes.bgColor = DisplayAttributes.COLORS[37];
+    if (decodedEsc.contains(';40')) _attributes.bgColor = DisplayAttributes.COLORS[30];
+    if (decodedEsc.contains(';41')) _attributes.bgColor = DisplayAttributes.COLORS[31];
+    if (decodedEsc.contains(';42')) _attributes.bgColor = DisplayAttributes.COLORS[32];
+    if (decodedEsc.contains(';43')) _attributes.bgColor = DisplayAttributes.COLORS[33];
+    if (decodedEsc.contains(';44')) _attributes.bgColor = DisplayAttributes.COLORS[34];
+    if (decodedEsc.contains(';45')) _attributes.bgColor = DisplayAttributes.COLORS[35];
+    if (decodedEsc.contains(';46')) _attributes.bgColor = DisplayAttributes.COLORS[36];
+    if (decodedEsc.contains(';47')) _attributes.bgColor = DisplayAttributes.COLORS[37];
   }
   
   DivElement generateRow(int r) {

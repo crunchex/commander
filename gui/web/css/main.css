@@ -228,7 +228,7 @@ li input {
   border: 1px solid #dddddd;
   background-color: #002b36;
   font-size: 11px;
-  font-family: "Lucida Console", Monaco, monospace;
+  font-family: "DejaVu Sans Mono", Liberation Mono, monospace;
   color: #93a1a1;
   overflow-y: auto;
 }

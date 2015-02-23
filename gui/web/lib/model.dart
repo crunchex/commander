@@ -158,7 +158,16 @@ class Glyph extends DisplayAttributes {
   
   Glyph (this.value, {bool bright: false, bool dim: false, bool underscore: false,
          bool blink: false, bool reverse: false, bool hidden: false,
-         String fgColor: '#93a1a1', String bgColor: '#002b36'});
+         String fgColor: '#93a1a1', String bgColor: '#002b36'}) {
+    this.bright = bright;
+    this.dim = dim;
+    this.underscore = underscore;
+    this.blink = blink;
+    this.reverse = reverse;
+    this.hidden = hidden;
+    this.fgColor = fgColor;
+    this.bgColor = bgColor;
+  }
   
   operator ==(Glyph other) {
     return (bright == other.bright

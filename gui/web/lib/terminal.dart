@@ -66,9 +66,9 @@ class Terminal {
       end = subList.indexOf(ESC) + 1;
 
       escapeString = output.sublist(start, end);
-      escape = escapeString.sublist(0, escapeString.lastIndexOf(109) + 1);
-      string = escapeString.sublist(escapeString.lastIndexOf(109) + 1);
-      print('escape: $escape, string: $string');
+      escape = escapeString.sublist(0, escapeString.indexOf(109) + 1);
+      string = escapeString.sublist(escapeString.indexOf(109) + 1);
+      _handleOutString(escape, string);
 
       for (int j in escapeString) {
         output.remove(j);
@@ -79,13 +79,17 @@ class Terminal {
     escapeString = output.sublist(start, end);
     escape = escapeString.sublist(0, escapeString.lastIndexOf(109) + 1);
     string = escapeString.sublist(escapeString.lastIndexOf(109) + 1);
-    print('escape: $escape, string: $string');
+    _handleOutString(escape, string);
+    
+    _model.debugDisplay('fgColor');
   }
   
   /// Appends a new [SpanElement] with the contents of [_outString]
   /// to the [_buffer] and updates the display.
-  void _handleOutString(List<int> outString) {
-    var codes = UTF8.decode(outString).codeUnits;
+  void _handleOutString(List<int> escape, List<int> string) {
+    _setAttributeMode(escape);
+
+    var codes = UTF8.decode(string).codeUnits;
     for (var code in codes) {
       String char = new String.fromCharCode(code);
       if (code == 10) {
@@ -110,8 +114,6 @@ class Terminal {
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
       _model.cursorNext();
     }
-
-    refreshDisplay();
   }
   
   /// Sets local [DisplayAttributes], given [escape].
@@ -121,7 +123,7 @@ class Terminal {
     if (escape.contains('0;')) {
       _attributes.resetAll(); 
     }
-    
+
     if (decodedEsc.contains(';1')) _attributes.bright = true;
     if (decodedEsc.contains(';2')) _attributes.dim = true;
     if (decodedEsc.contains(';4')) _attributes.underscore = true;
@@ -147,7 +149,7 @@ class Terminal {
     if (decodedEsc.contains(';46')) _attributes.bgColor = DisplayAttributes.COLORS[36];
     if (decodedEsc.contains(';47')) _attributes.bgColor = DisplayAttributes.COLORS[37];
   }
-  
+
   DivElement generateRow(int r) {
     Glyph prev, curr;
 

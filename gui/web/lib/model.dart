@@ -58,6 +58,17 @@ class Model {
       }
     }
   }
+  
+  void debugDisplay() {
+    for (int r = 0; r < numRows; r++) {
+      String s = '';
+      for (int c = 0; c < numCols; c++) {
+        Glyph g = _rows[r][c];
+        s += g.fgColor + ' ';
+      }
+      print(s);
+    }
+  }
 }
 
 /// Holds the current state of [Terminal] display attributes.

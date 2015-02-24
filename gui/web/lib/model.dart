@@ -149,10 +149,10 @@ class DisplayAttributes {
 
 /// The data model class for an individual glyph within [Model].
 class Glyph extends DisplayAttributes {
-  static const SPACE = '&nbsp;';
-  static const AMP = '&amp;';
-  static const LT = '&lt;';
-  static const GT = '&gt;';
+  static const SPACE = ' ';
+  static const AMP = '&';
+  static const LT = '<';
+  static const GT = '>';
   
   String value;
   

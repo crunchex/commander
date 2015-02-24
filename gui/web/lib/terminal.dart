@@ -56,19 +56,24 @@ class Terminal {
   void processStdOut(List<int> output) {
     List<int> escapeString, escape, string;
     int start, end;
+    
+    if (!output.contains(ESC)) {
+      print(output.toString());
+      _handleOutString(string);
+      return;
+    }
 
     while (true) {
       start = output.indexOf(ESC);
-
       List<int> subList = output.sublist(1);
       if (!subList.contains(ESC)) break;
-
       end = subList.indexOf(ESC) + 1;
 
       escapeString = output.sublist(start, end);
       escape = escapeString.sublist(0, escapeString.indexOf(109) + 1);
       string = escapeString.sublist(escapeString.indexOf(109) + 1);
-      _handleOutString(escape, string);
+      _setAttributeMode(escape);
+      _handleOutString(string);
 
       for (int j in escapeString) {
         output.remove(j);
@@ -79,19 +84,19 @@ class Terminal {
     escapeString = output.sublist(start, end);
     escape = escapeString.sublist(0, escapeString.lastIndexOf(109) + 1);
     string = escapeString.sublist(escapeString.lastIndexOf(109) + 1);
-    _handleOutString(escape, string);
+    _setAttributeMode(escape);
+    _handleOutString(string);
 
     refreshDisplay();
   }
   
   /// Appends a new [SpanElement] with the contents of [_outString]
   /// to the [_buffer] and updates the display.
-  void _handleOutString(List<int> escape, List<int> string) {
-    _setAttributeMode(escape);
-
+  void _handleOutString(List<int> string) {
     var codes = UTF8.decode(string).codeUnits;
     for (var code in codes) {
       String char = new String.fromCharCode(code);
+      print('char: ' + char);
       if (code == 10) {
         _model.cursorNewLine();
         continue;

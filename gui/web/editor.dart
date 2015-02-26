@@ -40,7 +40,8 @@ class UpDroidEditor {
   ButtonElement modalSaveButton;
   ButtonElement modalDiscardButton;
   InputElement fontSizeInput;
-  int fontSize = 18;
+  int fontSize = 16;
+  StreamSubscription fontInputListener;
   
   Editor aceEditor;
   String openFilePath;
@@ -134,7 +135,7 @@ class UpDroidEditor {
       // Keeps bootjack dropdown from closing    
       e.stopPropagation();
       
-     fontSizeInput.onKeyUp.listen((e) {
+     fontInputListener = fontSizeInput.onKeyUp.listen((e) {
       var keyEvent = new KeyEvent.wrap(e);
               if (keyEvent.keyCode == KeyCode.ENTER) {
                 var fontVal;
@@ -149,7 +150,8 @@ class UpDroidEditor {
                 finally{
                   fontSizeInput.value = "";
                   querySelector('#editor').click();
-                  aceEditor.focus();  
+                  aceEditor.focus();
+                  fontInputListener.cancel();
                 }
               }
       });

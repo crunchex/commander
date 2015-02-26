@@ -39,6 +39,8 @@ class UpDroidEditor {
   AnchorElement newTab;
   ButtonElement modalSaveButton;
   ButtonElement modalDiscardButton;
+  InputElement fontSizeInput;
+  int fontSize = 18;
   
   Editor aceEditor;
   String openFilePath;
@@ -57,6 +59,9 @@ class UpDroidEditor {
     modalSaveButton = querySelector('.modal-save');
     modalDiscardButton = querySelector('.modal-discard');
     
+    fontSizeInput = querySelector("#font-size-input");
+    fontSizeInput.placeholder = fontSize.toString();
+    
     setUpEditor();
     registerEditorEventHandlers();
     
@@ -70,7 +75,7 @@ class UpDroidEditor {
     aceEditor = edit(editorDiv);
     aceEditor
       ..session.mode = new Mode.named(Mode.PYTHON)
-      ..fontSize = 14
+      ..fontSize = fontSize
       ..theme = new Theme.named(Theme.SOLARIZED_DARK);
     
     resetSavePoint();
@@ -123,6 +128,32 @@ class UpDroidEditor {
           var newPath = absolutePathPrefix + '/' + um.body;
           handleNewText(newPath, newText);
         });
+    
+    fontSizeInput.onClick.listen((e){
+      
+      // Keeps bootjack dropdown from closing    
+      e.stopPropagation();
+      
+     fontSizeInput.onKeyUp.listen((e) {
+      var keyEvent = new KeyEvent.wrap(e);
+              if (keyEvent.keyCode == KeyCode.ENTER) {
+                var fontVal;
+                try{
+                  fontVal = int.parse(fontSizeInput.value);
+                  assert(fontVal is int);
+                  if(fontVal >= 1 && fontVal <= 60){
+                    aceEditor.fontSize = fontVal;
+                    fontSizeInput.placeholder = fontVal.toString();
+                  }
+                }
+                finally{
+                  fontSizeInput.value = "";
+                  querySelector('#editor').click();
+                  aceEditor.focus();  
+                }
+              }
+      });
+    });
     
     newButton.onClick.listen((e) {
       // Editor needs to request an available filename (e.g. untitled.py, untitled1.py, etc.)

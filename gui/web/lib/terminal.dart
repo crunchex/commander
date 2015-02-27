@@ -57,11 +57,15 @@ class Terminal {
     List<int> escapeString, escape, string;
     int start, end;
     
+    // The case where the current output contains
+    // no escape sequence.
     if (!output.contains(ESC)) {
       _handleOutString(output);
       return;
     }
 
+    // TODO: make escape parsing independent of the display attribute
+    // terminator, 109 (m).
     while (true) {
       start = output.indexOf(ESC);
       List<int> subList = output.sublist(1);
@@ -80,7 +84,7 @@ class Terminal {
     }
 
     // Deal with the remaining string composed of at least one final
-    // escape. TODO: make this less dependent on the 109.
+    // escape.
     escape = output.sublist(0, output.indexOf(109) + 1);
     string = output.sublist(output.indexOf(109) + 1);
     _setAttributeMode(escape);
@@ -157,6 +161,9 @@ class Terminal {
     if (decodedEsc.contains(';47')) _attributes.bgColor = DisplayAttributes.COLORS[37];
   }
 
+  /// Generates the HTML for an individual row given
+  /// the [Glyph]s contained in the model at that
+  /// corresponding row.
   DivElement generateRow(int r) {
     Glyph prev, curr;
 
@@ -175,6 +182,7 @@ class Terminal {
       if (curr != prev || c == _cols - 1) {
         row.append(span);
 
+        // TODO: handle other display attributes, link blink.
         span = new SpanElement();
         span.style.color = curr.fgColor;
         span.style.backgroundColor = curr.bgColor;
@@ -189,6 +197,8 @@ class Terminal {
     return row;
   }
   
+  /// Refreshes the entire console [DivElement] by setting its
+  /// contents to null and regenerating each row [DivElement].
   void refreshDisplay() {
     div.innerHtml = '';
     

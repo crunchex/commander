@@ -36,7 +36,7 @@ class Terminal {
   Terminal (this.div) {
     stdout = new StreamController<String>();
 
-    _charWidth = 11;
+    _charWidth = 7;
     _charHeight = 14;
     _inputSwitch = InputMode.normal;
     _model = new Model(_rows, _cols);
@@ -45,8 +45,8 @@ class Terminal {
     _registerEventHandlers();
   }
   
-  int get _cols => div.borderEdge.width ~/ _charWidth - 1;
-  int get _rows => div.borderEdge.height ~/ _charHeight - 1;
+  int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
+  int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
   
   void _registerEventHandlers() {
     stdout.stream.listen((String out) => processStdOut(JSON.decode(out)));

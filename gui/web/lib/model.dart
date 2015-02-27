@@ -11,13 +11,15 @@ class Cursor {
 
 /// Represents the data model for [Terminal].
 class Model {
-  List<List> _rows;
   Cursor cursor;
-  
   int numRows, numCols;
+  
+  List<List> _buffer;
+  List<List> _rows;
   
   Model (this.numRows, this.numCols) {
     cursor = new Cursor();
+    _buffer = [];
     _rows = [];
 
     _initModel();
@@ -43,9 +45,22 @@ class Model {
   void cursorNewLine() {
     if (cursor.row < numRows - 1) {
       cursor.row++;
+    } else {
+      _pushBuffer();
     }
     
     cursor.col = 0;
+  }
+  
+  void _pushBuffer() {
+    _buffer.add(_rows[0]);
+    _rows.removeAt(0);
+    
+    List<Glyph> newRow = [];
+    for (int c = 0; c < numCols; c++) {
+      newRow.add(new Glyph(Glyph.SPACE));
+    }
+    _rows.add(newRow);
   }
   
   /// Initializes the internal model with a List of Lists.

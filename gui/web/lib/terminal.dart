@@ -58,8 +58,7 @@ class Terminal {
     int start, end;
     
     if (!output.contains(ESC)) {
-      print(output.toString());
-      _handleOutString(string);
+      _handleOutString(output);
       return;
     }
 
@@ -80,10 +79,10 @@ class Terminal {
       }
     }
 
-    // Deal with the remaining string.
-    escapeString = output.sublist(start, end);
-    escape = escapeString.sublist(0, escapeString.lastIndexOf(109) + 1);
-    string = escapeString.sublist(escapeString.lastIndexOf(109) + 1);
+    // Deal with the remaining string composed of at least one final
+    // escape. TODO: make this less dependent on the 109.
+    escape = output.sublist(0, output.indexOf(109) + 1);
+    string = output.sublist(output.indexOf(109) + 1);
     _setAttributeMode(escape);
     _handleOutString(string);
 
@@ -96,7 +95,6 @@ class Terminal {
     var codes = UTF8.decode(string).codeUnits;
     for (var code in codes) {
       String char = new String.fromCharCode(code);
-      print('char: ' + char);
       if (code == 10) {
         _model.cursorNewLine();
         continue;

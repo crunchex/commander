@@ -20,7 +20,7 @@ class Model {
     cursor = new Cursor();
     _rows = [];
 
-    initModel();
+    _initModel();
   }
   
   /// Returns the [Glyph] at row, col.
@@ -50,7 +50,7 @@ class Model {
   
   /// Initializes the internal model with a List of Lists.
   /// Each location defaults to a Glyph.SPACE.
-  void initModel() {
+  void _initModel() {
     for (int r = 0; r < numRows; r++) {
       _rows.add(new List<Glyph>());
       for (int c = 0; c < numCols; c++) {

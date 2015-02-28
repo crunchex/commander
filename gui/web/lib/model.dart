@@ -14,12 +14,17 @@ class Model {
   Cursor cursor;
   int numRows, numCols;
   
-  List<List> _buffer;
+  // Implemented as stacks in scrolling.
+  List<List> _reverseBuffer;
+  List<List> _forwardBuffer;
+  
+  // Implemented as a queue in scrolling.
   List<List> _rows;
   
   Model (this.numRows, this.numCols) {
     cursor = new Cursor();
-    _buffer = [];
+    _reverseBuffer = [];
+    _forwardBuffer = [];
     _rows = [];
 
     _initModel();
@@ -46,14 +51,14 @@ class Model {
     if (cursor.row < numRows - 1) {
       cursor.row++;
     } else {
-      _pushBuffer();
+      pushBuffer();
     }
     
     cursor.col = 0;
   }
   
-  void _pushBuffer() {
-    _buffer.add(_rows[0]);
+  void pushBuffer() {
+    _reverseBuffer.add(_rows[0]);
     _rows.removeAt(0);
     
     List<Glyph> newRow = [];
@@ -61,6 +66,28 @@ class Model {
       newRow.add(new Glyph(Glyph.SPACE));
     }
     _rows.add(newRow);
+  }
+  
+  /// Manipulates the buffers and rows to handle scrolling
+  /// upward of a single line.
+  void scrollUp() {
+    if (_reverseBuffer.isEmpty) return;
+
+    _rows.insert(0, _reverseBuffer.last);
+    _reverseBuffer.removeLast();
+    _forwardBuffer.add(_rows[_rows.length - 1]);
+    _rows.removeLast();
+  }
+  
+  /// Manipulates the buffers and rows to handle scrolling
+  /// upward of a single line.
+  void scrollDown() {
+    if (_forwardBuffer.isEmpty) return;
+
+    _rows.add(_forwardBuffer.last);
+    _forwardBuffer.removeLast();
+    _reverseBuffer.add(_rows[0]);
+    _rows.removeAt(0);
   }
   
   /// Initializes the internal model with a List of Lists.

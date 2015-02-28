@@ -52,6 +52,20 @@ class Terminal {
     stdout.stream.listen((String out) => processStdOut(JSON.decode(out)));
   }
   
+  /// Handles a scroll up action by relaying the command to the model
+  /// and refreshing the display.
+  void scrollUp() {
+    _model.scrollUp();
+    refreshDisplay();
+  }
+  
+  /// Handles a scroll down action by relaying the command to the model
+  /// and refreshing the display.
+  void scrollDown() {
+    _model.scrollDown();
+    refreshDisplay();
+  }
+  
   /// Splits a UTF8 string into substrings, split by preceding escape sequences.
   void processStdOut(List<int> output) {
     List<int> escapeString, escape, string;

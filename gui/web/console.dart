@@ -146,9 +146,9 @@ class UpDroidConsole {
       wheelEvent.preventDefault();
       
       if (wheelEvent.deltaY < 0) {
-        // Mouse wheel up.
+        term.scrollUp();
       } else {
-        // Mouse wheel down.
+        term.scrollDown();
       }
     });
     

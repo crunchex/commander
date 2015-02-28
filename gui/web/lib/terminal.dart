@@ -77,6 +77,17 @@ class Terminal {
       _handleOutString(output);
       return;
     }
+    
+    // Handle any string preceding the first escape sequence.
+    if (output[0] != ESC) {
+      end = output.indexOf(ESC);
+      string = output.sublist(0, end);
+      _handleOutString(string);
+
+      for (int i in string) {
+        output.remove(i);
+      }
+    }
 
     // TODO: make escape parsing independent of the display attribute
     // terminator, 109 (m).

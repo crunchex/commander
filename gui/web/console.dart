@@ -58,26 +58,6 @@ class UpDroidConsole {
     }
   }
   
-  /// Process messages that Console has picked up according to the type.
-  void processMessage(CommanderMessage m) {
-    switch (m.type) {
-      case 'CONNECTED':
-        //updateOutputHandler('Connected to updroid!');
-        break;
-        
-      case 'DISCONNECTED':
-        //updateOutputHandler('Updroid disconnected.');
-        break;
-
-      case 'OUTPUT':
-        //updateOutputHandler(m.body);
-        break;
-        
-      default:
-        print('Console error: unrecognized message type: ' + m.type);
-    }
-  }
-  
   void handleInput(KeyboardEvent e) {
     int key = e.keyCode;
     
@@ -120,10 +100,6 @@ class UpDroidConsole {
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'CONSOLE_OUTPUT')
         .listen((um) => term.stdout.add(um.body));
-
-    cs.stream
-        .where((m) => m.dest == 'CONSOLE' || m.dest == 'ALL')
-        .listen((m) => processMessage(m));
 
     console.onKeyUp.listen((e) => handleInput(e));
     

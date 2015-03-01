@@ -12,10 +12,15 @@ part 'input_keys.dart';
 /// [stdout] needs to receive individual UTF8 integers and will handle
 /// them appropriately.
 class Terminal {
-  // Public
+  /// The [DivElement] within which all [Terminal] graphical elements
+  /// are rendered.
   DivElement div;
-  StreamController stdout;
-  StreamController stdin;
+  
+  /// A stream of [String], JSON-encoded UTF8 bytes (List<int>).
+  StreamController<String> stdout;
+  
+  /// A stream of [String], JSON-encoded UTF8 bytes (List<int>).
+  StreamController<String> stdin;
 
   // Private
   int _charWidth, _charHeight;

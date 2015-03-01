@@ -24,8 +24,8 @@ class Terminal {
   StreamController<String> stdin;
 
   /// An int that sets the number of lines scrolled per mouse
-  /// wheel event. Default: 1
-  int scrollSpeed = 1;
+  /// wheel event. Default: 3
+  int scrollSpeed = 3;
 
   // Private
   int _charWidth, _charHeight;

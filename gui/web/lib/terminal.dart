@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 import 'package:quiver/core.dart';
+import 'console_helper.dart';
 
 part 'model.dart';
 
@@ -24,6 +25,7 @@ class Terminal {
   DivElement div;
   StreamController stdin;
   StreamController stdout;
+  WebSocket ws;
 
   // Private
   int _charWidth, _charHeight, _inputSwitch;
@@ -31,12 +33,16 @@ class Terminal {
   List<SpanElement> _buffer;
   Model _model;
   DisplayAttributes _attributes;
+  bool inputDone;
+  List<int> inputString;
   
   static const int ESC = 27;
   
-  Terminal (this.div) {
+  Terminal (this.div, this.ws) {
     stdin = new StreamController<String>();
     stdout = new StreamController<String>();
+    inputDone = false;
+    inputString = [];
 
     _charWidth = 7;
     _charHeight = 14;
@@ -53,6 +59,60 @@ class Terminal {
   void _registerEventHandlers() {
     stdout.stream.listen((String out) => processStdOut(JSON.decode(out)));
     stdin.stream.listen((int input) => processStdIn(input));
+    
+    div.onKeyUp.listen((e) => handleInput(e));
+    
+    div.onKeyDown.listen((e) {
+      if (e.keyCode == 8) e.preventDefault();
+    });
+    
+    div.onMouseWheel.listen((wheelEvent) {
+      // Scrolling should target only the console.
+      wheelEvent.preventDefault();
+      
+      if (wheelEvent.deltaY < 0) {
+        scrollUp();
+      } else {
+        scrollDown();
+      }
+    });
+  }
+  
+  void handleInput(KeyboardEvent e) {
+    int key = e.keyCode;
+    
+    // keyCode behaves very oddly.
+    if (!e.shiftKey) {
+      if (NOSHIFT_KEYS.containsKey(key)) {
+        key = NOSHIFT_KEYS[key];
+      }
+    } else {
+      if (SHIFT_KEYS.containsKey(key)) {
+        key = SHIFT_KEYS[key];
+      }
+    }
+
+    // Carriage Return (13) => New Line (10).
+    if (key == 13) {
+      key = 10;
+      inputDone = true;
+    }
+
+    // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
+    if (key != 16 && key != 17 && key != 91 && key != 18) {
+      stdin.add(key);
+      if (key == 8 && inputString.isNotEmpty) {
+        inputString.removeLast();
+      } else {
+        inputString.add(key);
+      }
+    }
+    
+    if (inputDone) {
+      ws.send('[[CONSOLE_INPUT]]' + JSON.encode(inputString));
+      inputString = [];
+      inputDone = false;
+    }
   }
   
   /// Handles a scroll up action by relaying the command to the model

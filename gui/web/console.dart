@@ -20,27 +20,19 @@ class UpDroidConsole {
   DivElement console;
   AnchorElement consoleButton;
   AnchorElement themeButton;
-  
   bool lightTheme;
-  bool consoleSelected;
-  bool inputDone;
-  
-  List<int> inputString;
   
   UpDroidConsole(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
     this.cs = cs;
     
     lightTheme = false;
-    consoleSelected = false;
-    inputDone = false;
-    inputString = [];
 
     console = querySelector('#console');
     consoleButton = querySelector('#button-console');
     themeButton = querySelector('.button-console-theme');
     
-    term = new Terminal(console);
+    term = new Terminal(console, ws);
     
     registerConsoleEventHandlers();
 
@@ -57,43 +49,6 @@ class UpDroidConsole {
       lightTheme = true;
     }
   }
-  
-  void handleInput(KeyboardEvent e) {
-    int key = e.keyCode;
-    
-    // keyCode behaves very oddly.
-    if (!e.shiftKey) {
-      if (NOSHIFT_KEYS.containsKey(key)) {
-        key = NOSHIFT_KEYS[key];
-      }
-    } else {
-      if (SHIFT_KEYS.containsKey(key)) {
-        key = SHIFT_KEYS[key];
-      }
-    }
-
-    // Carriage Return (13) => New Line (10).
-    if (key == 13) {
-      key = 10;
-      inputDone = true;
-    }
-
-    // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
-    if (key != 16 && key != 17 && key != 91 && key != 18) {
-      term.stdin.add(key);
-      if (key == 8 && inputString.isNotEmpty) {
-        inputString.removeLast();
-      } else {
-        inputString.add(key);
-      }
-    }
-    
-    if (inputDone) {
-      ws.send('[[CONSOLE_INPUT]]' + JSON.encode(inputString));
-      inputString = [];
-      inputDone = false;
-    }
-  }
 
   /// Sets up the event handlers for the console.
   void registerConsoleEventHandlers() {
@@ -101,38 +56,6 @@ class UpDroidConsole {
         .where((um) => um.header == 'CONSOLE_OUTPUT')
         .listen((um) => term.stdout.add(um.body));
 
-    console.onKeyUp.listen((e) => handleInput(e));
-    
-    console.onKeyDown.listen((e) {
-      if (e.keyCode == 8) e.preventDefault();
-    });
-    
-    // TODO: figure out a way to deselect the console.
-    console.onClick.listen((e) {
-      consoleSelected = true;
-    });
-    
-    window.onClick.listen((e) {
-      if (e.target.classes.contains('termrow') || e.target.id == 'console') {
-        return;
-      }
-
-      consoleSelected = false;
-    });
-    
-    window.onMouseWheel.listen((wheelEvent) {
-      if (!consoleSelected) return;
-
-      // Scrolling should target only the console.
-      wheelEvent.preventDefault();
-      
-      if (wheelEvent.deltaY < 0) {
-        term.scrollUp();
-      } else {
-        term.scrollDown();
-      }
-    });
-    
     themeButton.onClick.listen((e) {
       toggleTheme();
       e.preventDefault();

@@ -4,7 +4,7 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 import 'package:quiver/core.dart';
-import 'console_helper.dart';
+import 'input_keys.dart';
 
 part 'model.dart';
 

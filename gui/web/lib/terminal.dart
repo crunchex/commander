@@ -139,14 +139,7 @@ class Terminal {
 
     if (input == 8 && _model.inputCursorIndex > 0) {
       _model.cursorBack();
-      Glyph g = new Glyph(Glyph.SPACE, bright: _attributes.bright,
-                                dim: _attributes.dim,
-                                underscore: _attributes.underscore,
-                                blink: _attributes.blink,
-                                reverse: _attributes.reverse,
-                                hidden: _attributes.hidden,
-                                fgColor: _attributes.fgColor,
-                                bgColor: _attributes.bgColor);
+      Glyph g = new Glyph(Glyph.SPACE, _attributes);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
       refreshDisplay();
       return;
@@ -156,14 +149,7 @@ class Terminal {
       char = Glyph.SPACE;
     }
 
-    Glyph g = new Glyph(char, bright: _attributes.bright,
-                              dim: _attributes.dim,
-                              underscore: _attributes.underscore,
-                              blink: _attributes.blink,
-                              reverse: _attributes.reverse,
-                              hidden: _attributes.hidden,
-                              fgColor: _attributes.fgColor,
-                              bgColor: _attributes.bgColor);
+    Glyph g = new Glyph(char, _attributes);
     _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
     _model.cursorNext();
     _model.inputCursorIndex++;
@@ -244,14 +230,7 @@ class Terminal {
         char = Glyph.SPACE;
       }
 
-      Glyph g = new Glyph(char, bright: _attributes.bright,
-                                dim: _attributes.dim,
-                                underscore: _attributes.underscore,
-                                blink: _attributes.blink,
-                                reverse: _attributes.reverse,
-                                hidden: _attributes.hidden,
-                                fgColor: _attributes.fgColor,
-                                bgColor: _attributes.bgColor);
+      Glyph g = new Glyph(char, _attributes);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
       _model.cursorNext();
     }

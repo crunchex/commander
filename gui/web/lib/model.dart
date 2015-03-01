@@ -73,7 +73,7 @@ class Model {
     
     List<Glyph> newRow = [];
     for (int c = 0; c < numCols; c++) {
-      newRow.add(new Glyph(Glyph.SPACE));
+      newRow.add(new Glyph(Glyph.SPACE, new DisplayAttributes()));
     }
     _rows.add(newRow);
   }
@@ -106,7 +106,7 @@ class Model {
     for (int r = 0; r < numRows; r++) {
       _rows.add(new List<Glyph>());
       for (int c = 0; c < numCols; c++) {
-        _rows[r].add(new Glyph(Glyph.SPACE));
+        _rows[r].add(new Glyph(Glyph.SPACE, new DisplayAttributes()));
       }
     }
   }
@@ -200,28 +200,39 @@ class DisplayAttributes {
 }
 
 /// The data model class for an individual glyph within [Model].
-class Glyph extends DisplayAttributes {
+class Glyph {
   static const SPACE = ' ';
   static const AMP = '&';
   static const LT = '<';
   static const GT = '>';
+
+  bool bright, dim, underscore, blink, reverse, hidden;
+  String value, fgColor, bgColor;
   
-  String value;
-  
-  Glyph (this.value, {bool bright: false, bool dim: false, bool underscore: false,
-         bool blink: false, bool reverse: false, bool hidden: false,
-         String fgColor: '#93a1a1', String bgColor: '#002b36'}) {
-    this.bright = bright;
-    this.dim = dim;
-    this.underscore = underscore;
-    this.blink = blink;
-    this.reverse = reverse;
-    this.hidden = hidden;
-    this.fgColor = fgColor;
-    this.bgColor = bgColor;
+  Glyph (this.value, DisplayAttributes attr) {
+    bright = attr.bright;
+    dim = attr.dim;
+    underscore = attr.underscore;
+    blink = attr.blink;
+    reverse = attr.reverse;
+    hidden = attr.hidden;
+    fgColor = attr.fgColor;
+    bgColor = attr.bgColor;
   }
   
   operator ==(Glyph other) {
+    return (value == other.value
+            && bright == other.bright
+            && dim == other.dim
+            && underscore == other.underscore
+            && blink == other.blink
+            && reverse == other.reverse
+            && hidden == other.hidden
+            && fgColor == other.fgColor
+            && bgColor == other.bgColor);
+  }
+  
+  bool hasSameAttributes(Glyph other) {
     return (bright == other.bright
             && dim == other.dim
             && underscore == other.underscore

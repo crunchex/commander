@@ -33,6 +33,7 @@ class UpDroidConsole {
     themeButton = querySelector('.button-console-theme');
     
     term = new Terminal(console);
+    term.scrollSpeed = 3;
     
     registerConsoleEventHandlers();
 

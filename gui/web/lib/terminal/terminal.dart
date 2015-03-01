@@ -22,6 +22,10 @@ class Terminal {
   /// A stream of [String], JSON-encoded UTF8 bytes (List<int>).
   StreamController<String> stdin;
 
+  /// An int that sets the number of lines scrolled per mouse
+  /// wheel event. Default: 1
+  int scrollSpeed = 1;
+
   // Private
   int _charWidth, _charHeight;
   List<SpanElement> _buffer;
@@ -63,7 +67,7 @@ class Terminal {
       // Scrolling should target only the console.
       wheelEvent.preventDefault();
       
-      (wheelEvent.deltaY < 0) ? _model.scrollUp() : _model.scrollDown();
+      (wheelEvent.deltaY < 0) ? _model.scrollUp(scrollSpeed) : _model.scrollDown(scrollSpeed);
       _refreshDisplay();
     });
   }

@@ -80,24 +80,28 @@ class Model {
   
   /// Manipulates the buffers and rows to handle scrolling
   /// upward of a single line.
-  void scrollUp() {
-    if (_reverseBuffer.isEmpty) return;
-
-    _rows.insert(0, _reverseBuffer.last);
-    _reverseBuffer.removeLast();
-    _forwardBuffer.add(_rows[_rows.length - 1]);
-    _rows.removeLast();
+  void scrollUp(int numLines) {
+    for (int i = 0; i < numLines; i++) {
+      if (_reverseBuffer.isEmpty) return;
+      
+      _rows.insert(0, _reverseBuffer.last);
+      _reverseBuffer.removeLast();
+      _forwardBuffer.add(_rows[_rows.length - 1]);
+      _rows.removeLast();
+    }
   }
   
   /// Manipulates the buffers and rows to handle scrolling
   /// upward of a single line.
-  void scrollDown() {
-    if (_forwardBuffer.isEmpty) return;
-
-    _rows.add(_forwardBuffer.last);
-    _forwardBuffer.removeLast();
-    _reverseBuffer.add(_rows[0]);
-    _rows.removeAt(0);
+  void scrollDown(int numLines) {
+    for (int i = 0; i < numLines; i++) {
+      if (_forwardBuffer.isEmpty) return;
+  
+      _rows.add(_forwardBuffer.last);
+      _forwardBuffer.removeLast();
+      _reverseBuffer.add(_rows[0]);
+      _rows.removeAt(0);
+    }
   }
   
   /// Initializes the internal model with a List of Lists.

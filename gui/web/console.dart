@@ -97,13 +97,11 @@ class UpDroidConsole {
       key = 10;
       inputDone = true;
     }
-    
-    print(key.toString());
 
     // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
     if (key != 16 && key != 17 && key != 91 && key != 18) {
       term.stdin.add(key);
-      if (key == 8) {
+      if (key == 8 && inputString.isNotEmpty) {
         inputString.removeLast();
       } else {
         inputString.add(key);

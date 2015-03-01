@@ -73,13 +73,12 @@ class Terminal {
     String char = new String.fromCharCode(input);
     if (input == 10) {
       _model.cursorNewLine();
+      _model.inputCursorIndex = 0;
       return;
     }
 
-    if (input == 8) {
-      print(_model.cursor);
+    if (input == 8 && _model.inputCursorIndex > 0) {
       _model.cursorBack();
-      print(_model.cursor);
       Glyph g = new Glyph(Glyph.SPACE, bright: _attributes.bright,
                                 dim: _attributes.dim,
                                 underscore: _attributes.underscore,

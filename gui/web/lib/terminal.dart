@@ -21,8 +21,7 @@ class Terminal {
   int _charWidth, _charHeight;
   List<SpanElement> _buffer;
   Model _model;
-  DisplayAttributes _attributes;
-  StreamController _keyboard;
+  DisplayAttributes _attr;
   bool _inputDone;
   List<int> _inputString;
   
@@ -37,8 +36,7 @@ class Terminal {
     _charWidth = 7;
     _charHeight = 14;
     _model = new Model(_rows, _cols);
-    _attributes = new DisplayAttributes();
-    _keyboard = new StreamController<String>();
+    _attr = new DisplayAttributes();
     
     _registerEventHandlers();
   }
@@ -48,10 +46,10 @@ class Terminal {
   
   void _registerEventHandlers() {
     stdout.stream.listen((String out) => _processStdOut(JSON.decode(out)));
-    _keyboard.stream.listen((int input) => _processKey(input));
     
     div.onKeyUp.listen((e) => _handleInput(e));
     
+    // Disables browser back navigation with backspace key.
     div.onKeyDown.listen((e) {
       if (e.keyCode == 8) e.preventDefault();
     });
@@ -60,14 +58,12 @@ class Terminal {
       // Scrolling should target only the console.
       wheelEvent.preventDefault();
       
-      if (wheelEvent.deltaY < 0) {
-        _scrollUp();
-      } else {
-        _scrollDown();
-      }
+      (wheelEvent.deltaY < 0) ? _model.scrollUp() : _model.scrollDown();
+      _refreshDisplay();
     });
   }
   
+  /// Handles a given [KeyboardEvent].
   void _handleInput(KeyboardEvent e) {
     int key = e.keyCode;
     
@@ -90,7 +86,7 @@ class Terminal {
 
     // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
     if (key != 16 && key != 17 && key != 91 && key != 18) {
-      _keyboard.add(key);
+      _processKey(key);
       if (key == 8 && _inputString.isNotEmpty) {
         _inputString.removeLast();
       } else {
@@ -104,21 +100,7 @@ class Terminal {
       _inputDone = false;
     }
   }
-  
-  /// Handles a scroll up action by relaying the command to the model
-  /// and refreshing the display.
-  void _scrollUp() {
-    _model.scrollUp();
-    _refreshDisplay();
-  }
-  
-  /// Handles a scroll down action by relaying the command to the model
-  /// and refreshing the display.
-  void _scrollDown() {
-    _model.scrollDown();
-    _refreshDisplay();
-  }
-  
+
   void _processKey(int input) {
     String char = new String.fromCharCode(input);
     if (input == 10) {
@@ -129,7 +111,7 @@ class Terminal {
 
     if (input == 8 && _model.inputCursorIndex > 0) {
       _model.cursorBack();
-      Glyph g = new Glyph(Glyph.SPACE, _attributes);
+      Glyph g = new Glyph(Glyph.SPACE, _attr);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
       _refreshDisplay();
       return;
@@ -139,7 +121,7 @@ class Terminal {
       char = Glyph.SPACE;
     }
 
-    Glyph g = new Glyph(char, _attributes);
+    Glyph g = new Glyph(char, _attr);
     _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
     _model.cursorNext();
     _model.inputCursorIndex++;
@@ -220,7 +202,7 @@ class Terminal {
         char = Glyph.SPACE;
       }
 
-      Glyph g = new Glyph(char, _attributes);
+      Glyph g = new Glyph(char, _attr);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
       _model.cursorNext();
     }
@@ -231,33 +213,33 @@ class Terminal {
     String decodedEsc = UTF8.decode(escape);
 
     if (escape.contains('0;')) {
-      _attributes.resetAll(); 
+      _attr.resetAll(); 
     }
 
-    if (decodedEsc.contains(';1')) _attributes.bright = true;
-    if (decodedEsc.contains(';2')) _attributes.dim = true;
-    if (decodedEsc.contains(';4')) _attributes.underscore = true;
-    if (decodedEsc.contains(';5')) _attributes.blink = true;
-    if (decodedEsc.contains(';7')) _attributes.reverse = true;
-    if (decodedEsc.contains(';8')) _attributes.hidden = true;
+    if (decodedEsc.contains(';1')) _attr.bright = true;
+    if (decodedEsc.contains(';2')) _attr.dim = true;
+    if (decodedEsc.contains(';4')) _attr.underscore = true;
+    if (decodedEsc.contains(';5')) _attr.blink = true;
+    if (decodedEsc.contains(';7')) _attr.reverse = true;
+    if (decodedEsc.contains(';8')) _attr.hidden = true;
 
-    if (decodedEsc.contains(';30')) _attributes.fgColor = DisplayAttributes.COLORS[30];
-    if (decodedEsc.contains(';31')) _attributes.fgColor = DisplayAttributes.COLORS[31];
-    if (decodedEsc.contains(';32')) _attributes.fgColor = DisplayAttributes.COLORS[32];
-    if (decodedEsc.contains(';33')) _attributes.fgColor = DisplayAttributes.COLORS[33];
-    if (decodedEsc.contains(';34')) _attributes.fgColor = DisplayAttributes.COLORS[34];
-    if (decodedEsc.contains(';35')) _attributes.fgColor = DisplayAttributes.COLORS[35];
-    if (decodedEsc.contains(';36')) _attributes.fgColor = DisplayAttributes.COLORS[36];
-    if (decodedEsc.contains(';37')) _attributes.fgColor = DisplayAttributes.COLORS[37];
+    if (decodedEsc.contains(';30')) _attr.fgColor = DisplayAttributes.COLORS[30];
+    if (decodedEsc.contains(';31')) _attr.fgColor = DisplayAttributes.COLORS[31];
+    if (decodedEsc.contains(';32')) _attr.fgColor = DisplayAttributes.COLORS[32];
+    if (decodedEsc.contains(';33')) _attr.fgColor = DisplayAttributes.COLORS[33];
+    if (decodedEsc.contains(';34')) _attr.fgColor = DisplayAttributes.COLORS[34];
+    if (decodedEsc.contains(';35')) _attr.fgColor = DisplayAttributes.COLORS[35];
+    if (decodedEsc.contains(';36')) _attr.fgColor = DisplayAttributes.COLORS[36];
+    if (decodedEsc.contains(';37')) _attr.fgColor = DisplayAttributes.COLORS[37];
 
-    if (decodedEsc.contains(';40')) _attributes.bgColor = DisplayAttributes.COLORS[30];
-    if (decodedEsc.contains(';41')) _attributes.bgColor = DisplayAttributes.COLORS[31];
-    if (decodedEsc.contains(';42')) _attributes.bgColor = DisplayAttributes.COLORS[32];
-    if (decodedEsc.contains(';43')) _attributes.bgColor = DisplayAttributes.COLORS[33];
-    if (decodedEsc.contains(';44')) _attributes.bgColor = DisplayAttributes.COLORS[34];
-    if (decodedEsc.contains(';45')) _attributes.bgColor = DisplayAttributes.COLORS[35];
-    if (decodedEsc.contains(';46')) _attributes.bgColor = DisplayAttributes.COLORS[36];
-    if (decodedEsc.contains(';47')) _attributes.bgColor = DisplayAttributes.COLORS[37];
+    if (decodedEsc.contains(';40')) _attr.bgColor = DisplayAttributes.COLORS[30];
+    if (decodedEsc.contains(';41')) _attr.bgColor = DisplayAttributes.COLORS[31];
+    if (decodedEsc.contains(';42')) _attr.bgColor = DisplayAttributes.COLORS[32];
+    if (decodedEsc.contains(';43')) _attr.bgColor = DisplayAttributes.COLORS[33];
+    if (decodedEsc.contains(';44')) _attr.bgColor = DisplayAttributes.COLORS[34];
+    if (decodedEsc.contains(';45')) _attr.bgColor = DisplayAttributes.COLORS[35];
+    if (decodedEsc.contains(';46')) _attr.bgColor = DisplayAttributes.COLORS[36];
+    if (decodedEsc.contains(';47')) _attr.bgColor = DisplayAttributes.COLORS[37];
   }
 
   /// Generates the HTML for an individual row given
@@ -281,7 +263,7 @@ class Terminal {
       if (curr != prev || c == _cols - 1) {
         row.append(span);
 
-        // TODO: handle other display attributes, link blink.
+        // TODO: handle other display attributes, like blink.
         span = new SpanElement();
         span.style.color = curr.fgColor;
         span.style.backgroundColor = curr.bgColor;

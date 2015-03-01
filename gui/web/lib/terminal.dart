@@ -23,9 +23,8 @@ class InputMode {
 class Terminal {
   // Public
   DivElement div;
-  StreamController stdin;
   StreamController stdout;
-  WebSocket ws;
+  StreamController stdin;
 
   // Private
   int _charWidth, _charHeight, _inputSwitch;
@@ -33,14 +32,15 @@ class Terminal {
   List<SpanElement> _buffer;
   Model _model;
   DisplayAttributes _attributes;
+  StreamController _keyboard;
   bool inputDone;
   List<int> inputString;
   
   static const int ESC = 27;
   
-  Terminal (this.div, this.ws) {
-    stdin = new StreamController<String>();
+  Terminal (this.div) {
     stdout = new StreamController<String>();
+    stdin = new StreamController<String>();
     inputDone = false;
     inputString = [];
 
@@ -49,6 +49,7 @@ class Terminal {
     _inputSwitch = InputMode.normal;
     _model = new Model(_rows, _cols);
     _attributes = new DisplayAttributes();
+    _keyboard = new StreamController<String>();
     
     _registerEventHandlers();
   }
@@ -58,7 +59,7 @@ class Terminal {
   
   void _registerEventHandlers() {
     stdout.stream.listen((String out) => processStdOut(JSON.decode(out)));
-    stdin.stream.listen((int input) => processStdIn(input));
+    _keyboard.stream.listen((int input) => processKey(input));
     
     div.onKeyUp.listen((e) => handleInput(e));
     
@@ -100,7 +101,7 @@ class Terminal {
 
     // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
     if (key != 16 && key != 17 && key != 91 && key != 18) {
-      stdin.add(key);
+      _keyboard.add(key);
       if (key == 8 && inputString.isNotEmpty) {
         inputString.removeLast();
       } else {
@@ -109,7 +110,7 @@ class Terminal {
     }
     
     if (inputDone) {
-      ws.send('[[CONSOLE_INPUT]]' + JSON.encode(inputString));
+      stdin.add(JSON.encode(inputString));
       inputString = [];
       inputDone = false;
     }
@@ -129,7 +130,7 @@ class Terminal {
     refreshDisplay();
   }
   
-  void processStdIn(int input) {
+  void processKey(int input) {
     String char = new String.fromCharCode(input);
     if (input == 10) {
       _model.cursorNewLine();

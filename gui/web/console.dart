@@ -32,7 +32,7 @@ class UpDroidConsole {
     consoleButton = querySelector('#button-console');
     themeButton = querySelector('.button-console-theme');
     
-    term = new Terminal(console, ws);
+    term = new Terminal(console);
     
     registerConsoleEventHandlers();
 
@@ -55,6 +55,8 @@ class UpDroidConsole {
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'CONSOLE_OUTPUT')
         .listen((um) => term.stdout.add(um.body));
+    
+    term.stdin.stream.listen((data) => ws.send('[[CONSOLE_INPUT]]' + data));
 
     themeButton.onClick.listen((e) {
       toggleTheme();

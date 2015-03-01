@@ -7,6 +7,7 @@ import 'package:quiver/core.dart';
 
 part 'model.dart';
 part 'input_keys.dart';
+part 'theme.dart';
 
 /// A class for rendering a terminal emulator in a [DivElement] (param).
 /// [stdout] needs to receive individual UTF8 integers and will handle
@@ -33,6 +34,7 @@ class Terminal {
   DisplayAttributes _attr;
   bool _inputDone;
   List<int> _inputString;
+  Theme _theme;
   
   static const int ESC = 27;
   
@@ -46,12 +48,28 @@ class Terminal {
     _charHeight = 14;
     _model = new Model(_rows, _cols);
     _attr = new DisplayAttributes();
+    _theme = new Theme.SolarizedDark();
     
     _registerEventHandlers();
   }
   
   int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
   int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
+  
+  /// A [String] that sets the colored theme of the entire [Terminal].
+  /// Supported themes: solarized-dark, solarized-light.
+  /// Default: solarized-dark.
+  void set theme(String name) {
+    switch (name) {
+      case 'solarized-light':
+        _theme = new Theme.SolarizedLight();
+        break;
+      default:
+        _theme = new Theme.SolarizedDark();
+    }
+    div.style.backgroundColor = _theme.backgroundColor;
+    _refreshDisplay();
+  }
   
   void _registerEventHandlers() {
     stdout.stream.listen((String out) => _processStdOut(JSON.decode(out)));
@@ -242,23 +260,23 @@ class Terminal {
     if (decodedEsc.contains(';7')) _attr.reverse = true;
     if (decodedEsc.contains(';8')) _attr.hidden = true;
 
-    if (decodedEsc.contains(';30')) _attr.fgColor = DisplayAttributes.COLORS[30];
-    if (decodedEsc.contains(';31')) _attr.fgColor = DisplayAttributes.COLORS[31];
-    if (decodedEsc.contains(';32')) _attr.fgColor = DisplayAttributes.COLORS[32];
-    if (decodedEsc.contains(';33')) _attr.fgColor = DisplayAttributes.COLORS[33];
-    if (decodedEsc.contains(';34')) _attr.fgColor = DisplayAttributes.COLORS[34];
-    if (decodedEsc.contains(';35')) _attr.fgColor = DisplayAttributes.COLORS[35];
-    if (decodedEsc.contains(';36')) _attr.fgColor = DisplayAttributes.COLORS[36];
-    if (decodedEsc.contains(';37')) _attr.fgColor = DisplayAttributes.COLORS[37];
+    if (decodedEsc.contains(';30')) _attr.fgColor = 'black';
+    if (decodedEsc.contains(';31')) _attr.fgColor = 'red';
+    if (decodedEsc.contains(';32')) _attr.fgColor = 'green';
+    if (decodedEsc.contains(';33')) _attr.fgColor = 'yellow';
+    if (decodedEsc.contains(';34')) _attr.fgColor = 'blue';
+    if (decodedEsc.contains(';35')) _attr.fgColor = 'magenta';
+    if (decodedEsc.contains(';36')) _attr.fgColor = 'cyan';
+    if (decodedEsc.contains(';37')) _attr.fgColor = 'white';
 
-    if (decodedEsc.contains(';40')) _attr.bgColor = DisplayAttributes.COLORS[30];
-    if (decodedEsc.contains(';41')) _attr.bgColor = DisplayAttributes.COLORS[31];
-    if (decodedEsc.contains(';42')) _attr.bgColor = DisplayAttributes.COLORS[32];
-    if (decodedEsc.contains(';43')) _attr.bgColor = DisplayAttributes.COLORS[33];
-    if (decodedEsc.contains(';44')) _attr.bgColor = DisplayAttributes.COLORS[34];
-    if (decodedEsc.contains(';45')) _attr.bgColor = DisplayAttributes.COLORS[35];
-    if (decodedEsc.contains(';46')) _attr.bgColor = DisplayAttributes.COLORS[36];
-    if (decodedEsc.contains(';47')) _attr.bgColor = DisplayAttributes.COLORS[37];
+    if (decodedEsc.contains(';40')) _attr.bgColor = 'black';
+    if (decodedEsc.contains(';41')) _attr.bgColor = 'red';
+    if (decodedEsc.contains(';42')) _attr.bgColor = 'green';
+    if (decodedEsc.contains(';43')) _attr.bgColor = 'yellow';
+    if (decodedEsc.contains(';44')) _attr.bgColor = 'blue';
+    if (decodedEsc.contains(';45')) _attr.bgColor = 'magenta';
+    if (decodedEsc.contains(';46')) _attr.bgColor = 'cyan';
+    if (decodedEsc.contains(';47')) _attr.bgColor = 'white';
   }
   
   /// Renders the cursor at [Cursor]'s current position.
@@ -278,8 +296,8 @@ class Terminal {
     SpanElement span = new SpanElement();
     prev = _model.getGlyphAt(r, 0);
 
-    span.style.color = prev.fgColor;
-    span.style.backgroundColor = prev.bgColor;
+    span.style.color = _theme.colors[prev.fgColor];
+    span.style.backgroundColor = _theme.colors[prev.bgColor];
     span.text += prev.value;
 
     for (int c = 1; c < _cols; c++) {
@@ -290,8 +308,8 @@ class Terminal {
 
         // TODO: handle other display attributes, like blink.
         span = new SpanElement();
-        span.style.color = curr.fgColor;
-        span.style.backgroundColor = curr.bgColor;
+        span.style.color = _theme.colors[curr.fgColor];
+        span.style.backgroundColor = _theme.colors[curr.bgColor];
         span.text += curr.value;
       } else {
         span.text += curr.value;

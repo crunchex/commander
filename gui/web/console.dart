@@ -25,15 +25,17 @@ class UpDroidConsole {
   UpDroidConsole(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
     this.cs = cs;
-    
-    lightTheme = false;
 
     console = querySelector('#console');
     consoleButton = querySelector('#button-console');
     themeButton = querySelector('.button-console-theme');
     
     term = new Terminal(console);
-    term.scrollSpeed = 3;
+    term
+        ..scrollSpeed = 3
+        ..theme = 'solarized-dark';
+    
+    lightTheme = false;
     
     registerConsoleEventHandlers();
 
@@ -43,10 +45,10 @@ class UpDroidConsole {
   /// Toggles between a Solarized dark and light theme.
   void toggleTheme() {
     if (lightTheme) {
-      console.style.backgroundColor = '#002b36'; // base-green
+      term.theme = 'solarized-dark';
       lightTheme = false;
     } else {
-      console.style.backgroundColor = '#fdf6e3'; // base-tan
+      term.theme = 'solarized-light';
       lightTheme = true;
     }
   }

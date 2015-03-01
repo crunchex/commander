@@ -158,23 +158,12 @@ class Model {
 
 /// Holds the current state of [Terminal] display attributes.
 class DisplayAttributes {
-  static const COLORS = const {
-    30: '#002b36',  // black
-    31: '#dc322f',  // red
-    32: '#859900',  // green
-    33: '#b58900',  // yellow
-    34: '#268bd2',  // blue
-    35: '#d33682',  // magenta
-    36: '#2aa198',  // cyan
-    37: '#93a1a1'   // white
-  };
-
   bool bright, dim, underscore, blink, reverse, hidden;
   String fgColor, bgColor;
   
   DisplayAttributes ({this.bright: false, this.dim: false, this.underscore: false,
          this.blink: false, this.reverse: false, this.hidden: false,
-         this.fgColor: '#93a1a1', this.bgColor: '#002b36'});
+         this.fgColor: 'white', this.bgColor: 'black'});
   
   String toString() {
     Map properties = {
@@ -198,8 +187,8 @@ class DisplayAttributes {
     reverse = false;
     hidden = false;
     
-    fgColor = COLORS[37];
-    bgColor = COLORS[37];
+    fgColor = 'white';
+    bgColor = 'black';
   }
 }
 

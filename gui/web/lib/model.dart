@@ -14,6 +14,8 @@ class Model {
   Cursor cursor;
   int numRows, numCols;
   
+  int inputCursorIndex;
+  
   // Implemented as stacks in scrolling.
   List<List> _reverseBuffer;
   List<List> _forwardBuffer;
@@ -23,6 +25,7 @@ class Model {
   
   Model (this.numRows, this.numCols) {
     cursor = new Cursor();
+    inputCursorIndex = 0;
     _reverseBuffer = [];
     _forwardBuffer = [];
     _rows = [];
@@ -45,6 +48,13 @@ class Model {
     }
     
     cursorNewLine();
+  }
+  
+  void cursorBack() {
+    if (inputCursorIndex > 0) {
+      cursor.col--;
+      inputCursorIndex--;
+    }
   }
   
   void cursorNewLine() {

@@ -22,6 +22,7 @@ class InputMode {
 class Terminal {
   // Public
   DivElement div;
+  StreamController stdin;
   StreamController stdout;
 
   // Private
@@ -34,6 +35,7 @@ class Terminal {
   static const int ESC = 27;
   
   Terminal (this.div) {
+    stdin = new StreamController<String>();
     stdout = new StreamController<String>();
 
     _charWidth = 7;
@@ -50,6 +52,7 @@ class Terminal {
   
   void _registerEventHandlers() {
     stdout.stream.listen((String out) => processStdOut(JSON.decode(out)));
+    stdin.stream.listen((int input) => processStdIn(input));
   }
   
   /// Handles a scroll up action by relaying the command to the model
@@ -63,6 +66,49 @@ class Terminal {
   /// and refreshing the display.
   void scrollDown() {
     _model.scrollDown();
+    refreshDisplay();
+  }
+  
+  void processStdIn(int input) {
+    String char = new String.fromCharCode(input);
+    if (input == 10) {
+      _model.cursorNewLine();
+      return;
+    }
+
+    if (input == 8) {
+      print(_model.cursor);
+      _model.cursorBack();
+      print(_model.cursor);
+      Glyph g = new Glyph(Glyph.SPACE, bright: _attributes.bright,
+                                dim: _attributes.dim,
+                                underscore: _attributes.underscore,
+                                blink: _attributes.blink,
+                                reverse: _attributes.reverse,
+                                hidden: _attributes.hidden,
+                                fgColor: _attributes.fgColor,
+                                bgColor: _attributes.bgColor);
+      _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
+      refreshDisplay();
+      return;
+    }
+    
+    if (input == 32) {
+      char = Glyph.SPACE;
+    }
+
+    Glyph g = new Glyph(char, bright: _attributes.bright,
+                              dim: _attributes.dim,
+                              underscore: _attributes.underscore,
+                              blink: _attributes.blink,
+                              reverse: _attributes.reverse,
+                              hidden: _attributes.hidden,
+                              fgColor: _attributes.fgColor,
+                              bgColor: _attributes.bgColor);
+    _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
+    _model.cursorNext();
+    _model.inputCursorIndex++;
+
     refreshDisplay();
   }
   

@@ -4,9 +4,9 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 import 'package:quiver/core.dart';
-import 'input_keys.dart';
 
 part 'model.dart';
+part 'input_keys.dart';
 
 const bool debug = false;
 

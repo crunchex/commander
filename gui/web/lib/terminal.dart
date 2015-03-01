@@ -8,15 +8,6 @@ import 'package:quiver/core.dart';
 part 'model.dart';
 part 'input_keys.dart';
 
-const bool debug = false;
-
-/// A class for keeping track of inputHandling state.
-/// Stand-in for what should be an enum.
-class InputMode {
-  static int normal = 1;
-  static int escape = 2;
-}
-
 /// A class for rendering a terminal emulator in a [DivElement] (param).
 /// [stdout] needs to receive individual UTF8 integers and will handle
 /// them appropriately.
@@ -27,26 +18,24 @@ class Terminal {
   StreamController stdin;
 
   // Private
-  int _charWidth, _charHeight, _inputSwitch;
-  List<int> _cursorXY;
+  int _charWidth, _charHeight;
   List<SpanElement> _buffer;
   Model _model;
   DisplayAttributes _attributes;
   StreamController _keyboard;
-  bool inputDone;
-  List<int> inputString;
+  bool _inputDone;
+  List<int> _inputString;
   
   static const int ESC = 27;
   
   Terminal (this.div) {
     stdout = new StreamController<String>();
     stdin = new StreamController<String>();
-    inputDone = false;
-    inputString = [];
+    _inputDone = false;
+    _inputString = [];
 
     _charWidth = 7;
     _charHeight = 14;
-    _inputSwitch = InputMode.normal;
     _model = new Model(_rows, _cols);
     _attributes = new DisplayAttributes();
     _keyboard = new StreamController<String>();
@@ -58,10 +47,10 @@ class Terminal {
   int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
   
   void _registerEventHandlers() {
-    stdout.stream.listen((String out) => processStdOut(JSON.decode(out)));
-    _keyboard.stream.listen((int input) => processKey(input));
+    stdout.stream.listen((String out) => _processStdOut(JSON.decode(out)));
+    _keyboard.stream.listen((int input) => _processKey(input));
     
-    div.onKeyUp.listen((e) => handleInput(e));
+    div.onKeyUp.listen((e) => _handleInput(e));
     
     div.onKeyDown.listen((e) {
       if (e.keyCode == 8) e.preventDefault();
@@ -72,14 +61,14 @@ class Terminal {
       wheelEvent.preventDefault();
       
       if (wheelEvent.deltaY < 0) {
-        scrollUp();
+        _scrollUp();
       } else {
-        scrollDown();
+        _scrollDown();
       }
     });
   }
   
-  void handleInput(KeyboardEvent e) {
+  void _handleInput(KeyboardEvent e) {
     int key = e.keyCode;
     
     // keyCode behaves very oddly.
@@ -96,41 +85,41 @@ class Terminal {
     // Carriage Return (13) => New Line (10).
     if (key == 13) {
       key = 10;
-      inputDone = true;
+      _inputDone = true;
     }
 
     // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
     if (key != 16 && key != 17 && key != 91 && key != 18) {
       _keyboard.add(key);
-      if (key == 8 && inputString.isNotEmpty) {
-        inputString.removeLast();
+      if (key == 8 && _inputString.isNotEmpty) {
+        _inputString.removeLast();
       } else {
-        inputString.add(key);
+        _inputString.add(key);
       }
     }
     
-    if (inputDone) {
-      stdin.add(JSON.encode(inputString));
-      inputString = [];
-      inputDone = false;
+    if (_inputDone) {
+      stdin.add(JSON.encode(_inputString));
+      _inputString = [];
+      _inputDone = false;
     }
   }
   
   /// Handles a scroll up action by relaying the command to the model
   /// and refreshing the display.
-  void scrollUp() {
+  void _scrollUp() {
     _model.scrollUp();
-    refreshDisplay();
+    _refreshDisplay();
   }
   
   /// Handles a scroll down action by relaying the command to the model
   /// and refreshing the display.
-  void scrollDown() {
+  void _scrollDown() {
     _model.scrollDown();
-    refreshDisplay();
+    _refreshDisplay();
   }
   
-  void processKey(int input) {
+  void _processKey(int input) {
     String char = new String.fromCharCode(input);
     if (input == 10) {
       _model.cursorNewLine();
@@ -142,7 +131,7 @@ class Terminal {
       _model.cursorBack();
       Glyph g = new Glyph(Glyph.SPACE, _attributes);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
-      refreshDisplay();
+      _refreshDisplay();
       return;
     }
     
@@ -155,11 +144,11 @@ class Terminal {
     _model.cursorNext();
     _model.inputCursorIndex++;
 
-    refreshDisplay();
+    _refreshDisplay();
   }
   
   /// Splits a UTF8 string into substrings, split by preceding escape sequences.
-  void processStdOut(List<int> output) {
+  void _processStdOut(List<int> output) {
     List<int> escapeString, escape, string;
     int start, end;
     
@@ -207,7 +196,7 @@ class Terminal {
     _setAttributeMode(escape);
     _handleOutString(string);
 
-    refreshDisplay();
+    _refreshDisplay();
   }
   
   /// Appends a new [SpanElement] with the contents of [_outString]
@@ -274,7 +263,7 @@ class Terminal {
   /// Generates the HTML for an individual row given
   /// the [Glyph]s contained in the model at that
   /// corresponding row.
-  DivElement generateRow(int r) {
+  DivElement _generateRow(int r) {
     Glyph prev, curr;
 
     DivElement row = new DivElement();
@@ -309,12 +298,12 @@ class Terminal {
   
   /// Refreshes the entire console [DivElement] by setting its
   /// contents to null and regenerating each row [DivElement].
-  void refreshDisplay() {
+  void _refreshDisplay() {
     div.innerHtml = '';
     
     DivElement row;
     for (int r = 0; r < _rows; r++) {
-      row = generateRow(r);
+      row = _generateRow(r);
       row.classes.add('termrow');
       
       div.append(row);

@@ -104,15 +104,22 @@ class Terminal {
   void _processKey(int input) {
     String char = new String.fromCharCode(input);
     if (input == 10) {
+      // Set glyph at cursor to blank.
+      Glyph g = new Glyph(Glyph.SPACE, _attr);
+      _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
+
       _model.cursorNewLine();
       _model.inputCursorIndex = 0;
       return;
     }
 
     if (input == 8 && _model.inputCursorIndex > 0) {
-      _model.cursorBack();
+      // Set glyph at cursor to blank.
       Glyph g = new Glyph(Glyph.SPACE, _attr);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
+
+      _model.cursorBack();
+      _drawCursor();
       _refreshDisplay();
       return;
     }
@@ -125,6 +132,7 @@ class Terminal {
     _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
     _model.cursorNext();
     _model.inputCursorIndex++;
+    _drawCursor();
 
     _refreshDisplay();
   }
@@ -177,6 +185,8 @@ class Terminal {
     string = output.sublist(output.indexOf(109) + 1);
     _setAttributeMode(escape);
     _handleOutString(string);
+    
+    _drawCursor();
 
     _refreshDisplay();
   }
@@ -240,6 +250,12 @@ class Terminal {
     if (decodedEsc.contains(';45')) _attr.bgColor = DisplayAttributes.COLORS[35];
     if (decodedEsc.contains(';46')) _attr.bgColor = DisplayAttributes.COLORS[36];
     if (decodedEsc.contains(';47')) _attr.bgColor = DisplayAttributes.COLORS[37];
+  }
+  
+  /// Renders the cursor at [Cursor]'s current position.
+  void _drawCursor() {
+    Glyph cursor = new Glyph('|', _attr);
+    _model.setGlyphAt(cursor, _model.cursor.row, _model.cursor.col);
   }
 
   /// Generates the HTML for an individual row given

@@ -564,7 +564,7 @@ class UpDroidExplorer {
       dirElement = querySelector('#explorer-body');
       dirElement.children.add(li);
     }
-    else if(!file.path.contains('/.')){
+    else if(!file.path.contains('/.') && !file.path.contains('CMakeLists.txt')){
       var validPath = removeSpaces(truePath);
       var validParent = removeSpaces(file.parentDir);
       dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");

@@ -94,6 +94,12 @@ html, body {
   background-color: transparent;  
 }
 
+#explorer-body {
+  display: inline-block;
+  float: left;
+  clear: both;
+}
+
 #explorer-body .btn:hover {
   color: #268bd2;
 }
@@ -340,7 +346,6 @@ li input {
 }
 
 .explorer-li{
-  min-width: 120px;
   cursor: pointer;
 }
 

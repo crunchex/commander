@@ -346,6 +346,7 @@ li input {
 }
 
 .explorer-li{
+  min-width: 200px;
   cursor: pointer;
 }
 

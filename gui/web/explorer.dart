@@ -244,12 +244,12 @@ class UpDroidExplorer {
         ..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
       
-      glyphicon.onDoubleClick.listen((e) {
+      glyphicon.onClick.listen((e) {
           ul.classes.add('explorer-hidden');
           glyphicon.replaceWith(glyph);
       });
       
-      glyph.onDoubleClick.listen((e){
+      glyph.onClick.listen((e){
         glyph.replaceWith(glyphicon);
         ul.classes.remove('explorer-hidden');
       });

@@ -1,8 +1,9 @@
 #!/usr/bin/env dart
 
 import 'dart:io';
-import 'package:http_server/http_server.dart' show VirtualDirectory;
 import 'dart:async';
+import 'dart:convert';
+import 'package:http_server/http_server.dart' show VirtualDirectory;
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 
@@ -21,6 +22,29 @@ bool defaultDebugFlag = false;
 void handleWebSocket(WebSocket socket, Directory dir) {
   help.debug('Client connected!', 0);
   StreamController<String> processInput = new StreamController<String>.broadcast();
+
+  Process bash;
+  IOSink shellStdin;
+  List<int> inputEcho = [];
+  Process.start('bash', ['-i'], workingDirectory: dir.path).then((Process shell) {
+    bash = shell;
+    shellStdin = shell.stdin;
+    shell.stdout.listen((data) {
+      help.debug('stdout: ' + data.toString(), 0);
+      socket.add('[[CONSOLE_OUTPUT]]' + JSON.encode(data));
+    });
+    
+    shell.stderr.listen((data) {
+      List err = new List.from(data, growable: true);
+      if (inputEcho.isNotEmpty) {
+        help.debug('echo: ' + inputEcho.toString(), 0);
+        err.removeWhere((char) => inputEcho.contains(char));
+      }
+      help.debug('stderr: ' + err.toString(), 0);
+      socket.add('[[CONSOLE_OUTPUT]]' + JSON.encode(err));
+      inputEcho = []; 
+    });
+  });
   
   socket.listen((String s) {
     help.UpDroidMessage um = new help.UpDroidMessage(s);
@@ -85,14 +109,21 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         break;
         
       case 'CONSOLE_INPUT':
-        passInput(processInput, um.body);
+        inputEcho.addAll(JSON.decode(um.body));
+        shellStdin.add(JSON.decode(um.body));
         break;  
         
       default:
         help.debug('Message received without updroid header.', 1);
     }
   }, onDone: () {
-    help.debug('Client disconnected', 0);  
+    help.debug('Client disconnected... killing shell process', 0);
+    // Kill the shell process.
+    bash.kill();
+  }, onError: () {
+    help.debug('Socket error... killing shell process', 1);
+    // Kill the shell process.
+    bash.kill();
   });
   
   watcher.events.listen((e) => help.formattedFsUpdate(socket, e));

@@ -113,7 +113,7 @@ html, body {
 }
 
 #file-explorer-title {
-  display: inline-block;
+  display: block;
   margin-bottom: 10px;
   text-align: center;
   vertical-align: middle;

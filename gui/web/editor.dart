@@ -36,14 +36,13 @@ class UpDroidEditor {
   AnchorElement saveButton;
   AnchorElement newButton;
   AnchorElement themeButton;
-  AnchorElement newTab;
   ButtonElement modalSaveButton;
   ButtonElement modalDiscardButton;
   InputElement fontSizeInput;
   int fontSize = 16;
   StreamSubscription fontInputListener;
   
-  Editor aceEditor;
+  ace.Editor aceEditor;
   String openFilePath;
   String originalContents;
 
@@ -52,8 +51,7 @@ class UpDroidEditor {
     this.cs = cs;
     
     editorDiv = querySelector('#editor');
-    newTab = querySelector("#new-tab");
-        
+    
     saveButton = querySelector('#column-1 .button-save');
     newButton = querySelector('#column-1 .button-new');
     themeButton = querySelector('#column-1 .button-editor-theme');
@@ -71,13 +69,13 @@ class UpDroidEditor {
 
   /// Sets up the editor and styles.
   void setUpEditor() {
-    implementation = ACE_PROXY_IMPLEMENTATION;
+    ace.implementation = ACE_PROXY_IMPLEMENTATION;
     
-    aceEditor = edit(editorDiv);
+    aceEditor = ace.edit(editorDiv);
     aceEditor
-      ..session.mode = new Mode.named(Mode.PYTHON)
+      ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
       ..fontSize = fontSize
-      ..theme = new Theme.named(Theme.SOLARIZED_DARK);
+      ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK);
     
     resetSavePoint();
   }
@@ -168,8 +166,8 @@ class UpDroidEditor {
     saveButton.onClick.listen((e) => saveText());
     
     themeButton.onClick.listen((e) {
-      String newTheme = (aceEditor.theme.name == 'solarized_dark') ? Theme.SOLARIZED_LIGHT : Theme.SOLARIZED_DARK;
-      aceEditor.theme = new Theme.named(newTheme);
+      String newTheme = (aceEditor.theme.name == 'solarized_dark') ? ace.Theme.SOLARIZED_LIGHT : ace.Theme.SOLARIZED_DARK;
+      aceEditor.theme = new ace.Theme.named(newTheme);
       
       // Stops the button from sending the page to the top (href=#).
       e.preventDefault();

@@ -21,9 +21,12 @@ pub get > /dev/null
 echo "OK"
 
 echo -n "Building (minifying) cmdr......."
-mkdir bin
-dart2js --output-type=dart --categories=Server --minify -o bin/cmdr cmdr.dart > /dev/null
-rm bin/cmdr.deps
+mkdir -p bin
+dart2js --output-type=dart --categories=Server --minify -o cmdr cmdr.dart > /dev/null
+rm cmdr.deps
+sed -i '1i#!/usr/bin/env dart' cmdr
+chmod +x cmdr
+mv cmdr bin/
 echo "OK"
 
 cd ../
@@ -40,3 +43,8 @@ pub build > /dev/null
 echo "OK"
 
 cd ../
+
+### package ###
+echo -n "Packaging......................."
+fpm -s dir -t deb -n cmdr -v 0.2 ./gui/build/web=/etc/updroid ./cmdr/bin/cmdr=/usr/bin/cmdr  > /dev/null
+echo "OK"

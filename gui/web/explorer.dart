@@ -72,9 +72,13 @@ class UpDroidExplorer {
         .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
         .listen((um) {
           workspacePath = um.body;
-          ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+          ws.send('[[INITIAL_DIRECTORY_LIST]]');
         });
-
+    
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'INITIAL_DIRECTORY_LIST')
+        .listen((um) => initialDirectoryList(um.body));
+    
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EXPLORER_DIRECTORY_LIST')
         .listen((um) => generateDirectoryList(um.body));
@@ -210,7 +214,7 @@ class UpDroidExplorer {
   
   /// Returns a generated [LIElement] with inner HTML based on
   /// the [SimpleFile]'s contents.
-  LIElement generateLiHtml(file) {
+  LIElement generateLiHtml(file, [expanded]) {
     LIElement li = new LIElement();
     li
       ..dataset['name'] = removeSpaces(file.name)
@@ -244,6 +248,12 @@ class UpDroidExplorer {
         ..dataset['path'] = removeSpaces(file.path)
         ..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
+      
+      if (expanded == false) {
+        ul.classes.add("explorer-hidden");
+        glyphicon.replaceWith(glyph);
+        li.dataset['expanded'] = 'false';
+      }
       
       glyphicon.onClick.listen((e) {
           ul.classes.add("explorer-hidden");
@@ -544,11 +554,11 @@ class UpDroidExplorer {
   
   
   /// Sets up a new HTML element from a SimpleFile.
-  Future newElementFromFile(SimpleFile file) {
+  Future newElementFromFile(SimpleFile file, [bool expanded]) {
     Completer completer = new Completer();
     completer.complete(true);
 
-    LIElement li = generateLiHtml(file);
+    LIElement li = generateLiHtml(file , expanded);
     String truePath = pathGrab(li);
 
     // Register double-click event handler for file renaming.
@@ -575,6 +585,19 @@ class UpDroidExplorer {
     }
     
     return completer.future;
+  }
+  
+  /// First List Generation
+ 
+  void initialDirectoryList(String raw) {
+    var files = fileList(raw);
+    
+    UListElement explorer = querySelector('#explorer-body');
+    explorer.innerHtml = '';
+    
+    for (SimpleFile file in files) {
+      newElementFromFile(file, false);
+    }
   }
   
   /// Redraws all file explorer views.

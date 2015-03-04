@@ -55,6 +55,10 @@ void handleWebSocket(WebSocket socket, Directory dir) {
         sendPath(socket, dir);
         break;
         
+      case 'INITIAL_DIRECTORY_LIST':
+        sendInitial(socket, dir);
+        break;
+        
       case 'EXPLORER_DIRECTORY_LIST':
         sendDirectory(socket, dir);
         break;

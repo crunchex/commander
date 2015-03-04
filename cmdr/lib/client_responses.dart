@@ -5,6 +5,12 @@ import 'dart:convert';
 import 'dart:async';
 import 'server_helper.dart' as help;
 
+void sendInitial(WebSocket s, Directory dir) {
+  help.getDirectory(dir).then((files) {
+    s.add('[[INITIAL_DIRECTORY_LIST]]' + files.toString());
+  });
+}
+
 void sendDirectory(WebSocket s, Directory dir) {
   help.getDirectory(dir).then((files) {
     s.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());

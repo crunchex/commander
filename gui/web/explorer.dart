@@ -129,7 +129,6 @@ class UpDroidExplorer {
                                  item.remove();
                                }
                                else if(checkContents(item) == true){
-                                 print("nested folder move");
                                  ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                                  ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
                                  item.remove();
@@ -314,7 +313,6 @@ class UpDroidExplorer {
                              '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
                         }
                         else if(checkContents(item) == true){
-                          print("nested folder move");
                           ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                           ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
                           item.remove();
@@ -521,14 +519,16 @@ class UpDroidExplorer {
 
     // Try to detect the parent, and if it doesn't exist then create the element for it.
     LIElement li = querySelector("[data-path='$parentPath']");
-    String curPath = '/';
+    String curPath = '';
 
     // Iterate through the path checking to see if the folder exists
     var split = parentPath.replaceFirst(workspacePath, '').split('/');
-    for(int i = 1; i< split.length; i++){
+    for(int i = 0; i< split.length; i++){
       curPath += split[i];
       LIElement curLi = querySelector('[data-path="$workspacePath$curPath"]');
+      print(workspacePath + curPath);
       if (curLi == null) {
+        print("this getting called");
         newElementFromFile(new SimpleFile.fromPath(workspacePath + curPath, workspacePath, true)).then((result) {
             });
           }
@@ -606,6 +606,7 @@ class UpDroidExplorer {
 
   /// Redraws all file explorer views.
   void generateDirectoryList(String raw) {
+    print("list generation getting called");
     var files = fileList(raw);
     var folderStateList = {};
     for (var file in files) {

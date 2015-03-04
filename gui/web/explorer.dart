@@ -232,6 +232,7 @@ class UpDroidExplorer {
     var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
     glyphicon.classes.addAll(['glyphicon', glyphType]);
     dropSetup(glyphicon, file);
+    dropSetup(glyph, file);
     li.children.add(glyphicon);
 
     // Hold the text inline with the glyphicon
@@ -441,7 +442,7 @@ class UpDroidExplorer {
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       for (SpanElement span in spanList) {
         span.classes.add('span-ondrag');
-      }   
+      }
     });
     
     d.onDragEnd.listen((event) {

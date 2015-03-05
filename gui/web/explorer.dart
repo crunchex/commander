@@ -377,8 +377,7 @@ class UpDroidExplorer {
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
-          var newPath = pathLib.dirname(file.path) + '/' + input.value;
-          print(newPath);
+          var newPath = pathLib.join(pathLib.dirname(file.path), input.value);
 
           LIElement duplicate = querySelector("[data-path='$newPath']");
           if(duplicate == null){
@@ -519,21 +518,19 @@ class UpDroidExplorer {
   /// Handles an Explorer add update for a single file.
   void addUpdate(String path) {
     SimpleFile sFile = new SimpleFile.fromPath(path, workspacePath, false);
-    var parentPath = pathLib.dirname(sFile.name);
+    var parentPath = pathLib.dirname(sFile.path);
 
     // Try to detect the parent, and if it doesn't exist then create the element for it.
     LIElement li = querySelector("[data-path='$parentPath']");
     String curPath = '';
 
     // Iterate through the path checking to see if the folder exists
-    var split = parentPath.replaceFirst(workspacePath, '').split('/');
-    for(int i = 0; i< split.length; i++){
+    var split = parentPath.replaceFirst(workspacePath.substring(0, workspacePath.length -1), '').split('/');
+    for(int i = 1; i< split.length; i++){
       curPath += split[i];
-      LIElement curLi = querySelector('[data-path="$workspacePath$curPath"]');
-      print(workspacePath + curPath);
-      if (curLi == null) {
-        print("this getting called");
-        newElementFromFile(new SimpleFile.fromPath(workspacePath + curPath, workspacePath, true)).then((result) {
+      LIElement curLi = querySelector('[data-path="${pathLib.join(workspacePath, curPath)}"]');
+      if (curLi == null && pathLib.join(workspacePath, curPath) != workspacePath) {
+        newElementFromFile(new SimpleFile.fromPath(pathLib.join(workspacePath, curPath), workspacePath, true)).then((result) {
             });
           }
       if(i != split.length - 1){
@@ -610,7 +607,6 @@ class UpDroidExplorer {
 
   /// Redraws all file explorer views.
   void generateDirectoryList(String raw) {
-    print("list generation getting called");
     var files = fileList(raw);
     var folderStateList = {};
     for (var file in files) {

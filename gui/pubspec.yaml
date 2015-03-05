@@ -5,4 +5,5 @@ dependencies:
   bootjack: any
   browser: any
   dnd: any
+  path: any
   quiver: any

@@ -377,7 +377,8 @@ class UpDroidExplorer {
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
-          var newPath = filePathGrab(file) + '/' + input.value;
+          var newPath = pathLib.dirname(file.path) + '/' + input.value;
+          print(newPath);
 
           LIElement duplicate = querySelector("[data-path='$newPath']");
           if(duplicate == null){
@@ -518,7 +519,7 @@ class UpDroidExplorer {
   /// Handles an Explorer add update for a single file.
   void addUpdate(String path) {
     SimpleFile sFile = new SimpleFile.fromPath(path, workspacePath, false);
-    var parentPath = filePathGrab(sFile);
+    var parentPath = pathLib.dirname(sFile.name);
 
     // Try to detect the parent, and if it doesn't exist then create the element for it.
     LIElement li = querySelector("[data-path='$parentPath']");

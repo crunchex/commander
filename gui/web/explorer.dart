@@ -567,7 +567,7 @@ class UpDroidExplorer {
     completer.complete(true);
 
     LIElement li = generateLiHtml(file , expanded);
-    String truePath = pathGrab(li);
+    String truePath = pathLib.dirname(li.dataset['path']);
 
     // Register double-click event handler for file renaming.
     li.children[1].onDoubleClick.listen((e) {

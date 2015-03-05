@@ -43,18 +43,3 @@ import 'dart:html';
     }
     return valid;
   }
-
-  /// Helper function grabs correct parent directory path
-
-  String pathGrab(LIElement li){
-    String result = '';
-    String raw = li.dataset['path'];
-    List split = raw.split('/');
-    for(var i=0; i<(split.length -1); i++){
-      result += split[i];
-      if(i != split.length -2){
-        result += "/";
-      }
-    }
-    return result;
-  }

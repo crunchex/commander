@@ -221,7 +221,6 @@ class UpDroidExplorer {
       ..dataset['trueName'] = (file.name)
       ..dataset['path'] = file.path
       ..dataset['isDir'] = file.isDirectory.toString()
-      ..dataset['expanded'] = "false"
       ..draggable = true
       ..classes.add('explorer-li');
 
@@ -243,7 +242,7 @@ class UpDroidExplorer {
     li.children.add(filename);
 
     if (file.isDirectory) {
-      li.dataset['expanded'] = 'true';
+      li.dataset['expanded'] = 'false';
       UListElement ul = new UListElement();
       ul
         ..dataset['name'] = 'explorer-ul-${removeSpaces(file.name)}'
@@ -251,10 +250,14 @@ class UpDroidExplorer {
         ..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
 
-      if (expanded == false) {
-        ul.classes.add("explorer-hidden");
-        glyphicon.replaceWith(glyph);
-        li.dataset['expanded'] = 'false';
+      ul.classes.add("explorer-hidden");
+      glyphicon.replaceWith(glyph);
+      li.dataset['expanded'] = 'false';
+
+      if (expanded == true) {
+        glyph.replaceWith(glyphicon);
+        li.dataset['expanded'] = 'true';
+        ul.classes.remove("explorer-hidden");
       }
 
       glyphicon.onClick.listen((e) {

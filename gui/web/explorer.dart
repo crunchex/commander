@@ -118,6 +118,7 @@ class UpDroidExplorer {
        }
 
        if(e.draggableElement.dataset['isDir'] == 'true'){
+         print(e.draggableElement.dataset['expanded']);
 
                      // Avoid an exception thrown when the new name already exists or dragging to same folder.
 
@@ -128,11 +129,15 @@ class UpDroidExplorer {
                                     '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
                                  item.remove();
                                }
+
+                               // TODO: Preserve structure
                                else if(checkContents(item) == true){
                                  ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                                  ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
                                  item.remove();
                                }
+
+                               // TODO: Preserve structure
                                else{
                                  ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                                  item.remove();
@@ -540,8 +545,6 @@ class UpDroidExplorer {
     newElementFromFile(sFile);
   }
 
-  // fixpoint
-
   /// Handles an Explorer remove update for a single file.
 
   void removeUpdate(String path) {
@@ -580,19 +583,19 @@ class UpDroidExplorer {
     if(file.parentDir == '' && !file.path.contains('/.')){
 
       dirElement = querySelector('#explorer-body');
-      dirElement.children.add(li);
+      dirElement.append(li);
     }
     else if(!file.path.contains('/.') && !file.path.contains('CMakeLists.txt')){
       var validPath = removeSpaces(truePath);
       var validParent = removeSpaces(file.parentDir);
       dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
-        dirElement.children.add(li);
+        dirElement.append(li);
     }
 
     return completer.future;
   }
 
-  /// First List Generation
+  /// First Directory List Generation
 
   void initialDirectoryList(String raw) {
     var files = fileList(raw);
@@ -661,7 +664,6 @@ class SimpleFile {
 
   SimpleFile.fromPath(String raw, String prefix, bool isDir) {
 
-    // What is this for??
     path = raw.replaceAll(r'\', '');
     isDirectory = isDir;
     raw = raw.replaceFirst(prefix, '');

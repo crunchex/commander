@@ -530,7 +530,7 @@ class UpDroidExplorer {
     String curPath = '';
 
     // Iterate through the path checking to see if the folder exists
-    var split = parentPath.replaceFirst(workspacePath.substring(0, workspacePath.length -1), '').split('/');
+    var split = parentPath.replaceFirst(pathLib.normalize(workspacePath), '').split('/');
     for(int i = 1; i< split.length; i++){
       curPath += split[i];
       LIElement curLi = querySelector('[data-path="${pathLib.join(workspacePath, curPath)}"]');

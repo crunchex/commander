@@ -14,6 +14,7 @@ class UpDroidExplorer {
   HRElement rootline;
   DivElement rootlineContainer;
   ParagraphElement recycle;
+  LIElement fileName;
 
   Draggable dragNewFile;
   Draggable dragNewFolder;
@@ -41,6 +42,7 @@ class UpDroidExplorer {
 
     editorDiv = querySelector('#editor');
     dzEditor = new Dropzone(editorDiv);
+    fileName = querySelector('#filename');
 
     registerExplorerEventHandlers();
 
@@ -195,6 +197,7 @@ class UpDroidExplorer {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
         cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
+        fileName.text = e.draggableElement.dataset['name'];
       }
     });
   }

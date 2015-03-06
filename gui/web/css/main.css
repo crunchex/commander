@@ -108,6 +108,7 @@ html, body {
   padding-top: 10px;
   background-color: #f5f5f5;
   border: 1px solid #e3e3e3;
+  border-bottom: none;
   text-align: center;
 }
 
@@ -220,6 +221,12 @@ li input {
 
 .editing{
   width: 200%;
+}
+
+#filename{
+  font-size: 16px;
+  padding: 5px 20px 0 0;
+  float: right;
 }
 
 .tab-content {

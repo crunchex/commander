@@ -11,6 +11,7 @@ import 'package:http_server/http_server.dart';
 import 'lib/client_responses.dart';
 import 'lib/server_helper.dart' as help;
 
+/// A class that serves the Commander frontend and handles [WebSocket] duties.
 class UpDroidServer {
   static const String defaultWorkspacePath = '/home/user/workspace';
   static const String defaultGuiPath = '/etc/updroid/web';
@@ -20,9 +21,11 @@ class UpDroidServer {
     Directory dir = new Directory(results.command['workspace']);
     DirectoryWatcher watcher = new DirectoryWatcher(dir.path);
     VirtualDirectory virDir = getVirDir(results);
+
     initServer(dir, virDir, watcher);
   }
 
+  /// Returns a [VirtualDirectory] set up with a path from [results].
   VirtualDirectory getVirDir (ArgResults results) {
     String guiPath = results.command['path'];
     VirtualDirectory virDir;
@@ -30,6 +33,7 @@ class UpDroidServer {
         ..allowDirectoryListing = true
         ..followLinks = true
         ..directoryHandler = (dir, request) {
+          // Redirects '/' to 'index.html'
           var indexUri = new Uri.file(dir.path).resolve('index.html');
           virDir.serveFile(new File(indexUri.toFilePath()), request);
         };
@@ -37,6 +41,7 @@ class UpDroidServer {
     return virDir;
   }
 
+  /// Initializes and HTTP server to serve the gui and handle [WebSocket] requests.
   void initServer(Directory dir, VirtualDirectory virDir, DirectoryWatcher watcher) {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.

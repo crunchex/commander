@@ -20,13 +20,13 @@ class UpDroidServer {
   UpDroidServer (ArgResults results) {
     Directory dir = new Directory(results.command['workspace']);
     DirectoryWatcher watcher = new DirectoryWatcher(dir.path);
-    VirtualDirectory virDir = getVirDir(results);
+    VirtualDirectory virDir = _getVirDir(results);
 
-    initServer(dir, virDir, watcher);
+    _initServer(dir, virDir, watcher);
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
-  VirtualDirectory getVirDir (ArgResults results) {
+  VirtualDirectory _getVirDir (ArgResults results) {
     String guiPath = results.command['path'];
     VirtualDirectory virDir;
     virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
@@ -42,7 +42,7 @@ class UpDroidServer {
   }
 
   /// Initializes and HTTP server to serve the gui and handle [WebSocket] requests.
-  void initServer(Directory dir, VirtualDirectory virDir, DirectoryWatcher watcher) {
+  void _initServer(Directory dir, VirtualDirectory virDir, DirectoryWatcher watcher) {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
@@ -51,7 +51,7 @@ class UpDroidServer {
         // WebSocket requests are considered "upgraded" HTTP requests.
         help.debug("${request.method} request for: ${request.uri.path}", 0);
         if (WebSocketTransformer.isUpgradeRequest(request)) {
-          WebSocketTransformer.upgrade(request).then((WebSocket ws) => handleWebSocket(ws, dir, watcher));
+          WebSocketTransformer.upgrade(request).then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
         } else {
 
           virDir.serveRequest(request);
@@ -62,7 +62,7 @@ class UpDroidServer {
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
-  void handleWebSocket(WebSocket socket, Directory dir, DirectoryWatcher watcher) {
+  void _handleWebSocket(WebSocket socket, Directory dir, DirectoryWatcher watcher) {
     help.debug('Client connected!', 0);
     StreamController<String> processInput = new StreamController<String>.broadcast();
 

@@ -7,7 +7,6 @@ import 'package:ace/ace.dart' as ace;
 import 'package:bootjack/bootjack.dart';
 import 'package:ace/proxy.dart';
 import 'package:dnd/dnd.dart';
-import 'package:path/path.dart' as pathLib;
 import 'lib/updroid_message.dart';
 import 'lib/explorer_helper.dart';
 import 'lib/terminal/terminal.dart';
@@ -36,11 +35,11 @@ class UpDroidClient {
     this.cs = new StreamController<CommanderMessage>.broadcast();
 
     // Create the server <-> client [WebSocket].
-    // Port 12065 is the default port that UpDroid uses.
+    // Port 12060 is the default port that UpDroid uses.
 
     //  Uncomment for build
     //  initWebSocket('ws://' + window.location.host + '/ws');
-    initWebSocket('ws://localhost:12065/ws');
+    initWebSocket('ws://localhost:12060/ws');
 
     registerEventHandlers(ws, cs);
     initializeClasses(ws, cs);

@@ -60,7 +60,9 @@ class UpDroidConsole {
       term.stdout.add(JSON.encode(buf.asUint8List()));
     });
 
-    //term.stdin.stream.listen((data) => ws.send('[[CONSOLE_INPUT]]' + data));
+    term.stdin.stream.listen((data) {
+      ws.sendByteBuffer(new Uint8List.fromList(JSON.decode(data)).buffer);
+    });
 
     themeButton.onClick.listen((e) {
       toggleTheme();

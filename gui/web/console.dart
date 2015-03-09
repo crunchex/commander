@@ -57,11 +57,11 @@ class UpDroidConsole {
   void registerConsoleEventHandlers() {
     ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;
-      term.stdout.add(JSON.encode(buf.asUint8List()));
+      term.stdout.add(buf.asUint8List());
     });
 
     term.stdin.stream.listen((data) {
-      ws.sendByteBuffer(new Uint8List.fromList(JSON.decode(data)).buffer);
+      ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
     });
 
     themeButton.onClick.listen((e) {

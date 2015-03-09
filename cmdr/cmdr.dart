@@ -21,4 +21,5 @@ void main(List<String> args) {
   help.enableDebug(debugFlag);
 
   UpDroidServer server = new UpDroidServer(results);
+  UpDroidPty pty = new UpDroidPty(results.command['workspace']);
 }

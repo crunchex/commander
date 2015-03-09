@@ -13,7 +13,7 @@
 <body>
 
   <!-- Modal -->
-  
+
   <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -43,16 +43,15 @@
 
     </ul>
   </nav>
-  
+
   <!-- Commander Body -->
-  
+
   <div class="container-fluid">
     <div id="row-main" class="row">
-    
-    <!-- Explorer --> 
-    
+
+    <!-- Explorer -->
+
       <div class="col-xs-2">
-        <div id='explorer-container' class="well well-sm">
           <div id="title-container">
               <li id="file-explorer-title">UP-Root
               </li>
@@ -60,16 +59,17 @@
               <span id="folder" class="glyphicon glyphicon-folder-close"></span>
               <span id="file" class="glyphicon glyphicon-file"></span>
             </li>
-          </div>
           <div id="file-explorer-hr-container">
-            <p style="margin-top: 1em; margin-bottom: 0; text-align: center;">Top Level</p>
+            <p style="margin-top: .5em; margin-bottom: 0.5em; text-align: center;">Top Level</p>
             <hr id="file-explorer-hr">
-          </div> 
+          </div>
+          </div>
+        <div id='explorer-container' class="well well-sm">
           <ul class="explorer" id="explorer-body" ></ul>
         </div>
         <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span></p>
       </div>
-      
+
       <!-- Editor -->
 
       <div id="column-1" class="col-xs-5 column-content">
@@ -77,7 +77,7 @@
           <li class="active"><a id="button-editor" href="#tab-editor-container" data-toggle="tab">Editor</a></li>
           <li><a href="#video_tab" data-toggle="tab">Video</a></li>
         </ul>
-        
+
         <div class="tab-content">
           <div id="tab-editor-container" class="tab-pane active">
             <ul class="nav nav-tabs inner-tabs" role="tablist">
@@ -97,31 +97,32 @@
                     </li>
                 </ul>
               </li>
+              <li id="filename"></li>
             </ul>
-            
+
             <div class="tab-content">
               <div id="tab-editor" class="tab-pane active">
                 <div id="editor" class="editor"></div>
               </div>
             </div>
           </div>
-          
-       <!-- Add Video here -->   
-          
+
+       <!-- Add Video here -->
+
           <div id="video_tab" class="tab-pane">
             <p>Video tab</p>
           </div>
         </div>
       </div>
-      
-      
+
+
       <!-- Console -->
-      
+
       <div id="column-2" class="col-xs-5 column-content">
         <ul class="nav nav-tabs" role="tablist">
           <li class="active"><a id="button-console" href="#tab-console-container" data-toggle="tab">Console</a></li>
         </ul>
-        
+
         <div class="tab-content">
           <div id="tab-console-container" class="tab-pane active">
             <ul class="nav nav-tabs inner-tabs" role="tablist">
@@ -132,7 +133,7 @@
               </li>
               <li class="dropdown"><a id="console-help" href="#" class="dropdown-toggle" data-toggle="popover" data-content="Console only accepts commands that are command-line based. Curses-style programs, like vim, are not yet supported.">Help</a></li>
             </ul>
-            
+
             <div class="tab-content">
               <div tabindex="0" id="console"></div>
             </div>
@@ -141,7 +142,7 @@
       </div>
     </div>
   </div>
-  
+
   <div class="footer">
     <div class="container">
       <p class="text-muted">Copyright 2014 UpDroid, Inc. All rights reserved.</p>

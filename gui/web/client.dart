@@ -11,6 +11,7 @@ import 'package:dnd/dnd.dart';
 import 'lib/updroid_message.dart';
 import 'lib/explorer_helper.dart';
 import 'lib/terminal/terminal.dart';
+import "package:path/path.dart" as pathLib;
 
 part 'explorer.dart';
 part 'editor.dart';

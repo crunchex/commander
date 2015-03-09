@@ -73,6 +73,11 @@ class UpDroidServer {
       help.debug('Incoming message: ' + s, 0);
 
       switch (um.header) {
+
+        case "INITIAL_DIRECTORY_LIST":
+          sendInitial(socket, dir);
+          break;
+
         case 'EXPLORER_DIRECTORY_PATH':
           sendPath(socket, dir);
           break;

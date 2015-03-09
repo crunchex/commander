@@ -21,27 +21,27 @@ class UpDroidConsole {
   AnchorElement consoleButton;
   AnchorElement themeButton;
   bool lightTheme;
-  
-  UpDroidConsole(WebSocket ws, StreamController<CommanderMessage> cs) {
-    this.ws = ws;
+
+  UpDroidConsole(StreamController<CommanderMessage> cs) {
     this.cs = cs;
 
     console = querySelector('#console');
     consoleButton = querySelector('#button-console');
     themeButton = querySelector('.button-console-theme');
-    
+
     term = new Terminal(console);
     term
         ..scrollSpeed = 3
         ..theme = 'solarized-dark';
-    
+
     lightTheme = false;
-    
+
+    initWebSocket('ws://localhost:12061/pty');
     registerConsoleEventHandlers();
 
     cs.add(new CommanderMessage('CLIENT', 'CONSOLE_READY'));
   }
-  
+
   /// Toggles between a Solarized dark and light theme.
   void toggleTheme() {
     if (lightTheme) {
@@ -55,15 +55,41 @@ class UpDroidConsole {
 
   /// Sets up the event handlers for the console.
   void registerConsoleEventHandlers() {
-    ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'CONSOLE_OUTPUT')
-        .listen((um) => term.stdout.add(um.body));
-    
-    term.stdin.stream.listen((data) => ws.send('[[CONSOLE_INPUT]]' + data));
+    ws.onMessage.listen((e) {
+      ByteBuffer buf = e.data;
+      term.stdout.add(JSON.encode(buf.asUint8List()));
+    });
+
+    //term.stdin.stream.listen((data) => ws.send('[[CONSOLE_INPUT]]' + data));
 
     themeButton.onClick.listen((e) {
       toggleTheme();
       e.preventDefault();
+    });
+  }
+
+  void initWebSocket(String url, [int retrySeconds = 2]) {
+    bool encounteredError = false;
+
+    ws = new WebSocket(url);
+    ws.binaryType = "arraybuffer";
+
+    ws.onOpen.listen((e) => print('Console connected.'));
+
+    ws.onClose.listen((e) {
+      print('Console disconnected. Retrying...');
+      if (!encounteredError) {
+        new Timer(new Duration(seconds:retrySeconds), () => initWebSocket(url, retrySeconds * 2));
+      }
+      encounteredError = true;
+    });
+
+    ws.onError.listen((e) {
+      print('Console disconnected. Retrying...');
+      if (!encounteredError) {
+        new Timer(new Duration(seconds:retrySeconds), () => initWebSocket(url, retrySeconds * 2));
+      }
+      encounteredError = true;
     });
   }
 }

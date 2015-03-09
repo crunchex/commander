@@ -33,7 +33,7 @@ void handleWebSocket(WebSocket socket, Directory dir) {
       help.debug('stdout: ' + data.toString(), 0);
       socket.add('[[CONSOLE_OUTPUT]]' + JSON.encode(data));
     });
-    
+
     shell.stderr.listen((data) {
       List err = new List.from(data, growable: true);
       if (inputEcho.isNotEmpty) {
@@ -42,31 +42,31 @@ void handleWebSocket(WebSocket socket, Directory dir) {
       }
       help.debug('stderr: ' + err.toString(), 0);
       socket.add('[[CONSOLE_OUTPUT]]' + JSON.encode(err));
-      inputEcho = []; 
+      inputEcho = [];
     });
   });
-  
+
   socket.listen((String s) {
     help.UpDroidMessage um = new help.UpDroidMessage(s);
     help.debug('Incoming message: ' + s, 0);
-    
+
     switch (um.header) {
       case 'EXPLORER_DIRECTORY_PATH':
         sendPath(socket, dir);
         break;
-        
+
       case 'EXPLORER_DIRECTORY_LIST':
         sendDirectory(socket, dir);
         break;
-        
+
       case 'EXPLORER_DIRECTORY_REFRESH':
         refreshDirectory(socket, dir);
         break;
-        
+
       case 'EXPLORER_NEW_FILE':
         fsNewFile(um.body);
         break;
-        
+
       case 'EXPLORER_NEW_FOLDER':
         fsNewFolder(um.body);
         // Empty folders don't trigger an incremental update, so we need to
@@ -87,32 +87,32 @@ void handleWebSocket(WebSocket socket, Directory dir) {
       case 'EXPLORER_DELETE':
         fsDelete(um.body, socket);
         break;
-        
+
       case 'EDITOR_OPEN':
         sendFileContents(socket, um.body);
         break;
-        
+
       case 'EDITOR_SAVE':
         saveFile(um.body);
         break;
-        
+
       case 'EDITOR_REQUEST_FILENAME':
         requestFilename(socket, um.body);
         break;
-        
+
       case 'CONSOLE_COMMAND':
         processCommand(socket, processInput, um.body, dir);
         break;
-      
+
       case 'CONSOLE_INVALID':
         sendErrorMessage(socket);
         break;
-        
+
       case 'CONSOLE_INPUT':
         inputEcho.addAll(JSON.decode(um.body));
         shellStdin.add(JSON.decode(um.body));
-        break;  
-        
+        break;
+
       default:
         help.debug('Message received without updroid header.', 1);
     }
@@ -125,14 +125,14 @@ void handleWebSocket(WebSocket socket, Directory dir) {
     // Kill the shell process.
     bash.kill();
   });
-  
+
   watcher.events.listen((e) => help.formattedFsUpdate(socket, e));
 }
 
 void initServer(dir) {
   // Set up an HTTP webserver and listen for standard page requests or upgraded
   // [WebSocket] requests.
-  HttpServer.bind(InternetAddress.ANY_IP_V4, 12065).then((HttpServer server) {
+  HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
     help.debug("HttpServer listening on port:${server.port}...", 0);
     server.listen((HttpRequest request) {
       // WebSocket requests are considered "upgraded" HTTP requests.
@@ -161,21 +161,21 @@ void main(List<String> args) {
   command.addOption('workspace', abbr: 'w', defaultsTo: defaultWorkspacePath);
   command.addOption('path', abbr: 'p', defaultsTo: defaultGuiPath);
   var results = parser.parse(args);
-  
+
   // Set up logging.
   bool debugFlag = results['debug'];
   help.enableDebug(debugFlag);
-  
+
   // Creating Virtual Directory
   String guiPath = results.command['path'];
   virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
       ..allowDirectoryListing = true
       ..directoryHandler = directoryHandler
       ..followLinks = true;
- 
+
   // Initialize the DirectoryWatcher.
   Directory dir = new Directory(results.command['workspace']);
   watcher = new DirectoryWatcher(dir.path);
-  
+
   initServer(dir);
 }

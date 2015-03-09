@@ -16,12 +16,12 @@ class Terminal {
   /// The [DivElement] within which all [Terminal] graphical elements
   /// are rendered.
   DivElement div;
-  
+
   /// A stream of [String], JSON-encoded UTF8 bytes (List<int>).
-  StreamController<String> stdout;
-  
+  StreamController<List<int>> stdout;
+
   /// A stream of [String], JSON-encoded UTF8 bytes (List<int>).
-  StreamController<String> stdin;
+  StreamController<List<int>> stdin;
 
   /// An int that sets the number of lines scrolled per mouse
   /// wheel event. Default: 3
@@ -35,12 +35,12 @@ class Terminal {
   bool _inputDone;
   List<int> _inputString;
   Theme _theme;
-  
+
   static const int ESC = 27;
-  
+
   Terminal (this.div) {
-    stdout = new StreamController<String>();
-    stdin = new StreamController<String>();
+    stdout = new StreamController<List<int>>();
+    stdin = new StreamController<List<int>>();
     _inputDone = false;
     _inputString = [];
 
@@ -49,13 +49,13 @@ class Terminal {
     _model = new Model(_rows, _cols);
     _attr = new DisplayAttributes();
     _theme = new Theme.SolarizedDark();
-    
+
     _registerEventHandlers();
   }
-  
+
   int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
   int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
-  
+
   /// A [String] that sets the colored theme of the entire [Terminal].
   /// Supported themes: solarized-dark, solarized-light.
   /// Default: solarized-dark.
@@ -70,30 +70,30 @@ class Terminal {
     div.style.backgroundColor = _theme.backgroundColor;
     _refreshDisplay();
   }
-  
+
   void _registerEventHandlers() {
-    stdout.stream.listen((String out) => _processStdOut(JSON.decode(out)));
-    
+    stdout.stream.listen((List<int> out) => _processStdOut(new List.from(out)));
+
     div.onKeyUp.listen((e) => _handleInput(e));
-    
+
     // Disables browser back navigation with backspace key.
     div.onKeyDown.listen((e) {
       if (e.keyCode == 8) e.preventDefault();
     });
-    
+
     div.onMouseWheel.listen((wheelEvent) {
       // Scrolling should target only the console.
       wheelEvent.preventDefault();
-      
+
       (wheelEvent.deltaY < 0) ? _model.scrollUp(scrollSpeed) : _model.scrollDown(scrollSpeed);
       _refreshDisplay();
     });
   }
-  
+
   /// Handles a given [KeyboardEvent].
   void _handleInput(KeyboardEvent e) {
     int key = e.keyCode;
-    
+
     // keyCode behaves very oddly.
     if (!e.shiftKey) {
       if (NOSHIFT_KEYS.containsKey(key)) {
@@ -120,9 +120,9 @@ class Terminal {
         _inputString.add(key);
       }
     }
-    
+
     if (_inputDone) {
-      stdin.add(JSON.encode(_inputString));
+      stdin.add(_inputString);
       _inputString = [];
       _inputDone = false;
     }
@@ -150,7 +150,7 @@ class Terminal {
       _refreshDisplay();
       return;
     }
-    
+
     if (input == 32) {
       char = Glyph.SPACE;
     }
@@ -163,19 +163,19 @@ class Terminal {
 
     _refreshDisplay();
   }
-  
+
   /// Splits a UTF8 string into substrings, split by preceding escape sequences.
   void _processStdOut(List<int> output) {
     List<int> escapeString, escape, string;
     int start, end;
-    
+
     // The case where the current output contains
     // no escape sequence.
     if (!output.contains(ESC)) {
       _handleOutString(output);
       return;
     }
-    
+
     // Handle any string preceding the first escape sequence.
     if (output[0] != ESC) {
       end = output.indexOf(ESC);
@@ -212,12 +212,12 @@ class Terminal {
     string = output.sublist(output.indexOf(109) + 1);
     _setAttributeMode(escape);
     _handleOutString(string);
-    
+
     _drawCursor();
 
     _refreshDisplay();
   }
-  
+
   /// Appends a new [SpanElement] with the contents of [_outString]
   /// to the [_buffer] and updates the display.
   void _handleOutString(List<int> string) {
@@ -234,7 +234,7 @@ class Terminal {
         // comes with the newline. Eat it for now.
         continue;
       }
-      
+
       if (code == 32) {
         char = Glyph.SPACE;
       }
@@ -244,13 +244,13 @@ class Terminal {
       _model.cursorNext();
     }
   }
-  
+
   /// Sets local [DisplayAttributes], given [escape].
   void _setAttributeMode(List<int> escape) {
     String decodedEsc = UTF8.decode(escape);
 
     if (escape.contains('0;')) {
-      _attr.resetAll(); 
+      _attr.resetAll();
     }
 
     if (decodedEsc.contains(';1')) _attr.bright = true;
@@ -278,7 +278,7 @@ class Terminal {
     if (decodedEsc.contains(';46')) _attr.bgColor = 'cyan';
     if (decodedEsc.contains(';47')) _attr.bgColor = 'white';
   }
-  
+
   /// Renders the cursor at [Cursor]'s current position.
   void _drawCursor() {
     Glyph cursor = new Glyph('|', _attr);
@@ -302,7 +302,7 @@ class Terminal {
 
     for (int c = 1; c < _cols; c++) {
       curr = _model.getGlyphAt(r, c);
-      
+
       if (curr != prev || c == _cols - 1) {
         row.append(span);
 
@@ -320,17 +320,17 @@ class Terminal {
 
     return row;
   }
-  
+
   /// Refreshes the entire console [DivElement] by setting its
   /// contents to null and regenerating each row [DivElement].
   void _refreshDisplay() {
     div.innerHtml = '';
-    
+
     DivElement row;
     for (int r = 0; r < _rows; r++) {
       row = _generateRow(r);
       row.classes.add('termrow');
-      
+
       div.append(row);
     }
   }

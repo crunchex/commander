@@ -13,8 +13,9 @@ Programs that are curses-based, such as htop, will not work.
 /// user to pass in white-listed commands to the server and view their output.
 /// It is not meant to be a complete terminal emulator like xterm.
 class UpDroidConsole {
-  WebSocket _ws;
   StreamController<CommanderMessage> _cs;
+  int _consoleNum;
+  WebSocket _ws;
   Terminal _term;
 
   DivElement _console;
@@ -23,10 +24,10 @@ class UpDroidConsole {
   bool _lightTheme;
 
   UpDroidConsole(int consoleNum, StreamController<CommanderMessage> cs) {
+    _consoleNum = consoleNum;
     _cs = cs;
 
     _console = querySelector('#console-$consoleNum');
-    print(_console.id.toString());
     _consoleButton = querySelector('#button-console-$consoleNum');
     _themeButton = querySelector('#button-console-theme-$consoleNum');
 
@@ -77,10 +78,10 @@ class UpDroidConsole {
     _ws = new WebSocket(url);
     _ws.binaryType = "arraybuffer";
 
-    _ws.onOpen.listen((e) => print('Console connected.'));
+    _ws.onOpen.listen((e) => print('Console-$_consoleNum connected.'));
 
     _ws.onClose.listen((e) {
-      print('Console disconnected. Retrying...');
+      print('Console-$_consoleNum disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }
@@ -88,7 +89,7 @@ class UpDroidConsole {
     });
 
     _ws.onError.listen((e) {
-      print('Console disconnected. Retrying...');
+      print('Console-$_consoleNum disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }

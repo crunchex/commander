@@ -24,5 +24,7 @@ void main(List<String> args) {
 
   // TODO: an [UpDroidPty] object should be created dynamically, given
   // some command from the Commander side (like a new Console tab being created).
-  UpDroidPty pty = new UpDroidPty(1, results.command['workspace']);
+  for (int i = 1; i <= 4; i++) {
+    UpDroidPty pty = new UpDroidPty(i, results.command['workspace']);
+  }
 }

@@ -26,6 +26,7 @@ class UpDroidConsole {
     this.cs = cs;
 
     console = querySelector('#console-$consoleNum');
+    print(console.id.toString());
     consoleButton = querySelector('#button-console-$consoleNum');
     themeButton = querySelector('.button-console-theme');
 

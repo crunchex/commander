@@ -215,10 +215,6 @@ class Terminal {
     string = output.sublist(output.indexOf(109) + 1);
     _setAttributeMode(escape);
     _handleOutString(string);
-
-    _drawCursor();
-
-    _refreshDisplay();
   }
 
   /// Appends a new [SpanElement] with the contents of [_outString]
@@ -228,6 +224,7 @@ class Terminal {
     for (var code in codes) {
       String char = new String.fromCharCode(code);
       if (code == 10) {
+        _drawSpace();
         _model.cursorNewLine();
         continue;
       }
@@ -246,13 +243,16 @@ class Terminal {
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
       _model.cursorNext();
     }
+
+    _drawCursor();
+    _refreshDisplay();
   }
 
   /// Sets local [DisplayAttributes], given [escape].
   void _setAttributeMode(List<int> escape) {
     String decodedEsc = UTF8.decode(escape);
 
-    if (escape.contains('0;')) {
+    if (decodedEsc.contains('0m')) {
       _attr.resetAll();
     }
 
@@ -285,6 +285,13 @@ class Terminal {
   /// Renders the cursor at [Cursor]'s current position.
   void _drawCursor() {
     Glyph cursor = new Glyph('|', _attr);
+    _model.setGlyphAt(cursor, _model.cursor.row, _model.cursor.col);
+  }
+
+  /// Renders a space at [Cursor]'s current position.
+  /// Useful for "removing" the cursor.
+  void _drawSpace() {
+    Glyph cursor = new Glyph(Glyph.SPACE, _attr);
     _model.setGlyphAt(cursor, _model.cursor.row, _model.cursor.col);
   }
 

@@ -1,14 +1,5 @@
 part of updroid_client;
 
-const String CONSOLE_HELP_TEXT =
-r'''
-Console only accepts commands that are non-interactive and command-line based.
-For example:
-  pwd, ls -ls
-
-Programs that are curses-based, such as htop, will not work.
-''';
-
 /// [UpDroidConsole] functions like a trimmed down terminal that allows the
 /// user to pass in white-listed commands to the server and view their output.
 /// It is not meant to be a complete terminal emulator like xterm.

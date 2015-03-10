@@ -4,6 +4,7 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOPDIR=$DIR/..
 
+### check dependencies ###
 echo -n "Checking system for fpm........."
 command -v fpm >/dev/null 2>&1 || {
 	echo "FAIL";
@@ -15,9 +16,10 @@ echo "OK"
 cd $TOPDIR
 
 ### build ###
-tools/build_cmdr.sh
+$TOPDIR/tools/build_cmdr.sh
 
 ### package ###
 echo -n "Packaging......................."
-fpm -s dir -t deb -n cmdr -v 0.2 ./gui/build/web=/etc/updroid ./cmdr/bin/cmdr=/usr/bin/cmdr  > /dev/null
+mkdir -p $TOPDIR/deploy
+fpm -s dir -t deb -n cmdr -v 0.2 -p $TOPDIR/deploy/ ./gui/build/web=/etc/updroid ./cmdr/bin/cmdr=/usr/bin/cmdr  > /dev/null
 echo "OK"

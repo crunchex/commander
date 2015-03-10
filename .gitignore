@@ -7,6 +7,7 @@ packages
 # Or the directories and files created by any UpDroid tools.
 bin/
 *.deb
+deploy/
 
 # Or the files created by dart2js.
 *.dart.js

@@ -2,6 +2,7 @@
 
 # Gets the absolute path of the script (not where it's called from)
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+TOPDIR=$DIR/..
 
 echo -n "Checking system for fpm........."
 command -v fpm >/dev/null 2>&1 || {
@@ -11,7 +12,7 @@ command -v fpm >/dev/null 2>&1 || {
 }
 echo "OK"
 
-cd $DIR/../
+cd $TOPDIR
 
 ### build ###
 tools/build_cmdr.sh

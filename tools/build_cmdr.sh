@@ -2,7 +2,9 @@
 
 # Gets the absolute path of the script (not where it's called from)
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-cd $DIR/../
+TOPDIR=$DIR/..
+
+cd $TOPDIR
 
 ### cmdr ###
 cd cmdr
@@ -20,7 +22,7 @@ chmod +x cmdr
 mv cmdr bin/
 echo "OK"
 
-cd ../
+cd $TOPDIR
 
 ### gui ###
 cd gui
@@ -33,4 +35,4 @@ echo -n "Building (minifying) gui........"
 pub build > /dev/null
 echo "OK"
 
-cd ../
+cd $TOPDIR

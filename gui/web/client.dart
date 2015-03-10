@@ -51,7 +51,9 @@ class UpDroidClient {
   void initializeClasses(WebSocket ws, StreamController<CommanderMessage> cs) {
     editor = new UpDroidEditor(ws, cs);
     explorer = new UpDroidExplorer(ws, cs);
-    console = new UpDroidConsole(cs);
+    for (int i = 1; i <= 4; i++) {
+      console = new UpDroidConsole(i, cs);
+    }
   }
 
   /// Process messages according to the type.

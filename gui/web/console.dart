@@ -22,11 +22,11 @@ class UpDroidConsole {
   AnchorElement themeButton;
   bool lightTheme;
 
-  UpDroidConsole(StreamController<CommanderMessage> cs) {
+  UpDroidConsole(int consoleNum, StreamController<CommanderMessage> cs) {
     this.cs = cs;
 
-    console = querySelector('#console');
-    consoleButton = querySelector('#button-console');
+    console = querySelector('#console-$consoleNum');
+    consoleButton = querySelector('#button-console-$consoleNum');
     themeButton = querySelector('.button-console-theme');
 
     term = new Terminal(console);
@@ -36,7 +36,7 @@ class UpDroidConsole {
 
     lightTheme = false;
 
-    initWebSocket('ws://localhost:12061/pty');
+    initWebSocket('ws://localhost:1206$consoleNum/pty');
     registerConsoleEventHandlers();
 
     cs.add(new CommanderMessage('CLIENT', 'CONSOLE_READY'));

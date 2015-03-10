@@ -120,7 +120,6 @@ class UpDroidExplorer {
        }
 
        if(e.draggableElement.dataset['isDir'] == 'true'){
-         print(e.draggableElement.dataset['expanded']);
 
                      // Avoid an exception thrown when the new name already exists or dragging to same folder.
 

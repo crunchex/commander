@@ -1,8 +1,7 @@
 part of updroid_client;
 
-/// [UpDroidConsole] functions like a trimmed down terminal that allows the
-/// user to pass in white-listed commands to the server and view their output.
-/// It is not meant to be a complete terminal emulator like xterm.
+/// [UpDroidConsole] is a client-side class that combines a [Terminal]
+/// and [WebSocket], into an UpDroid Commander tab.
 class UpDroidConsole {
   StreamController<CommanderMessage> _cs;
   int _consoleNum;

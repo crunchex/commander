@@ -53,8 +53,11 @@ class Terminal {
     _registerEventHandlers();
   }
 
-  int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
-  int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
+  // TODO: fix this dynamic size detection
+  //int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
+  //int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
+  int get _cols => 80;
+  int get _rows => 30;
 
   /// A [String] that sets the colored theme of the entire [Terminal].
   /// Supported themes: solarized-dark, solarized-light.

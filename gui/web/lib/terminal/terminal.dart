@@ -252,7 +252,7 @@ class Terminal {
   void _setAttributeMode(List<int> escape) {
     String decodedEsc = UTF8.decode(escape);
 
-    if (escape.contains('0;')) {
+    if (decodedEsc.contains('0m')) {
       _attr.resetAll();
     }
 

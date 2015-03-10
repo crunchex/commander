@@ -359,11 +359,10 @@ class UpDroidExplorer {
   void renameEventHandler(LIElement li, SimpleFile file) {
     bool refresh = false;
 
-    if(li.dataset['isDir'] == 'true'){
-      if(checkContents(li) == true){
+    if(li.dataset['isDir'] == 'true'  && checkContents(li) == true){
             refresh = true;
           }
-    }
+
     if (!li.className.contains('editing')) {
       li.classes.add('editing');
 

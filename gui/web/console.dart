@@ -28,7 +28,7 @@ class UpDroidConsole {
     console = querySelector('#console-$consoleNum');
     print(console.id.toString());
     consoleButton = querySelector('#button-console-$consoleNum');
-    themeButton = querySelector('.button-console-theme');
+    themeButton = querySelector('#button-console-theme-$consoleNum');
 
     term = new Terminal(console);
     term

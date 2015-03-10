@@ -21,4 +21,8 @@ void main(List<String> args) {
   help.enableDebug(debugFlag);
 
   UpDroidServer server = new UpDroidServer(results);
+
+  // TODO: an [UpDroidPty] object should be created dynamically, given
+  // some command from the Commander side (like a new Console tab being created).
+  UpDroidPty pty = new UpDroidPty(1, results.command['workspace']);
 }

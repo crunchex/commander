@@ -3,6 +3,7 @@ library updroid_client;
 import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:ace/ace.dart' as ace;
 import 'package:bootjack/bootjack.dart';
 import 'package:ace/proxy.dart';
@@ -50,7 +51,7 @@ class UpDroidClient {
   void initializeClasses(WebSocket ws, StreamController<CommanderMessage> cs) {
     editor = new UpDroidEditor(ws, cs);
     explorer = new UpDroidExplorer(ws, cs);
-    console = new UpDroidConsole(ws, cs);
+    console = new UpDroidConsole(cs);
   }
 
   /// Process messages according to the type.

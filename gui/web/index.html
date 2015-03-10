@@ -120,11 +120,68 @@
 
       <div id="column-2" class="col-xs-5 column-content">
         <ul class="nav nav-tabs" role="tablist">
-          <li class="active"><a id="button-console" href="#tab-console-container" data-toggle="tab">Console</a></li>
+          <li class="active"><a id="button-console" href="#tab-console-container-a" data-toggle="tab">Console-A</a></li>
+          <li><a id="button-console" href="#tab-console-container-b" data-toggle="tab">Console-B</a></li>
+          <li><a id="button-console" href="#tab-console-container-c" data-toggle="tab">Console-C</a></li>
+          <li><a id="button-console" href="#tab-console-container-d" data-toggle="tab">Console-D</a></li>
         </ul>
 
         <div class="tab-content">
-          <div id="tab-console-container" class="tab-pane active">
+
+          <!-- Console A -->
+
+          <div id="tab-console-container-a" class="tab-pane active">
+            <ul class="nav nav-tabs inner-tabs" role="tablist">
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" class="button-console-theme">Theme</a></li>
+                </ul>
+              </li>
+              <li class="dropdown"><a id="console-help" href="#" class="dropdown-toggle" data-toggle="popover" data-content="Console only accepts commands that are command-line based. Curses-style programs, like vim, are not yet supported.">Help</a></li>
+            </ul>
+
+            <div class="tab-content">
+              <div tabindex="0" id="console"></div>
+            </div>
+          </div>
+
+          <!-- Console B -->
+
+          <div id="tab-console-container-b" class="tab-pane active">
+            <ul class="nav nav-tabs inner-tabs" role="tablist">
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" class="button-console-theme">Theme</a></li>
+                </ul>
+              </li>
+              <li class="dropdown"><a id="console-help-2" href="#" class="dropdown-toggle" data-toggle="popover" data-content="Console only accepts commands that are command-line based. Curses-style programs, like vim, are not yet supported.">Help</a></li>
+            </ul>
+
+            <div class="tab-content">
+              <div tabindex="0" id="console"></div>
+            </div>
+          </div>
+
+          <!-- Console C -->
+
+          <div id="tab-console-container-c" class="tab-pane active">
+            <ul class="nav nav-tabs inner-tabs" role="tablist">
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" class="button-console-theme">Theme</a></li>
+                </ul>
+              </li>
+              <li class="dropdown"><a id="console-help" href="#" class="dropdown-toggle" data-toggle="popover" data-content="Console only accepts commands that are command-line based. Curses-style programs, like vim, are not yet supported.">Help</a></li>
+            </ul>
+
+            <div class="tab-content">
+              <div tabindex="0" id="console"></div>
+            </div>
+          </div>
+
+          <!-- Console D -->
+
+          <div id="tab-console-container-d" class="tab-pane active">
             <ul class="nav nav-tabs inner-tabs" role="tablist">
               <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
                 <ul class="dropdown-menu" role="menu">
@@ -139,6 +196,7 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>

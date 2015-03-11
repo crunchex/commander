@@ -4,10 +4,11 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOPDIR=$DIR/..
 
-cd $TOPDIR
+### start build ###
+echo "##### Building Commander... ######"
 
 ### cmdr ###
-cd cmdr
+cd $TOPDIR/cmdr
 
 echo -n "Getting dependencies for cmdr..."
 pub get > /dev/null
@@ -22,10 +23,8 @@ chmod +x cmdr
 mv cmdr bin/
 echo "OK"
 
-cd $TOPDIR
-
 ### gui ###
-cd gui
+cd $TOPDIR/gui
 
 echo -n "Getting dependencies for gui...."
 pub get > /dev/null
@@ -44,4 +43,6 @@ echo -n "Building (minifying) gui........"
 pub build > /dev/null
 echo "OK"
 
+### done ###
 cd $TOPDIR
+echo "####### Build complete. ##########"

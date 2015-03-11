@@ -28,7 +28,8 @@ class UpDroidConsole {
 
     _lightTheme = false;
 
-    _initWebSocket('ws://localhost:1206$consoleNum/pty');
+    _initWebSocket('ws://' + window.location.host + '/pty');
+    //_initWebSocket('ws://localhost:1206$consoleNum/pty');
     _registerConsoleEventHandlers();
 
     cs.add(new CommanderMessage('CLIENT', 'CONSOLE_READY'));

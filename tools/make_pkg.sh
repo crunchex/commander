@@ -4,7 +4,27 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOPDIR=$DIR/..
 
-### start build ###
+function usage {
+    echo "usage: make_pkg [[[-n nobuild ] | [-h]]"
+}
+
+# process args
+nobuild=0
+while [ "$1" != "" ]; do
+    case $1 in
+        -n | --nobuild )        shift
+                                nobuild=1
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+
+### start packaging ###
 echo "##### Packaging Commander... #####"
 
 ### check dependencies ###
@@ -19,7 +39,9 @@ echo "OK"
 cd $TOPDIR
 
 ### build ###
-$TOPDIR/tools/build_cmdr.sh
+if [ $nobuild == 0 ]; then
+	$TOPDIR/tools/build_cmdr.sh
+fi
 
 ### package ###
 echo -n "Packaging......................."

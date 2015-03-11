@@ -4,10 +4,11 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOPDIR=$DIR/..
 
-cd $TOPDIR
+### start build ###
+echo "##### Building Commander... ######"
 
 ### cmdr ###
-cd cmdr
+cd $TOPDIR/cmdr
 
 echo -n "Getting dependencies for cmdr..."
 pub get > /dev/null
@@ -22,17 +23,26 @@ chmod +x cmdr
 mv cmdr bin/
 echo "OK"
 
-cd $TOPDIR
-
 ### gui ###
-cd gui
+cd $TOPDIR/gui
 
 echo -n "Getting dependencies for gui...."
 pub get > /dev/null
+cd web
+if [ ! -d "ace-builds" ]; then
+	git clone --quiet https://github.com/ajaxorg/ace-builds.git
+fi
+cd ace-builds
+# make sure we're using package 03.03.15
+git checkout --quiet beb9ff68e397b4dcaa1d40f79651a063fc917736
 echo "OK"
+
+cd $TOPDIR/gui
 
 echo -n "Building (minifying) gui........"
 pub build > /dev/null
 echo "OK"
 
+### done ###
 cd $TOPDIR
+echo "####### Build complete. ##########"

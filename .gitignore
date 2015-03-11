@@ -8,6 +8,8 @@ packages
 bin/
 *.deb
 deploy/
+ace-builds/
+
 
 # Or the files created by dart2js.
 *.dart.js

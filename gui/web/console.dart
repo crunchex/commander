@@ -68,8 +68,6 @@ class UpDroidConsole {
     _ws = new WebSocket(url);
     _ws.binaryType = "arraybuffer";
 
-    _ws.onOpen.listen((e) => print('Console-$_consoleNum connected.'));
-
     _ws.onClose.listen((e) {
       print('Console-$_consoleNum disconnected. Retrying...');
       if (!encounteredError) {

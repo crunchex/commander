@@ -11,7 +11,7 @@ class UpDroidExplorer {
   DivElement editorDiv;
   SpanElement newFile;
   SpanElement newFolder;
-  HRElement rootline;
+  DivElement newFileDrop;
   DivElement rootlineContainer;
   ParagraphElement recycle;
   LIElement fileName;
@@ -34,7 +34,7 @@ class UpDroidExplorer {
     newFolder = querySelector('#folder');
     newFolderDragSetup();
 
-    rootline = querySelector('#file-explorer-hr');
+    newFileDrop = querySelector('#new-file-drop');
     rootlineContainer = querySelector('#file-explorer-hr-container');
     dzRootLineContainer = new Dropzone(rootlineContainer);
     recycle = querySelector('#recycle');
@@ -97,8 +97,8 @@ class UpDroidExplorer {
         .where((um) => um.header == 'EXPLORER_REMOVE')
         .listen((um) => removeUpdate(um.body));
 
-    dzRootLineContainer.onDragEnter.listen((e) => rootline.classes.add('file-explorer-hr-entered'));
-    dzRootLineContainer.onDragLeave.listen((e) => rootline.classes.remove('file-explorer-hr-entered'));
+    dzRootLineContainer.onDragEnter.listen((e) => newFileDrop.classes.add('file-drop-entered'));
+    dzRootLineContainer.onDragLeave.listen((e) => newFileDrop.classes.remove('file-drop-entered'));
 
     dzRootLineContainer.onDrop.listen((e) {
       if (e.draggableElement.className.contains('explorer-li')) {
@@ -235,7 +235,7 @@ class UpDroidExplorer {
     // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
     SpanElement glyph = new SpanElement();
-    glyph.classes.addAll(['glyphicon', 'glyphicon-folder-close']);
+    glyph.classes.addAll(['glyphicon', 'glyphicon-folder-close', "list-folder"]);
     var glyphType = (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
     glyphicon.classes.addAll(['glyphicon', glyphType]);
     dropSetup(glyphicon, file);
@@ -359,11 +359,10 @@ class UpDroidExplorer {
   void renameEventHandler(LIElement li, SimpleFile file) {
     bool refresh = false;
 
-    if(li.dataset['isDir'] == 'true'){
-      if(checkContents(li) == true){
+    if(li.dataset['isDir'] == 'true'  && checkContents(li) == true){
             refresh = true;
           }
-    }
+
     if (!li.className.contains('editing')) {
       li.classes.add('editing');
 
@@ -449,19 +448,23 @@ class UpDroidExplorer {
 
     // Highlight valid dropzones: rootline, editor, any workspace folder.
     d.onDragStart.listen((event) {
-      rootline.classes.add('file-explorer-hr-ondrag');
+      newFileDrop.classes.add('file-drop-ondrag');
       cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
-      for (SpanElement span in spanList) {
+      List<SpanElement> closedList = querySelectorAll('.list-folder');
+      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      for (SpanElement span in folderList) {
         span.classes.add('span-ondrag');
       }
     });
 
     d.onDragEnd.listen((event) {
-      rootline.classes.remove('file-explorer-hr-ondrag');
+      newFileDrop.classes.remove('file-drop-ondrag');
       cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
-      for (SpanElement span in spanList) {
+      List<SpanElement> closedList = querySelectorAll('.list-folder');
+      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      for (SpanElement span in folderList) {
         span.classes.remove('span-ondrag');
       }
     });
@@ -475,17 +478,21 @@ class UpDroidExplorer {
 
     // Highlight valid dropzones: rootline, any workspace folder.
     d.onDragStart.listen((event) {
-      rootline.classes.add('file-explorer-hr-ondrag');
+      newFileDrop.classes.add('file-drop-ondrag');
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
-      for (SpanElement span in spanList) {
+      List<SpanElement> closedList = querySelectorAll('.list-folder');
+      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      for (SpanElement span in folderList) {
         span.classes.add('span-ondrag');
       }
     });
 
     d.onDragEnd.listen((event) {
-      rootline.classes.remove('file-explorer-hr-ondrag');
+      newFileDrop.classes.remove('file-drop-ondrag');
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
-      for (SpanElement span in spanList) {
+      List<SpanElement> closedList = querySelectorAll('.list-folder');
+      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      for (SpanElement span in folderList) {
         span.classes.remove('span-ondrag');
       }
     });
@@ -499,10 +506,12 @@ class UpDroidExplorer {
 
     // Dragging through nested dropzones appears to be glitchy.
     d.onDragStart.listen((event) {
-      rootline.classes.add('file-explorer-hr-ondrag');
+      newFileDrop.classes.add('file-drop-ondrag');
       recycle.classes.add('recycle-ondrag');
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
-      for (SpanElement span in spanList) {
+      List<SpanElement> closedList = querySelectorAll('.list-folder');
+      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      for (SpanElement span in folderList) {
         span.classes.add('span-ondrag');
       }
       if (!file.isDirectory) {
@@ -511,10 +520,12 @@ class UpDroidExplorer {
     });
 
     d.onDragEnd.listen((event) {
-      rootline.classes.remove('file-explorer-hr-ondrag');
+      newFileDrop.classes.remove('file-drop-ondrag');
       recycle.classes.remove('recycle-ondrag');
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
-      for (SpanElement span in spanList) {
+      List<SpanElement> closedList = querySelectorAll('.list-folder');
+      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      for (SpanElement span in folderList) {
         span.classes.remove('span-ondrag');
       }
       if (!file.isDirectory) {

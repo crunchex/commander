@@ -131,18 +131,27 @@ html, body {
 #file-explorer-hr-container {
 }
 
-#file-explorer-hr {
-  margin: 0 0 5px 0;
+#new-file-drop {
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
-.file-explorer-hr-ondrag {
-  border-top-width: 2px;
-  border-color: #268bd2;
+#new-file-drop p {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  text-align: center;
 }
 
-.file-explorer-hr-entered {
+.file-drop-ondrag {
   border-top-width: 2px;
-  border-color: #ffffff;
+  background-color: #268bd2;
+}
+
+.file-drop-entered {
+  border-top-width: 2px;
+  background-color: #c6e9bb;
 }
 
 li input {

@@ -28,8 +28,12 @@ class UpDroidConsole {
 
     _lightTheme = false;
 
-    _initWebSocket('ws://' + window.location.host + '/pty');
-    //_initWebSocket('ws://localhost:1206$consoleNum/pty');
+    // window.location.host returns whatever is in the URL bar (including port).
+    // Since the port here needs to be dynamic, the default needs to be replaced.
+    String url = window.location.host;
+    url = url.split(':')[0];
+    _initWebSocket('ws://' + url + ':1206$consoleNum/pty');
+
     _registerConsoleEventHandlers();
 
     cs.add(new CommanderMessage('CLIENT', 'CONSOLE_READY'));

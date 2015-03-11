@@ -29,7 +29,16 @@ cd gui
 
 echo -n "Getting dependencies for gui...."
 pub get > /dev/null
+cd web
+if [ ! -d "ace-builds" ]; then
+	git clone --quiet https://github.com/ajaxorg/ace-builds.git
+fi
+cd ace-builds
+# make sure we're using package 03.03.15
+git checkout --quiet beb9ff68e397b4dcaa1d40f79651a063fc917736
 echo "OK"
+
+cd $TOPDIR/gui
 
 echo -n "Building (minifying) gui........"
 pub build > /dev/null

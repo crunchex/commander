@@ -16,8 +16,7 @@ class GuiCommand extends Command {
   }
 
   void run() {
-    print('running');
     help.enableDebug(argResults['debug']);
-    UpDroidServer server = new UpDroidServer(argResults['workspace']);
+    UpDroidServer server = new UpDroidServer(argResults);
   }
 }

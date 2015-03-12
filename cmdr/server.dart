@@ -20,7 +20,7 @@ class UpDroidServer {
   static const bool defaultDebugFlag = false;
 
   UpDroidServer (ArgResults results) {
-    Directory dir = new Directory(results.command['workspace']);
+    Directory dir = new Directory(results['workspace']);
     DirectoryWatcher watcher = new DirectoryWatcher(dir.path);
     VirtualDirectory virDir = _getVirDir(results);
 
@@ -30,7 +30,7 @@ class UpDroidServer {
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
   VirtualDirectory _getVirDir (ArgResults results) {
-    String guiPath = results.command['path'];
+    String guiPath = results['path'];
     VirtualDirectory virDir;
     virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
         ..allowDirectoryListing = true

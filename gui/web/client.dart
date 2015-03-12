@@ -38,10 +38,9 @@ class UpDroidClient {
 
     // Create the server <-> client [WebSocket].
     // Port 12060 is the default port that UpDroid uses.
-
-    // Only use localhost for host-side development.
-    initWebSocket('ws://' + window.location.host + '/ws');
-    //initWebSocket('ws://localhost:12060/ws');
+    String url = window.location.host;
+    url = url.split(':')[0];
+    initWebSocket('ws://' + url + ':12060/pty');
 
     registerEventHandlers(ws, cs);
     initializeClasses(ws, cs);

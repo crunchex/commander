@@ -46,6 +46,9 @@ fi
 ### package ###
 echo -n "Packaging......................."
 mkdir -p $TOPDIR/deploy
+if [ -e "$TOPDIR/deploy/cmdr"* ]; then
+	rm deploy/cmdr*
+fi
 fpm -s dir -t deb -n cmdr -v 0.2 -p $TOPDIR/deploy/ ./gui/build/web=/etc/updroid ./cmdr/bin/cmdr=/usr/bin/cmdr  > /dev/null
 echo "OK"
 

@@ -25,6 +25,7 @@ class UpDroidServer {
     VirtualDirectory virDir = _getVirDir(results);
 
     _initServer(dir, virDir, watcher);
+    _initPty(dir);
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -133,5 +134,13 @@ class UpDroidServer {
     });
 
     watcher.events.listen((e) => help.formattedFsUpdate(socket, e));
+  }
+
+  void _initPty(Directory dir) {
+    // TODO: an [UpDroidPty] object should be created dynamically, given
+    // some command from the Commander side (like a new Console tab being created).
+    for (int i = 1; i <= 4; i++) {
+      UpDroidPty pty = new UpDroidPty(i, dir.path);
+    }
   }
 }

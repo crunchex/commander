@@ -1,6 +1,5 @@
 #!/usr/bin/env dart
 
-import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 
 import 'commands.dart';
@@ -12,7 +11,7 @@ void main(List<String> args) {
     runner.run(args).catchError((error) {
       if (error is! UsageException) throw error;
       print(error);
-      return; // Exit code 64 indicates a usage error.
+      return;
     });
 
 }

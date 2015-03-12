@@ -91,11 +91,23 @@ class Terminal {
       (wheelEvent.deltaY < 0) ? _model.scrollUp(scrollSpeed) : _model.scrollDown(scrollSpeed);
       _refreshDisplay();
     });
+
+    div.onPaste.listen((e) {
+      String pasteString = e.clipboardData.getData('text');
+      for (int i in pasteString.runes) {
+        stdin.add([i]);
+      }
+    });
   }
 
   /// Handles a given [KeyboardEvent].
   void _handleInput(KeyboardEvent e) {
     int key = e.keyCode;
+
+    // Eat ctrl-c and ctrl-v (copy & paste).
+    if (e.ctrlKey) {
+      if (key == 86 || key == 67) return;
+    }
 
     // keyCode behaves very oddly.
     if (!e.shiftKey) {

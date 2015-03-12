@@ -1,26 +1,18 @@
 #!/usr/bin/env dart
 
 import 'package:args/args.dart';
+import 'package:args/command_runner.dart';
 
-import 'server.dart';
-import 'lib/server_helper.dart' as help;
+import 'commands.dart';
 
 void main(List<String> args) {
-  // Create an args parser.
-  ArgParser parser = new ArgParser();
-  parser.addFlag('debug', abbr: 'd', defaultsTo: UpDroidServer.defaultDebugFlag);
+  CommandRunner runner = new CommandRunner("cmdr", "The UpDroid Command tool.")
+    ..addCommand(new GuiCommand());
 
-  // Add the 'gui' command and an option to override the default workspace.
-  ArgParser command = parser.addCommand('gui');
-  command.addOption('workspace', abbr: 'w', defaultsTo: UpDroidServer.defaultWorkspacePath);
-  command.addOption('path', abbr: 'p', defaultsTo: UpDroidServer.defaultGuiPath);
-  ArgResults results = parser.parse(args);
+    runner.run(args).catchError((error) {
+      if (error is! UsageException) throw error;
+      print(error);
+      return; // Exit code 64 indicates a usage error.
+    });
 
-  // Set up logging.
-  bool debugFlag = results['debug'];
-  help.enableDebug(debugFlag);
-
-  if (results.arguments.contains('gui')) {
-    UpDroidServer server = new UpDroidServer(results);
-  }
 }

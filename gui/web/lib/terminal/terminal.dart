@@ -104,9 +104,9 @@ class Terminal {
   void _handleInput(KeyboardEvent e) {
     int key = e.keyCode;
 
-    // Eat Ctrl-v (Paste).
-    if (e.ctrlKey && key == 86) {
-      return;
+    // Eat ctrl-c and ctrl-v (copy & paste).
+    if (e.ctrlKey) {
+      if (key == 86 || key == 67) return;
     }
 
     // keyCode behaves very oddly.

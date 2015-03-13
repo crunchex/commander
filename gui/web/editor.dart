@@ -202,7 +202,7 @@ class UpDroidEditor {
 
   /// Shows the modal for unsaved changes.
   void presentModal() {
-    DivElement modal = querySelector('#myModal');
+    DivElement modal = querySelector('#save');
     Modal m = new Modal(modal);
     m.show();
   }

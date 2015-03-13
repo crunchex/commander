@@ -1,9 +1,4 @@
-library commands;
-
-import 'package:args/command_runner.dart';
-
-import 'server.dart';
-import 'lib/server_helper.dart' as help;
+part of updroid_server;
 
 class GuiCommand extends Command {
   final name = "gui";

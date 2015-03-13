@@ -214,6 +214,14 @@ li input {
   background-color: transparent;
 }
 
+#video-canvas {
+  /* Always stretch the canvas to 640x480, regardless of its
+  internal size. */
+  width: 100%;
+  height: 450px;
+  border: 1px solid #dddddd;
+}
+
 .editor {
   width: 100%;
   height: 450px;
@@ -240,6 +248,12 @@ li input {
 
 .tab-content {
   border: 1px solid #dddddd;
+}
+
+/* workaround for strange height bug */
+/* remove this override to reproduce the problem */
+.tab-content2 {
+  height: 452px;
 }
 
 #row-main {

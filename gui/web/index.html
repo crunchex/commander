@@ -111,7 +111,24 @@
        <!-- Add Video here -->
 
           <div id="video_tab" class="tab-pane">
-            <p>Video tab</p>
+            <ul class="nav nav-tabs inner-tabs" role="tablist">
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" id="button-console-theme-2">Quality</a></li>
+                </ul>
+              </li>
+            </ul>
+
+            <div class="tab-content tab-content2">
+              <canvas id="video-canvas" width="320" height="240">
+                <p>
+                  Please use a browser that supports the Canvas Element, like
+                  <a href="http://www.google.com/chrome">Chrome</a>,
+                  <a href="http://www.mozilla.com/firefox/">Firefox</a>,
+                  <a href="http://www.apple.com/safari/">Safari</a> or Internet Explorer 10
+                </p>
+              </canvas>
+            </div>
           </div>
         </div>
       </div>
@@ -210,6 +227,18 @@
 
   <script type="text/javascript" src="./ace-builds/src-min-noconflict/ace.js"></script>
   <script type="text/javascript" src="./packages/ace/src/js/ext-language_tools.js"></script>
+      <script type="text/javascript" src="./jsmpg.js"></script>
+    <script type="text/javascript">
+    // Show loading notice
+    var canvas = document.getElementById('video-canvas');
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#444';
+    ctx.fillText('Loading...', canvas.width/2-30, canvas.height/3);
+
+    // Setup the WebSocket connection and start the player
+    var client = new WebSocket( 'ws://localhost:8084/' );
+    var player = new jsmpeg(client, {canvas:canvas});
+  </script>
   <script type="application/dart" src="main.dart"></script>
   <script src="./packages/browser/dart.js"></script>
 

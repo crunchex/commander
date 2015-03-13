@@ -25,7 +25,11 @@ class UpDroidServer {
   UpDroidServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
     DirectoryWatcher watcher = new DirectoryWatcher(dir.path);
-    VirtualDirectory virDir = _getVirDir(results);
+
+    VirtualDirectory virDir;
+    if (!results['serveronly']) {
+      virDir = _getVirDir(results);
+    }
 
     _initServer(dir, virDir, watcher);
     _initPty(dir);
@@ -59,8 +63,9 @@ class UpDroidServer {
         if (WebSocketTransformer.isUpgradeRequest(request)) {
           WebSocketTransformer.upgrade(request).then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
         } else {
-
-          virDir.serveRequest(request);
+          if (virDir != null) {
+            virDir.serveRequest(request);
+          }
         }
       });
     });

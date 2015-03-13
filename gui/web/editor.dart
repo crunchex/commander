@@ -41,7 +41,7 @@ class UpDroidEditor {
   InputElement fontSizeInput;
   int fontSize = 16;
   StreamSubscription fontInputListener;
-  
+
   ace.Editor aceEditor;
   String openFilePath;
   String originalContents;
@@ -49,48 +49,48 @@ class UpDroidEditor {
   UpDroidEditor(WebSocket ws, StreamController<CommanderMessage> cs) {
     this.ws = ws;
     this.cs = cs;
-    
+
     editorDiv = querySelector('#editor');
-    
+
     saveButton = querySelector('#column-1 .button-save');
     newButton = querySelector('#column-1 .button-new');
     themeButton = querySelector('#column-1 .button-editor-theme');
     modalSaveButton = querySelector('.modal-save');
     modalDiscardButton = querySelector('.modal-discard');
-    
+
     fontSizeInput = querySelector("#font-size-input");
     fontSizeInput.placeholder = fontSize.toString();
-    
+
     setUpEditor();
     registerEditorEventHandlers();
-    
+
     cs.add(new CommanderMessage('CLIENT', 'EDITOR_READY'));
   }
 
   /// Sets up the editor and styles.
   void setUpEditor() {
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
-    
+
     aceEditor = ace.edit(editorDiv);
     aceEditor
       ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
       ..fontSize = fontSize
       ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK);
-    
+
     resetSavePoint();
   }
-  
+
   /// Process messages according to the type.
   void processMessage(CommanderMessage m) {
     switch (m.type) {
       case 'CLASS_ADD':
         editorDiv.classes.add(m.body);
         break;
-        
+
       case 'CLASS_REMOVE':
         editorDiv.classes.remove(m.body);
         break;
-        
+
       case 'OPEN_FILE':
         ws.send('[[EDITOR_OPEN]]' + m.body);
         break;
@@ -99,13 +99,13 @@ class UpDroidEditor {
         print('Client error: unrecognized message type: ' + m.type);
     }
   }
-  
+
   /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
     cs.stream
         .where((m) => m.dest == 'EDITOR')
         .listen((m) => processMessage(m));
-              
+
     // Editor receives the open file contents from the server.
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EDITOR_FILE_TEXT')
@@ -115,11 +115,11 @@ class UpDroidEditor {
           var newText = returnedData[1];
           handleNewText(newPath, newText);
         });
-    
+
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
         .listen((um) => absolutePathPrefix = um.body);
-    
+
     ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EDITOR_NEW_FILENAME')
         .listen((um) {
@@ -127,12 +127,12 @@ class UpDroidEditor {
           var newPath = absolutePathPrefix + '/' + um.body;
           handleNewText(newPath, newText);
         });
-    
+
     fontSizeInput.onClick.listen((e){
-      
-      // Keeps bootjack dropdown from closing    
+
+      // Keeps bootjack dropdown from closing
       e.stopPropagation();
-      
+
      fontInputListener = fontSizeInput.onKeyUp.listen((e) {
       var keyEvent = new KeyEvent.wrap(e);
               if (keyEvent.keyCode == KeyCode.ENTER) {
@@ -154,7 +154,7 @@ class UpDroidEditor {
               }
       });
     });
-    
+
     newButton.onClick.listen((e) {
       // Editor needs to request an available filename (e.g. untitled.py, untitled1.py, etc.)
       ws.send('[[EDITOR_REQUEST_FILENAME]]' + absolutePathPrefix);
@@ -164,16 +164,16 @@ class UpDroidEditor {
     });
 
     saveButton.onClick.listen((e) => saveText());
-    
+
     themeButton.onClick.listen((e) {
       String newTheme = (aceEditor.theme.name == 'solarized_dark') ? ace.Theme.SOLARIZED_LIGHT : ace.Theme.SOLARIZED_DARK;
       aceEditor.theme = new ace.Theme.named(newTheme);
-      
+
       // Stops the button from sending the page to the top (href=#).
       e.preventDefault();
     });
   }
-  
+
   /// Handles changes to the Editor model, new files and opening files.
   handleNewText(String newPath, String newText) {
     if (noUnsavedChanges()) {
@@ -189,33 +189,36 @@ class UpDroidEditor {
       });
     }
   }
-  
+
   /// Sets the Editor's text with [newText], updates [openFilePath], and resets the save point.
   setEditorText(String newPath, String newText) {
     openFilePath = newPath;
     aceEditor.setValue(newText, 1);
     resetSavePoint();
-    
+
     // Set focus to the interactive area so the user can typing immediately.
     aceEditor.focus();
   }
-  
+
   /// Shows the modal for unsaved changes.
   void presentModal() {
     DivElement modal = querySelector('#myModal');
     Modal m = new Modal(modal);
     m.show();
   }
-  
+
   /// Sends the file path and contents to the server to be saved to disk.
   void saveText() {
+    if (openFilePath == null) {
+      openFilePath = absolutePathPrefix + "/untitled.py";
+    }
     ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFilePath);
     resetSavePoint();
   }
-  
+
   /// Compares the Editor's current text with text at the last save point.
   bool noUnsavedChanges() => aceEditor.value == originalContents;
-  
+
   /// Resets the save point based on the Editor's current text.
   String resetSavePoint() => originalContents = aceEditor.value;
 }

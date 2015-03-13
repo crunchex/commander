@@ -79,9 +79,9 @@ class Terminal {
 
     div.onKeyUp.listen((e) => _handleInput(e));
 
-    // Disables browser back navigation with backspace key.
+    // Disable browser navigation keys.
     div.onKeyDown.listen((e) {
-      if (e.keyCode == 8) e.preventDefault();
+      if (e.keyCode == 8 || e.keyCode == 9) e.preventDefault();
     });
 
     div.onMouseWheel.listen((wheelEvent) {

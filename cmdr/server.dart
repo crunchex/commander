@@ -6,12 +6,15 @@ import 'dart:convert';
 
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
+import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
+import 'package:args/command_runner.dart';
 
 import 'lib/client_responses.dart';
 import 'lib/server_helper.dart' as help;
 
 part 'pty.dart';
+part 'commands.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class UpDroidServer {
@@ -22,7 +25,11 @@ class UpDroidServer {
   UpDroidServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
     DirectoryWatcher watcher = new DirectoryWatcher(dir.path);
-    VirtualDirectory virDir = _getVirDir(results);
+
+    VirtualDirectory virDir;
+    if (!results['serveronly']) {
+      virDir = _getVirDir(results);
+    }
 
     _initServer(dir, virDir, watcher);
     _initPty(dir);
@@ -56,8 +63,9 @@ class UpDroidServer {
         if (WebSocketTransformer.isUpgradeRequest(request)) {
           WebSocketTransformer.upgrade(request).then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
         } else {
-
-          virDir.serveRequest(request);
+          if (virDir != null) {
+            virDir.serveRequest(request);
+          }
         }
       });
     });

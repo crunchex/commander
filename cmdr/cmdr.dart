@@ -2,7 +2,7 @@
 
 import 'package:args/command_runner.dart';
 
-import 'commands.dart';
+import 'server.dart';
 
 void main(List<String> args) {
   CommandRunner runner = new CommandRunner("cmdr", "The UpDroid Command tool.")

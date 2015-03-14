@@ -62,16 +62,24 @@ class UpDroidServer {
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.listen((HttpRequest request) {
         // WebSocket requests are considered "upgraded" HTTP requests.
-        help.debug("${request.method} request for: ${request.uri.path}", 0);
         if (WebSocketTransformer.isUpgradeRequest(request)) {
-          WebSocketTransformer.upgrade(request).then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
-        } else {
-          if (virDir != null) {
-            virDir.serveRequest(request);
-          }
+          WebSocketTransformer
+            .upgrade(request)
+            .then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
+          return;
         }
+
+        _handleRequest(request, virDir);
       });
     });
+  }
+
+  void _handleRequest(HttpRequest request, VirtualDirectory virDir) {
+    help.debug("${request.method} request for: ${request.uri.path}", 0);
+
+    if (virDir != null) {
+      virDir.serveRequest(request);
+    }
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests

@@ -136,16 +136,13 @@ class Terminal {
     List<int> escapeString, escape, string;
     int start, end;
 
-    // The case where the current output contains
-    // no escape sequence.
-    if (!output.contains(ESC)) {
+    // Handle cases where there are no Escapes, or a regular string
+    // precedes an Escape.
+    end = output.indexOf(ESC);
+    if (end == -1) {
       _handleOutString(output);
       return;
-    }
-
-    // Handle any string preceding the first escape sequence.
-    if (output[0] != ESC) {
-      end = output.indexOf(ESC);
+    } else {
       string = output.sublist(0, end);
       _handleOutString(string);
 

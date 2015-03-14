@@ -3,6 +3,7 @@ part of updroid_server;
 class UpDroidCamera {
   int cameraNum = 1;
   WebSocket _ws;
+  StreamController<List<int>> _transStream;
 
   Uint16List _streamHeader;
 
@@ -13,6 +14,7 @@ class UpDroidCamera {
     help.debug('Spawning UpDroidCamera ($cameraNum)', 0);
 
     _streamHeader = [];
+    _transStream = new StreamController<List<int>>();
 
     _setUpStreamReceiver();
     _runFFMpeg();
@@ -27,6 +29,9 @@ class UpDroidCamera {
           WebSocketTransformer.upgrade(request).then((WebSocket ws) {
             _ws = ws;
             _ws.add(_streamHeader);
+            _transStream.stream.listen((data) {
+              _ws.add(data);
+            });
           });
         }
       });
@@ -41,17 +46,21 @@ class UpDroidCamera {
         if (params[0] == 'cheesecake') {
           int width = int.parse(params[1]);
           int height = int.parse(params[2]);
-          // Need to send: 106, 115, 109, 2, 128, 1, 224
 
           _streamHeader.addAll(UTF8.encode('jsmp'));
-          //_streamHeader.add(width);
+          // TODO: replace hardcoding with actual UInt16BE conversion.
+          //_streamHeader.add(width.g);
           //_streamHeader.add(height);
+          //streamHeader.writeUInt16BE(width, 4);
+          //streamHeader.writeUInt16BE(height, 6);
           _streamHeader.add(2);
           _streamHeader.add(128);
           _streamHeader.add(1);
           _streamHeader.add(224);
 
-
+          request.listen((data) {
+            _transStream.add(data);
+          });
         } else {
           help.debug('Failed Stream Connection', 1);
         }
@@ -61,10 +70,7 @@ class UpDroidCamera {
 
   void _runFFMpeg() {
     List<String> options = ['-s', '640x480', '-f', 'video4linux2', '-i', '/dev/video0', '-f', 'mpeg1video', '-b', '800k', '-r', '20', 'http://127.0.0.1:1208$cameraNum/cheesecake/640/480'];
-    Process.start('ffmpeg', options).then((Process shell) {
-      //shell.stdout.listen((data) => help.debug('ffmpeg[$cameraNum] stdout: ${UTF8.decode(data)}', 0));
-      //shell.stderr.listen((data) => help.debug('ffmpeg[$cameraNum] stderr: ${UTF8.decode(data)}', 0));
-    }).catchError((error) {
+    Process.run('ffmpeg', options).catchError((error) {
       if (error is! ProcessException) throw error;
       help.debug('ffmpeg [cameraNum]: run failed. Probably not installed', 1);
       return;

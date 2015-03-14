@@ -159,6 +159,7 @@ class UpDroidEditor {
 
     newButton.onClick.listen((e) {
       // Editor needs to request an available filename (e.g. untitled.py, untitled1.py, etc.)
+
       ws.send('[[EDITOR_REQUEST_FILENAME]]' + absolutePathPrefix);
 
       // Stops the button from sending the page to the top (href=#).
@@ -166,6 +167,24 @@ class UpDroidEditor {
     });
 
     saveButton.onClick.listen((e) => saveText());
+
+    saveAsButton.onClick.listen((e){
+      var input = querySelector('#save-as-input');
+      presentModal("#save-as");
+      input.onClick.listen((e){
+        // move key event listener here
+      });
+      var keyEvent = new KeyEvent.wrap(e);
+      if (keyEvent.keyCode == KeyCode.ENTER){
+        input = querySelector('#save-as-input').text;
+        if(input == '' ) {
+          saveText();
+        }
+        else{
+          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + input);
+        }
+      }
+    });
 
     themeButton.onClick.listen((e) {
       String newTheme = (aceEditor.theme.name == 'solarized_dark') ? ace.Theme.SOLARIZED_LIGHT : ace.Theme.SOLARIZED_DARK;
@@ -181,7 +200,7 @@ class UpDroidEditor {
     if (noUnsavedChanges()) {
       setEditorText(newPath, newText);
     } else {
-      presentModal();
+      presentModal("#unsaved");
       modalSaveButton.onClick.listen((e) {
         saveText();
         setEditorText(newPath, newText);
@@ -203,8 +222,8 @@ class UpDroidEditor {
   }
 
   /// Shows the modal for unsaved changes.
-  void presentModal() {
-    DivElement modal = querySelector('#save');
+  void presentModal(String selector) {
+    DivElement modal = querySelector(selector);
     Modal m = new Modal(modal);
     m.show();
   }

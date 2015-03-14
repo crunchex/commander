@@ -123,60 +123,12 @@ class Terminal {
     // Carriage Return (13) => New Line (10).
     if (key == 13) {
       key = 10;
-      _inputDone = true;
     }
 
     // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
     if (key != 16 && key != 17 && key != 91 && key != 18) {
-      _processKey(key);
-      if (key == 8 && _inputString.isNotEmpty) {
-        _inputString.removeLast();
-      } else {
-        _inputString.add(key);
-      }
+      stdin.add([key]);
     }
-
-    if (_inputDone) {
-      stdin.add(_inputString);
-      _inputString = [];
-      _inputDone = false;
-    }
-  }
-
-  void _processKey(int input) {
-    String char = new String.fromCharCode(input);
-    if (input == 10) {
-      // Set glyph at cursor to blank.
-      Glyph g = new Glyph(Glyph.SPACE, _attr);
-      _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
-
-      _model.cursorNewLine();
-      _model.inputCursorIndex = 0;
-      return;
-    }
-
-    if (input == 8 && _model.inputCursorIndex > 0) {
-      // Set glyph at cursor to blank.
-      Glyph g = new Glyph(Glyph.SPACE, _attr);
-      _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
-
-      _model.cursorBack();
-      _drawCursor();
-      _refreshDisplay();
-      return;
-    }
-
-    if (input == 32) {
-      char = Glyph.SPACE;
-    }
-
-    Glyph g = new Glyph(char, _attr);
-    _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
-    _model.cursorNext();
-    _model.inputCursorIndex++;
-    _drawCursor();
-
-    _refreshDisplay();
   }
 
   /// Splits a UTF8 string into substrings, split by preceding escape sequences.

@@ -70,4 +70,58 @@ class EscapeHandler {
     _model = model;
     _attr = attr;
   }
+
+  /// Sets the cursor position where subsequent text will begin.
+  /// If no row/column parameters are provided (ie. <ESC>[H),
+  /// the cursor will move to the home position, at the upper left of the screen.
+  void cursorHome(List<int> escape) {
+    if (escape.length == 3) {
+      print('cursor home: 0 0');
+      return;
+    }
+
+    int indexOfSemi = escape.indexOf(59);
+    _model.cursor.row = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
+    _model.cursor.col = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
+  }
+
+  /// Moves the cursor forward by COUNT columns; the default count is 1.
+  void cursorForward() {
+    _model.cursorNext();
+  }
+
+  /// Sets multiple display attribute settings.
+  /// Sets local [DisplayAttributes], given [escape].
+  void setAttributeMode(List<int> escape) {
+    String decodedEsc = UTF8.decode(escape);
+
+    if (decodedEsc.contains('0m')) {
+      _attr.resetAll();
+    }
+
+    if (decodedEsc.contains(';1')) _attr.bright = true;
+    if (decodedEsc.contains(';2')) _attr.dim = true;
+    if (decodedEsc.contains(';4')) _attr.underscore = true;
+    if (decodedEsc.contains(';5')) _attr.blink = true;
+    if (decodedEsc.contains(';7')) _attr.reverse = true;
+    if (decodedEsc.contains(';8')) _attr.hidden = true;
+
+    if (decodedEsc.contains(';30')) _attr.fgColor = 'black';
+    if (decodedEsc.contains(';31')) _attr.fgColor = 'red';
+    if (decodedEsc.contains(';32')) _attr.fgColor = 'green';
+    if (decodedEsc.contains(';33')) _attr.fgColor = 'yellow';
+    if (decodedEsc.contains(';34')) _attr.fgColor = 'blue';
+    if (decodedEsc.contains(';35')) _attr.fgColor = 'magenta';
+    if (decodedEsc.contains(';36')) _attr.fgColor = 'cyan';
+    if (decodedEsc.contains(';37')) _attr.fgColor = 'white';
+
+    if (decodedEsc.contains(';40')) _attr.bgColor = 'black';
+    if (decodedEsc.contains(';41')) _attr.bgColor = 'red';
+    if (decodedEsc.contains(';42')) _attr.bgColor = 'green';
+    if (decodedEsc.contains(';43')) _attr.bgColor = 'yellow';
+    if (decodedEsc.contains(';44')) _attr.bgColor = 'blue';
+    if (decodedEsc.contains(';45')) _attr.bgColor = 'magenta';
+    if (decodedEsc.contains(';46')) _attr.bgColor = 'cyan';
+    if (decodedEsc.contains(';47')) _attr.bgColor = 'white';
+  }
 }

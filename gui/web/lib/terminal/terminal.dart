@@ -143,8 +143,7 @@ class Terminal {
         return;
       } else {
         _handleOutString(output.sublist(0, nextEsc));
-        List<int> temp = output.sublist(nextEsc);
-        output = _parseEscape(temp);
+        output = _parseEscape(output.sublist(nextEsc));
       }
     }
   }
@@ -157,6 +156,12 @@ class Terminal {
     for (int i = 1; i <= output.length; i++) {
       termIndex = i;
       escape = output.sublist(0, i);
+
+      if (escape.length != 1 && escape.last == 27) {
+        print('Unknown escape detected: ${escape.sublist(0, escape.length - 1).toString()}');
+        break;
+      }
+
       if (constantEscapes.containsKey(escape)) {
         switch (variableEscapeTerminators[escape.last]) {
           default:

@@ -178,6 +178,9 @@ class Terminal {
           case 'Cursor Home':
             _cursorHome(escape);
             break;
+          case 'Cursor Forward':
+            _cursorForward();
+            break;
           default:
             print('Variable escape : ${variableEscapeTerminators[escape.last]} not yet supported');
         }
@@ -262,6 +265,10 @@ class Terminal {
     int indexOfSemi = escape.indexOf(59);
     _model.cursor.row = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
     _model.cursor.col = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
+  }
+
+  void _cursorForward() {
+    _model.cursorNext();
   }
 
   /// Renders the cursor at [Cursor]'s current position.

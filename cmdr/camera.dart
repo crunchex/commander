@@ -14,7 +14,7 @@ class UpDroidCamera {
     help.debug('Spawning UpDroidCamera ($cameraNum)', 0);
 
     _streamHeader = [];
-    _transStream = new StreamController<List<int>>();
+    _transStream = new StreamController<List<int>>.broadcast();
 
     _setUpStreamReceiver();
     _runFFMpeg();

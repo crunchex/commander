@@ -3,7 +3,7 @@ part of terminal;
 class Cursor {
   int row = 0;
   int col = 0;
-  
+
   String toString () {
     return 'row: $row, col: $col';
   }
@@ -13,16 +13,16 @@ class Cursor {
 class Model {
   Cursor cursor;
   int numRows, numCols;
-  
+
   int inputCursorIndex;
-  
+
   // Implemented as stacks in scrolling.
   List<List> _reverseBuffer;
   List<List> _forwardBuffer;
-  
+
   // Implemented as a queue in scrolling.
   List<List> _rows;
-  
+
   Model (this.numRows, this.numCols) {
     cursor = new Cursor();
     inputCursorIndex = 0;
@@ -32,78 +32,80 @@ class Model {
 
     _initModel();
   }
-  
+
   /// Returns the [Glyph] at row, col.
   Glyph getGlyphAt(int row, int col) => _rows[row][col];
-  
+
   /// Sets a [Glyph] at location row, col.
   void setGlyphAt(Glyph g, int row, int col) {
     _rows[row][col] = g;
   }
-  
+
   void cursorNext() {
     if (cursor.col < numCols - 1) {
       cursor.col++;
       return;
     }
-    
+
     cursorNewLine();
   }
-  
+
   void cursorBack() {
     if (inputCursorIndex > 0) {
       cursor.col--;
       inputCursorIndex--;
     }
   }
-  
+
+  void cursorCarriageReturn() {
+    cursor.col = 0;
+  }
+
   void cursorNewLine() {
     if (cursor.row < numRows - 1) {
       cursor.row++;
     } else {
       pushBuffer();
     }
-    
-    cursor.col = 0;
   }
-  
+
   void pushBuffer() {
     _reverseBuffer.add(_rows[0]);
     _rows.removeAt(0);
-    
+
     List<Glyph> newRow = [];
     for (int c = 0; c < numCols; c++) {
       newRow.add(new Glyph(Glyph.SPACE, new DisplayAttributes()));
     }
     _rows.add(newRow);
   }
-  
+
   /// Manipulates the buffers and rows to handle scrolling
   /// upward of a single line.
   void scrollUp(int numLines) {
     for (int i = 0; i < numLines; i++) {
       if (_reverseBuffer.isEmpty) return;
-      
+
       _rows.insert(0, _reverseBuffer.last);
       _reverseBuffer.removeLast();
       _forwardBuffer.add(_rows[_rows.length - 1]);
       _rows.removeLast();
     }
   }
-  
+
   /// Manipulates the buffers and rows to handle scrolling
   /// upward of a single line.
   void scrollDown(int numLines) {
     for (int i = 0; i < numLines; i++) {
       if (_forwardBuffer.isEmpty) return;
-  
+
       _rows.add(_forwardBuffer.last);
       _forwardBuffer.removeLast();
       _reverseBuffer.add(_rows[0]);
       _rows.removeAt(0);
     }
   }
-  
+
   /// Initializes the internal model with a List of Lists.
   /// Each location defaults to a Glyph.SPACE.
   void _initModel() {
@@ -160,11 +162,11 @@ class Model {
 class DisplayAttributes {
   bool bright, dim, underscore, blink, reverse, hidden;
   String fgColor, bgColor;
-  
+
   DisplayAttributes ({this.bright: false, this.dim: false, this.underscore: false,
          this.blink: false, this.reverse: false, this.hidden: false,
          this.fgColor: 'white', this.bgColor: 'black'});
-  
+
   String toString() {
     Map properties = {
       'bright': bright,
@@ -178,7 +180,7 @@ class DisplayAttributes {
     };
     return JSON.encode(properties);
   }
-  
+
   void resetAll() {
     bright = false;
     dim = false;
@@ -186,7 +188,7 @@ class DisplayAttributes {
     blink = false;
     reverse = false;
     hidden = false;
-    
+
     fgColor = 'white';
     bgColor = 'black';
   }
@@ -201,7 +203,7 @@ class Glyph {
 
   bool bright, dim, underscore, blink, reverse, hidden;
   String value, fgColor, bgColor;
-  
+
   Glyph (this.value, DisplayAttributes attr) {
     bright = attr.bright;
     dim = attr.dim;
@@ -212,7 +214,7 @@ class Glyph {
     fgColor = attr.fgColor;
     bgColor = attr.bgColor;
   }
-  
+
   operator ==(Glyph other) {
     return (value == other.value
             && bright == other.bright
@@ -224,7 +226,7 @@ class Glyph {
             && fgColor == other.fgColor
             && bgColor == other.bgColor);
   }
-  
+
   bool hasSameAttributes(Glyph other) {
     return (bright == other.bright
             && dim == other.dim
@@ -240,7 +242,7 @@ class Glyph {
     List members = [bright, dim, underscore, blink, reverse, hidden, fgColor, bgColor];
     return hashObjects(members);
   }
-  
+
   String toString() {
     Map properties = {
       'value': value,

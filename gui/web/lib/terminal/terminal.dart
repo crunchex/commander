@@ -158,12 +158,21 @@ class Terminal {
       termIndex = i;
       escape = output.sublist(0, i);
       if (constantEscapes.containsKey(escape)) {
-        print(constantEscapes[escape]);
+        switch (variableEscapeTerminators[escape.last]) {
+          default:
+            print('Variable escape : ${constantEscapes[escape]} not yet supported');
+        }
         break;
       }
 
       if (variableEscapeTerminators.containsKey(escape.last)) {
-        print(variableEscapeTerminators[escape.last]);
+        switch (variableEscapeTerminators[escape.last]) {
+          case 'Set Attribute Mode':
+            _setAttributeMode(escape);
+            break;
+          default:
+            print('Variable escape : ${variableEscapeTerminators[escape.last]} not yet supported');
+        }
         break;
       }
     }

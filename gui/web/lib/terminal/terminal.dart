@@ -132,7 +132,8 @@ class Terminal {
     }
   }
 
-  /// Splits a UTF8 string into substrings, split by preceding escape sequences.
+  /// Processes [output] by coordinating handling of strings
+  /// and escape parsing.
   void _processStdOut(List<int> output) {
     int nextEsc;
     while (output.isNotEmpty) {
@@ -148,6 +149,8 @@ class Terminal {
     }
   }
 
+  /// Parses out escape sequences. When it finds one,
+  /// it handles it and returns the remainder of [output].
   List<int> _parseEscape(List<int> output) {
     List<int> escape;
     int termIndex;

@@ -170,6 +170,9 @@ class Terminal {
           case 'Set Attribute Mode':
             _setAttributeMode(escape);
             break;
+          case 'Cursor Home':
+            _cursorHome(escape);
+            break;
           default:
             print('Variable escape : ${variableEscapeTerminators[escape.last]} not yet supported');
         }
@@ -243,6 +246,14 @@ class Terminal {
     if (decodedEsc.contains(';45')) _attr.bgColor = 'magenta';
     if (decodedEsc.contains(';46')) _attr.bgColor = 'cyan';
     if (decodedEsc.contains(';47')) _attr.bgColor = 'white';
+  }
+
+  void _cursorHome(List<int> escape) {
+    //print('cursor home: ${escape.toString()}');
+    int indexOfSemi = escape.indexOf(59);
+    int row = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
+    int column = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 2)));
+    //print('cursor home: $row $column');
   }
 
   /// Renders the cursor at [Cursor]'s current position.

@@ -8,6 +8,7 @@ import 'package:quiver/core.dart';
 part 'model.dart';
 part 'input_keys.dart';
 part 'theme.dart';
+part 'escape_sequences.dart';
 
 /// A class for rendering a terminal emulator in a [DivElement] (param).
 /// [stdout] needs to receive individual UTF8 integers and will handle
@@ -133,49 +134,38 @@ class Terminal {
 
   /// Splits a UTF8 string into substrings, split by preceding escape sequences.
   void _processStdOut(List<int> output) {
-    List<int> escapeString, escape, string;
-    int start, end;
+    int nextEsc;
+    while (output.isNotEmpty) {
+      nextEsc = output.indexOf(ESC);
+      if (nextEsc == -1) {
+        _handleOutString(output);
+        return;
+      } else {
+        _handleOutString(output.sublist(0, nextEsc));
+        List<int> temp = output.sublist(nextEsc);
+        output = _parseEscape(temp);
+      }
+    }
+  }
 
-    // Handle cases where there are no Escapes, or a regular string
-    // precedes an Escape.
-    end = output.indexOf(ESC);
-    if (end == -1) {
-      _handleOutString(output);
-      return;
-    } else {
-      string = output.sublist(0, end);
-      _handleOutString(string);
+  List<int> _parseEscape(List<int> output) {
+    List<int> escape;
+    int termIndex;
+    for (int i = 1; i <= output.length; i++) {
+      termIndex = i;
+      escape = output.sublist(0, i);
+      if (constantEscapes.containsKey(escape)) {
+        print(constantEscapes[escape]);
+        break;
+      }
 
-      for (int i in string) {
-        output.remove(i);
+      if (variableEscapeTerminators.containsKey(escape.last)) {
+        print(variableEscapeTerminators[escape.last]);
+        break;
       }
     }
 
-    // TODO: make escape parsing independent of the display attribute
-    // terminator, 109 (m).
-    while (true) {
-      start = output.indexOf(ESC);
-      List<int> subList = output.sublist(1);
-      if (!subList.contains(ESC)) break;
-      end = subList.indexOf(ESC) + 1;
-
-      escapeString = output.sublist(start, end);
-      escape = escapeString.sublist(0, escapeString.indexOf(109) + 1);
-      string = escapeString.sublist(escapeString.indexOf(109) + 1);
-      _setAttributeMode(escape);
-      _handleOutString(string);
-
-      for (int j in escapeString) {
-        output.remove(j);
-      }
-    }
-
-    // Deal with the remaining string composed of at least one final
-    // escape.
-    escape = output.sublist(0, output.indexOf(109) + 1);
-    string = output.sublist(output.indexOf(109) + 1);
-    _setAttributeMode(escape);
-    _handleOutString(string);
+    return output.sublist(termIndex);
   }
 
   /// Appends a new [SpanElement] with the contents of [_outString]

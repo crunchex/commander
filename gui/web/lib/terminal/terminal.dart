@@ -162,16 +162,18 @@ class Terminal {
         break;
       }
 
-      if (constantEscapes.containsKey(escape)) {
-        switch (variableEscapeTerminators[escape.last]) {
+      if (EscapeHandler.constantEscapes.containsKey(escape)) {
+        switch (EscapeHandler.variableEscapeTerminators[escape.last]) {
           default:
-            print('Variable escape : ${constantEscapes[escape]} (${escape.toString()}) not yet supported');
+            print('Variable escape : ${EscapeHandler
+                .constantEscapes[escape]} (${escape.toString()}) not yet supported');
         }
         break;
       }
 
-      if (variableEscapeTerminators.containsKey(escape.last)) {
-        switch (variableEscapeTerminators[escape.last]) {
+      if (EscapeHandler.variableEscapeTerminators.containsKey(escape.last)) {
+        switch (EscapeHandler
+                .variableEscapeTerminators[escape.last]) {
           case 'Set Attribute Mode':
             _setAttributeMode(escape);
             break;
@@ -182,7 +184,8 @@ class Terminal {
             _cursorForward();
             break;
           default:
-            print('Variable escape : ${variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
+            print('Variable escape : ${EscapeHandler
+                .variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
         }
         break;
       }

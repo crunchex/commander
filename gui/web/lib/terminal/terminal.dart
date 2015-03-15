@@ -165,7 +165,7 @@ class Terminal {
       if (constantEscapes.containsKey(escape)) {
         switch (variableEscapeTerminators[escape.last]) {
           default:
-            print('Variable escape : ${constantEscapes[escape]} not yet supported');
+            print('Variable escape : ${constantEscapes[escape]} (${escape.toString()}) not yet supported');
         }
         break;
       }
@@ -182,7 +182,7 @@ class Terminal {
             _cursorForward();
             break;
           default:
-            print('Variable escape : ${variableEscapeTerminators[escape.last]} not yet supported');
+            print('Variable escape : ${variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
         }
         break;
       }

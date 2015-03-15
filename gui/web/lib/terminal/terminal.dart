@@ -255,9 +255,15 @@ class Terminal {
 
   void _cursorHome(List<int> escape) {
     //print('cursor home: ${escape.toString()}');
+
+    if (escape.length == 3) {
+      print('cursor home: 0 0');
+      return;
+    }
+
     int indexOfSemi = escape.indexOf(59);
     int row = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
-    int column = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 2)));
+    int column = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
     //print('cursor home: $row $column');
   }
 

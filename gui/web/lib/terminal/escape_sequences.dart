@@ -62,4 +62,12 @@ class EscapeHandler {
     // Set Display Attribute
     109: 'Set Attribute Mode'
   };
+
+  Model _model;
+  DisplayAttributes _attr;
+
+  EscapeHandler(Model model, DisplayAttributes attr) {
+    _model = model;
+    _attr = attr;
+  }
 }

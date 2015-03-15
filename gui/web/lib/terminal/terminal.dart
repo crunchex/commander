@@ -137,7 +137,6 @@ class Terminal {
   /// Processes [output] by coordinating handling of strings
   /// and escape parsing.
   void _processStdOut(List<int> output) {
-    print('original output: ${output.toString()}');
     int nextEsc;
     while (output.isNotEmpty) {
       nextEsc = output.indexOf(ESC);
@@ -200,13 +199,9 @@ class Terminal {
   /// Appends a new [SpanElement] with the contents of [_outString]
   /// to the [_buffer] and updates the display.
   void _handleOutString(List<int> string) {
-    print('outstring: ${string.toString()}');
-    print('converted: ${UTF8.decode(string)}');
     var codes = UTF8.decode(string).codeUnits;
     for (var code in codes) {
       String char = new String.fromCharCode(code);
-      print('cursor: ${_model.cursor.row} ${_model.cursor.col}');
-      print('char: $char');
 
       if (code == 13) {
         _model.cursorCarriageReturn();

@@ -85,7 +85,10 @@ class Terminal {
 
     // Disable browser navigation keys.
     div.onKeyDown.listen((e) {
-      if (e.keyCode == 8 || e.keyCode == 9 || e.keyCode == 32) e.preventDefault();
+      if (e.keyCode == 8 ||
+          e.keyCode == 9 ||
+          e.keyCode == 32 ||
+          e.keyCode == 9) e.preventDefault();
     });
 
     div.onMouseWheel.listen((wheelEvent) {
@@ -227,7 +230,7 @@ class Terminal {
         char = Glyph.SPACE;
       }
 
-      if (code == 8) {
+      if (code == 8 || code == 7) {
         prevCode = code;
         continue;
       }

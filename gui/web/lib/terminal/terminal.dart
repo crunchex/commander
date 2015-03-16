@@ -263,11 +263,9 @@ class Terminal {
         span = new SpanElement();
         span.style.color = _theme.colors[curr.fgColor];
         span.style.backgroundColor = _theme.colors[curr.bgColor];
-        span.text += curr.value;
-      } else {
-        span.text += curr.value;
       }
 
+      span.text += curr.value;
       prev = curr;
     }
 

@@ -247,15 +247,25 @@ class Terminal {
 
     DivElement row = new DivElement();
     String str = '';
+    prev = _model.getGlyphAt(r, 0);
     for (int c = 0; c < _cols; c++) {
-      if (c == _cols - 1) {
-        row.append(new DocumentFragment.html(str));
+      curr = _model.getGlyphAt(r, c);
+
+      if (!curr.hasSameAttributes(prev) || c == _cols - 1) {
+        if (prev.hasDefaults()) {
+          row.append(new DocumentFragment.html(str));
+        } else {
+          SpanElement span = new SpanElement();
+          span.style.color = _theme.colors[prev.fgColor];
+          span.style.backgroundColor = _theme.colors[prev.bgColor];
+          span.append(new DocumentFragment.html(str));
+          row.append(span);
+        }
+
         str = '';
       }
 
-      curr = _model.getGlyphAt(r, c);
       str += curr.value;
-
       prev = curr;
     }
 

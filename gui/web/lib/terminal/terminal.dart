@@ -59,7 +59,8 @@ class Terminal {
   // TODO: fix this dynamic size detection
   //int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
   //int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
-  int get _cols => 80;
+  // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
+  int get _cols => 81;
   int get _rows => 30;
 
   /// A [String] that sets the colored theme of the entire [Terminal].

@@ -29,12 +29,15 @@ cd $TOPDIR/gui
 echo -n "Getting dependencies for gui...."
 pub get > /dev/null
 cd web
-if [ ! -d "ace-builds" ]; then
+if [ ! -d "src-min-noconflict" ]; then
 	git clone --quiet https://github.com/ajaxorg/ace-builds.git
+	cd ace-builds
+	# make sure we're using package 03.03.15
+	git checkout --quiet beb9ff68e397b4dcaa1d40f79651a063fc917736
+	mv src-min-noconflict ../src-min-noconflict
 fi
-cd ace-builds
-# make sure we're using package 03.03.15
-git checkout --quiet beb9ff68e397b4dcaa1d40f79651a063fc917736
+cd $TOPDIR/gui
+rm -rf $TOPDIR/gui/web/ace-builds
 echo "OK"
 
 cd $TOPDIR/gui

@@ -242,19 +242,6 @@ class Terminal {
     _refreshDisplay();
   }
 
-  /// Renders the cursor at [Cursor]'s current position.
-  void _drawCursor() {
-    Glyph cursor = new Glyph('|', _attr);
-    _model.setGlyphAt(cursor, _model.cursor.row, _model.cursor.col);
-  }
-
-  /// Renders a space at [Cursor]'s current position.
-  /// Useful for "removing" the cursor.
-  void _drawSpace() {
-    Glyph cursor = new Glyph(Glyph.SPACE, _attr);
-    _model.setGlyphAt(cursor, _model.cursor.row, _model.cursor.col);
-  }
-
   /// Generates the HTML for an individual row given
   /// the [Glyph]s contained in the model at that
   /// corresponding row.
@@ -281,7 +268,13 @@ class Terminal {
         str = '';
       }
 
-      str += curr.value;
+      // Draw the cursor.
+      if (_model.cursor.row == r && _model.cursor.col == c) {
+        str += '|';
+      } else {
+        str += curr.value;
+      }
+
       prev = curr;
     }
 

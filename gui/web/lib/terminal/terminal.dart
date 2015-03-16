@@ -246,26 +246,19 @@ class Terminal {
 
     DivElement row = new DivElement();
 
-    SpanElement span = new SpanElement();
     prev = _model.getGlyphAt(r, 0);
-
-    span.style.color = _theme.colors[prev.fgColor];
-    span.style.backgroundColor = _theme.colors[prev.bgColor];
-    span.text += prev.value;
+    String str = '';
+    str += prev.value;
 
     for (int c = 1; c < _cols; c++) {
       curr = _model.getGlyphAt(r, c);
 
-      if (!curr.hasSameAttributes(prev) || c == _cols - 1) {
-        row.append(span);
-
-        // TODO: handle other display attributes, like blink.
-        span = new SpanElement();
-        span.style.color = _theme.colors[curr.fgColor];
-        span.style.backgroundColor = _theme.colors[curr.bgColor];
+      if (c == _cols - 1) {
+        row.append(new DocumentFragment.html(str));
+        str = '';
       }
 
-      span.text += curr.value;
+      str += curr.value;
       prev = curr;
     }
 

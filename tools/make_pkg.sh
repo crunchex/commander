@@ -41,6 +41,7 @@ cd $TOPDIR
 ### build ###
 if [ $nobuild == 0 ]; then
 	$TOPDIR/tools/build_cmdr.sh
+    $TOPDIR/tools/build_cmdr_pty.sh
 fi
 
 ### package ###
@@ -49,7 +50,8 @@ mkdir -p $TOPDIR/deploy
 if [ -e "$TOPDIR/deploy/cmdr"* ]; then
 	rm deploy/cmdr*
 fi
-fpm -s dir -t deb -n cmdr -v 0.2 -p $TOPDIR/deploy/ ./gui/build/web=/opt/updroid/cmdr ./cmdr/bin/cmdr=/usr/local/bin/cmdr  > /dev/null
+fpm -s dir -t deb -n cmdr -v 0.2 -p $TOPDIR/deploy/ ./gui/build/web=/opt/updroid/cmdr \
+./cmdr/bin/cmdr=/usr/local/bin/cmdr ./cmdr/bin/cmdr-pty=/usr/local/bin/cmdr-pty  > /dev/null
 echo "OK"
 
 ### done ###

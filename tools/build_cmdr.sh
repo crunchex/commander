@@ -45,4 +45,4 @@ echo "OK"
 
 ### done ###
 cd $TOPDIR
-echo "####### Build complete. ##########"
+echo "##### Build complete. ############"

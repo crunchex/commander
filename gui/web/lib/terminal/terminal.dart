@@ -111,9 +111,13 @@ class Terminal {
   void _handleInput(KeyboardEvent e) {
     int key = e.keyCode;
 
-    // Eat ctrl-c and ctrl-v (copy & paste).
     if (e.ctrlKey) {
-      if (key == 86 || key == 67) return;
+      // Eat ctrl-v (paste).
+      if (key == 86) return;
+
+      if (key == 67) {
+        key = 3;
+      }
     }
 
     // keyCode behaves very oddly.

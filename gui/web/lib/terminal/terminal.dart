@@ -8,6 +8,7 @@ import 'package:quiver/core.dart';
 part 'model.dart';
 part 'input_keys.dart';
 part 'theme.dart';
+part 'escape_sequences.dart';
 
 /// A class for rendering a terminal emulator in a [DivElement] (param).
 /// [stdout] needs to receive individual UTF8 integers and will handle
@@ -35,6 +36,7 @@ class Terminal {
   bool _inputDone;
   List<int> _inputString;
   Theme _theme;
+  EscapeHandler _escHandler;
 
   static const int ESC = 27;
 
@@ -45,9 +47,10 @@ class Terminal {
     _inputString = [];
 
     _charWidth = 7;
-    _charHeight = 14;
+    _charHeight = 13;
     _model = new Model(_rows, _cols);
     _attr = new DisplayAttributes();
+    _escHandler = new EscapeHandler(_model, _attr);
     _theme = new Theme.SolarizedDark();
 
     _registerEventHandlers();
@@ -56,8 +59,9 @@ class Terminal {
   // TODO: fix this dynamic size detection
   //int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
   //int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
-  int get _cols => 80;
-  int get _rows => 30;
+  // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
+  int get _cols => 81;
+  int get _rows => 33;
 
   /// A [String] that sets the colored theme of the entire [Terminal].
   /// Supported themes: solarized-dark, solarized-light.
@@ -81,7 +85,7 @@ class Terminal {
 
     // Disable browser navigation keys.
     div.onKeyDown.listen((e) {
-      if (e.keyCode == 8 || e.keyCode == 9) e.preventDefault();
+      if (e.keyCode == 8 || e.keyCode == 9 || e.keyCode == 32) e.preventDefault();
     });
 
     div.onMouseWheel.listen((wheelEvent) {
@@ -123,127 +127,93 @@ class Terminal {
     // Carriage Return (13) => New Line (10).
     if (key == 13) {
       key = 10;
-      _inputDone = true;
     }
 
     // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
     if (key != 16 && key != 17 && key != 91 && key != 18) {
-      _processKey(key);
-      if (key == 8 && _inputString.isNotEmpty) {
-        _inputString.removeLast();
-      } else {
-        _inputString.add(key);
-      }
-    }
-
-    if (_inputDone) {
-      stdin.add(_inputString);
-      _inputString = [];
-      _inputDone = false;
+      stdin.add([key]);
     }
   }
 
-  void _processKey(int input) {
-    String char = new String.fromCharCode(input);
-    if (input == 10) {
-      // Set glyph at cursor to blank.
-      Glyph g = new Glyph(Glyph.SPACE, _attr);
-      _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
-
-      _model.cursorNewLine();
-      _model.inputCursorIndex = 0;
-      return;
-    }
-
-    if (input == 8 && _model.inputCursorIndex > 0) {
-      // Set glyph at cursor to blank.
-      Glyph g = new Glyph(Glyph.SPACE, _attr);
-      _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
-
-      _model.cursorBack();
-      _drawCursor();
-      _refreshDisplay();
-      return;
-    }
-
-    if (input == 32) {
-      char = Glyph.SPACE;
-    }
-
-    Glyph g = new Glyph(char, _attr);
-    _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
-    _model.cursorNext();
-    _model.inputCursorIndex++;
-    _drawCursor();
-
-    _refreshDisplay();
-  }
-
-  /// Splits a UTF8 string into substrings, split by preceding escape sequences.
+  /// Processes [output] by coordinating handling of strings
+  /// and escape parsing.
   void _processStdOut(List<int> output) {
-    List<int> escapeString, escape, string;
-    int start, end;
-
-    // The case where the current output contains
-    // no escape sequence.
-    if (!output.contains(ESC)) {
-      _handleOutString(output);
-      return;
+    int nextEsc;
+    while (output.isNotEmpty) {
+      nextEsc = output.indexOf(ESC);
+      if (nextEsc == -1) {
+        _handleOutString(output);
+        return;
+      } else {
+        _handleOutString(output.sublist(0, nextEsc));
+        output = _parseEscape(output.sublist(nextEsc));
+      }
     }
+  }
 
-    // Handle any string preceding the first escape sequence.
-    if (output[0] != ESC) {
-      end = output.indexOf(ESC);
-      string = output.sublist(0, end);
-      _handleOutString(string);
+  /// Parses out escape sequences. When it finds one,
+  /// it handles it and returns the remainder of [output].
+  List<int> _parseEscape(List<int> output) {
+    List<int> escape;
+    int termIndex;
+    for (int i = 1; i <= output.length; i++) {
+      termIndex = i;
+      escape = output.sublist(0, i);
 
-      for (int i in string) {
-        output.remove(i);
+      if (escape.length != 1 && escape.last == 27) {
+        print('Unknown escape detected: ${escape.sublist(0, escape.length - 1).toString()}');
+        break;
+      }
+
+      if (EscapeHandler.constantEscapes.containsKey(escape)) {
+        switch (EscapeHandler.constantEscapes[escape]) {
+          default:
+            print('Constant escape : ${EscapeHandler
+                .constantEscapes[escape]} (${escape.toString()}) not yet supported');
+        }
+        break;
+      }
+
+      if (EscapeHandler.variableEscapeTerminators.containsKey(escape.last)) {
+        switch (EscapeHandler
+                .variableEscapeTerminators[escape.last]) {
+          case 'Set Attribute Mode':
+            _escHandler.setAttributeMode(escape);
+            break;
+          case 'Cursor Home':
+            _escHandler.cursorHome(escape);
+            break;
+          case 'Cursor Forward':
+            _escHandler.cursorForward();
+            break;
+          default:
+            print('Variable escape : ${EscapeHandler
+                .variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
+        }
+        break;
       }
     }
 
-    // TODO: make escape parsing independent of the display attribute
-    // terminator, 109 (m).
-    while (true) {
-      start = output.indexOf(ESC);
-      List<int> subList = output.sublist(1);
-      if (!subList.contains(ESC)) break;
-      end = subList.indexOf(ESC) + 1;
-
-      escapeString = output.sublist(start, end);
-      escape = escapeString.sublist(0, escapeString.indexOf(109) + 1);
-      string = escapeString.sublist(escapeString.indexOf(109) + 1);
-      _setAttributeMode(escape);
-      _handleOutString(string);
-
-      for (int j in escapeString) {
-        output.remove(j);
-      }
-    }
-
-    // Deal with the remaining string composed of at least one final
-    // escape.
-    escape = output.sublist(0, output.indexOf(109) + 1);
-    string = output.sublist(output.indexOf(109) + 1);
-    _setAttributeMode(escape);
-    _handleOutString(string);
+    return output.sublist(termIndex);
   }
 
   /// Appends a new [SpanElement] with the contents of [_outString]
   /// to the [_buffer] and updates the display.
   void _handleOutString(List<int> string) {
     var codes = UTF8.decode(string).codeUnits;
+    var prevCode;
     for (var code in codes) {
       String char = new String.fromCharCode(code);
-      if (code == 10) {
-        _drawSpace();
-        _model.cursorNewLine();
+
+      if (code == 13) {
+        _model.cursorCarriageReturn();
+        prevCode = code;
         continue;
       }
 
-      if (code == 13) {
-        // TODO: figure out what to do with the carriage return since it
-        // comes with the newline. Eat it for now.
+      if (code == 10) {
+        _model.cursorNewLine();
+        prevCode = code;
         continue;
       }
 
@@ -253,45 +223,12 @@ class Terminal {
 
       Glyph g = new Glyph(char, _attr);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
-      _model.cursorNext();
+      _model.cursorForward();
+
+      prevCode = code;
     }
 
-    _drawCursor();
     _refreshDisplay();
-  }
-
-  /// Sets local [DisplayAttributes], given [escape].
-  void _setAttributeMode(List<int> escape) {
-    String decodedEsc = UTF8.decode(escape);
-
-    if (decodedEsc.contains('0m')) {
-      _attr.resetAll();
-    }
-
-    if (decodedEsc.contains(';1')) _attr.bright = true;
-    if (decodedEsc.contains(';2')) _attr.dim = true;
-    if (decodedEsc.contains(';4')) _attr.underscore = true;
-    if (decodedEsc.contains(';5')) _attr.blink = true;
-    if (decodedEsc.contains(';7')) _attr.reverse = true;
-    if (decodedEsc.contains(';8')) _attr.hidden = true;
-
-    if (decodedEsc.contains(';30')) _attr.fgColor = 'black';
-    if (decodedEsc.contains(';31')) _attr.fgColor = 'red';
-    if (decodedEsc.contains(';32')) _attr.fgColor = 'green';
-    if (decodedEsc.contains(';33')) _attr.fgColor = 'yellow';
-    if (decodedEsc.contains(';34')) _attr.fgColor = 'blue';
-    if (decodedEsc.contains(';35')) _attr.fgColor = 'magenta';
-    if (decodedEsc.contains(';36')) _attr.fgColor = 'cyan';
-    if (decodedEsc.contains(';37')) _attr.fgColor = 'white';
-
-    if (decodedEsc.contains(';40')) _attr.bgColor = 'black';
-    if (decodedEsc.contains(';41')) _attr.bgColor = 'red';
-    if (decodedEsc.contains(';42')) _attr.bgColor = 'green';
-    if (decodedEsc.contains(';43')) _attr.bgColor = 'yellow';
-    if (decodedEsc.contains(';44')) _attr.bgColor = 'blue';
-    if (decodedEsc.contains(';45')) _attr.bgColor = 'magenta';
-    if (decodedEsc.contains(';46')) _attr.bgColor = 'cyan';
-    if (decodedEsc.contains(';47')) _attr.bgColor = 'white';
   }
 
   /// Renders the cursor at [Cursor]'s current position.
@@ -314,29 +251,26 @@ class Terminal {
     Glyph prev, curr;
 
     DivElement row = new DivElement();
-
-    SpanElement span = new SpanElement();
+    String str = '';
     prev = _model.getGlyphAt(r, 0);
-
-    span.style.color = _theme.colors[prev.fgColor];
-    span.style.backgroundColor = _theme.colors[prev.bgColor];
-    span.text += prev.value;
-
-    for (int c = 1; c < _cols; c++) {
+    for (int c = 0; c < _cols; c++) {
       curr = _model.getGlyphAt(r, c);
 
-      if (curr != prev || c == _cols - 1) {
-        row.append(span);
+      if (!curr.hasSameAttributes(prev) || c == _cols - 1) {
+        if (prev.hasDefaults()) {
+          row.append(new DocumentFragment.html(str));
+        } else {
+          SpanElement span = new SpanElement();
+          span.style.color = _theme.colors[prev.fgColor];
+          span.style.backgroundColor = _theme.colors[prev.bgColor];
+          span.append(new DocumentFragment.html(str));
+          row.append(span);
+        }
 
-        // TODO: handle other display attributes, like blink.
-        span = new SpanElement();
-        span.style.color = _theme.colors[curr.fgColor];
-        span.style.backgroundColor = _theme.colors[curr.bgColor];
-        span.text += curr.value;
-      } else {
-        span.text += curr.value;
+        str = '';
       }
 
+      str += curr.value;
       prev = curr;
     }
 

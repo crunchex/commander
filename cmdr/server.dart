@@ -3,6 +3,7 @@ library updroid_server;
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
@@ -14,12 +15,13 @@ import 'lib/client_responses.dart';
 import 'lib/server_helper.dart' as help;
 
 part 'pty.dart';
+part 'camera.dart';
 part 'commands.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class UpDroidServer {
-  static const String defaultWorkspacePath = '/home/user/workspace';
-  static const String defaultGuiPath = '/etc/updroid/web';
+  static const String defaultWorkspacePath = '/home/user/uproot';
+  static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
   UpDroidServer (ArgResults results) {
@@ -33,6 +35,7 @@ class UpDroidServer {
 
     _initServer(dir, virDir, watcher);
     _initPty(dir);
+    _initCamera();
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -59,16 +62,24 @@ class UpDroidServer {
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.listen((HttpRequest request) {
         // WebSocket requests are considered "upgraded" HTTP requests.
-        help.debug("${request.method} request for: ${request.uri.path}", 0);
         if (WebSocketTransformer.isUpgradeRequest(request)) {
-          WebSocketTransformer.upgrade(request).then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
-        } else {
-          if (virDir != null) {
-            virDir.serveRequest(request);
-          }
+          WebSocketTransformer
+            .upgrade(request)
+            .then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
+          return;
         }
+
+        _handleRequest(request, virDir);
       });
     });
+  }
+
+  void _handleRequest(HttpRequest request, VirtualDirectory virDir) {
+    help.debug("${request.method} request for: ${request.uri.path}", 0);
+
+    if (virDir != null) {
+      virDir.serveRequest(request);
+    }
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
@@ -150,5 +161,9 @@ class UpDroidServer {
     for (int i = 1; i <= 4; i++) {
       UpDroidPty pty = new UpDroidPty(i, dir.path);
     }
+  }
+
+  void _initCamera() {
+    UpDroidCamera camera = new UpDroidCamera(1);
   }
 }

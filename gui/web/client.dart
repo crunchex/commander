@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:js' as js;
 import 'package:ace/ace.dart' as ace;
 import 'package:bootjack/bootjack.dart';
 import 'package:ace/proxy.dart';
@@ -16,11 +17,13 @@ import "package:path/path.dart" as pathLib;
 part 'explorer.dart';
 part 'editor.dart';
 part 'console.dart';
+part 'camera.dart';
 
 class UpDroidClient {
   UpDroidEditor editor;
   UpDroidExplorer explorer;
   UpDroidConsole console;
+  UpDroidCamera camera;
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
@@ -53,6 +56,7 @@ class UpDroidClient {
     for (int i = 1; i <= 4; i++) {
       console = new UpDroidConsole(i, cs);
     }
+    camera = new UpDroidCamera(1);
   }
 
   /// Process messages according to the type.

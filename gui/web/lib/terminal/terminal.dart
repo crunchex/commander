@@ -47,7 +47,7 @@ class Terminal {
     _inputString = [];
 
     _charWidth = 7;
-    _charHeight = 14;
+    _charHeight = 13;
     _model = new Model(_rows, _cols);
     _attr = new DisplayAttributes();
     _escHandler = new EscapeHandler(_model, _attr);

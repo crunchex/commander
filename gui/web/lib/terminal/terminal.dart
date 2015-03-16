@@ -165,11 +165,12 @@ class Terminal {
         break;
       }
 
-      if (EscapeHandler.constantEscapes.containsKey(escape)) {
-        switch (EscapeHandler.constantEscapes[escape]) {
+      String encodedEscape = JSON.encode(escape);
+      if (EscapeHandler.constantEscapes.containsKey(encodedEscape)) {
+        switch (EscapeHandler.constantEscapes[encodedEscape]) {
           default:
             print('Constant escape : ${EscapeHandler
-                .constantEscapes[escape]} (${escape.toString()}) not yet supported');
+                .constantEscapes[encodedEscape]} (${escape.toString()}) not yet supported');
         }
         break;
       }

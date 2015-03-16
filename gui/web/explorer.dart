@@ -367,7 +367,6 @@ class UpDroidExplorer {
 
       InputElement input = new InputElement();
       input.value = '${li.dataset['trueName']}';
-      input.select();
 
       Element outside = querySelector('.container-fluid');
 
@@ -436,6 +435,8 @@ class UpDroidExplorer {
 
       // Replace child 1 (span filename) with input.
       li.children[1] = input;
+      input.focus();
+      input.select();
     }
   }
 

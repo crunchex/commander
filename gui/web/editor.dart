@@ -175,6 +175,7 @@ class UpDroidEditor {
       var close = querySelector('.close');
       presentModal("#save-as");
       input.onKeyUp.listen((e){
+        bool completed = false;
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER){
           input = querySelector('#save-as-input');
@@ -235,10 +236,13 @@ class UpDroidEditor {
   /// Sends the file path and contents to the server to be saved to disk.
   void saveText() {
     if (openFilePath == null) {
-      openFilePath = absolutePathPrefix + "/untitled.py";
+      saveAsButton.click();
     }
-    ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFilePath);
-    resetSavePoint();
+    else{
+      ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFilePath);
+      resetSavePoint();
+
+    }
   }
 
   /// Compares the Editor's current text with text at the last save point.

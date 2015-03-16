@@ -20,8 +20,8 @@ part 'commands.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class UpDroidServer {
-  static const String defaultWorkspacePath = '/home/user/workspace';
-  static const String defaultGuiPath = '/etc/updroid/web';
+  static const String defaultWorkspacePath = '/home/user/uproot';
+  static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
   UpDroidServer (ArgResults results) {

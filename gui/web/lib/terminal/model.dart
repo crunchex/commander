@@ -238,6 +238,17 @@ class Glyph {
             && bgColor == other.bgColor);
   }
 
+  bool hasDefaults() {
+    return (bright == false
+            && dim == false
+            && underscore == false
+            && blink == false
+            && reverse == false
+            && hidden == false
+            && fgColor == 'white'
+            && bgColor == 'black');
+  }
+
   int get hashCode {
     List members = [bright, dim, underscore, blink, reverse, hidden, fgColor, bgColor];
     return hashObjects(members);

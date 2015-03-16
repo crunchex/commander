@@ -256,7 +256,7 @@ class Terminal {
     for (int c = 1; c < _cols; c++) {
       curr = _model.getGlyphAt(r, c);
 
-      if (curr != prev || c == _cols - 1) {
+      if (!curr.hasSameAttributes(prev) || c == _cols - 1) {
         row.append(span);
 
         // TODO: handle other display attributes, like blink.

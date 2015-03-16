@@ -48,7 +48,7 @@ class Model {
   }
 
   void cursorBackward() {
-    if (cursor.col > 0) {
+    if (cursor.col > 1) {
       cursor.col--;
     }
   }

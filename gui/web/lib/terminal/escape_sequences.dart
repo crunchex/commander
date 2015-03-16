@@ -90,6 +90,15 @@ class EscapeHandler {
     _model.cursorForward();
   }
 
+  /// Erases from the current cursor position to the end of the current line.
+  void eraseEndOfLine() {
+    _model.cursorBackward();
+    // TODO: need to be able to use the same display attributes from the previous Glyph,
+    // but right now it's too cumbersome.
+    Glyph g = new Glyph(Glyph.SPACE, _attr);
+    _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
+  }
+
   /// Sets multiple display attribute settings.
   /// Sets local [DisplayAttributes], given [escape].
   void setAttributeMode(List<int> escape) {

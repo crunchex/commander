@@ -168,10 +168,14 @@ class Terminal {
       String encodedEscape = JSON.encode(escape);
       if (EscapeHandler.constantEscapes.containsKey(encodedEscape)) {
         switch (EscapeHandler.constantEscapes[encodedEscape]) {
+          case 'Erase End of Line':
+            _escHandler.eraseEndOfLine();
+            break;
           default:
             print('Constant escape : ${EscapeHandler
                 .constantEscapes[encodedEscape]} (${escape.toString()}) not yet supported');
         }
+        _refreshDisplay();
         break;
       }
 
@@ -191,6 +195,7 @@ class Terminal {
             print('Variable escape : ${EscapeHandler
                 .variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
         }
+        _refreshDisplay();
         break;
       }
     }
@@ -220,6 +225,11 @@ class Terminal {
 
       if (code == 32) {
         char = Glyph.SPACE;
+      }
+
+      if (code == 8) {
+        prevCode = code;
+        continue;
       }
 
       Glyph g = new Glyph(char, _attr);

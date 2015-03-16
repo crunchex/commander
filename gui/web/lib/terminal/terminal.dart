@@ -33,10 +33,11 @@ class Terminal {
   List<SpanElement> _buffer;
   Model _model;
   DisplayAttributes _attr;
-  bool _inputDone;
+  bool _inputDone, _blinkOn;
   List<int> _inputString;
   Theme _theme;
   EscapeHandler _escHandler;
+  Timer _timer;
 
   static const int ESC = 27;
 
@@ -45,6 +46,7 @@ class Terminal {
     stdin = new StreamController<List<int>>();
     _inputDone = false;
     _inputString = [];
+    _blinkOn = false;
 
     _charWidth = 7;
     _charHeight = 13;
@@ -52,6 +54,11 @@ class Terminal {
     _attr = new DisplayAttributes();
     _escHandler = new EscapeHandler(_model, _attr);
     _theme = new Theme.SolarizedDark();
+
+    _timer = new Timer.periodic(new Duration(milliseconds: 500), (timer) {
+      _blinkOn = !_blinkOn;
+      _refreshDisplay();
+    });
 
     _registerEventHandlers();
   }
@@ -277,7 +284,7 @@ class Terminal {
 
       // Draw the cursor.
       if (_model.cursor.row == r && _model.cursor.col == c) {
-        str += '|';
+        if (_blinkOn) str += '|';
       } else {
         str += curr.value;
       }

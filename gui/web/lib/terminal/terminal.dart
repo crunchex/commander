@@ -201,16 +201,19 @@ class Terminal {
   /// to the [_buffer] and updates the display.
   void _handleOutString(List<int> string) {
     var codes = UTF8.decode(string).codeUnits;
+    var prevCode;
     for (var code in codes) {
       String char = new String.fromCharCode(code);
 
       if (code == 13) {
         _model.cursorCarriageReturn();
+        prevCode = code;
         continue;
       }
 
       if (code == 10) {
         _model.cursorNewLine();
+        prevCode = code;
         continue;
       }
 
@@ -220,7 +223,9 @@ class Terminal {
 
       Glyph g = new Glyph(char, _attr);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
-      _model.cursorNext();
+      _model.cursorForward();
+
+      prevCode = code;
     }
 
     _refreshDisplay();

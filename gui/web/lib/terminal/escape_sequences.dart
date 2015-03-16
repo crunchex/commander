@@ -87,7 +87,7 @@ class EscapeHandler {
 
   /// Moves the cursor forward by COUNT columns; the default count is 1.
   void cursorForward() {
-    _model.cursorNext();
+    _model.cursorForward();
   }
 
   /// Sets multiple display attribute settings.

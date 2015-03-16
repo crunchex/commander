@@ -41,19 +41,15 @@ class Model {
     _rows[row][col] = g;
   }
 
-  void cursorNext() {
+  void cursorForward() {
     if (cursor.col < numCols - 1) {
       cursor.col++;
-      return;
     }
-
-    cursorNewLine();
   }
 
-  void cursorBack() {
-    if (inputCursorIndex > 0) {
+  void cursorBackward() {
+    if (cursor.col > 0) {
       cursor.col--;
-      inputCursorIndex--;
     }
   }
 

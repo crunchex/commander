@@ -61,7 +61,7 @@ class Terminal {
   //int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
   // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
   int get _cols => 81;
-  int get _rows => 30;
+  int get _rows => 33;
 
   /// A [String] that sets the colored theme of the entire [Terminal].
   /// Supported themes: solarized-dark, solarized-light.

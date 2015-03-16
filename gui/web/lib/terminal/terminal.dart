@@ -166,9 +166,9 @@ class Terminal {
       }
 
       if (EscapeHandler.constantEscapes.containsKey(escape)) {
-        switch (EscapeHandler.variableEscapeTerminators[escape.last]) {
+        switch (EscapeHandler.constantEscapes[escape]) {
           default:
-            print('Variable escape : ${EscapeHandler
+            print('Constant escape : ${EscapeHandler
                 .constantEscapes[escape]} (${escape.toString()}) not yet supported');
         }
         break;

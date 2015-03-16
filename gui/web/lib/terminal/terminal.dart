@@ -246,20 +246,16 @@ class Terminal {
     Glyph prev, curr;
 
     DivElement row = new DivElement();
-
-    prev = _model.getGlyphAt(r, 0);
     String str = '';
-    str += prev.value;
-
-    for (int c = 1; c < _cols; c++) {
-      curr = _model.getGlyphAt(r, c);
-
+    for (int c = 0; c < _cols; c++) {
       if (c == _cols - 1) {
         row.append(new DocumentFragment.html(str));
         str = '';
       }
 
+      curr = _model.getGlyphAt(r, c);
       str += curr.value;
+
       prev = curr;
     }
 

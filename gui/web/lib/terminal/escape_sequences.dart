@@ -4,44 +4,44 @@ class EscapeHandler {
   // Taken from: http://www.termsys.demon.co.uk/vtansi.htm
   static Map constantEscapes = {
     // Device Status
-    [27, 91, 99]: 'Query Device Code',
-    [27, 91, 53, 110]: 'Query Device Status',
-    [27, 91, 48, 110]: 'Report Device OK',
-    [27, 91, 51, 110]: 'Report Device Failure',
-    [27, 91, 54, 110]: 'Query Cursor Position',
-    [27, 91, 53, 110]: 'Report Cursor Position',
+    JSON.encode([27, 91, 99]): 'Query Device Code',
+    JSON.encode([27, 91, 53, 110]): 'Query Device Status',
+    JSON.encode([27, 91, 48, 110]): 'Report Device OK',
+    JSON.encode([27, 91, 51, 110]): 'Report Device Failure',
+    JSON.encode([27, 91, 54, 110]): 'Query Cursor Position',
+    JSON.encode([27, 91, 53, 110]): 'Report Cursor Position',
     // Terminal Setup
-    [27, 99]: 'Reset Device',
-    [27, 55, 104]: 'Enable Line Wrap',
-    [27, 55, 108]: 'Disable Line Wrap',
+    JSON.encode([27, 99]): 'Reset Device',
+    JSON.encode([27, 55, 104]): 'Enable Line Wrap',
+    JSON.encode([27, 55, 108]): 'Disable Line Wrap',
     // Fonts
-    [27, 40]: 'Font Set G0',
-    [27, 41]: 'Font Set G1',
+    JSON.encode([27, 40]): 'Font Set G0',
+    JSON.encode([27, 41]): 'Font Set G1',
     // Cursor Control
-    [27, 91, 115]: 'Save Cursor',
-    [27, 91, 117]: 'Unsave Cursor',
-    [27, 55]: 'Save Cursor & Attrs',
-    [27, 56]: 'Restore Cursor & Attrs',
+    JSON.encode([27, 91, 115]): 'Save Cursor',
+    JSON.encode([27, 91, 117]): 'Unsave Cursor',
+    JSON.encode([27, 55]): 'Save Cursor & Attrs',
+    JSON.encode([27, 56]): 'Restore Cursor & Attrs',
     // Scrolling
-    [27, 91, 114]: 'Scroll Screen',
-    [27, 68]: 'Scroll Down',
-    [27, 77]: 'Scroll Up',
+    JSON.encode([27, 91, 114]): 'Scroll Screen',
+    JSON.encode([27, 68]): 'Scroll Down',
+    JSON.encode([27, 77]): 'Scroll Up',
     // Tab Control
-    [27, 72]: 'Set Tab',
-    [27, 91, 103]: 'Clear Tab',
-    [27, 91, 51, 103]: 'Clear All Tabs',
+    JSON.encode([27, 72]): 'Set Tab',
+    JSON.encode([27, 91, 103]): 'Clear Tab',
+    JSON.encode([27, 91, 51, 103]): 'Clear All Tabs',
     // Erasing Text
-    [27, 91, 75]: 'Erase End of Line',
-    [27, 91, 49, 75]: 'Erase Start of Line',
-    [27, 91, 50, 75]: 'Erase Line',
-    [27, 91, 74]: 'Erase Down',
-    [27, 91, 49, 74]: 'Erase Up',
-    [27, 91, 50, 74]: 'Erase Screen',
+    JSON.encode([27, 91, 75]): 'Erase End of Line',
+    JSON.encode([27, 91, 49, 75]): 'Erase Start of Line',
+    JSON.encode([27, 91, 50, 75]): 'Erase Line',
+    JSON.encode([27, 91, 74]): 'Erase Down',
+    JSON.encode([27, 91, 49, 74]): 'Erase Up',
+    JSON.encode([27, 91, 50, 74]): 'Erase Screen',
     // Printing
-    [27, 91, 105]: 'Print Screen',
-    [27, 91, 49, 105]: 'Print Line',
-    [27, 91, 52, 105]: 'Stop Print Log',
-    [27, 91, 53, 105]: 'Start Print Log'
+    JSON.encode([27, 91, 105]): 'Print Screen',
+    JSON.encode([27, 91, 49, 105]): 'Print Line',
+    JSON.encode([27, 91, 52, 105]): 'Stop Print Log',
+    JSON.encode([27, 91, 53, 105]): 'Start Print Log'
   };
 
   static Map variableEscapeTerminators = {
@@ -88,6 +88,15 @@ class EscapeHandler {
   /// Moves the cursor forward by COUNT columns; the default count is 1.
   void cursorForward() {
     _model.cursorForward();
+  }
+
+  /// Erases from the current cursor position to the end of the current line.
+  void eraseEndOfLine() {
+    _model.cursorBackward();
+    // TODO: need to be able to use the same display attributes from the previous Glyph,
+    // but right now it's too cumbersome.
+    Glyph g = new Glyph(Glyph.SPACE, _attr);
+    _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
   }
 
   /// Sets multiple display attribute settings.

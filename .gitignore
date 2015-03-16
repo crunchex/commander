@@ -8,7 +8,7 @@ packages
 bin/
 *.deb
 deploy/
-ace-builds/
+src-min-noconflict/
 
 
 # Or the files created by dart2js.

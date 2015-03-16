@@ -165,12 +165,17 @@ class Terminal {
         break;
       }
 
-      if (EscapeHandler.constantEscapes.containsKey(escape)) {
-        switch (EscapeHandler.constantEscapes[escape]) {
+      String encodedEscape = JSON.encode(escape);
+      if (EscapeHandler.constantEscapes.containsKey(encodedEscape)) {
+        switch (EscapeHandler.constantEscapes[encodedEscape]) {
+          case 'Erase End of Line':
+            _escHandler.eraseEndOfLine();
+            break;
           default:
             print('Constant escape : ${EscapeHandler
-                .constantEscapes[escape]} (${escape.toString()}) not yet supported');
+                .constantEscapes[encodedEscape]} (${escape.toString()}) not yet supported');
         }
+        _refreshDisplay();
         break;
       }
 
@@ -190,6 +195,7 @@ class Terminal {
             print('Variable escape : ${EscapeHandler
                 .variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
         }
+        _refreshDisplay();
         break;
       }
     }
@@ -221,6 +227,11 @@ class Terminal {
         char = Glyph.SPACE;
       }
 
+      if (code == 8) {
+        prevCode = code;
+        continue;
+      }
+
       Glyph g = new Glyph(char, _attr);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
       _model.cursorForward();
@@ -229,19 +240,6 @@ class Terminal {
     }
 
     _refreshDisplay();
-  }
-
-  /// Renders the cursor at [Cursor]'s current position.
-  void _drawCursor() {
-    Glyph cursor = new Glyph('|', _attr);
-    _model.setGlyphAt(cursor, _model.cursor.row, _model.cursor.col);
-  }
-
-  /// Renders a space at [Cursor]'s current position.
-  /// Useful for "removing" the cursor.
-  void _drawSpace() {
-    Glyph cursor = new Glyph(Glyph.SPACE, _attr);
-    _model.setGlyphAt(cursor, _model.cursor.row, _model.cursor.col);
   }
 
   /// Generates the HTML for an individual row given
@@ -270,7 +268,13 @@ class Terminal {
         str = '';
       }
 
-      str += curr.value;
+      // Draw the cursor.
+      if (_model.cursor.row == r && _model.cursor.col == c) {
+        str += '|';
+      } else {
+        str += curr.value;
+      }
+
       prev = curr;
     }
 

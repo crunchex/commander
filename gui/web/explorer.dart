@@ -66,36 +66,22 @@ class UpDroidExplorer {
 
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
-    cs.stream
-        .where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL')
-        .listen((m) => processMessage(m));
+    cs.stream.where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL').listen((m) => processMessage(m));
 
-    ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
-        .listen((um) {
-          workspacePath = um.body;
-          ws.send('[[INITIAL_DIRECTORY_LIST]]');
-        });
+    ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_DIRECTORY_PATH').listen((um) {
+      workspacePath = um.body;
+      ws.send('[[INITIAL_DIRECTORY_LIST]]');
+    });
 
-    ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'INITIAL_DIRECTORY_LIST')
-        .listen((um) => initialDirectoryList(um.body));
+    ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'INITIAL_DIRECTORY_LIST').listen((um) => initialDirectoryList(um.body));
 
-    ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_DIRECTORY_LIST')
-        .listen((um) => generateDirectoryList(um.body));
+    ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_DIRECTORY_LIST').listen((um) => generateDirectoryList(um.body));
 
-    ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_DIRECTORY_REFRESH')
-        .listen((um) => refreshPage(um.body));
+    ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_DIRECTORY_REFRESH').listen((um) => refreshPage(um.body));
 
-    ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_ADD')
-        .listen((um) => addUpdate(um.body));
+    ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_ADD').listen((um) => addUpdate(um.body));
 
-    ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_REMOVE')
-        .listen((um) => removeUpdate(um.body));
+    ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_REMOVE').listen((um) => removeUpdate(um.body));
 
     dzRootLineContainer.onDragEnter.listen((e) => newFileDrop.classes.add('file-drop-entered'));
     dzRootLineContainer.onDragLeave.listen((e) => newFileDrop.classes.remove('file-drop-entered'));
@@ -110,60 +96,53 @@ class UpDroidExplorer {
         LIElement item = querySelector('[data-path="$currentPath"]');
         var newPath = '$workspacePath/${e.draggableElement.dataset['trueName']}';
 
-       // Check for duplicate file name
-       LIElement duplicate = querySelector('[data-path="$workspacePath/${e.draggableElement.dataset['trueName']}"]');
-       bool alert = false;
+        // Check for duplicate file name
+        LIElement duplicate = querySelector('[data-path="$workspacePath/${e.draggableElement.dataset['trueName']}"]');
+        bool alert = false;
 
-       if(duplicate != null && duplicate != item){
-         alert = true;
-         window.alert("Cannot move here, filename already exists");
-       }
+        if (duplicate != null && duplicate != item) {
+          alert = true;
+          window.alert("Cannot move here, filename already exists");
+        }
 
-       if(e.draggableElement.dataset['isDir'] == 'true'){
+        if (e.draggableElement.dataset['isDir'] == 'true') {
 
-                     // Avoid an exception thrown when the new name already exists or dragging to same folder.
+          // Avoid an exception thrown when the new name already exists or dragging to same folder.
 
-                     if (currentPath != newPath && alert == false) {
-                               if(item.lastChild.hasChildNodes() == false){
-                                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
-                                 newElementFromFile(new SimpleFile.fromPath(workspacePath +
-                                    '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
-                                 item.remove();
-                               }
+          if (currentPath != newPath && alert == false) {
+            if (item.lastChild.hasChildNodes() == false) {
+              ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              newElementFromFile(new SimpleFile.fromPath(workspacePath + '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
+              item.remove();
+            } // TODO: Preserve structure
+            else if (checkContents(item) == true) {
+              ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
+              item.remove();
+            } // TODO: Preserve structure
+            else {
+              ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              item.remove();
+            }
+          }
+        } else {
+          if (currentPath != newPath && alert == false) {
+            ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+          }
+        }
 
-                               // TODO: Preserve structure
-                               else if(checkContents(item) == true){
-                                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
-                                 ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
-                                 item.remove();
-                               }
-
-                               // TODO: Preserve structure
-                               else{
-                                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
-                                 item.remove();
-                                 }
-                             }
-                 }
-
-                   else{
-                     if (currentPath != newPath && alert == false){
-                           ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
-                     }
-                   }
-
-      } else if (e.draggableElement.id == 'file'){
+      } else if (e.draggableElement.id == 'file') {
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
       } else {
         ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
       }
     });
 
-    newFolder.onDoubleClick.listen((e){
+    newFolder.onDoubleClick.listen((e) {
       ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
     });
 
-    newFile.onDoubleClick.listen((e){
+    newFile.onDoubleClick.listen((e) {
       ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
     });
 
@@ -174,7 +153,7 @@ class UpDroidExplorer {
       var path = e.draggableElement.dataset['path'];
 
       // Draggable is an empty folder
-      if(e.draggableElement.dataset['isDir'] == 'true'){
+      if (e.draggableElement.dataset['isDir'] == 'true') {
         LIElement selectedFolder = querySelector('[data-path="${e.draggableElement.dataset['path']}"');
         selectedFolder.remove();
       }
@@ -224,12 +203,12 @@ class UpDroidExplorer {
   LIElement generateLiHtml(file, [expanded]) {
     LIElement li = new LIElement();
     li
-      ..dataset['name'] = removeSpaces(file.name)
-      ..dataset['trueName'] = (file.name)
-      ..dataset['path'] = file.path
-      ..dataset['isDir'] = file.isDirectory.toString()
-      ..draggable = true
-      ..classes.add('explorer-li');
+        ..dataset['name'] = removeSpaces(file.name)
+        ..dataset['trueName'] = (file.name)
+        ..dataset['path'] = file.path
+        ..dataset['isDir'] = file.isDirectory.toString()
+        ..draggable = true
+        ..classes.add('explorer-li');
 
     // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
@@ -252,9 +231,9 @@ class UpDroidExplorer {
       li.dataset['expanded'] = 'false';
       UListElement ul = new UListElement();
       ul
-        ..dataset['name'] = 'explorer-ul-${removeSpaces(file.name)}'
-        ..dataset['path'] = removeSpaces(file.path)
-        ..classes.addAll(['explorer', 'explorer-ul']);
+          ..dataset['name'] = 'explorer-ul-${removeSpaces(file.name)}'
+          ..dataset['path'] = removeSpaces(file.path)
+          ..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
 
       ul.classes.add("explorer-hidden");
@@ -268,12 +247,12 @@ class UpDroidExplorer {
       }
 
       glyphicon.onClick.listen((e) {
-          ul.classes.add("explorer-hidden");
-          glyphicon.replaceWith(glyph);
-          li.dataset['expanded'] = 'false';
+        ul.classes.add("explorer-hidden");
+        glyphicon.replaceWith(glyph);
+        li.dataset['expanded'] = 'false';
       });
 
-      glyph.onClick.listen((e){
+      glyph.onClick.listen((e) {
         glyph.replaceWith(glyphicon);
         li.dataset['expanded'] = 'true';
         ul.classes.remove("explorer-hidden");
@@ -301,47 +280,41 @@ class UpDroidExplorer {
           // Check for duplicate file name
           LIElement duplicate = querySelector('[data-path="${span.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}"]');
           bool alert = false;
-          if(duplicate != null){
+          if (duplicate != null) {
             alert = true;
           }
 
-            // The draggable is an empty folder
+          // The draggable is an empty folder
 
-            if(e.draggableElement.dataset['isDir'] == 'true'){
+          if (e.draggableElement.dataset['isDir'] == 'true') {
 
-              bool send = true;
-              if (span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])) {
-                send = checkNested(span.parent.dataset['path'], e.draggableElement.dataset['path']);
-              }
-              // Avoid an exception thrown when the new name already exists or dragging to same folder.
+            bool send = true;
+            if (span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])) {
+              send = checkNested(span.parent.dataset['path'], e.draggableElement.dataset['path']);
+            }
+            // Avoid an exception thrown when the new name already exists or dragging to same folder.
 
-              if (currentPath != newPath && duplicate == null && send == true) {
-                        if(item.lastChild.hasChildNodes() == false){
-                          ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
-                          item.remove();
-                          newElementFromFile(new SimpleFile.fromPath(span.parent.dataset['path'] +
-                             '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
-                        }
-                        else if(checkContents(item) == true){
-                          ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
-                          ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
-                          item.remove();
-                        }
-                        else{
-                          ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
-                          item.remove();
-                          }
-                      }
-          }
-
-            else{
-              if (currentPath != newPath && duplicate == null
-                  && !span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])){
-                    ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+            if (currentPath != newPath && duplicate == null && send == true) {
+              if (item.lastChild.hasChildNodes() == false) {
+                ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                item.remove();
+                newElementFromFile(new SimpleFile.fromPath(span.parent.dataset['path'] + '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
+              } else if (checkContents(item) == true) {
+                ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
+                item.remove();
+              } else {
+                ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                item.remove();
               }
             }
+          } else {
+            if (currentPath != newPath && duplicate == null && !span.parent.dataset['path'].contains(e.draggableElement.dataset['path'])) {
+              ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+            }
+          }
 
-          if(alert == true && item != duplicate){
+          if (alert == true && item != duplicate) {
             window.alert("Cannot move here, file name already exists.");
           }
 
@@ -357,10 +330,11 @@ class UpDroidExplorer {
   /// Handles file renaming with a double-click event.
   void renameEventHandler(LIElement li, SimpleFile file) {
     bool refresh = false;
+    bool renameFinish = false;
 
-    if(li.dataset['isDir'] == 'true'  && checkContents(li) == true){
-            refresh = true;
-          }
+    if (li.dataset['isDir'] == 'true' && checkContents(li) == true) {
+      refresh = true;
+    }
 
     if (!li.className.contains('editing')) {
       li.classes.add('editing');
@@ -370,8 +344,8 @@ class UpDroidExplorer {
 
       Element outside = querySelector('.container-fluid');
 
-      outsideClickListener = outside.onClick.listen((e){
-        if(e.target != input){
+      outsideClickListener = outside.onClick.listen((e) {
+        if (e.target != input && renameFinish == false) {
           ws.send('[[EXPLORER_DIRECTORY_LIST]]');
           outsideClickListener.cancel();
         }
@@ -382,47 +356,47 @@ class UpDroidExplorer {
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
+          renameFinish = true;
           var newPath = pathLib.join(pathLib.dirname(file.path), input.value);
 
           LIElement duplicate = querySelector("[data-path='$newPath']");
-          if(duplicate == null){
+          if (duplicate == null) {
             ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
           }
 
           // TODO: Create a overwrite option in case of existing file name
 
-          if(duplicate != null){
-            if(duplicate == li){
+          if (duplicate != null) {
+            if (duplicate == li) {
               ws.send('[[EXPLORER_DIRECTORY_LIST]]');
-            }
-            else{
+            } else {
               window.alert("File name already exists");
               ws.send('[[EXPLORER_DIRECTORY_LIST]]');
             }
           }
 
           // Remove this element once editing is complete, as the new one will soon appear.
-          if(file.path != newPath){
+          if (file.path != newPath) {
             UListElement ul = li.parent;
-                      ul.children.remove(li);
+            ul.children.remove(li);
           }
 
-       // Put the element back in the case that rename is canceled
+          // Put the element back in the case that rename is canceled
 
-         if(file.path == newPath){
-           li.remove();
-           if(file.isDirectory == true){
-             ws.send('[[EXPLORER_DIRECTORY_LIST]]');
-           }
-         }
+          if (file.path == newPath) {
+            li.remove();
+            if (file.isDirectory == true) {
+              ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+            }
+          }
 
-          if(refresh == true){
+          if (refresh == true) {
             ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
           }
 
           // Create a folder icon if the item renamed was an empty folder
 
-          if(file.isDirectory == true && li.lastChild.hasChildNodes() == false){
+          if (file.isDirectory == true && li.lastChild.hasChildNodes() == false) {
             newElementFromFile(new SimpleFile.fromPath(newPath, workspacePath, true));
           }
 
@@ -452,7 +426,7 @@ class UpDroidExplorer {
       cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       List<SpanElement> closedList = querySelectorAll('.list-folder');
-      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      List<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
       for (SpanElement span in folderList) {
         span.classes.add('span-ondrag');
       }
@@ -463,7 +437,7 @@ class UpDroidExplorer {
       cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       List<SpanElement> closedList = querySelectorAll('.list-folder');
-      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      List<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
       for (SpanElement span in folderList) {
         span.classes.remove('span-ondrag');
       }
@@ -481,7 +455,7 @@ class UpDroidExplorer {
       newFileDrop.classes.add('file-drop-ondrag');
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       List<SpanElement> closedList = querySelectorAll('.list-folder');
-      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      List<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
       for (SpanElement span in folderList) {
         span.classes.add('span-ondrag');
       }
@@ -491,7 +465,7 @@ class UpDroidExplorer {
       newFileDrop.classes.remove('file-drop-ondrag');
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       List<SpanElement> closedList = querySelectorAll('.list-folder');
-      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      List<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
       for (SpanElement span in folderList) {
         span.classes.remove('span-ondrag');
       }
@@ -510,7 +484,7 @@ class UpDroidExplorer {
       recycle.classes.add('recycle-ondrag');
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       List<SpanElement> closedList = querySelectorAll('.list-folder');
-      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      List<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
       for (SpanElement span in folderList) {
         span.classes.add('span-ondrag');
       }
@@ -524,7 +498,7 @@ class UpDroidExplorer {
       recycle.classes.remove('recycle-ondrag');
       List<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       List<SpanElement> closedList = querySelectorAll('.list-folder');
-      List <SpanElement> folderList = new List.from(spanList)..addAll(closedList);
+      List<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
       for (SpanElement span in folderList) {
         span.classes.remove('span-ondrag');
       }
@@ -545,14 +519,14 @@ class UpDroidExplorer {
 
     // Iterate through the path checking to see if the folder exists
     var split = parentPath.replaceFirst(pathLib.normalize(workspacePath), '').split('/');
-    for(int i = 1; i< split.length; i++){
+    for (int i = 1; i < split.length; i++) {
       curPath += split[i];
       LIElement curLi = querySelector('[data-path="${pathLib.join(workspacePath, curPath)}"]');
       if (curLi == null && pathLib.join(workspacePath, curPath) != workspacePath) {
         newElementFromFile(new SimpleFile.fromPath(pathLib.join(workspacePath, curPath), workspacePath, true)).then((result) {
-            });
-          }
-      if(i != split.length - 1){
+        });
+      }
+      if (i != split.length - 1) {
         curPath += '/';
       }
     }
@@ -565,12 +539,10 @@ class UpDroidExplorer {
     LIElement li = querySelector("[data-path='$path']");
 
     // Case to deal with removeUpdate grabbing null objects when items are renamed
-    if(li == null){
-    }
-
-    else{
-    UListElement ul = li.parent;
-    ul.children.remove(li);
+    if (li == null) {
+    } else {
+      UListElement ul = li.parent;
+      ul.children.remove(li);
     }
   }
 
@@ -580,7 +552,7 @@ class UpDroidExplorer {
     Completer completer = new Completer();
     completer.complete(true);
 
-    LIElement li = generateLiHtml(file , expanded);
+    LIElement li = generateLiHtml(file, expanded);
     String truePath = pathLib.dirname(li.dataset['path']);
 
     // Register double-click event handler for file renaming.
@@ -594,16 +566,15 @@ class UpDroidExplorer {
     dragSetup(li, file);
 
     UListElement dirElement;
-    if(file.parentDir == '' && !file.path.contains('/.')){
+    if (file.parentDir == '' && !file.path.contains('/.')) {
 
       dirElement = querySelector('#explorer-body');
       dirElement.append(li);
-    }
-    else if(!file.path.contains('/.') && !file.path.contains('CMakeLists.txt')){
+    } else if (!file.path.contains('/.') && !file.path.contains('CMakeLists.txt')) {
       var validPath = removeSpaces(truePath);
       var validParent = removeSpaces(file.parentDir);
       dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
-        dirElement.append(li);
+      dirElement.append(li);
     }
 
     return completer.future;
@@ -627,9 +598,9 @@ class UpDroidExplorer {
     var files = fileList(raw);
     var folderStateList = {};
     for (var file in files) {
-      if(file.isDirectory == true) {
+      if (file.isDirectory == true) {
         LIElement folder = querySelector('[data-path="${file.path}"]');
-        if(folder != null) {
+        if (folder != null) {
           folder.dataset['expanded'] == "true" ? folderStateList[file] = true : folderStateList[file] = false;
         }
       }
@@ -640,8 +611,7 @@ class UpDroidExplorer {
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {
-      file.isDirectory == true ?
-        newElementFromFile(file, folderStateList[file]) : newElementFromFile(file);
+      file.isDirectory == true ? newElementFromFile(file, folderStateList[file]) : newElementFromFile(file);
     }
   }
 
@@ -652,9 +622,9 @@ class UpDroidExplorer {
 
     for (SimpleFile file in files) {
       //only check for folders
-      if(file.isDirectory == true){
+      if (file.isDirectory == true) {
         LIElement curFolder = querySelector('[data-path="${file.path}"]');
-        if(curFolder == null){
+        if (curFolder == null) {
           newElementFromFile(file);
         }
       }

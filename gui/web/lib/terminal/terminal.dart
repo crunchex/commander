@@ -37,7 +37,8 @@ class Terminal {
   List<int> _inputString;
   Theme _theme;
   EscapeHandler _escHandler;
-  Timer _timer;
+  Timer _blinkTimer;
+  Timer _blinkTimeout;
 
   static const int ESC = 27;
 
@@ -55,9 +56,11 @@ class Terminal {
     _escHandler = new EscapeHandler(_model, _attr);
     _theme = new Theme.SolarizedDark();
 
-    _timer = new Timer.periodic(new Duration(milliseconds: 500), (timer) {
-      _blinkOn = !_blinkOn;
-      _refreshDisplay();
+    _blinkTimeout = new Timer(new Duration(milliseconds: 1000), () {
+      _blinkTimer = new Timer.periodic(new Duration(milliseconds: 500), (timer) {
+        _blinkOn = !_blinkOn;
+        _refreshDisplay();
+      });
     });
 
     _registerEventHandlers();
@@ -116,6 +119,20 @@ class Terminal {
 
   /// Handles a given [KeyboardEvent].
   void _handleInput(KeyboardEvent e) {
+    // Deactivate blinking while the user is typing.
+    // Reactivate after an idle period.
+    _blinkTimeout.cancel();
+    _blinkTimer.cancel();
+    _blinkOn = true;
+    _blinkTimeout = new Timer(new Duration(milliseconds: 1000), () {
+      _blinkTimer = new Timer.periodic(new Duration(milliseconds: 500), (timer) {
+        _blinkOn = !_blinkOn;
+        _refreshDisplay();
+      });
+    });
+
+
+
     int key = e.keyCode;
 
     if (e.ctrlKey) {

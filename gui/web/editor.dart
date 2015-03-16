@@ -42,6 +42,7 @@ class UpDroidEditor {
   InputElement fontSizeInput;
   int fontSize = 16;
   StreamSubscription fontInputListener;
+  Modal curModal;
 
   ace.Editor aceEditor;
   String openFilePath;
@@ -184,6 +185,7 @@ class UpDroidEditor {
             ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + absolutePathPrefix + "/" + input.value);
           }
           input.value = "";
+          curModal.hide();
         }
       });
     });
@@ -226,8 +228,8 @@ class UpDroidEditor {
   /// Shows the modal for unsaved changes.
   void presentModal(String selector) {
     DivElement modal = querySelector(selector);
-    Modal m = new Modal(modal);
-    m.show();
+    curModal = new Modal(modal);
+    curModal.show();
   }
 
   /// Sends the file path and contents to the server to be saved to disk.

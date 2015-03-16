@@ -170,20 +170,22 @@ class UpDroidEditor {
 
     saveAsButton.onClick.listen((e){
       var input = querySelector('#save-as-input');
+      var saveCommit = querySelector('#save-as-commit');
+      var close = querySelector('.close');
       presentModal("#save-as");
-      input.onClick.listen((e){
-        // move key event listener here
+      input.onKeyUp.listen((e){
+        var keyEvent = new KeyEvent.wrap(e);
+        if (keyEvent.keyCode == KeyCode.ENTER){
+          input = querySelector('#save-as-input');
+          if(input.value == '' ) {
+            saveText();
+          }
+          else if(openFilePath == null){
+            ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + absolutePathPrefix + "/" + input.value);
+          }
+          input.value = "";
+        }
       });
-      var keyEvent = new KeyEvent.wrap(e);
-      if (keyEvent.keyCode == KeyCode.ENTER){
-        input = querySelector('#save-as-input').text;
-        if(input == '' ) {
-          saveText();
-        }
-        else{
-          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + input);
-        }
-      }
     });
 
     themeButton.onClick.listen((e) {

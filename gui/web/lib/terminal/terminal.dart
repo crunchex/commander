@@ -34,14 +34,8 @@ class Terminal {
   /// A [String] that sets the colored theme of the entire [Terminal].
   /// Supported themes: solarized-dark, solarized-light.
   /// Default: solarized-dark.
-  void set theme(String name) {
-    switch (name) {
-      case 'solarized-light':
-        _theme = new Theme.SolarizedLight();
-        break;
-      default:
-        _theme = new Theme.SolarizedDark();
-    }
+  void set theme(Theme thm) {
+    _theme = thm;
     div.style.backgroundColor = _theme.backgroundColor;
     div.style.color = _theme.colors['white'];
     _refreshDisplay();

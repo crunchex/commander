@@ -24,7 +24,8 @@ class UpDroidConsole {
     _term = new Terminal(_console);
     _term
         ..scrollSpeed = 3
-        ..theme = 'solarized-dark';
+        ..cursorBlink = true
+        ..theme = new Theme.SolarizedDark();
 
     _lightTheme = false;
 
@@ -41,13 +42,8 @@ class UpDroidConsole {
 
   /// Toggles between a Solarized dark and light theme.
   void _toggleTheme() {
-    if (_lightTheme) {
-      _term.theme = 'solarized-dark';
-      _lightTheme = false;
-    } else {
-      _term.theme = 'solarized-light';
-      _lightTheme = true;
-    }
+    _term.theme = _lightTheme ? new Theme.SolarizedDark() : new Theme.SolarizedLight();
+    _lightTheme = !_lightTheme;
   }
 
   /// Sets up the event handlers for the console.

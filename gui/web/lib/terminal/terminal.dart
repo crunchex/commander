@@ -8,7 +8,7 @@ import 'package:quiver/core.dart';
 part 'model.dart';
 part 'input_keys.dart';
 part 'theme.dart';
-part 'escape_sequences.dart';
+part 'escape_handler.dart';
 
 /// A class for rendering a terminal emulator in a [DivElement] (param).
 /// [stdout] needs to receive individual UTF8 integers and will handle
@@ -28,55 +28,67 @@ class Terminal {
   /// wheel event. Default: 3
   int scrollSpeed = 3;
 
+  /// Enable cursor blink. Default: true
+  bool cursorBlink = true;
+
+  /// A [String] that sets the colored theme of the entire [Terminal].
+  /// Supported themes: solarized-dark, solarized-light.
+  /// Default: solarized-dark.
+  void set theme(Theme thm) {
+    _theme = thm;
+    div.style.backgroundColor = _theme.backgroundColor;
+    div.style.color = _theme.colors['white'];
+    _refreshDisplay();
+  }
+
   // Private
-  int _charWidth, _charHeight;
-  List<SpanElement> _buffer;
   Model _model;
-  DisplayAttributes _attr;
-  bool _inputDone;
-  List<int> _inputString;
+  DisplayAttributes _currAttributes;
   Theme _theme;
-  EscapeHandler _escHandler;
+  Timer _blinkTimer, _blinkTimeout;
+  bool _blinkOn;
 
   static const int ESC = 27;
 
   Terminal (this.div) {
     stdout = new StreamController<List<int>>();
     stdin = new StreamController<List<int>>();
-    _inputDone = false;
-    _inputString = [];
 
-    _charWidth = 7;
-    _charHeight = 13;
     _model = new Model(_rows, _cols);
-    _attr = new DisplayAttributes();
-    _escHandler = new EscapeHandler(_model, _attr);
+    _currAttributes = new DisplayAttributes();
     _theme = new Theme.SolarizedDark();
+    _blinkOn = false;
+
+    setUpBlink();
 
     _registerEventHandlers();
   }
 
-  // TODO: fix this dynamic size detection
+  void setUpBlink() {
+    if (!cursorBlink) return;
+
+    _blinkTimeout = new Timer(new Duration(milliseconds: 1000), () {
+      _blinkTimer = new Timer.periodic(new Duration(milliseconds: 500), (timer) {
+        _blinkOn = !_blinkOn;
+        _refreshDisplay();
+      });
+    });
+  }
+
+  void cancelBlink() {
+    if (!cursorBlink) return;
+
+    _blinkTimeout.cancel();
+    _blinkTimer.cancel();
+    _blinkOn = true;
+  }
+
+  // TODO: fix this dynamic size detection. _charWidth = 7, _charWidth = 13.
   //int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
   //int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
   // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
   int get _cols => 81;
-  int get _rows => 33;
-
-  /// A [String] that sets the colored theme of the entire [Terminal].
-  /// Supported themes: solarized-dark, solarized-light.
-  /// Default: solarized-dark.
-  void set theme(String name) {
-    switch (name) {
-      case 'solarized-light':
-        _theme = new Theme.SolarizedLight();
-        break;
-      default:
-        _theme = new Theme.SolarizedDark();
-    }
-    div.style.backgroundColor = _theme.backgroundColor;
-    _refreshDisplay();
-  }
+  int get _rows => 31;
 
   void _registerEventHandlers() {
     stdout.stream.listen((List<int> out) => _processStdOut(new List.from(out)));
@@ -109,11 +121,20 @@ class Terminal {
 
   /// Handles a given [KeyboardEvent].
   void _handleInput(KeyboardEvent e) {
+    // Deactivate blinking while the user is typing.
+    // Reactivate after an idle period.
+    cancelBlink();
+    setUpBlink();
+
     int key = e.keyCode;
 
-    // Eat ctrl-c and ctrl-v (copy & paste).
     if (e.ctrlKey) {
-      if (key == 86 || key == 67) return;
+      // Eat ctrl-v (paste).
+      if (key == 86) return;
+
+      if (key == 67) {
+        key = 3;
+      }
     }
 
     // keyCode behaves very oddly.
@@ -163,46 +184,12 @@ class Terminal {
       termIndex = i;
       escape = output.sublist(0, i);
 
-      if (escape.length != 1 && escape.last == 27) {
-        print('Unknown escape detected: ${escape.sublist(0, escape.length - 1).toString()}');
-        break;
-      }
-
-      String encodedEscape = JSON.encode(escape);
-      if (EscapeHandler.constantEscapes.containsKey(encodedEscape)) {
-        switch (EscapeHandler.constantEscapes[encodedEscape]) {
-          case 'Erase End of Line':
-            _escHandler.eraseEndOfLine();
-            break;
-          default:
-            print('Constant escape : ${EscapeHandler
-                .constantEscapes[encodedEscape]} (${escape.toString()}) not yet supported');
-        }
-        _refreshDisplay();
-        break;
-      }
-
-      if (EscapeHandler.variableEscapeTerminators.containsKey(escape.last)) {
-        switch (EscapeHandler
-                .variableEscapeTerminators[escape.last]) {
-          case 'Set Attribute Mode':
-            _escHandler.setAttributeMode(escape);
-            break;
-          case 'Cursor Home':
-            _escHandler.cursorHome(escape);
-            break;
-          case 'Cursor Forward':
-            _escHandler.cursorForward();
-            break;
-          default:
-            print('Variable escape : ${EscapeHandler
-                .variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
-        }
+      bool escapeHandled = EscapeHandler.handleEscape(escape, _model, _currAttributes);
+      if (escapeHandled) {
         _refreshDisplay();
         break;
       }
     }
-
     return output.sublist(termIndex);
   }
 
@@ -210,19 +197,16 @@ class Terminal {
   /// to the [_buffer] and updates the display.
   void _handleOutString(List<int> string) {
     var codes = UTF8.decode(string).codeUnits;
-    var prevCode;
     for (var code in codes) {
       String char = new String.fromCharCode(code);
 
       if (code == 13) {
         _model.cursorCarriageReturn();
-        prevCode = code;
         continue;
       }
 
       if (code == 10) {
         _model.cursorNewLine();
-        prevCode = code;
         continue;
       }
 
@@ -231,15 +215,12 @@ class Terminal {
       }
 
       if (code == 8 || code == 7) {
-        prevCode = code;
         continue;
       }
 
-      Glyph g = new Glyph(char, _attr);
+      Glyph g = new Glyph(char, _currAttributes);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
       _model.cursorForward();
-
-      prevCode = code;
     }
 
     _refreshDisplay();
@@ -273,7 +254,7 @@ class Terminal {
 
       // Draw the cursor.
       if (_model.cursor.row == r && _model.cursor.col == c) {
-        str += '|';
+        if (_blinkOn) str += '|';
       } else {
         str += curr.value;
       }

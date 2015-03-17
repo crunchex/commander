@@ -8,7 +8,7 @@ import 'package:quiver/core.dart';
 part 'model.dart';
 part 'input_keys.dart';
 part 'theme.dart';
-part 'escape_sequences.dart';
+part 'escape_handler.dart';
 
 /// A class for rendering a terminal emulator in a [DivElement] (param).
 /// [stdout] needs to receive individual UTF8 integers and will handle

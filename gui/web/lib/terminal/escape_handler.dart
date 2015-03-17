@@ -63,6 +63,47 @@ class EscapeHandler {
     109: 'Set Attribute Mode'
   };
 
+  static bool handleEscape(List<int> escape, Model model, DisplayAttributes currAttributes) {
+    if (escape.length != 1 && escape.last == 27) {
+      print('Unknown escape detected: ${escape.sublist(0, escape.length - 1).toString()}');
+      return true;
+    }
+
+    String encodedEscape = JSON.encode(escape);
+    if (EscapeHandler.constantEscapes.containsKey(encodedEscape)) {
+      switch (EscapeHandler.constantEscapes[encodedEscape]) {
+        case 'Erase End of Line':
+          EscapeHandler.eraseEndOfLine(model, currAttributes);
+          break;
+        default:
+          print('Constant escape : ${EscapeHandler
+              .constantEscapes[encodedEscape]} (${escape.toString()}) not yet supported');
+      }
+      return true;
+    }
+
+    if (EscapeHandler.variableEscapeTerminators.containsKey(escape.last)) {
+      switch (EscapeHandler
+              .variableEscapeTerminators[escape.last]) {
+        case 'Set Attribute Mode':
+          EscapeHandler.setAttributeMode(escape, currAttributes);
+          break;
+        case 'Cursor Home':
+          EscapeHandler.cursorHome(escape, model);
+          break;
+        case 'Cursor Forward':
+          EscapeHandler.cursorForward(model);
+          break;
+        default:
+          print('Variable escape : ${EscapeHandler
+              .variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
+      }
+      return true;
+    }
+
+    return false;
+  }
+
   /// Sets the cursor position where subsequent text will begin.
   /// If no row/column parameters are provided (ie. <ESC>[H),
   /// the cursor will move to the home position, at the upper left of the screen.

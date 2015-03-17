@@ -185,46 +185,12 @@ class Terminal {
       termIndex = i;
       escape = output.sublist(0, i);
 
-      if (escape.length != 1 && escape.last == 27) {
-        print('Unknown escape detected: ${escape.sublist(0, escape.length - 1).toString()}');
-        break;
-      }
-
-      String encodedEscape = JSON.encode(escape);
-      if (EscapeHandler.constantEscapes.containsKey(encodedEscape)) {
-        switch (EscapeHandler.constantEscapes[encodedEscape]) {
-          case 'Erase End of Line':
-            EscapeHandler.eraseEndOfLine(_model, _currAttributes);
-            break;
-          default:
-            print('Constant escape : ${EscapeHandler
-                .constantEscapes[encodedEscape]} (${escape.toString()}) not yet supported');
-        }
-        _refreshDisplay();
-        break;
-      }
-
-      if (EscapeHandler.variableEscapeTerminators.containsKey(escape.last)) {
-        switch (EscapeHandler
-                .variableEscapeTerminators[escape.last]) {
-          case 'Set Attribute Mode':
-            EscapeHandler.setAttributeMode(escape, _currAttributes);
-            break;
-          case 'Cursor Home':
-            EscapeHandler.cursorHome(escape, _model);
-            break;
-          case 'Cursor Forward':
-            EscapeHandler.cursorForward(_model);
-            break;
-          default:
-            print('Variable escape : ${EscapeHandler
-                .variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
-        }
+      bool escapeHandled = EscapeHandler.handleEscape(escape, _model, _currAttributes);
+      if (escapeHandled) {
         _refreshDisplay();
         break;
       }
     }
-
     return output.sublist(termIndex);
   }
 

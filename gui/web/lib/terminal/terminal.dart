@@ -44,7 +44,7 @@ class Terminal {
   // Private
   Model _model;
   EscapeHandler _escHandler;
-  DisplayAttributes _attr;
+  DisplayAttributes _currAttributes;
   Theme _theme;
   Timer _blinkTimer, _blinkTimeout;
   bool _blinkOn;
@@ -56,7 +56,7 @@ class Terminal {
     stdin = new StreamController<List<int>>();
 
     _model = new Model(_rows, _cols);
-    _attr = new DisplayAttributes();
+    _currAttributes = new DisplayAttributes();
     _theme = new Theme.SolarizedDark();
     _blinkOn = false;
 
@@ -194,7 +194,7 @@ class Terminal {
       if (EscapeHandler.constantEscapes.containsKey(encodedEscape)) {
         switch (EscapeHandler.constantEscapes[encodedEscape]) {
           case 'Erase End of Line':
-            EscapeHandler.eraseEndOfLine(_model, _attr);
+            EscapeHandler.eraseEndOfLine(_model, _currAttributes);
             break;
           default:
             print('Constant escape : ${EscapeHandler
@@ -208,7 +208,7 @@ class Terminal {
         switch (EscapeHandler
                 .variableEscapeTerminators[escape.last]) {
           case 'Set Attribute Mode':
-            EscapeHandler.setAttributeMode(escape, _attr);
+            EscapeHandler.setAttributeMode(escape, _currAttributes);
             break;
           case 'Cursor Home':
             EscapeHandler.cursorHome(escape, _model);
@@ -257,7 +257,7 @@ class Terminal {
         continue;
       }
 
-      Glyph g = new Glyph(char, _attr);
+      Glyph g = new Glyph(char, _currAttributes);
       _model.setGlyphAt(g, _model.cursor.row, _model.cursor.col);
       _model.cursorForward();
 

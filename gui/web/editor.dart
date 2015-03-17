@@ -43,9 +43,14 @@ class UpDroidEditor {
   int fontSize = 16;
   StreamSubscription fontInputListener;
   Modal curModal;
+  Element saveCommit;
+
+//  Stream Subscriptions
+
   StreamSubscription saveAsClickEnd;
   StreamSubscription saveAsEnterEnd;
-  Element saveCommit;
+  StreamSubscription unsavedSave;
+  StreamSubscription unsavedDiscard;
 
   ace.Editor aceEditor;
   String openFilePath;
@@ -163,10 +168,23 @@ class UpDroidEditor {
     });
 
     newButton.onClick.listen((e) {
-      // Editor needs to request an available filename (e.g. untitled.py, untitled1.py, etc.)
-
-      ws.send('[[EDITOR_REQUEST_FILENAME]]' + absolutePathPrefix);
-
+      openFilePath = null;
+      if (noUnsavedChanges()) {
+        aceEditor.setValue(ROS_TALKER, 1);
+      }
+      else{
+        presentModal("#unsaved");
+        unsavedSave = modalSaveButton.onClick.listen((e) {
+          saveText();
+          aceEditor.setValue(ROS_TALKER, 1);
+          unsavedSave.cancel();
+        });
+        unsavedDiscard = modalDiscardButton.onClick.listen((e) {
+          aceEditor.setValue(ROS_TALKER, 1);
+          unsavedDiscard.cancel();
+        });
+      }
+      aceEditor.focus();
       // Stops the button from sending the page to the top (href=#).
       e.preventDefault();
     });
@@ -177,6 +195,7 @@ class UpDroidEditor {
     saveAsButton.onClick.listen((e){
       var input = querySelector('#save-as-input');
       var close = querySelector('.close');
+      bool saveComplete = false;
       presentModal("#save-as");
 
       void completeSave() {
@@ -185,21 +204,32 @@ class UpDroidEditor {
         }
         else if(openFilePath == null){
           ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + absolutePathPrefix + "/" + input.value);
+          saveComplete = true;
+          resetSavePoint();
+        }
+        else{
+          saveText();
+          ws.send('[[EXPLORER_RENAME]]' + openFilePath + ':divider:' +
+              pathLib.dirname(openFilePath) + "/" + input.value);
+          saveComplete = true;
+          resetSavePoint();
         }
         input.value = "";
-        curModal.hide();
+        if(saveComplete == true) {
+          curModal.hide();
+          saveAsClickEnd.cancel();
+          saveAsEnterEnd.cancel();
+        }
       }
 
       saveAsClickEnd = saveCommit.onClick.listen((e){
         completeSave();
-        saveAsClickEnd.cancel();
       });
 
       saveAsEnterEnd = input.onKeyUp.listen((e){
         var keyEvent = new KeyEvent.wrap(e);
         if(keyEvent.keyCode == KeyCode.ENTER) {
           completeSave();
-          saveAsEnterEnd.cancel();
           }
       });
     });

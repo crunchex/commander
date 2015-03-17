@@ -143,10 +143,6 @@ class UpDroidServer {
           saveFile(um.body);
           break;
 
-        case 'EDITOR_REQUEST_FILENAME':
-          requestFilename(socket, um.body);
-          break;
-
         default:
           help.debug('Message received without updroid header.', 1);
       }

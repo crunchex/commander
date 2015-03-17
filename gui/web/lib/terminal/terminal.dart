@@ -32,32 +32,24 @@ class Terminal {
   bool cursorBlink = true;
 
   // Private
-  int _charWidth, _charHeight;
-  List<SpanElement> _buffer;
   Model _model;
-  DisplayAttributes _attr;
-  bool _inputDone, _blinkOn;
-  List<int> _inputString;
-  Theme _theme;
   EscapeHandler _escHandler;
-  Timer _blinkTimer;
-  Timer _blinkTimeout;
+  DisplayAttributes _attr;
+  Theme _theme;
+  Timer _blinkTimer, _blinkTimeout;
+  bool _blinkOn;
 
   static const int ESC = 27;
 
   Terminal (this.div) {
     stdout = new StreamController<List<int>>();
     stdin = new StreamController<List<int>>();
-    _inputDone = false;
-    _inputString = [];
-    _blinkOn = false;
 
-    _charWidth = 7;
-    _charHeight = 13;
     _model = new Model(_rows, _cols);
     _attr = new DisplayAttributes();
     _escHandler = new EscapeHandler(_model, _attr);
     _theme = new Theme.SolarizedDark();
+    _blinkOn = false;
 
     setUpBlink();
 
@@ -83,7 +75,7 @@ class Terminal {
     _blinkOn = true;
   }
 
-  // TODO: fix this dynamic size detection
+  // TODO: fix this dynamic size detection. _charWidth = 7, _charWidth = 13.
   //int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
   //int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
   // _cols must be $COLUMNS + 1 or we see some glitchy stuff.

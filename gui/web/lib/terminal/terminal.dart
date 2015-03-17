@@ -28,6 +28,9 @@ class Terminal {
   /// wheel event. Default: 3
   int scrollSpeed = 3;
 
+  /// Enable cursor blink. Default: true
+  bool cursorBlink = true;
+
   // Private
   int _charWidth, _charHeight;
   List<SpanElement> _buffer;
@@ -62,6 +65,8 @@ class Terminal {
   }
 
   void setUpBlink() {
+    if (!cursorBlink) return;
+
     _blinkTimeout = new Timer(new Duration(milliseconds: 1000), () {
       _blinkTimer = new Timer.periodic(new Duration(milliseconds: 500), (timer) {
         _blinkOn = !_blinkOn;
@@ -71,6 +76,8 @@ class Terminal {
   }
 
   void cancelBlink() {
+    if (!cursorBlink) return;
+
     _blinkTimeout.cancel();
     _blinkTimer.cancel();
     _blinkOn = true;

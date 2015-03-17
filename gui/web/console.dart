@@ -24,6 +24,7 @@ class UpDroidConsole {
     _term = new Terminal(_console);
     _term
         ..scrollSpeed = 3
+        ..cursorBlink = true
         ..theme = 'solarized-dark';
 
     _lightTheme = false;

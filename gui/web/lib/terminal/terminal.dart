@@ -56,14 +56,24 @@ class Terminal {
     _escHandler = new EscapeHandler(_model, _attr);
     _theme = new Theme.SolarizedDark();
 
+    setUpBlink();
+
+    _registerEventHandlers();
+  }
+
+  void setUpBlink() {
     _blinkTimeout = new Timer(new Duration(milliseconds: 1000), () {
       _blinkTimer = new Timer.periodic(new Duration(milliseconds: 500), (timer) {
         _blinkOn = !_blinkOn;
         _refreshDisplay();
       });
     });
+  }
 
-    _registerEventHandlers();
+  void cancelBlink() {
+    _blinkTimeout.cancel();
+    _blinkTimer.cancel();
+    _blinkOn = true;
   }
 
   // TODO: fix this dynamic size detection
@@ -121,17 +131,8 @@ class Terminal {
   void _handleInput(KeyboardEvent e) {
     // Deactivate blinking while the user is typing.
     // Reactivate after an idle period.
-    _blinkTimeout.cancel();
-    _blinkTimer.cancel();
-    _blinkOn = true;
-    _blinkTimeout = new Timer(new Duration(milliseconds: 1000), () {
-      _blinkTimer = new Timer.periodic(new Duration(milliseconds: 500), (timer) {
-        _blinkOn = !_blinkOn;
-        _refreshDisplay();
-      });
-    });
-
-
+    cancelBlink();
+    setUpBlink();
 
     int key = e.keyCode;
 

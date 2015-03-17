@@ -42,13 +42,8 @@ class UpDroidConsole {
 
   /// Toggles between a Solarized dark and light theme.
   void _toggleTheme() {
-    if (_lightTheme) {
-      _term.theme = 'solarized-dark';
-      _lightTheme = false;
-    } else {
-      _term.theme = 'solarized-light';
-      _lightTheme = true;
-    }
+    _term.theme = _lightTheme ? 'solarized-dark' : 'solarized-light';
+    _lightTheme = !_lightTheme;
   }
 
   /// Sets up the event handlers for the console.

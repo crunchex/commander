@@ -94,6 +94,7 @@ class Terminal {
         _theme = new Theme.SolarizedDark();
     }
     div.style.backgroundColor = _theme.backgroundColor;
+    div.style.color = _theme.colors['white'];
     _refreshDisplay();
   }
 

@@ -57,7 +57,6 @@ class Terminal {
 
     _model = new Model(_rows, _cols);
     _attr = new DisplayAttributes();
-    _escHandler = new EscapeHandler(_model, _attr);
     _theme = new Theme.SolarizedDark();
     _blinkOn = false;
 
@@ -195,7 +194,7 @@ class Terminal {
       if (EscapeHandler.constantEscapes.containsKey(encodedEscape)) {
         switch (EscapeHandler.constantEscapes[encodedEscape]) {
           case 'Erase End of Line':
-            _escHandler.eraseEndOfLine();
+            EscapeHandler.eraseEndOfLine(_model, _attr);
             break;
           default:
             print('Constant escape : ${EscapeHandler
@@ -209,13 +208,13 @@ class Terminal {
         switch (EscapeHandler
                 .variableEscapeTerminators[escape.last]) {
           case 'Set Attribute Mode':
-            _escHandler.setAttributeMode(escape);
+            EscapeHandler.setAttributeMode(escape, _attr);
             break;
           case 'Cursor Home':
-            _escHandler.cursorHome(escape);
+            EscapeHandler.cursorHome(escape, _model);
             break;
           case 'Cursor Forward':
-            _escHandler.cursorForward();
+            EscapeHandler.cursorForward(_model);
             break;
           default:
             print('Variable escape : ${EscapeHandler

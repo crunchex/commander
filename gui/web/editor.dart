@@ -61,7 +61,6 @@ class UpDroidEditor {
     newButton = querySelector('#button-new');
     saveAsButton = querySelector('#button-save-as');
     saveCommit = querySelector('#save-as-commit');
-    input = querySelector('#save-as-input');
     themeButton = querySelector('#button-editor-theme');
     modalSaveButton = querySelector('.modal-save');
     modalDiscardButton = querySelector('.modal-discard');
@@ -174,28 +173,34 @@ class UpDroidEditor {
 
     saveButton.onClick.listen((e) => saveText());
 
-    saveAsClickEnd = saveCommit.onClick.listen((e){
-
-    });
 
     saveAsButton.onClick.listen((e){
       var input = querySelector('#save-as-input');
       var close = querySelector('.close');
       presentModal("#save-as");
-      input.onKeyUp.listen((e){
-        bool completed = false;
-        var keyEvent = new KeyEvent.wrap(e);
-        if (keyEvent.keyCode == KeyCode.ENTER){
-          input = querySelector('#save-as-input');
-          if(input.value == '' ) {
-            saveText();
-          }
-          else if(openFilePath == null){
-            ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + absolutePathPrefix + "/" + input.value);
-          }
-          input.value = "";
-          curModal.hide();
+
+      void completeSave() {
+        if(input.value == '' ) {
+          window.alert("Please enter a valid file name");
         }
+        else if(openFilePath == null){
+          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + absolutePathPrefix + "/" + input.value);
+        }
+        input.value = "";
+        curModal.hide();
+      }
+
+      saveAsClickEnd = saveCommit.onClick.listen((e){
+        completeSave();
+        saveAsClickEnd.cancel();
+      });
+
+      saveAsEnterEnd = input.onKeyUp.listen((e){
+        var keyEvent = new KeyEvent.wrap(e);
+        if(keyEvent.keyCode == KeyCode.ENTER) {
+          completeSave();
+          saveAsEnterEnd.cancel();
+          }
       });
     });
 

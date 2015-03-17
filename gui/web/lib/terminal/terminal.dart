@@ -31,6 +31,22 @@ class Terminal {
   /// Enable cursor blink. Default: true
   bool cursorBlink = true;
 
+  /// A [String] that sets the colored theme of the entire [Terminal].
+  /// Supported themes: solarized-dark, solarized-light.
+  /// Default: solarized-dark.
+  void set theme(String name) {
+    switch (name) {
+      case 'solarized-light':
+        _theme = new Theme.SolarizedLight();
+        break;
+      default:
+        _theme = new Theme.SolarizedDark();
+    }
+    div.style.backgroundColor = _theme.backgroundColor;
+    div.style.color = _theme.colors['white'];
+    _refreshDisplay();
+  }
+
   // Private
   Model _model;
   EscapeHandler _escHandler;
@@ -81,22 +97,6 @@ class Terminal {
   // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
   int get _cols => 81;
   int get _rows => 33;
-
-  /// A [String] that sets the colored theme of the entire [Terminal].
-  /// Supported themes: solarized-dark, solarized-light.
-  /// Default: solarized-dark.
-  void set theme(String name) {
-    switch (name) {
-      case 'solarized-light':
-        _theme = new Theme.SolarizedLight();
-        break;
-      default:
-        _theme = new Theme.SolarizedDark();
-    }
-    div.style.backgroundColor = _theme.backgroundColor;
-    div.style.color = _theme.colors['white'];
-    _refreshDisplay();
-  }
 
   void _registerEventHandlers() {
     stdout.stream.listen((List<int> out) => _processStdOut(new List.from(out)));

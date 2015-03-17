@@ -215,7 +215,6 @@ class UpDroidEditor {
           saveComplete = true;
           saveAsPath = absolutePathPrefix + input.value;
           fileName.text = input.value;
-          resetSavePoint();
         }
         else{
           saveText();
@@ -224,10 +223,10 @@ class UpDroidEditor {
               saveAsPath);
           fileName.text = input.value;
           saveComplete = true;
-          resetSavePoint();
         }
         input.value = "";
         if(saveComplete == true) {
+          resetSavePoint();
           curModal.hide();
           saveAsClickEnd.cancel();
           saveAsEnterEnd.cancel();

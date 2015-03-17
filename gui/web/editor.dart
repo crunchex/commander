@@ -43,6 +43,9 @@ class UpDroidEditor {
   int fontSize = 16;
   StreamSubscription fontInputListener;
   Modal curModal;
+  StreamSubscription saveAsClickEnd;
+  StreamSubscription saveAsEnterEnd;
+  Element saveCommit;
 
   ace.Editor aceEditor;
   String openFilePath;
@@ -57,6 +60,8 @@ class UpDroidEditor {
     saveButton = querySelector('#button-save');
     newButton = querySelector('#button-new');
     saveAsButton = querySelector('#button-save-as');
+    saveCommit = querySelector('#save-as-commit');
+    input = querySelector('#save-as-input');
     themeButton = querySelector('#button-editor-theme');
     modalSaveButton = querySelector('.modal-save');
     modalDiscardButton = querySelector('.modal-discard');
@@ -169,9 +174,12 @@ class UpDroidEditor {
 
     saveButton.onClick.listen((e) => saveText());
 
+    saveAsClickEnd = saveCommit.onClick.listen((e){
+
+    });
+
     saveAsButton.onClick.listen((e){
       var input = querySelector('#save-as-input');
-      var saveCommit = querySelector('#save-as-commit');
       var close = querySelector('.close');
       presentModal("#save-as");
       input.onKeyUp.listen((e){

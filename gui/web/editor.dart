@@ -40,6 +40,7 @@ class UpDroidEditor {
   ButtonElement modalSaveButton;
   ButtonElement modalDiscardButton;
   InputElement fontSizeInput;
+  LIElement fileName;
   int fontSize = 16;
   StreamSubscription fontInputListener;
   Modal curModal;
@@ -61,7 +62,7 @@ class UpDroidEditor {
     this.cs = cs;
 
     editorDiv = querySelector('#editor');
-
+    fileName = querySelector('#filename');
     saveButton = querySelector('#button-save');
     newButton = querySelector('#button-new');
     saveAsButton = querySelector('#button-save-as');
@@ -171,16 +172,22 @@ class UpDroidEditor {
       openFilePath = null;
       if (noUnsavedChanges()) {
         aceEditor.setValue(ROS_TALKER, 1);
+        fileName.text = "untitled";
       }
       else{
         presentModal("#unsaved");
+
+        // TODO: refine this case
+
         unsavedSave = modalSaveButton.onClick.listen((e) {
           saveText();
           aceEditor.setValue(ROS_TALKER, 1);
+          fileName.text = "untitled";
           unsavedSave.cancel();
         });
         unsavedDiscard = modalDiscardButton.onClick.listen((e) {
           aceEditor.setValue(ROS_TALKER, 1);
+          fileName.text = "untitled";
           unsavedDiscard.cancel();
         });
       }
@@ -195,6 +202,7 @@ class UpDroidEditor {
     saveAsButton.onClick.listen((e){
       var input = querySelector('#save-as-input');
       var close = querySelector('.close');
+      String saveAsPath;
       bool saveComplete = false;
       presentModal("#save-as");
 
@@ -203,14 +211,18 @@ class UpDroidEditor {
           window.alert("Please enter a valid file name");
         }
         else if(openFilePath == null){
-          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + absolutePathPrefix + "/" + input.value);
+          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + absolutePathPrefix + input.value);
           saveComplete = true;
+          saveAsPath = absolutePathPrefix + input.value;
+          fileName.text = input.value;
           resetSavePoint();
         }
         else{
           saveText();
+          saveAsPath = pathLib.dirname(openFilePath) + "/" + input.value;;
           ws.send('[[EXPLORER_RENAME]]' + openFilePath + ':divider:' +
-              pathLib.dirname(openFilePath) + "/" + input.value);
+              saveAsPath);
+          fileName.text = input.value;
           saveComplete = true;
           resetSavePoint();
         }
@@ -219,6 +231,7 @@ class UpDroidEditor {
           curModal.hide();
           saveAsClickEnd.cancel();
           saveAsEnterEnd.cancel();
+          openFilePath = saveAsPath;
         }
       }
 
@@ -249,12 +262,14 @@ class UpDroidEditor {
       setEditorText(newPath, newText);
     } else {
       presentModal("#unsaved");
-      modalSaveButton.onClick.listen((e) {
+      unsavedSave = modalSaveButton.onClick.listen((e) {
         saveText();
         setEditorText(newPath, newText);
+        unsavedSave.cancel();
       });
-      modalDiscardButton.onClick.listen((e) {
+      unsavedDiscard = modalDiscardButton.onClick.listen((e) {
         setEditorText(newPath, newText);
+        unsavedDiscard.cancel();
       });
     }
   }

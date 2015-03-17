@@ -70,33 +70,31 @@ class EscapeHandler {
     }
 
     String encodedEscape = JSON.encode(escape);
-    if (EscapeHandler.constantEscapes.containsKey(encodedEscape)) {
-      switch (EscapeHandler.constantEscapes[encodedEscape]) {
+    if (constantEscapes.containsKey(encodedEscape)) {
+      switch (constantEscapes[encodedEscape]) {
         case 'Erase End of Line':
-          EscapeHandler.eraseEndOfLine(model, currAttributes);
+          eraseEndOfLine(model, currAttributes);
           break;
         default:
-          print('Constant escape : ${EscapeHandler
-              .constantEscapes[encodedEscape]} (${escape.toString()}) not yet supported');
+          print('Constant escape : ${constantEscapes[encodedEscape]} (${escape.toString()}) not yet supported');
       }
       return true;
     }
 
-    if (EscapeHandler.variableEscapeTerminators.containsKey(escape.last)) {
+    if (variableEscapeTerminators.containsKey(escape.last)) {
       switch (EscapeHandler
               .variableEscapeTerminators[escape.last]) {
         case 'Set Attribute Mode':
-          EscapeHandler.setAttributeMode(escape, currAttributes);
+          setAttributeMode(escape, currAttributes);
           break;
         case 'Cursor Home':
-          EscapeHandler.cursorHome(escape, model);
+          cursorHome(escape, model);
           break;
         case 'Cursor Forward':
-          EscapeHandler.cursorForward(model);
+          cursorForward(model);
           break;
         default:
-          print('Variable escape : ${EscapeHandler
-              .variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
+          print('Variable escape : ${variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
       }
       return true;
     }

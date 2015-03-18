@@ -5,6 +5,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOPDIR=$DIR/..
 
 ### start build ###
+echo ""
 echo "##### Building Commander... ######"
 
 ### check tools ###
@@ -57,4 +58,5 @@ echo "OK"
 
 ### done ###
 cd $TOPDIR
+echo ""
 echo "##### Build complete. ############"

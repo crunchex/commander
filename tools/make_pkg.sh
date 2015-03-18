@@ -24,7 +24,14 @@ while [ "$1" != "" ]; do
     shift
 done
 
+### build ###
+if [ $nobuild == 0 ]; then
+    $TOPDIR/tools/build_cmdr.sh
+    $TOPDIR/tools/build_cmdr_pty.sh
+fi
+
 ### start packaging ###
+echo ""
 echo "##### Packaging Commander... #####"
 
 ### check dependencies ###
@@ -38,12 +45,6 @@ echo "OK"
 
 cd $TOPDIR
 
-### build ###
-if [ $nobuild == 0 ]; then
-	$TOPDIR/tools/build_cmdr.sh
-    $TOPDIR/tools/build_cmdr_pty.sh
-fi
-
 ### package ###
 echo -n "Packaging......................."
 mkdir -p $TOPDIR/deploy
@@ -56,5 +57,6 @@ echo "OK"
 
 ### done ###
 cd $TOPDIR
+echo ""
 echo "##### Packaging complete. ########"
 echo "You will find your debian package in deploy/."

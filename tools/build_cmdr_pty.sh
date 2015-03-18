@@ -5,6 +5,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOPDIR=$DIR/..
 
 ### start build ###
+echo ""
 echo "###### Building cmdr... ##########"
 
 ### check dependencies ###
@@ -17,6 +18,7 @@ command -v go >/dev/null 2>&1 || {
 echo "OK"
 
 ### build cmdr-pty ###
+echo ""
 echo "##### Building cmdr-pty ##########"
 echo -n "Retrieving cmdr-pty source......"
 GO_UPDROID_PATH=${GOPATH:?"Need to set GOPATH non-empty"}/src/bitbucket.org/updroid
@@ -36,4 +38,5 @@ echo "OK"
 
 ### done ###
 cd $TOPDIR
+echo ""
 echo "##### Build complete. ############"

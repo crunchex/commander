@@ -28,6 +28,7 @@ if __name__ == '__main__':
 /// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
 /// for the editor and an additional menu bar with some filesystem operations.
 class UpDroidEditor {
+  List<String> pathList;
   WebSocket ws;
   StreamController<CommanderMessage> cs;
   String absolutePathPrefix;
@@ -106,6 +107,11 @@ class UpDroidEditor {
 
       case 'OPEN_FILE':
         ws.send('[[EDITOR_OPEN]]' + m.body);
+        break;
+
+      case 'PATH_PASS':
+        pathList = m.body;
+        print(pathList);
         break;
 
       default:

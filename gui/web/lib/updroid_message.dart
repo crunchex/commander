@@ -7,17 +7,17 @@ import 'dart:async';
 /// from the UpDroid server.
 class UpDroidMessage {
   final String s;
-  
+
   UpDroidMessage(this.s);
-  
+
   String get header => createHeader();
   String get body => createBody();
-  
+
   String createHeader() {
     var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
     return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
   }
-  
+
   String createBody() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
 }
 
@@ -31,6 +31,7 @@ StreamTransformer updroidTransformer = new StreamTransformer.fromHandlers(handle
 ///   type: the type of message (e.g. 'command')
 ///   body: the body of the message
 class CommanderMessage {
-  String dest, type, body;
+  String dest, type;
+  var body;
   CommanderMessage(this.dest, this.type, {this.body});
 }

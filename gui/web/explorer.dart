@@ -236,18 +236,18 @@ class UpDroidExplorer {
           ..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
 
-      ul.classes.add("explorer-hidden");
+      ul.classes.add("hidden");
       glyphicon.replaceWith(glyph);
       li.dataset['expanded'] = 'false';
 
       if (expanded == true) {
         glyph.replaceWith(glyphicon);
         li.dataset['expanded'] = 'true';
-        ul.classes.remove("explorer-hidden");
+        ul.classes.remove("hidden");
       }
 
       glyphicon.onClick.listen((e) {
-        ul.classes.add("explorer-hidden");
+        ul.classes.add("hidden");
         glyphicon.replaceWith(glyph);
         li.dataset['expanded'] = 'false';
       });
@@ -255,7 +255,7 @@ class UpDroidExplorer {
       glyph.onClick.listen((e) {
         glyph.replaceWith(glyphicon);
         li.dataset['expanded'] = 'true';
-        ul.classes.remove("explorer-hidden");
+        ul.classes.remove("hidden");
       });
     }
 

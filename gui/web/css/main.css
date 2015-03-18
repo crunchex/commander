@@ -368,6 +368,10 @@ li input {
   padding-left: 20px;
 }
 
+.modal-body div h4{
+  margin-left: 40px;
+}
+
 .modal-footer {
   padding: 5px;
 }
@@ -425,7 +429,7 @@ li input {
   cursor: pointer;
 }
 
-.explorer-hidden {
+.hidden {
   display: none;
 }
 

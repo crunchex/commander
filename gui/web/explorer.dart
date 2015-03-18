@@ -584,16 +584,13 @@ class UpDroidExplorer {
 
   void initialDirectoryList(String raw) {
     var files = fileList(raw);
-    var pathList = [];
 
     UListElement explorer = querySelector('#explorer-body');
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {
       newElementFromFile(file, false);
-      pathList.add(file.path);
     }
-    cs.add(new CommanderMessage('EDITOR', 'PATH_PASS', body: pathList));
   }
 
   /// Redraws all file explorer views.

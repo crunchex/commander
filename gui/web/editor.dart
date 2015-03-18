@@ -109,11 +109,6 @@ class UpDroidEditor {
         ws.send('[[EDITOR_OPEN]]' + m.body);
         break;
 
-      case 'PATH_PASS':
-        pathList = m.body;
-        print(pathList);
-        break;
-
       default:
         print('Client error: unrecognized message type: ' + m.type);
     }

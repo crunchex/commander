@@ -7,6 +7,15 @@ TOPDIR=$DIR/..
 ### start build ###
 echo "##### Building Commander... ######"
 
+### check tools ###
+echo -n "Checking system for dart-sdk...."
+command -v pub >/dev/null 2>&1 || {
+	echo "FAIL";
+	echo "Please install dart-sdk, add bin to PATH, and restart this script. Aborting."
+	exit 1;
+}
+echo "OK"
+
 ### cmdr ###
 cd $TOPDIR/cmdr
 

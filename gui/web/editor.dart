@@ -142,6 +142,10 @@ class UpDroidEditor {
           handleNewText(newPath, newText);
         });
 
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'PATH_LIST')
+        .listen((um) => pullPaths(um.body));
+
     fontSizeInput.onClick.listen((e){
 
       // Keeps bootjack dropdown from closing
@@ -212,7 +216,7 @@ class UpDroidEditor {
       // Check to make sure that the supplied input doesn't conflict with existing files
       // on sytem.  Also determines what action to take depending on save case.
 
-      String checkSave() {
+      void checkSave() {
         ws.send("[[EDITOR_REQUEST_LIST]]");
         String saveCase;
         if(input.value == '' ) {
@@ -226,9 +230,10 @@ class UpDroidEditor {
           saveCase = "rename";
           saveAsPath = pathLib.dirname(openFilePath) + "/" + input.value;
         }
+      }
 
-        else if(openFilePath == null){
-          saveCase = "rename";
+      void completeSave(String saveCase) {
+        if(saveCase == "new"){
           saveAsPath = absolutePathPrefix + input.value;
           ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + saveAsPath);
           fileName.text = input.value;
@@ -318,6 +323,11 @@ class UpDroidEditor {
       resetSavePoint();
 
     }
+  }
+
+  void pullPaths(String raw) {
+    raw = raw.replaceAll(new RegExp(r"(\[|\]|')"), '');
+    pathList = raw.split(',');
   }
 
   /// Compares the Editor's current text with text at the last save point.

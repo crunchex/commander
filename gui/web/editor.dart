@@ -28,7 +28,7 @@ if __name__ == '__main__':
 /// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
 /// for the editor and an additional menu bar with some filesystem operations.
 class UpDroidEditor {
-  List<String> pathList;
+  Map pathMap;
   WebSocket ws;
   StreamController<CommanderMessage> cs;
   String absolutePathPrefix;
@@ -207,30 +207,16 @@ class UpDroidEditor {
     /// Save as click handler
 
     saveAsButton.onClick.listen((e){
+      ws.send("[[EDITOR_REQUEST_LIST]]");
       var input = querySelector('#save-as-input');
       var close = querySelector('.close');
       String saveAsPath;
       bool saveComplete = false;
       presentModal("#save-as");
 
+
       // Check to make sure that the supplied input doesn't conflict with existing files
       // on sytem.  Also determines what action to take depending on save case.
-
-      void checkSave() {
-        ws.send("[[EDITOR_REQUEST_LIST]]");
-        String saveCase;
-        if(input.value == '' ) {
-          window.alert("Please enter a valid file name");
-        }
-        if(openFilePath == null) {
-          saveCase = "new";
-          saveAsPath = absolutePathPrefix + input.value;
-        }
-        else{
-          saveCase = "rename";
-          saveAsPath = pathLib.dirname(openFilePath) + "/" + input.value;
-        }
-      }
 
       void completeSave(String saveCase) {
         if(saveCase == "new"){
@@ -258,13 +244,13 @@ class UpDroidEditor {
       }
 
       saveAsClickEnd = saveCommit.onClick.listen((e){
-        checkSave();
+        print(pathMap);
       });
 
       saveAsEnterEnd = input.onKeyUp.listen((e){
         var keyEvent = new KeyEvent.wrap(e);
         if(keyEvent.keyCode == KeyCode.ENTER) {
-          checkSave();
+
           }
       });
     });
@@ -326,8 +312,13 @@ class UpDroidEditor {
   }
 
   void pullPaths(String raw) {
+    var pathList;
     raw = raw.replaceAll(new RegExp(r"(\[|\]|')"), '');
     pathList = raw.split(',');
+    pathMap = new Map.fromIterable(pathList,
+        key: (item) => item.replaceAll(new RegExp(r"(Directory: | File: |Directory: |File:)"), '').trim(),
+        value: (item) => item.contains("Directory:") ? "directory" : "file"
+        );
   }
 
   /// Compares the Editor's current text with text at the last save point.

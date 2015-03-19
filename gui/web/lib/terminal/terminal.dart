@@ -29,7 +29,13 @@ class Terminal {
   int scrollSpeed = 3;
 
   /// Enable cursor blink. Default: true
-  bool cursorBlink = true;
+  void set cursorBlink(bool b) {
+    _cursorBlink = b;
+
+    cancelBlink();
+    setUpBlink();
+    _refreshDisplay();
+  }
 
   /// A [String] that sets the colored theme of the entire [Terminal].
   /// Supported themes: solarized-dark, solarized-light.
@@ -47,6 +53,7 @@ class Terminal {
   Theme _theme;
   Timer _blinkTimer, _blinkTimeout;
   bool _blinkOn;
+  bool _cursorBlink = true;
 
   static const int ESC = 27;
 
@@ -65,7 +72,7 @@ class Terminal {
   }
 
   void setUpBlink() {
-    if (!cursorBlink) return;
+    if (!_cursorBlink) return;
 
     _blinkTimeout = new Timer(new Duration(milliseconds: 1000), () {
       _blinkTimer = new Timer.periodic(new Duration(milliseconds: 500), (timer) {
@@ -76,10 +83,8 @@ class Terminal {
   }
 
   void cancelBlink() {
-    if (!cursorBlink) return;
-
-    _blinkTimeout.cancel();
-    _blinkTimer.cancel();
+    if (_blinkTimeout != null) _blinkTimeout.cancel();
+    if (_blinkTimer != null) _blinkTimer.cancel();
     _blinkOn = true;
   }
 

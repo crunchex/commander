@@ -47,6 +47,7 @@ class UpDroidEditor {
   Modal curModal;
   Element saveCommit;
   Element warning;
+  Element overwriteCommit;
 
 //  Stream Subscriptions
 
@@ -54,6 +55,7 @@ class UpDroidEditor {
   StreamSubscription saveAsEnterEnd;
   StreamSubscription unsavedSave;
   StreamSubscription unsavedDiscard;
+  StreamSubscription overwrite;
 
   ace.Editor aceEditor;
   String openFilePath;
@@ -72,6 +74,7 @@ class UpDroidEditor {
     themeButton = querySelector('#button-editor-theme');
     modalSaveButton = querySelector('.modal-save');
     modalDiscardButton = querySelector('.modal-discard');
+    overwriteCommit = querySelector('#warning button');
     warning = querySelector('#warning');
 
     fontSizeInput = querySelector("#font-size-input");
@@ -211,42 +214,71 @@ class UpDroidEditor {
     saveAsButton.onClick.listen((e){
       ws.send("[[EDITOR_REQUEST_LIST]]");
       var input = querySelector('#save-as-input');
-      var close = querySelector('.close');
-      String saveAsPath;
-      bool saveComplete = false;
+      String saveAsPath = '';
       presentModal("#save-as");
 
-
-      // Check to make sure that the supplied input doesn't conflict with existing files
-      // on sytem.  Also determines what action to take depending on save case.
-
-      void completeSave(String saveCase) {
-        if(saveCase == "new"){
-          saveAsPath = absolutePathPrefix + input.value;
-          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + saveAsPath);
-          fileName.text = input.value;
-          saveComplete = true;
-        }
-        else{
+      void completeSave(bool rename) {
+        if(rename == true) {
           saveText();
-          saveAsPath = pathLib.dirname(openFilePath) + "/" + input.value;;
           ws.send('[[EXPLORER_RENAME]]' + openFilePath + ':divider:' +
               saveAsPath);
           fileName.text = input.value;
-          saveComplete = true;
         }
-        input.value = "";
-        if(saveComplete == true) {
+        else {
+          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + saveAsPath);
+          fileName.text = input.value;
+        }
+          input.value = '';
           resetSavePoint();
           curModal.hide();
           saveAsClickEnd.cancel();
           saveAsEnterEnd.cancel();
           openFilePath = saveAsPath;
-        }
       }
 
-      void checkSave() {
+      // Check to make sure that the supplied input doesn't conflict with existing files
+      // on system.  Also determines what action to take depending on whether the file exists or not.
 
+      void checkSave() {
+        bool rename = false;
+
+        // User enters no input
+        if(input.value == '') {
+          window.alert("Please enter a valid filename");
+        }
+
+        // Determining the save path
+        if(openFilePath == null) {
+          saveAsPath = pathLib.normalize(absolutePathPrefix + "${input.value}");
+        }
+        else{
+          saveAsPath = pathLib.dirname(openFilePath)+  "/${input.value}";
+          rename = true;
+        }
+        print(pathMap);
+        print("saveAsPath: " + saveAsPath);
+
+        // Filename already exists on system
+        if(pathMap.containsKey(saveAsPath)){
+          if(pathMap[saveAsPath] == 'directory') {
+            window.alert("That filename already exists as a directory");
+            input.value = "";
+          }
+          else if(pathMap[saveAsPath] == 'file') {
+            warning.classes.remove('hidden');
+            overwrite = overwriteCommit.onClick.listen((e){
+              openFilePath == null ? null : rename == true;
+              completeSave(rename);
+              warning.classes.add('hidden');
+              overwrite.cancel();
+            });
+          }
+        }
+
+        // Filename clear, continue with save
+        else{
+          completeSave(rename);
+        }
       }
 
       saveAsClickEnd = saveCommit.onClick.listen((e){

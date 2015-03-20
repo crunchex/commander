@@ -23,6 +23,7 @@ class Model {
 
   Model (this.numRows, this.numCols) {
     cursor = new Cursor();
+
     _reverseBuffer = [];
     _forwardBuffer = [];
     _frame = [];
@@ -35,7 +36,12 @@ class Model {
 
   /// Sets a [Glyph] at location row, col.
   void setGlyphAt(Glyph g, int row, int col) {
-    _frame[row][col] = g;
+    if (_forwardBuffer.isEmpty) {
+      _frame[row][col] = g;
+      return;
+    }
+
+    _forwardBuffer.first[col] = g;
   }
 
   void cursorForward() {
@@ -55,6 +61,14 @@ class Model {
   }
 
   void cursorNewLine() {
+    if (_forwardBuffer.isNotEmpty) {
+      _forwardBuffer.insert(0, new List<Glyph>());
+      for (int c = 0; c < numCols; c++) {
+        _forwardBuffer.first.add(new Glyph(Glyph.SPACE, new DisplayAttributes()));
+      }
+      return;
+    }
+
     if (cursor.row < numRows - 1) {
       cursor.row++;
     } else {

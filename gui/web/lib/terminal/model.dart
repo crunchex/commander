@@ -72,11 +72,11 @@ class Model {
     if (cursor.row < numRows - 1) {
       cursor.row++;
     } else {
-      pushBuffer();
+      _pushBuffer();
     }
   }
 
-  void pushBuffer() {
+  void _pushBuffer() {
     _reverseBuffer.add(_frame[0]);
     _frame.removeAt(0);
 

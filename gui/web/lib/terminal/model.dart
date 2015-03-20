@@ -113,6 +113,15 @@ class Model {
     }
   }
 
+  void scrollToBottom() {
+    while (_forwardBuffer.isNotEmpty) {
+      _frame.add(_forwardBuffer.last);
+      _forwardBuffer.removeLast();
+      _reverseBuffer.add(_frame[0]);
+      _frame.removeAt(0);
+    }
+  }
+
   /// Initializes the internal model with a List of Lists.
   /// Each location defaults to a Glyph.SPACE.
   void _initModel() {

@@ -129,6 +129,7 @@ class Terminal {
     // Deactivate blinking while the user is typing.
     // Reactivate after an idle period.
     cancelBlink();
+    _model.scrollToBottom();
     setUpBlink();
 
     int key = e.keyCode;

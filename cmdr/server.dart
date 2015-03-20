@@ -135,6 +135,9 @@ class UpDroidServer {
           fsDelete(um.body, socket);
           break;
 
+        case 'EDITOR_REQUEST_LIST':
+          break;
+
         case 'EDITOR_OPEN':
           sendFileContents(socket, um.body);
           break;

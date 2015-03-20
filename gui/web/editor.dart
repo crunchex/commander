@@ -109,11 +109,6 @@ class UpDroidEditor {
         ws.send('[[EDITOR_OPEN]]' + m.body);
         break;
 
-      case 'PATH_PASS':
-        pathList = m.body;
-        print(pathList);
-        break;
-
       default:
         print('Client error: unrecognized message type: ' + m.type);
     }
@@ -205,6 +200,8 @@ class UpDroidEditor {
     saveButton.onClick.listen((e) => saveText());
 
 
+    /// Save as click handler
+
     saveAsButton.onClick.listen((e){
       var input = querySelector('#save-as-input');
       var close = querySelector('.close');
@@ -212,15 +209,22 @@ class UpDroidEditor {
       bool saveComplete = false;
       presentModal("#save-as");
 
-      void completeSave() {
+      // Check to make sure that the supplied input doesn't conflict with existing files
+      // on sytem.  Also determines what action to take depending on save case.
+
+      String checkSave() {
+        ws.send("[[EDITOR_REQUEST_LIST]]");
+        String saveCase;
         if(input.value == '' ) {
           window.alert("Please enter a valid file name");
         }
+
         else if(openFilePath == null){
-          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + absolutePathPrefix + input.value);
-          saveComplete = true;
+          saveCase = "rename";
           saveAsPath = absolutePathPrefix + input.value;
+          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + saveAsPath);
           fileName.text = input.value;
+          saveComplete = true;
         }
         else{
           saveText();
@@ -241,13 +245,13 @@ class UpDroidEditor {
       }
 
       saveAsClickEnd = saveCommit.onClick.listen((e){
-        completeSave();
+        checkSave();
       });
 
       saveAsEnterEnd = input.onKeyUp.listen((e){
         var keyEvent = new KeyEvent.wrap(e);
         if(keyEvent.keyCode == KeyCode.ENTER) {
-          completeSave();
+          checkSave();
           }
       });
     });

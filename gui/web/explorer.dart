@@ -236,18 +236,18 @@ class UpDroidExplorer {
           ..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
 
-      ul.classes.add("explorer-hidden");
+      ul.classes.add("hidden");
       glyphicon.replaceWith(glyph);
       li.dataset['expanded'] = 'false';
 
       if (expanded == true) {
         glyph.replaceWith(glyphicon);
         li.dataset['expanded'] = 'true';
-        ul.classes.remove("explorer-hidden");
+        ul.classes.remove("hidden");
       }
 
       glyphicon.onClick.listen((e) {
-        ul.classes.add("explorer-hidden");
+        ul.classes.add("hidden");
         glyphicon.replaceWith(glyph);
         li.dataset['expanded'] = 'false';
       });
@@ -255,7 +255,7 @@ class UpDroidExplorer {
       glyph.onClick.listen((e) {
         glyph.replaceWith(glyphicon);
         li.dataset['expanded'] = 'true';
-        ul.classes.remove("explorer-hidden");
+        ul.classes.remove("hidden");
       });
     }
 
@@ -584,16 +584,13 @@ class UpDroidExplorer {
 
   void initialDirectoryList(String raw) {
     var files = fileList(raw);
-    var pathList = [];
 
     UListElement explorer = querySelector('#explorer-body');
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {
       newElementFromFile(file, false);
-      pathList.add(file.path);
     }
-    cs.add(new CommanderMessage('EDITOR', 'PATH_PASS', body: pathList));
   }
 
   /// Redraws all file explorer views.

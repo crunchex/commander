@@ -129,14 +129,21 @@ class EscapeHandler {
   /// If no row/column parameters are provided (ie. <ESC>[H),
   /// the cursor will move to the home position, at the upper left of the screen.
   static void cursorHome(List<int> escape, Model model) {
+    int row, col;
+
     if (escape.length == 3) {
-      print('cursor home: 0 0');
-      return;
+      row = 0;
+      col = 0;
+    } else {
+      int indexOfSemi = escape.indexOf(59);
+      row = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
+      col = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
     }
 
-    int indexOfSemi = escape.indexOf(59);
-    model.cursor.row = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
-    model.cursor.col = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
+    model.cursor.row = row;
+    model.cursor.col = col;
+
+    print('cursor home: ${row.toString()}, ${col.toString()}');
   }
 
   /// Moves the cursor forward by COUNT columns; the default count is 1.

@@ -42,7 +42,7 @@ class UpDroidEditor {
   ButtonElement modalDiscardButton;
   InputElement fontSizeInput;
   LIElement fileName;
-  int fontSize = 16;
+  int fontSize = 14;
   StreamSubscription fontInputListener;
   Modal curModal;
   Element saveCommit;

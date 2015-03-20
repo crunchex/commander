@@ -85,7 +85,6 @@ class Terminal {
   void cancelBlink() {
     if (_blinkTimeout != null) _blinkTimeout.cancel();
     if (_blinkTimer != null) _blinkTimer.cancel();
-    _blinkOn = true;
   }
 
   // TODO: fix this dynamic size detection. _charWidth = 7, _charWidth = 13.
@@ -113,6 +112,7 @@ class Terminal {
       wheelEvent.preventDefault();
 
       cursorBlink = (_model.atBottom) ? true : false;
+     _blinkOn = false;
       (wheelEvent.deltaY < 0) ? _model.scrollUp(scrollSpeed) : _model.scrollDown(scrollSpeed);
       _refreshDisplay();
     });
@@ -130,6 +130,7 @@ class Terminal {
     // Deactivate blinking while the user is typing.
     // Reactivate after an idle period.
     cancelBlink();
+    _blinkOn = true;
     _model.scrollToBottom();
     setUpBlink();
 
@@ -260,8 +261,8 @@ class Terminal {
       }
 
       // Draw the cursor.
-      if (_model.cursor.row == r && _model.cursor.col == c) {
-        if (_blinkOn) str += '|';
+      if (_model.cursor.row == r && _model.cursor.col == c && _blinkOn) {
+        str += '|';
       } else {
         str += curr.value;
       }

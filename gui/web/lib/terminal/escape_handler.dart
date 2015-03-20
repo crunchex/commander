@@ -99,6 +99,9 @@ class EscapeHandler {
         case 'Set Mode':
           setMode(escape);
           break;
+        case 'Reset Mode':
+          resetMode(escape);
+          break;
         case 'Scroll Screen':
           scrollScreen(escape);
           break;
@@ -114,6 +117,12 @@ class EscapeHandler {
   static void setMode(List<int> escape) {
     if (JSON.encode(escape) == '[27, 91, 63, 49, 104]') {
       print('setMode: not yet supported');
+    }
+  }
+
+  static void resetMode(List<int> escape) {
+    if (JSON.encode(escape) == '[27, 91, 63, 49, 108]') {
+      print('resetMode: not yet supported');
     }
   }
 

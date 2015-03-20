@@ -11,6 +11,8 @@ class Cursor {
 
 /// Represents the data model for [Terminal].
 class Model {
+  static const int _MAXBUFFER = 500;
+
   bool get atBottom =>_forwardBuffer.isEmpty;
 
   Cursor cursor;
@@ -80,6 +82,7 @@ class Model {
 
   void _pushBuffer() {
     _reverseBuffer.add(_frame[0]);
+    if (_reverseBuffer.length > _MAXBUFFER) _reverseBuffer.removeAt(0);
     _frame.removeAt(0);
 
     List<Glyph> newRow = [];

@@ -161,7 +161,7 @@ li input {
 
 #recycle {
   margin-top: 20px;
-  margin-bottom: 0px;
+  margin-bottom: 20px;
   padding: 2px;
   text-align: center;
   color: #333333;
@@ -176,6 +176,23 @@ li input {
 #recycle.recycle-entered {
   color: #811819;
   border-color: #811819;
+}
+
+#control-buttons {
+  border: 0 1px 1px 1px;
+  padding: none;
+}
+
+#build-button {
+  margin-right: 10px;
+  color: #ffffff;
+  background-color: #268bd2;
+}
+
+#run-button {
+  margin-left: 10px;
+  color: #ffffff;
+  background-color: #859900;
 }
 
 .column-content .nav-tabs {

@@ -11,6 +11,8 @@ class UpDroidConsole {
   DivElement _console;
   AnchorElement _consoleButton;
   AnchorElement _themeButton;
+  AnchorElement _blinkButton;
+  bool _blink;
   bool _lightTheme;
 
   UpDroidConsole(int consoleNum, StreamController<CommanderMessage> cs) {
@@ -20,6 +22,7 @@ class UpDroidConsole {
     _console = querySelector('#console-$consoleNum');
     _consoleButton = querySelector('#button-console-$consoleNum');
     _themeButton = querySelector('#button-console-theme-$consoleNum');
+    _blinkButton = querySelector('#button-console-blink-$consoleNum');
 
     _term = new Terminal(_console);
     _term
@@ -27,6 +30,7 @@ class UpDroidConsole {
         ..cursorBlink = true
         ..theme = new Theme.SolarizedDark();
 
+    _blink = true;
     _lightTheme = false;
 
     // window.location.host returns whatever is in the URL bar (including port).
@@ -46,6 +50,12 @@ class UpDroidConsole {
     _lightTheme = !_lightTheme;
   }
 
+  /// Toggles cursor blink on/off.
+  void _toggleBlink() {
+    _term.cursorBlink = _blink ? false : true;
+    _blink = !_blink;
+  }
+
   /// Sets up the event handlers for the console.
   void _registerConsoleEventHandlers() {
     _ws.onMessage.listen((e) {
@@ -59,6 +69,11 @@ class UpDroidConsole {
 
     _themeButton.onClick.listen((e) {
       _toggleTheme();
+      e.preventDefault();
+    });
+
+    _blinkButton.onClick.listen((e) {
+      _toggleBlink();
       e.preventDefault();
     });
   }

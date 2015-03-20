@@ -29,7 +29,13 @@ class Terminal {
   int scrollSpeed = 3;
 
   /// Enable cursor blink. Default: true
-  bool cursorBlink = true;
+  void set cursorBlink(bool b) {
+    _cursorBlink = b;
+
+    cancelBlink();
+    setUpBlink();
+    _refreshDisplay();
+  }
 
   /// A [String] that sets the colored theme of the entire [Terminal].
   /// Supported themes: solarized-dark, solarized-light.
@@ -47,6 +53,7 @@ class Terminal {
   Theme _theme;
   Timer _blinkTimer, _blinkTimeout;
   bool _blinkOn;
+  bool _cursorBlink = true;
 
   static const int ESC = 27;
 
@@ -65,7 +72,7 @@ class Terminal {
   }
 
   void setUpBlink() {
-    if (!cursorBlink) return;
+    if (!_cursorBlink) return;
 
     _blinkTimeout = new Timer(new Duration(milliseconds: 1000), () {
       _blinkTimer = new Timer.periodic(new Duration(milliseconds: 500), (timer) {
@@ -76,18 +83,15 @@ class Terminal {
   }
 
   void cancelBlink() {
-    if (!cursorBlink) return;
-
-    _blinkTimeout.cancel();
-    _blinkTimer.cancel();
-    _blinkOn = true;
+    if (_blinkTimeout != null) _blinkTimeout.cancel();
+    if (_blinkTimer != null) _blinkTimer.cancel();
   }
 
   // TODO: fix this dynamic size detection. _charWidth = 7, _charWidth = 13.
   //int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
   //int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
   // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
-  int get _cols => 81;
+  int get _cols => 58;
   int get _rows => 31;
 
   void _registerEventHandlers() {
@@ -97,16 +101,19 @@ class Terminal {
 
     // Disable browser navigation keys.
     div.onKeyDown.listen((e) {
-      if (e.keyCode == 8 ||
-          e.keyCode == 9 ||
-          e.keyCode == 32 ||
-          e.keyCode == 9) e.preventDefault();
+      //if (e.keyCode == 8 ||
+      //    e.keyCode == 9 ||
+      //    e.keyCode == 32 ||
+      //    e.keyCode == 9) e.preventDefault();
+      e.preventDefault();
     });
 
     div.onMouseWheel.listen((wheelEvent) {
       // Scrolling should target only the console.
       wheelEvent.preventDefault();
 
+      cursorBlink = (_model.atBottom) ? true : false;
+     _blinkOn = false;
       (wheelEvent.deltaY < 0) ? _model.scrollUp(scrollSpeed) : _model.scrollDown(scrollSpeed);
       _refreshDisplay();
     });
@@ -124,6 +131,8 @@ class Terminal {
     // Deactivate blinking while the user is typing.
     // Reactivate after an idle period.
     cancelBlink();
+    _blinkOn = true;
+    _model.scrollToBottom();
     setUpBlink();
 
     int key = e.keyCode;
@@ -135,6 +144,12 @@ class Terminal {
       if (key == 67) {
         key = 3;
       }
+
+    }
+
+    if (key == 38) {
+      stdin.add([27, 91, 65]);
+      return;
     }
 
     // keyCode behaves very oddly.
@@ -253,8 +268,8 @@ class Terminal {
       }
 
       // Draw the cursor.
-      if (_model.cursor.row == r && _model.cursor.col == c) {
-        if (_blinkOn) str += '|';
+      if (_model.cursor.row == r && _model.cursor.col == c && _blinkOn) {
+        str += '|';
       } else {
         str += curr.value;
       }

@@ -11,34 +11,41 @@ class Cursor {
 
 /// Represents the data model for [Terminal].
 class Model {
+  static const int _MAXBUFFER = 500;
+
+  bool get atBottom =>_forwardBuffer.isEmpty;
+
   Cursor cursor;
   int numRows, numCols;
-
-  int inputCursorIndex;
 
   // Implemented as stacks in scrolling.
   List<List> _reverseBuffer;
   List<List> _forwardBuffer;
 
   // Implemented as a queue in scrolling.
-  List<List> _rows;
+  List<List> _frame;
 
   Model (this.numRows, this.numCols) {
     cursor = new Cursor();
-    inputCursorIndex = 0;
+
     _reverseBuffer = [];
     _forwardBuffer = [];
-    _rows = [];
+    _frame = [];
 
     _initModel();
   }
 
   /// Returns the [Glyph] at row, col.
-  Glyph getGlyphAt(int row, int col) => _rows[row][col];
+  Glyph getGlyphAt(int row, int col) => _frame[row][col];
 
   /// Sets a [Glyph] at location row, col.
   void setGlyphAt(Glyph g, int row, int col) {
-    _rows[row][col] = g;
+    if (_forwardBuffer.isEmpty) {
+      _frame[row][col] = g;
+      return;
+    }
+
+    _forwardBuffer.first[col] = g;
   }
 
   void cursorForward() {
@@ -58,22 +65,31 @@ class Model {
   }
 
   void cursorNewLine() {
+    if (_forwardBuffer.isNotEmpty) {
+      _forwardBuffer.insert(0, new List<Glyph>());
+      for (int c = 0; c < numCols; c++) {
+        _forwardBuffer.first.add(new Glyph(Glyph.SPACE, new DisplayAttributes()));
+      }
+      return;
+    }
+
     if (cursor.row < numRows - 1) {
       cursor.row++;
     } else {
-      pushBuffer();
+      _pushBuffer();
     }
   }
 
-  void pushBuffer() {
-    _reverseBuffer.add(_rows[0]);
-    _rows.removeAt(0);
+  void _pushBuffer() {
+    _reverseBuffer.add(_frame[0]);
+    if (_reverseBuffer.length > _MAXBUFFER) _reverseBuffer.removeAt(0);
+    _frame.removeAt(0);
 
     List<Glyph> newRow = [];
     for (int c = 0; c < numCols; c++) {
       newRow.add(new Glyph(Glyph.SPACE, new DisplayAttributes()));
     }
-    _rows.add(newRow);
+    _frame.add(newRow);
   }
 
   /// Manipulates the buffers and rows to handle scrolling
@@ -82,10 +98,10 @@ class Model {
     for (int i = 0; i < numLines; i++) {
       if (_reverseBuffer.isEmpty) return;
 
-      _rows.insert(0, _reverseBuffer.last);
+      _frame.insert(0, _reverseBuffer.last);
       _reverseBuffer.removeLast();
-      _forwardBuffer.add(_rows[_rows.length - 1]);
-      _rows.removeLast();
+      _forwardBuffer.add(_frame[_frame.length - 1]);
+      _frame.removeLast();
     }
   }
 
@@ -95,10 +111,19 @@ class Model {
     for (int i = 0; i < numLines; i++) {
       if (_forwardBuffer.isEmpty) return;
 
-      _rows.add(_forwardBuffer.last);
+      _frame.add(_forwardBuffer.last);
       _forwardBuffer.removeLast();
-      _reverseBuffer.add(_rows[0]);
-      _rows.removeAt(0);
+      _reverseBuffer.add(_frame[0]);
+      _frame.removeAt(0);
+    }
+  }
+
+  void scrollToBottom() {
+    while (_forwardBuffer.isNotEmpty) {
+      _frame.add(_forwardBuffer.last);
+      _forwardBuffer.removeLast();
+      _reverseBuffer.add(_frame[0]);
+      _frame.removeAt(0);
     }
   }
 
@@ -106,9 +131,9 @@ class Model {
   /// Each location defaults to a Glyph.SPACE.
   void _initModel() {
     for (int r = 0; r < numRows; r++) {
-      _rows.add(new List<Glyph>());
+      _frame.add(new List<Glyph>());
       for (int c = 0; c < numCols; c++) {
-        _rows[r].add(new Glyph(Glyph.SPACE, new DisplayAttributes()));
+        _frame[r].add(new Glyph(Glyph.SPACE, new DisplayAttributes()));
       }
     }
   }
@@ -118,7 +143,7 @@ class Model {
     for (int r = 0; r < numRows; r++) {
       String s = '';
       for (int c = 0; c < numCols; c++) {
-        Glyph g = _rows[r][c];
+        Glyph g = _frame[r][c];
         switch (member) {
           case 'value':
             s += '${g.value} ';

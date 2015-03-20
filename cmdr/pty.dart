@@ -11,7 +11,7 @@ class UpDroidPty {
 
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
     // See http://bitbucket.org/updroid/cmdr-pty
-    Process.start('cmdr-pty', ['-addr', ':1206$ptyNum'], environment: {'TERM':'vt100'}, workingDirectory: workspacePath).then((Process shell) {
+    Process.start('cmdr-pty', ['-addr', ':1206$ptyNum', '-size', '58x31'], environment: {'TERM':'vt100'}, workingDirectory: workspacePath).then((Process shell) {
       shell.stdout.listen((data) => help.debug('pty[$ptyNum] stdout: ${UTF8.decode(data)}', 0));
       shell.stderr.listen((data) => help.debug('pty[$ptyNum] stderr: ${UTF8.decode(data)}', 0));
     }).catchError((error) {

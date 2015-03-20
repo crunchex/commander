@@ -28,7 +28,7 @@ if __name__ == '__main__':
 /// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
 /// for the editor and an additional menu bar with some filesystem operations.
 class UpDroidEditor {
-  List<String> pathList;
+  Map pathMap;
   WebSocket ws;
   StreamController<CommanderMessage> cs;
   String absolutePathPrefix;
@@ -46,6 +46,8 @@ class UpDroidEditor {
   StreamSubscription fontInputListener;
   Modal curModal;
   Element saveCommit;
+  Element warning;
+  Element overwriteCommit;
 
 //  Stream Subscriptions
 
@@ -53,6 +55,7 @@ class UpDroidEditor {
   StreamSubscription saveAsEnterEnd;
   StreamSubscription unsavedSave;
   StreamSubscription unsavedDiscard;
+  StreamSubscription overwrite;
 
   ace.Editor aceEditor;
   String openFilePath;
@@ -71,6 +74,8 @@ class UpDroidEditor {
     themeButton = querySelector('#button-editor-theme');
     modalSaveButton = querySelector('.modal-save');
     modalDiscardButton = querySelector('.modal-discard');
+    overwriteCommit = querySelector('#warning button');
+    warning = querySelector('#warning');
 
     fontSizeInput = querySelector("#font-size-input");
     fontSizeInput.placeholder = fontSize.toString();
@@ -142,6 +147,10 @@ class UpDroidEditor {
           handleNewText(newPath, newText);
         });
 
+    ws.onMessage.transform(updroidTransformer)
+        .where((um) => um.header == 'PATH_LIST')
+        .listen((um) => pullPaths(um.body));
+
     fontSizeInput.onClick.listen((e){
 
       // Keeps bootjack dropdown from closing
@@ -203,44 +212,72 @@ class UpDroidEditor {
     /// Save as click handler
 
     saveAsButton.onClick.listen((e){
+      ws.send("[[EDITOR_REQUEST_LIST]]");
       var input = querySelector('#save-as-input');
-      var close = querySelector('.close');
-      String saveAsPath;
-      bool saveComplete = false;
+      String saveAsPath = '';
       presentModal("#save-as");
 
-      // Check to make sure that the supplied input doesn't conflict with existing files
-      // on sytem.  Also determines what action to take depending on save case.
-
-      String checkSave() {
-        ws.send("[[EDITOR_REQUEST_LIST]]");
-        String saveCase;
-        if(input.value == '' ) {
-          window.alert("Please enter a valid file name");
-        }
-
-        else if(openFilePath == null){
-          saveCase = "rename";
-          saveAsPath = absolutePathPrefix + input.value;
-          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + saveAsPath);
-          fileName.text = input.value;
-          saveComplete = true;
-        }
-        else{
+      void completeSave(bool rename) {
+        if(rename == true) {
           saveText();
-          saveAsPath = pathLib.dirname(openFilePath) + "/" + input.value;;
           ws.send('[[EXPLORER_RENAME]]' + openFilePath + ':divider:' +
               saveAsPath);
           fileName.text = input.value;
-          saveComplete = true;
         }
-        input.value = "";
-        if(saveComplete == true) {
+        else {
+          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + saveAsPath);
+          fileName.text = input.value;
+        }
+          input.value = '';
           resetSavePoint();
           curModal.hide();
           saveAsClickEnd.cancel();
           saveAsEnterEnd.cancel();
           openFilePath = saveAsPath;
+      }
+
+      // Check to make sure that the supplied input doesn't conflict with existing files
+      // on system.  Also determines what action to take depending on whether the file exists or not.
+
+      void checkSave() {
+        bool rename = false;
+
+        // User enters no input
+        if(input.value == '') {
+          window.alert("Please enter a valid filename");
+        }
+
+        // Determining the save path
+        if(openFilePath == null) {
+          saveAsPath = pathLib.normalize(absolutePathPrefix + "${input.value}");
+        }
+        else{
+          saveAsPath = pathLib.dirname(openFilePath)+  "/${input.value}";
+          rename = true;
+        }
+        print(pathMap);
+        print("saveAsPath: " + saveAsPath);
+
+        // Filename already exists on system
+        if(pathMap.containsKey(saveAsPath)){
+          if(pathMap[saveAsPath] == 'directory') {
+            window.alert("That filename already exists as a directory");
+            input.value = "";
+          }
+          else if(pathMap[saveAsPath] == 'file') {
+            warning.classes.remove('hidden');
+            overwrite = overwriteCommit.onClick.listen((e){
+              openFilePath == null ? null : rename == true;
+              completeSave(rename);
+              warning.classes.add('hidden');
+              overwrite.cancel();
+            });
+          }
+        }
+
+        // Filename clear, continue with save
+        else{
+          completeSave(rename);
         }
       }
 
@@ -310,6 +347,16 @@ class UpDroidEditor {
       resetSavePoint();
 
     }
+  }
+
+  void pullPaths(String raw) {
+    var pathList;
+    raw = raw.replaceAll(new RegExp(r"(\[|\]|')"), '');
+    pathList = raw.split(',');
+    pathMap = new Map.fromIterable(pathList,
+        key: (item) => item.replaceAll(new RegExp(r"(Directory: | File: |Directory: |File:)"), '').trim(),
+        value: (item) => item.contains("Directory:") ? "directory" : "file"
+        );
   }
 
   /// Compares the Editor's current text with text at the last save point.

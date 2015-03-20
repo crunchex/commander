@@ -136,6 +136,7 @@ class UpDroidServer {
           break;
 
         case 'EDITOR_REQUEST_LIST':
+          sendEditorList(socket, dir);
           break;
 
         case 'EDITOR_OPEN':

@@ -137,8 +137,6 @@ class EscapeHandler {
     int indexOfSemi = escape.indexOf(59);
     int start = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
     int end = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
-
-    print('scroll: ${start.toString()}, ${end.toString()}');
   }
 
   /// Sets the cursor position where subsequent text will begin.
@@ -158,8 +156,6 @@ class EscapeHandler {
 
     model.cursor.row = row;
     model.cursor.col = col;
-
-    print('cursor home: ${row.toString()}, ${col.toString()}');
   }
 
   /// Moves the cursor forward by COUNT columns; the default count is 1.

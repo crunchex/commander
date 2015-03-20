@@ -60,7 +60,10 @@ class EscapeHandler {
     // Define Key
     112: 'Set Key Definition',
     // Set Display Attribute
-    109: 'Set Attribute Mode'
+    109: 'Set Attribute Mode',
+    // Reset and Set Modes
+    104: 'Set Mode',
+    108: 'Reset Mode'
   };
 
   static bool handleEscape(List<int> escape, Model model, DisplayAttributes currAttributes) {
@@ -93,6 +96,12 @@ class EscapeHandler {
         case 'Cursor Forward':
           cursorForward(model);
           break;
+        case 'Set Mode':
+          setMode(escape);
+          break;
+        case 'Scroll Screen':
+          scrollScreen(escape);
+          break;
         default:
           print('Variable escape : ${variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
       }
@@ -102,18 +111,39 @@ class EscapeHandler {
     return false;
   }
 
+  static void setMode(List<int> escape) {
+    if (JSON.encode(escape) == '[27, 91, 63, 49, 104]') {
+      print('setMode: not yet supported');
+    }
+  }
+
+  static void scrollScreen(List<int> escape) {
+    int indexOfSemi = escape.indexOf(59);
+    int start = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
+    int end = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
+
+    print('scroll: ${start.toString()}, ${end.toString()}');
+  }
+
   /// Sets the cursor position where subsequent text will begin.
   /// If no row/column parameters are provided (ie. <ESC>[H),
   /// the cursor will move to the home position, at the upper left of the screen.
   static void cursorHome(List<int> escape, Model model) {
+    int row, col;
+
     if (escape.length == 3) {
-      print('cursor home: 0 0');
-      return;
+      row = 0;
+      col = 0;
+    } else {
+      int indexOfSemi = escape.indexOf(59);
+      row = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
+      col = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
     }
 
-    int indexOfSemi = escape.indexOf(59);
-    model.cursor.row = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
-    model.cursor.col = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
+    model.cursor.row = row;
+    model.cursor.col = col;
+
+    print('cursor home: ${row.toString()}, ${col.toString()}');
   }
 
   /// Moves the cursor forward by COUNT columns; the default count is 1.

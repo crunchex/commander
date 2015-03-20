@@ -145,6 +145,11 @@ class Terminal {
       }
     }
 
+    if (key == 38) {
+      stdin.add([27, 91, 65]);
+      return;
+    }
+
     // keyCode behaves very oddly.
     if (!e.shiftKey) {
       if (NOSHIFT_KEYS.containsKey(key)) {

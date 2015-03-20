@@ -46,6 +46,7 @@ class UpDroidEditor {
   StreamSubscription fontInputListener;
   Modal curModal;
   Element saveCommit;
+  Element warning;
 
 //  Stream Subscriptions
 
@@ -71,6 +72,7 @@ class UpDroidEditor {
     themeButton = querySelector('#button-editor-theme');
     modalSaveButton = querySelector('.modal-save');
     modalDiscardButton = querySelector('.modal-discard');
+    warning = querySelector('#warning');
 
     fontSizeInput = querySelector("#font-size-input");
     fontSizeInput.placeholder = fontSize.toString();
@@ -243,14 +245,18 @@ class UpDroidEditor {
         }
       }
 
+      void checkSave() {
+
+      }
+
       saveAsClickEnd = saveCommit.onClick.listen((e){
-        print(pathMap);
+        checkSave();
       });
 
       saveAsEnterEnd = input.onKeyUp.listen((e){
         var keyEvent = new KeyEvent.wrap(e);
         if(keyEvent.keyCode == KeyCode.ENTER) {
-
+          checkSave();
           }
       });
     });

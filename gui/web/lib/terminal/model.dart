@@ -11,6 +11,8 @@ class Cursor {
 
 /// Represents the data model for [Terminal].
 class Model {
+  bool get atBottom =>_forwardBuffer.isEmpty;
+
   Cursor cursor;
   int numRows, numCols;
 

@@ -112,6 +112,7 @@ class Terminal {
       // Scrolling should target only the console.
       wheelEvent.preventDefault();
 
+      cursorBlink = (_model.atBottom) ? true : false;
       (wheelEvent.deltaY < 0) ? _model.scrollUp(scrollSpeed) : _model.scrollDown(scrollSpeed);
       _refreshDisplay();
     });

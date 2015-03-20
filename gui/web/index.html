@@ -43,13 +43,13 @@
           <div id="save-input">
             <h3>Enter Filename:</h3><input id="save-as-input" type="text">
           </div>
-          <div>
-            <h4 class="hidden">Filename exists.  Overwrite?</h4>
+          <div id="warning" class="hidden">
+            <h4>Filename exists.</h4><button type="button">Overwrite?</button>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-warning modal-discard" data-dismiss="modal">Nope</button>
-          <button id="save-as-commit" class="btn btn-primary modal-save" data-dismiss="modal">Save</button>
+          <button id="save-as-commit" class="btn btn-primary modal-save">Save</button>
         </div>
       </div>
     </div>

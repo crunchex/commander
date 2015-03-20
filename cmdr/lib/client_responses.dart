@@ -18,6 +18,12 @@ void sendDirectory(WebSocket s, Directory dir) {
   });
 }
 
+void sendEditorList(WebSocket s, Directory dir) {
+  help.getDirectory(dir).then((files) {
+    s.add('[[PATH_LIST]]' + files.toString());
+  });
+}
+
 void refreshDirectory(WebSocket s, Directory dir) {
   help.getDirectory(dir).then((files) {
     s.add('[[EXPLORER_DIRECTORY_REFRESH]]' + files.toString());

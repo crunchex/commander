@@ -374,7 +374,7 @@ li input {
 }
 
 .modal-header h3 {
-  padding-left: 10px;
+  margin-left: 20px;
   font: 26px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
 
 }
@@ -387,8 +387,16 @@ li input {
   padding-left: 20px;
 }
 
-.modal-body div h4{
-  margin-left: 40px;
+#warning{
+  margin-left: 52px;
+}
+
+#warning *{
+  display: inline-block;
+}
+
+#warning button{
+  margin-left: 20px;
 }
 
 .modal-footer {

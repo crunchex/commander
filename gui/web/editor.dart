@@ -255,8 +255,6 @@ class UpDroidEditor {
           saveAsPath = pathLib.dirname(openFilePath)+  "/${input.value}";
           rename = true;
         }
-        print(pathMap);
-        print("saveAsPath: " + saveAsPath);
 
         // Filename already exists on system
         if(pathMap.containsKey(saveAsPath)){

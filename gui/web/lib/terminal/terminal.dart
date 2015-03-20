@@ -101,10 +101,11 @@ class Terminal {
 
     // Disable browser navigation keys.
     div.onKeyDown.listen((e) {
-      if (e.keyCode == 8 ||
-          e.keyCode == 9 ||
-          e.keyCode == 32 ||
-          e.keyCode == 9) e.preventDefault();
+      //if (e.keyCode == 8 ||
+      //    e.keyCode == 9 ||
+      //    e.keyCode == 32 ||
+      //    e.keyCode == 9) e.preventDefault();
+      e.preventDefault();
     });
 
     div.onMouseWheel.listen((wheelEvent) {
@@ -143,6 +144,7 @@ class Terminal {
       if (key == 67) {
         key = 3;
       }
+
     }
 
     if (key == 38) {

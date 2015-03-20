@@ -217,17 +217,9 @@ class UpDroidEditor {
       String saveAsPath = '';
       presentModal("#save-as");
 
-      void completeSave(bool rename) {
-        if(rename == true) {
-          saveText();
-          ws.send('[[EXPLORER_RENAME]]' + openFilePath + ':divider:' +
-              saveAsPath);
-          fileName.text = input.value;
-        }
-        else {
+      void completeSave() {
           ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + saveAsPath);
           fileName.text = input.value;
-        }
           input.value = '';
           resetSavePoint();
           curModal.hide();
@@ -240,7 +232,6 @@ class UpDroidEditor {
       // on system.  Also determines what action to take depending on whether the file exists or not.
 
       void checkSave() {
-        bool rename = false;
 
         // User enters no input
         if(input.value == '') {
@@ -253,7 +244,6 @@ class UpDroidEditor {
         }
         else{
           saveAsPath = pathLib.dirname(openFilePath)+  "/${input.value}";
-          rename = true;
         }
 
         // Filename already exists on system
@@ -265,8 +255,7 @@ class UpDroidEditor {
           else if(pathMap[saveAsPath] == 'file') {
             warning.classes.remove('hidden');
             overwrite = overwriteCommit.onClick.listen((e){
-              openFilePath == null ? null : rename == true;
-              completeSave(rename);
+              completeSave();
               warning.classes.add('hidden');
               overwrite.cancel();
             });
@@ -275,7 +264,7 @@ class UpDroidEditor {
 
         // Filename clear, continue with save
         else{
-          completeSave(rename);
+          completeSave();
         }
       }
 

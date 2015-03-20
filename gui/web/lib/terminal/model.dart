@@ -218,9 +218,9 @@ class DisplayAttributes {
 /// The data model class for an individual glyph within [Model].
 class Glyph {
   static const SPACE = '&nbsp';
-  static const AMP = '&';
-  static const LT = '<';
-  static const GT = '>';
+  static const AMP = '&amp';
+  static const LT = '&lt';
+  static const GT = '&gt';
 
   bool bright, dim, underscore, blink, reverse, hidden;
   String value, fgColor, bgColor;

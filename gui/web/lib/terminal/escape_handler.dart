@@ -60,7 +60,10 @@ class EscapeHandler {
     // Define Key
     112: 'Set Key Definition',
     // Set Display Attribute
-    109: 'Set Attribute Mode'
+    109: 'Set Attribute Mode',
+    // Reset and Set Modes
+    104: 'Set Mode',
+    108: 'Reset Mode'
   };
 
   static bool handleEscape(List<int> escape, Model model, DisplayAttributes currAttributes) {
@@ -93,6 +96,9 @@ class EscapeHandler {
         case 'Cursor Forward':
           cursorForward(model);
           break;
+        case 'Set Mode':
+          setMode(escape);
+          break;
         default:
           print('Variable escape : ${variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
       }
@@ -100,6 +106,12 @@ class EscapeHandler {
     }
 
     return false;
+  }
+
+  static void setMode(List<int> escape) {
+    if (JSON.encode(escape) == '[27, 91, 63, 49, 104]') {
+      print('setMode: not yet supported');
+    }
   }
 
   /// Sets the cursor position where subsequent text will begin.

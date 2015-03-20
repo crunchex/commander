@@ -99,6 +99,9 @@ class EscapeHandler {
         case 'Set Mode':
           setMode(escape);
           break;
+        case 'Scroll Screen':
+          scrollScreen(escape);
+          break;
         default:
           print('Variable escape : ${variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
       }
@@ -112,6 +115,14 @@ class EscapeHandler {
     if (JSON.encode(escape) == '[27, 91, 63, 49, 104]') {
       print('setMode: not yet supported');
     }
+  }
+
+  static void scrollScreen(List<int> escape) {
+    int indexOfSemi = escape.indexOf(59);
+    int start = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
+    int end = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
+
+    print('scroll: ${start.toString()}, ${end.toString()}');
   }
 
   /// Sets the cursor position where subsequent text will begin.

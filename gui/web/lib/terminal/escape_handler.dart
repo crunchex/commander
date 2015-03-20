@@ -78,6 +78,9 @@ class EscapeHandler {
         case 'Erase End of Line':
           eraseEndOfLine(model, currAttributes);
           break;
+        case 'Erase Down':
+          eraseDown(model);
+          break;
         default:
           print('Constant escape : ${constantEscapes[encodedEscape]} (${escape.toString()}) not yet supported');
       }
@@ -112,6 +115,10 @@ class EscapeHandler {
     }
 
     return false;
+  }
+
+  static void eraseDown(Model model) {
+    model.eraseDown();
   }
 
   static void setMode(List<int> escape) {

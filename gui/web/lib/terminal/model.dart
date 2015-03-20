@@ -80,6 +80,15 @@ class Model {
     }
   }
 
+  void eraseDown() {
+    int cursorRow = cursor.row;
+    for (List<Glyph> r in _frame.sublist(cursorRow)) {
+      for (int c = 0; c < r.length; c++) {
+        r[c].value = Glyph.SPACE;
+      }
+    }
+  }
+
   void _pushBuffer() {
     _reverseBuffer.add(_frame[0]);
     if (_reverseBuffer.length > _MAXBUFFER) _reverseBuffer.removeAt(0);

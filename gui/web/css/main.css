@@ -161,7 +161,6 @@ li input {
 
 #recycle {
   margin-top: 20px;
-  margin-bottom: 20px;
   padding: 2px;
   text-align: center;
   color: #333333;
@@ -181,16 +180,17 @@ li input {
 #control-buttons {
   border: 0 1px 1px 1px;
   padding: none;
+  width: 100%
 }
 
 #build-button {
-  margin-right: 10px;
+  width: 50%;
   color: #ffffff;
   background-color: #268bd2;
 }
 
 #run-button {
-  margin-left: 10px;
+  width: 50%;
   color: #ffffff;
   background-color: #859900;
 }

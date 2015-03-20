@@ -218,14 +218,6 @@ class UpDroidEditor {
         if(input.value == '' ) {
           window.alert("Please enter a valid file name");
         }
-        if(openFilePath == null) {
-          saveCase = "new";
-          saveAsPath = absolutePathPrefix + input.value;
-        }
-        else{
-          saveCase = "rename";
-          saveAsPath = pathLib.dirname(openFilePath) + "/" + input.value;
-        }
 
         else if(openFilePath == null){
           saveCase = "rename";

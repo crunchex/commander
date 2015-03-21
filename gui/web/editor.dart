@@ -151,30 +151,29 @@ class UpDroidEditor {
         .where((um) => um.header == 'PATH_LIST')
         .listen((um) => pullPaths(um.body));
 
-    fontSizeInput.onClick.listen((e){
-
+    fontSizeInput.onClick.listen((e) {
       // Keeps bootjack dropdown from closing
       e.stopPropagation();
 
-     fontInputListener = fontSizeInput.onKeyUp.listen((e) {
-      var keyEvent = new KeyEvent.wrap(e);
-              if (keyEvent.keyCode == KeyCode.ENTER) {
-                var fontVal;
-                try{
-                  fontVal = int.parse(fontSizeInput.value);
-                  assert(fontVal is int);
-                  if(fontVal >= 1 && fontVal <= 60){
-                    aceEditor.fontSize = fontVal;
-                    fontSizeInput.placeholder = fontVal.toString();
-                  }
-                }
-                finally{
-                  fontSizeInput.value = "";
-                  querySelector('#editor').click();
-                  aceEditor.focus();
-                  fontInputListener.cancel();
-                }
-              }
+      fontInputListener = fontSizeInput.onKeyUp.listen((e) {
+        var keyEvent = new KeyEvent.wrap(e);
+        if (keyEvent.keyCode == KeyCode.ENTER) {
+          var fontVal;
+          try {
+            fontVal = int.parse(fontSizeInput.value);
+            assert(fontVal is int);
+            if(fontVal >= 1 && fontVal <= 60){
+              aceEditor.fontSize = fontVal;
+              fontSizeInput.placeholder = fontVal.toString();
+            }
+          }
+          finally {
+            fontSizeInput.value = "";
+            querySelector('#editor').click();
+            aceEditor.focus();
+            fontInputListener.cancel();
+          }
+        }
       });
     });
 
@@ -211,7 +210,7 @@ class UpDroidEditor {
 
     /// Save as click handler
 
-    saveAsButton.onClick.listen((e){
+    saveAsButton.onClick.listen((e) {
       ws.send("[[EDITOR_REQUEST_LIST]]");
       var input = querySelector('#save-as-input');
       String saveAsPath = '';
@@ -234,25 +233,25 @@ class UpDroidEditor {
       void checkSave() {
 
         // User enters no input
-        if(input.value == '') {
+        if (input.value == '') {
           window.alert("Please enter a valid filename");
         }
 
         // Determining the save path
-        if(openFilePath == null) {
+        if (openFilePath == null) {
           saveAsPath = pathLib.normalize(absolutePathPrefix + "${input.value}");
         }
-        else{
+        else {
           saveAsPath = pathLib.dirname(openFilePath)+  "/${input.value}";
         }
 
         // Filename already exists on system
-        if(pathMap.containsKey(saveAsPath)){
-          if(pathMap[saveAsPath] == 'directory') {
+        if (pathMap.containsKey(saveAsPath)) {
+          if (pathMap[saveAsPath] == 'directory') {
             window.alert("That filename already exists as a directory");
             input.value = "";
           }
-          else if(pathMap[saveAsPath] == 'file') {
+          else if (pathMap[saveAsPath] == 'file') {
             warning.classes.remove('hidden');
             overwrite = overwriteCommit.onClick.listen((e){
               completeSave();
@@ -263,20 +262,20 @@ class UpDroidEditor {
         }
 
         // Filename clear, continue with save
-        else{
+        else {
           completeSave();
         }
       }
 
-      saveAsClickEnd = saveCommit.onClick.listen((e){
+      saveAsClickEnd = saveCommit.onClick.listen((e) {
         checkSave();
       });
 
-      saveAsEnterEnd = input.onKeyUp.listen((e){
+      saveAsEnterEnd = input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
-        if(keyEvent.keyCode == KeyCode.ENTER) {
+        if (keyEvent.keyCode == KeyCode.ENTER) {
           checkSave();
-          }
+        }
       });
     });
 
@@ -329,7 +328,7 @@ class UpDroidEditor {
     if (openFilePath == null) {
       saveAsButton.click();
     }
-    else{
+    else {
       ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFilePath);
       resetSavePoint();
 

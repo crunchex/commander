@@ -16,6 +16,7 @@ import 'lib/server_helper.dart' as help;
 part 'pty.dart';
 part 'camera.dart';
 part 'commands.dart';
+part 'editor.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
@@ -87,6 +88,8 @@ class CmdrServer {
     help.debug('Client connected!', 0);
     StreamController<String> processInput = new StreamController<String>.broadcast();
 
+    _initEditor(socket);
+
     socket.listen((String s) {
       help.UpDroidMessage um = new help.UpDroidMessage(s);
       help.debug('Incoming message: ' + s, 0);
@@ -152,6 +155,10 @@ class CmdrServer {
     });
 
     watcher.events.listen((e) => help.formattedFsUpdate(socket, e));
+  }
+
+  void _initEditor(WebSocket ws) {
+    CmdrEditor editor = new CmdrEditor(ws);
   }
 
   void _initPty(Directory dir) {

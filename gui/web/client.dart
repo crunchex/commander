@@ -79,6 +79,7 @@ class UpDroidClient {
 
     ws.onOpen.listen((e) {
       status = 'CONNECTED';
+      ws.send('[[CLIENT_CONFIG]]' + _config);
       cs.add(new CommanderMessage('ALL', status));
     });
 

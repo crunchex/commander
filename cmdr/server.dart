@@ -149,6 +149,9 @@ class CmdrServer {
           saveFile(um.body);
           break;
 
+        case 'CLIENT_CONFIG':
+          break;
+
         default:
           help.debug('Message received without updroid header.', 1);
       }

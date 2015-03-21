@@ -44,7 +44,7 @@ class UpDroidClient {
     // Port 12060 is the default port that UpDroid uses.
     String url = window.location.host;
     url = url.split(':')[0];
-    initWebSocket('ws://' + url + ':12060/');
+    initWebSocket('ws://' + url + ':12060/server/1');
 
     registerEventHandlers(ws, cs);
   }
@@ -120,7 +120,7 @@ class UpDroidClient {
 
     for (String className in tabs['left']) {
       if (className == UpDroidEditor.className) {
-        UpDroidEditor editor = new UpDroidEditor(ws, cs);
+        UpDroidEditor editor = new UpDroidEditor(cs);
       } else if (className == UpDroidCamera.className) {
         UpDroidCamera camera = new UpDroidCamera(1);
       }

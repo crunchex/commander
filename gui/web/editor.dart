@@ -31,8 +31,6 @@ class UpDroidEditor {
   static const String className = 'UpDroidEditor';
 
   Map pathMap;
-  WebSocket ws;
-  StreamController<CommanderMessage> cs;
   String absolutePathPrefix;
 
   DivElement editorDiv;
@@ -63,9 +61,11 @@ class UpDroidEditor {
   String openFilePath;
   String originalContents;
 
-  UpDroidEditor(WebSocket ws, StreamController<CommanderMessage> cs) {
-    this.ws = ws;
-    this.cs = cs;
+  WebSocket _ws;
+  StreamController<CommanderMessage> _cs;
+
+  UpDroidEditor(StreamController<CommanderMessage> cs) {
+    _cs = cs;
 
     editorDiv = querySelector('#editor');
     fileName = querySelector('#filename');
@@ -81,6 +81,12 @@ class UpDroidEditor {
 
     fontSizeInput = querySelector("#font-size-input");
     fontSizeInput.placeholder = fontSize.toString();
+
+    // Create the server <-> client [WebSocket].
+    // Port 12060 is the default port that UpDroid uses.
+    String url = window.location.host;
+    url = url.split(':')[0];
+    _ws = new WebSocket('ws://' + url + ':12060/editor/1');
 
     setUpEditor();
     registerEditorEventHandlers();
@@ -111,7 +117,7 @@ class UpDroidEditor {
         break;
 
       case 'OPEN_FILE':
-        ws.send('[[EDITOR_OPEN]]' + m.body);
+        _ws.send('[[EDITOR_OPEN]]' + m.body);
         break;
 
       default:
@@ -121,12 +127,12 @@ class UpDroidEditor {
 
   /// Sets up event handlers for the editor's menu buttons.
   void registerEditorEventHandlers() {
-    cs.stream
+    _cs.stream
         .where((m) => m.dest == 'EDITOR')
         .listen((m) => processMessage(m));
 
     // Editor receives the open file contents from the server.
-    ws.onMessage.transform(updroidTransformer)
+    _ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EDITOR_FILE_TEXT')
         .listen((um) {
           var returnedData = um.body.split('[[CONTENTS]]');
@@ -135,11 +141,11 @@ class UpDroidEditor {
           handleNewText(newPath, newText);
         });
 
-    ws.onMessage.transform(updroidTransformer)
+    _ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
         .listen((um) => absolutePathPrefix = um.body);
 
-    ws.onMessage.transform(updroidTransformer)
+    _ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EDITOR_NEW_FILENAME')
         .listen((um) {
           var newText = ROS_TALKER;
@@ -147,7 +153,7 @@ class UpDroidEditor {
           handleNewText(newPath, newText);
         });
 
-    ws.onMessage.transform(updroidTransformer)
+    _ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'PATH_LIST')
         .listen((um) => pullPaths(um.body));
 
@@ -211,13 +217,13 @@ class UpDroidEditor {
     /// Save as click handler
 
     saveAsButton.onClick.listen((e) {
-      ws.send("[[EDITOR_REQUEST_LIST]]");
+      _ws.send("[[EDITOR_REQUEST_LIST]]");
       var input = querySelector('#save-as-input');
       String saveAsPath = '';
       presentModal("#save-as");
 
       void completeSave() {
-          ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + saveAsPath);
+          _ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + saveAsPath);
           fileName.text = input.value;
           input.value = '';
           resetSavePoint();
@@ -329,7 +335,7 @@ class UpDroidEditor {
       saveAsButton.click();
     }
     else {
-      ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFilePath);
+      _ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + openFilePath);
       resetSavePoint();
 
     }

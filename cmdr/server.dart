@@ -24,6 +24,10 @@ class CmdrServer {
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
+  List<CmdrEditor> _editors = [];
+  List<CmdrPty> _ptys = [];
+  List<CmdrCamera> _cameras = [];
+
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
     DirectoryWatcher watcher = new DirectoryWatcher(dir.path);
@@ -58,17 +62,31 @@ class CmdrServer {
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
       help.debug("HttpServer listening on port:${server.port}...", 0);
-      server.listen((HttpRequest request) {
-        // WebSocket requests are considered "upgraded" HTTP requests.
-        if (WebSocketTransformer.isUpgradeRequest(request)) {
-          WebSocketTransformer
-            .upgrade(request)
-            .then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
-          return;
-        }
+      server.asBroadcastStream()
+          .listen((HttpRequest request) {
+            // WebSocket requests are considered "upgraded" HTTP requests.
+             if (!WebSocketTransformer.isUpgradeRequest(request)) {
+               _handleRequest(request, virDir);
+               return;
+             }
 
-        _handleRequest(request, virDir);
-      });
+             // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
+             int objectID = int.parse(request.uri.pathSegments[1]) - 1;
+             switch (request.uri.pathSegments[0]) {
+               case 'editor':
+                 WebSocketTransformer
+                   .upgrade(request)
+                   .then((WebSocket ws) => _editors[objectID].handleWebSocket(ws));
+                 break;
+
+               default:
+                 WebSocketTransformer
+                   .upgrade(request)
+                   .then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
+             }
+          })
+          .asFuture()  // Automatically cancels on error.
+          .catchError((_) => help.debug("caught error", 1));
     });
   }
 
@@ -133,20 +151,8 @@ class CmdrServer {
           fsDelete(um.body, socket);
           break;
 
-        case 'EDITOR_REQUEST_LIST':
-          sendEditorList(socket, dir);
-          break;
-
-        case 'EDITOR_OPEN':
-          sendFileContents(socket, um.body);
-          break;
-
-        case 'EDITOR_SAVE':
-          saveFile(um.body);
-          break;
-
         case 'CLIENT_CONFIG':
-          _initBackendClasses(um.body, dir, socket).then((value) {
+          _initBackendClasses(um.body, dir, socket, watcher).then((value) {
             socket.add('[[CLIENT_SERVER_READY]]');
           });
           break;
@@ -159,29 +165,21 @@ class CmdrServer {
     watcher.events.listen((e) => help.formattedFsUpdate(socket, e));
   }
 
-  Future _initBackendClasses(String config, Directory dir, WebSocket ws) {
+  Future _initBackendClasses(String config, Directory dir, WebSocket ws, DirectoryWatcher watcher) {
     var completer = new Completer();
 
     Map tabs = JSON.decode(config);
 
-    for (String className in tabs['side']) {
-
-    }
-
-    for (String className in tabs['left']) {
-      if (className == CmdrEditor.guiName) {
-        CmdrEditor camera = new CmdrEditor(ws);
-      } else if (className == CmdrCamera.guiName) {
-        CmdrCamera camera = new CmdrCamera(1);
+    for (String column in tabs.keys) {
+      for (String guiName in tabs[column]) {
+        if (guiName == CmdrEditor.guiName) {
+          _editors.add(new CmdrEditor(dir, watcher));
+        } else if (guiName == CmdrCamera.guiName) {
+          _cameras.add(new CmdrCamera(_cameras.length + 1));
+        } else if (guiName == CmdrPty.guiName) {
+          _ptys.add(new CmdrPty(_ptys.length + 1, dir.path));
+        }
       }
-    }
-
-    int i = 1;
-    for (String className in tabs['right']) {
-      if (className == CmdrPty.guiName) {
-        CmdrPty pty = new CmdrPty(i, dir.path);
-      }
-      i++;
     }
 
     completer.complete();

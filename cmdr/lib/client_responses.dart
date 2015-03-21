@@ -18,12 +18,6 @@ void sendDirectory(WebSocket s, Directory dir) {
   });
 }
 
-void sendEditorList(WebSocket s, Directory dir) {
-  help.getDirectory(dir).then((files) {
-    s.add('[[PATH_LIST]]' + files.toString());
-  });
-}
-
 void refreshDirectory(WebSocket s, Directory dir) {
   help.getDirectory(dir).then((files) {
     s.add('[[EXPLORER_DIRECTORY_REFRESH]]' + files.toString());
@@ -32,21 +26,6 @@ void refreshDirectory(WebSocket s, Directory dir) {
 
 void sendPath(WebSocket s, Directory dir) {
   help.formattedMessage(s, 'EXPLORER_DIRECTORY_PATH', dir.path);
-}
-
-void sendFileContents(WebSocket s, String path) {
-  var fileToOpen = new File(path);
-  fileToOpen.readAsString().then((String contents) {
-    s.add('[[EDITOR_FILE_TEXT]]' + path + '[[CONTENTS]]' + contents);
-  });
-}
-
-void saveFile(String args) {
-  // List[0] = data, List[1] = path.
-  List<String> argsList = args.split('[[PATH]]');
-
-  var fileToSave = new File(argsList[1]);
-  fileToSave.writeAsString(argsList[0]);
 }
 
 void fsNewFile(String path) {

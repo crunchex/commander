@@ -49,8 +49,6 @@ class UpDroidExplorer {
     registerExplorerEventHandlers();
 
     ws.send('[[EXPLORER_DIRECTORY_PATH]]');
-
-    cs.add(new CommanderMessage('CLIENT', 'EXPLORER_READY'));
   }
 
   /// Process messages according to the type.

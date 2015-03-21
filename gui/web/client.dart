@@ -51,24 +51,7 @@ class UpDroidClient {
 
   /// Process messages according to the type.
   void processMessage(CommanderMessage m) {
-    // The classes still need to be informed of connection status individually
-    // because they are initialized after first 'CONNECTED' broadcast.
-    // Subsequent connection notifications can be grouped together.
-    switch (m.type) {
-      case 'CONSOLE_READY':
-        //cs.add(new CommanderMessage('CONSOLE', status));
-        break;
-
-      case 'EXPLORER_READY':
-        //cs.add(new CommanderMessage('EXPLORER', status));
-        break;
-
-      case 'EDITOR_READY':
-        break;
-
-      default:
-        print('Client error: unrecognized message type: ' + m.type);
-    }
+    // TODO: evaluate whether this is necesary anymore.
   }
 
   void initWebSocket(String url, [int retrySeconds = 2]) {

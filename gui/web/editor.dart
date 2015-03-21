@@ -84,8 +84,6 @@ class UpDroidEditor {
 
     setUpEditor();
     registerEditorEventHandlers();
-
-    cs.add(new CommanderMessage('CLIENT', 'EDITOR_READY'));
   }
 
   /// Sets up the editor and styles.

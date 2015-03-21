@@ -42,8 +42,6 @@ class UpDroidConsole {
     _initWebSocket('ws://' + url + ':1206$consoleNum/pty');
 
     _registerConsoleEventHandlers();
-
-    cs.add(new CommanderMessage('CLIENT', 'CONSOLE_READY'));
   }
 
   /// Toggles between a Solarized dark and light theme.

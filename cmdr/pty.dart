@@ -1,6 +1,8 @@
 part of updroid_server;
 
 class CmdrPty {
+  static const String guiName = 'UpDroidConsole';
+
   int ptyNum = 1;
 
   CmdrPty(this.ptyNum, String workspacePath) {

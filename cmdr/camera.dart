@@ -1,6 +1,8 @@
 part of updroid_server;
 
 class CmdrCamera {
+  static const String guiName = 'UpDroidCamera';
+
   int cameraNum = 1;
   WebSocket _ws;
   StreamController<List<int>> _transStream;

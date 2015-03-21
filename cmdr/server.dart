@@ -34,8 +34,6 @@ class CmdrServer {
     }
 
     _initServer(dir, virDir, watcher);
-    _initPty(dir);
-    _initCamera();
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -87,8 +85,6 @@ class CmdrServer {
   void _handleWebSocket(WebSocket socket, Directory dir, DirectoryWatcher watcher) {
     help.debug('Client connected!', 0);
     StreamController<String> processInput = new StreamController<String>.broadcast();
-
-    _initEditor(socket);
 
     socket.listen((String s) {
       help.UpDroidMessage um = new help.UpDroidMessage(s);
@@ -150,6 +146,9 @@ class CmdrServer {
           break;
 
         case 'CLIENT_CONFIG':
+          _initBackendClasses(um.body, dir, socket).then((value) {
+            socket.add('[[CLIENT_SERVER_READY]]');
+          });
           break;
 
         default:
@@ -160,19 +159,32 @@ class CmdrServer {
     watcher.events.listen((e) => help.formattedFsUpdate(socket, e));
   }
 
-  void _initEditor(WebSocket ws) {
-    CmdrEditor editor = new CmdrEditor(ws);
-  }
+  Future _initBackendClasses(String config, Directory dir, WebSocket ws) {
+    var completer = new Completer();
 
-  void _initPty(Directory dir) {
-    // TODO: an [UpDroidPty] object should be created dynamically, given
-    // some command from the Commander side (like a new Console tab being created).
-    for (int i = 1; i <= 4; i++) {
-      CmdrPty pty = new CmdrPty(i, dir.path);
+    Map tabs = JSON.decode(config);
+
+    for (String className in tabs['side']) {
+
     }
-  }
 
-  void _initCamera() {
-    CmdrCamera camera = new CmdrCamera(1);
+    for (String className in tabs['left']) {
+      if (className == CmdrEditor.guiName) {
+        CmdrEditor camera = new CmdrEditor(ws);
+      } else if (className == CmdrCamera.guiName) {
+        CmdrCamera camera = new CmdrCamera(1);
+      }
+    }
+
+    int i = 1;
+    for (String className in tabs['right']) {
+      if (className == CmdrPty.guiName) {
+        CmdrPty pty = new CmdrPty(i, dir.path);
+      }
+      i++;
+    }
+
+    completer.complete();
+    return completer.future;
   }
 }

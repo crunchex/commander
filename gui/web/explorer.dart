@@ -48,6 +48,8 @@ class UpDroidExplorer {
 
     registerExplorerEventHandlers();
 
+    ws.send('[[EXPLORER_DIRECTORY_PATH]]');
+
     cs.add(new CommanderMessage('CLIENT', 'EXPLORER_READY'));
   }
 
@@ -55,7 +57,6 @@ class UpDroidExplorer {
   void processMessage(CommanderMessage m) {
     switch (m.type) {
       case 'CONNECTED':
-        ws.send('[[EXPLORER_DIRECTORY_PATH]]');
         break;
 
       case 'DISCONNECTED':

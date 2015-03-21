@@ -63,34 +63,36 @@ class CmdrServer {
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
-          .listen((HttpRequest request) {
-            // WebSocket requests are considered "upgraded" HTTP requests.
-             if (!WebSocketTransformer.isUpgradeRequest(request)) {
-               _handleRequest(request, virDir);
-               return;
-             }
-
-             // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
-             int objectID = int.parse(request.uri.pathSegments[1]) - 1;
-             switch (request.uri.pathSegments[0]) {
-               case 'editor':
-                 WebSocketTransformer
-                   .upgrade(request)
-                   .then((WebSocket ws) => _editors[objectID].handleWebSocket(ws));
-                 break;
-
-               default:
-                 WebSocketTransformer
-                   .upgrade(request)
-                   .then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
-             }
-          })
+          .listen((HttpRequest request) => _routeRequest(request, dir, virDir, watcher))
           .asFuture()  // Automatically cancels on error.
           .catchError((_) => help.debug("caught error", 1));
     });
   }
 
-  void _handleRequest(HttpRequest request, VirtualDirectory virDir) {
+  void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir, DirectoryWatcher watcher) {
+    // WebSocket requests are considered "upgraded" HTTP requests.
+    if (!WebSocketTransformer.isUpgradeRequest(request)) {
+      _handleStandardRequest(request, virDir);
+      return;
+    }
+
+    // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
+    int objectID = int.parse(request.uri.pathSegments[1]) - 1;
+    switch (request.uri.pathSegments[0]) {
+      case 'editor':
+        WebSocketTransformer
+          .upgrade(request)
+          .then((WebSocket ws) => _editors[objectID].handleWebSocket(ws));
+        break;
+
+      default:
+        WebSocketTransformer
+          .upgrade(request)
+          .then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
+    }
+  }
+
+  void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
     help.debug("${request.method} request for: ${request.uri.path}", 0);
 
     if (virDir != null) {

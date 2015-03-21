@@ -18,12 +18,12 @@ part 'camera.dart';
 part 'commands.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
-class UpDroidServer {
+class CmdrServer {
   static const String defaultWorkspacePath = '/home/user/uproot';
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
-  UpDroidServer (ArgResults results) {
+  CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
     DirectoryWatcher watcher = new DirectoryWatcher(dir.path);
 
@@ -158,11 +158,11 @@ class UpDroidServer {
     // TODO: an [UpDroidPty] object should be created dynamically, given
     // some command from the Commander side (like a new Console tab being created).
     for (int i = 1; i <= 4; i++) {
-      UpDroidPty pty = new UpDroidPty(i, dir.path);
+      CmdrPty pty = new CmdrPty(i, dir.path);
     }
   }
 
   void _initCamera() {
-    UpDroidCamera camera = new UpDroidCamera(1);
+    CmdrCamera camera = new CmdrCamera(1);
   }
 }

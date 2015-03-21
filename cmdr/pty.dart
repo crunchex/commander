@@ -1,9 +1,9 @@
 part of updroid_server;
 
-class UpDroidPty {
+class CmdrPty {
   int ptyNum = 1;
 
-  UpDroidPty(this.ptyNum, String workspacePath) {
+  CmdrPty(this.ptyNum, String workspacePath) {
     // TODO: this should be dynamically assigned when
     // multiple consoles are spawned.
 

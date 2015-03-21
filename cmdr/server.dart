@@ -9,7 +9,6 @@ import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
-import 'package:args/command_runner.dart';
 
 import 'lib/client_responses.dart';
 import 'lib/server_helper.dart' as help;

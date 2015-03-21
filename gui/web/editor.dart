@@ -216,11 +216,11 @@ class UpDroidEditor {
       var input = querySelector('#save-as-input');
       String saveAsPath = '';
       presentModal("#save-as");
+      input.value = '';
 
       void completeSave() {
           ws.send('[[EDITOR_SAVE]]' + aceEditor.value + '[[PATH]]' + saveAsPath);
           fileName.text = input.value;
-          input.value = '';
           resetSavePoint();
           curModal.hide();
           saveAsClickEnd.cancel();

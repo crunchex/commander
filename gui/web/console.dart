@@ -3,6 +3,8 @@ part of updroid_client;
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket], into an UpDroid Commander tab.
 class UpDroidConsole {
+  static const String className = 'UpDroidConsole';
+
   StreamController<CommanderMessage> _cs;
   int _consoleNum;
   WebSocket _ws;

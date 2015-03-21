@@ -4,6 +4,8 @@ part of updroid_client;
 /// side and all associated views. It also facilitates file operation requests
 /// to the server side.
 class UpDroidExplorer {
+  static const String className = 'UpDroidExplorer';
+
   WebSocket ws;
   StreamController<CommanderMessage> cs;
   String workspacePath;

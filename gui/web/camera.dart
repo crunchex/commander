@@ -3,6 +3,7 @@ part of updroid_client;
 /// [UpDroidCamera] is a client-side class that uses the jsmpeg library
 /// to render a video stream from a websocket onto a canvas element.
 class UpDroidCamera {
+  static const String className = 'UpDroidCamera';
   int cameraNum;
 
   UpDroidCamera(this.cameraNum) {

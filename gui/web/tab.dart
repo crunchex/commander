@@ -2,88 +2,87 @@ part of updroid_client;
 
 abstract class UpDroidTab {
 
-  Future _setUpTabContainer() {
+  Future _setUpTabContainer(bool active) {
     Completer completer = new Completer();
 
-    DivElement tabContainer = new DivElement();
-    tabContainer.id = 'tab-editor-container';
-    tabContainer.classes.add('tab-pane');
-    tabContainer.classes.add('active');
+    DivElement tabContainer = new DivElement()
+      ..id = 'tab-editor-container'
+      ..classes.add('tab-pane');
 
-    UListElement tabList = new UListElement();
-    tabList
+    if (active) tabContainer.classes.add('active');
+
+    UListElement tabList = new UListElement()
         ..classes.add('nav')
         ..classes.add('nav-tabs')
         ..classes.add('inner-tabs')
         ..attributes['role'] = 'tablist';
+    tabContainer.children.add(tabList);
 
-    tabList.children.add(_createDropdown('File', ['New', 'Save', 'Save As']));
+    tabList.children.add(_createDropdownMenu('File', ['New', 'Save', 'Save As']));
     tabList.children.add(_createDropdown2('Settings'));
     LIElement filename = new LIElement();
     filename.id = 'filename';
     tabList.children.add(filename);
 
-    tabContainer.children.add(tabList);
+    DivElement tabContent = new DivElement()
+      ..classes.add('tab-content')
+      ..classes.add('active');
+    tabContainer.children.add(tabContent);
 
-    DivElement tabContent = new DivElement();
-    tabContent.classes.add('tab-content');
-    tabContent.classes.add('active');
-    DivElement content = new DivElement();
-    content
+    DivElement content = new DivElement()
         ..id = 'editor'
         ..classes.add('editor');
     tabContent.children.add(content);
-    tabContainer.children.add(tabContent);
+
 
     completer.complete(tabContainer);
     return completer.future;
   }
 
-  LIElement _createDropdown(String title, List buttons) {
+  LIElement _createDropdownMenu(String title, List buttons) {
     LIElement dropdown = new LIElement();
     dropdown.classes.add('dropdown');
 
-    AnchorElement dropdownToggle = new AnchorElement();
-    dropdownToggle
+    AnchorElement dropdownToggle = new AnchorElement()
         ..href = '#'
         ..classes.add('dropdown-toggle')
         ..dataset['toggle'] = 'dropdown'
         ..text = title;
     dropdown.children.add(dropdownToggle);
 
-    UListElement dropdownMenu = new UListElement();
-    dropdownMenu
+    UListElement dropdownMenu = new UListElement()
         ..classes.add('dropdown-menu')
         ..attributes['role'] = 'menu';
+    dropdown.children.add(dropdownMenu);
 
     for (String title in buttons) {
       dropdownMenu.children.add(_createButton(title));
     }
 
-    dropdown.children.add(dropdownMenu);
-
     return dropdown;
   }
 
+  /// Special method specific to editor.
   LIElement _createDropdown2(String title) {
     LIElement dropdown = new LIElement();
     dropdown.classes.add('dropdown');
 
-    AnchorElement dropdownToggle = new AnchorElement();
-    dropdownToggle
+    AnchorElement dropdownToggle = new AnchorElement()
         ..href = '#'
         ..classes.add('dropdown-toggle')
         ..dataset['toggle'] = 'dropdown'
         ..text = title;
     dropdown.children.add(dropdownToggle);
 
-    UListElement dropdownMenu = new UListElement();
-    dropdownMenu
+    UListElement dropdownMenu = new UListElement()
         ..classes.add('dropdown-menu')
         ..attributes['role'] = 'menu';
+    dropdown.children.add(dropdownMenu);
 
     LIElement buttonTheme = _createButton('Theme');
     buttonTheme.children[0].id = 'button-editor-theme';
+    dropdownMenu.children.add(buttonTheme);
+
     LIElement li = new LIElement();
     li.style.textAlign = 'center';
     DivElement d = new DivElement();
@@ -99,10 +98,6 @@ abstract class UpDroidTab {
     li.children.add(d);
     buttonTheme.children.add(li);
 
-    dropdownMenu.children.add(buttonTheme);
-
-    dropdown.children.add(dropdownMenu);
-
     return dropdown;
   }
 
@@ -110,8 +105,7 @@ abstract class UpDroidTab {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     LIElement buttonList = new LIElement();
-    AnchorElement button = new AnchorElement();
-    button
+    AnchorElement button = new AnchorElement()
         ..id = 'button-$id'
         ..href = '#'
         ..attributes['role'] = 'button'
@@ -121,15 +115,3 @@ abstract class UpDroidTab {
     return buttonList;
   }
 }
-
-//<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
-//  <ul class="dropdown-menu" role="menu">
-//    <li><a href="#" id="button-editor-theme">Theme</a></li>
-//      <li style="text-align: center">
-//        <div style="display: inline-block;">
-//          <p style="display: inline-block;">Font Size</p><input id="font-size-input" type="text">
-//        </div>
-//      </li>
-//  </ul>
-//</li>
-//<li id="filename"></li>

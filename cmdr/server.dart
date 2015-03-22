@@ -12,7 +12,6 @@ import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
 import 'lib/server_helper.dart' as help;
-import 'lib/client_responses.dart';
 
 part 'pty.dart';
 part 'camera.dart';

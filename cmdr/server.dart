@@ -111,12 +111,12 @@ class CmdrServer {
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
   void _handleWebSocket(WebSocket socket, Directory dir, DirectoryWatcher watcher) {
-    help.debug('Client connected!', 0);
+    help.debug('Commander client connected.', 0);
     StreamController<String> processInput = new StreamController<String>.broadcast();
 
     socket.listen((String s) {
       help.UpDroidMessage um = new help.UpDroidMessage(s);
-      help.debug('Incoming message: ' + s, 0);
+      help.debug('Server incoming: ' + s, 0);
 
       switch (um.header) {
         case 'CLIENT_CONFIG':

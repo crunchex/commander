@@ -16,12 +16,12 @@ class CmdrExplorer {
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
   void handleWebSocket(WebSocket ws) {
-    help.debug('Client connected!', 0);
+    help.debug('Explorer client connected.', 0);
     StreamController<String> processInput = new StreamController<String>.broadcast();
 
     ws.listen((String s) {
       help.UpDroidMessage um = new help.UpDroidMessage(s);
-      help.debug('Incoming message: ' + s, 0);
+      help.debug('Explorer incoming: ' + s, 0);
 
       switch (um.header) {
         case "INITIAL_DIRECTORY_LIST":
@@ -66,7 +66,7 @@ class CmdrExplorer {
           break;
 
         default:
-          help.debug('Editor: message received without updroid header.', 1);
+          help.debug('Explorer: message received without updroid header.', 1);
       }
 
       _watcher.events.listen((e) => help.formattedFsUpdate(ws, e));

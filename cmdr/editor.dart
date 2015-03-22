@@ -7,9 +7,8 @@ class CmdrEditor {
   Directory _dir;
   DirectoryWatcher _watcher;
 
-  CmdrEditor(Directory dir, DirectoryWatcher watcher) {
+  CmdrEditor(Directory dir) {
     _dir = dir;
-    _watcher = watcher;
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests

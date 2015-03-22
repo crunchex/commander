@@ -141,7 +141,7 @@ class CmdrServer {
         if (guiName == CmdrExplorer.guiName) {
           _explorers.add(new CmdrExplorer(dir, watcher));
         } else if (guiName == CmdrEditor.guiName) {
-          _editors.add(new CmdrEditor(dir, watcher));
+          _editors.add(new CmdrEditor(dir));
         } else if (guiName == CmdrCamera.guiName) {
           _cameras.add(new CmdrCamera(_cameras.length + 1));
         } else if (guiName == CmdrPty.guiName) {

@@ -128,7 +128,7 @@ class CmdrServer {
         default:
           help.debug('Message received without updroid header.', 1);
       }
-    });
+    }).onDone(() => _cleanUpBackend());
   }
 
   Future _initBackendClasses(String config, Directory dir, WebSocket ws, DirectoryWatcher watcher) {
@@ -152,5 +152,12 @@ class CmdrServer {
 
     completer.complete();
     return completer.future;
+  }
+
+  void _cleanUpBackend() {
+    _explorers = [];
+    _editors = [];
+    _ptys = [];
+    _cameras = [];
   }
 }

@@ -1,8 +1,8 @@
 part of updroid_client;
 
-class UpDroidTab {
+abstract class UpDroidTab {
 
-  static Future setUpTabContainer() {
+  Future _setUpTabContainer() {
     Completer completer = new Completer();
 
     DivElement tabContainer = new DivElement();
@@ -39,7 +39,7 @@ class UpDroidTab {
     return completer.future;
   }
 
-  static LIElement _createDropdown(String title, List buttons) {
+  LIElement _createDropdown(String title, List buttons) {
     LIElement dropdown = new LIElement();
     dropdown.classes.add('dropdown');
 
@@ -65,7 +65,7 @@ class UpDroidTab {
     return dropdown;
   }
 
-  static LIElement _createDropdown2(String title) {
+  LIElement _createDropdown2(String title) {
     LIElement dropdown = new LIElement();
     dropdown.classes.add('dropdown');
 
@@ -106,7 +106,7 @@ class UpDroidTab {
     return dropdown;
   }
 
-  static LIElement _createButton(String title) {
+  LIElement _createButton(String title) {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     LIElement buttonList = new LIElement();

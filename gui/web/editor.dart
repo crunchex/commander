@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
 /// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
 /// for the editor and an additional menu bar with some filesystem operations.
-class UpDroidEditor {
+class UpDroidEditor extends UpDroidTab {
   static const String className = 'UpDroidEditor';
 
   Map pathMap;
@@ -68,7 +68,7 @@ class UpDroidEditor {
     _cs = cs;
 
     DivElement colOneTabContent = querySelector('#col-1-tab-content');
-    UpDroidTab.setUpTabContainer().then((editorContainer) {
+    _setUpTabContainer().then((editorContainer) {
       colOneTabContent.children.insert(0, editorContainer);
 
       editorDiv = querySelector('#editor');

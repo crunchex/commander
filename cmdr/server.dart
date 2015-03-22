@@ -9,14 +9,16 @@ import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
+import 'package:path/path.dart' as pathLib;
 
-import 'lib/client_responses.dart';
 import 'lib/server_helper.dart' as help;
+import 'lib/client_responses.dart';
 
 part 'pty.dart';
 part 'camera.dart';
 part 'commands.dart';
 part 'editor.dart';
+part 'explorer.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
@@ -24,6 +26,7 @@ class CmdrServer {
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
+  List<CmdrExplorer> _explorers = [];
   List<CmdrEditor> _editors = [];
   List<CmdrPty> _ptys = [];
   List<CmdrCamera> _cameras = [];
@@ -85,6 +88,12 @@ class CmdrServer {
           .then((WebSocket ws) => _editors[objectID].handleWebSocket(ws));
         break;
 
+      case 'explorer':
+        WebSocketTransformer
+          .upgrade(request)
+          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
+        break;
+
       default:
         WebSocketTransformer
           .upgrade(request)
@@ -111,48 +120,6 @@ class CmdrServer {
       help.debug('Incoming message: ' + s, 0);
 
       switch (um.header) {
-
-        case "INITIAL_DIRECTORY_LIST":
-          sendInitial(socket, dir);
-          break;
-
-        case 'EXPLORER_DIRECTORY_PATH':
-          sendPath(socket, dir);
-          break;
-
-        case 'EXPLORER_DIRECTORY_LIST':
-          sendDirectory(socket, dir);
-          break;
-
-        case 'EXPLORER_DIRECTORY_REFRESH':
-          refreshDirectory(socket, dir);
-          break;
-
-        case 'EXPLORER_NEW_FILE':
-          fsNewFile(um.body);
-          break;
-
-        case 'EXPLORER_NEW_FOLDER':
-          fsNewFolder(um.body);
-          // Empty folders don't trigger an incremental update, so we need to
-          // refresh the entire workspace.
-          sendDirectory(socket, dir);
-          break;
-
-        case 'EXPLORER_RENAME':
-          fsRename(um.body);
-          break;
-
-        case 'EXPLORER_MOVE':
-          // Currently implemented in the same way as RENAME as there is no
-          // direct API for MOVE.
-          fsRename(um.body);
-          break;
-
-        case 'EXPLORER_DELETE':
-          fsDelete(um.body, socket);
-          break;
-
         case 'CLIENT_CONFIG':
           _initBackendClasses(um.body, dir, socket, watcher).then((value) {
             socket.add('[[CLIENT_SERVER_READY]]');
@@ -163,8 +130,6 @@ class CmdrServer {
           help.debug('Message received without updroid header.', 1);
       }
     });
-
-    watcher.events.listen((e) => help.formattedFsUpdate(socket, e));
   }
 
   Future _initBackendClasses(String config, Directory dir, WebSocket ws, DirectoryWatcher watcher) {
@@ -174,7 +139,9 @@ class CmdrServer {
 
     for (String column in tabs.keys) {
       for (String guiName in tabs[column]) {
-        if (guiName == CmdrEditor.guiName) {
+        if (guiName == CmdrExplorer.guiName) {
+          _explorers.add(new CmdrExplorer(dir, watcher));
+        } else if (guiName == CmdrEditor.guiName) {
           _editors.add(new CmdrEditor(dir, watcher));
         } else if (guiName == CmdrCamera.guiName) {
           _cameras.add(new CmdrCamera(_cameras.length + 1));

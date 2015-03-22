@@ -114,7 +114,7 @@ class UpDroidClient {
 
     for (String className in tabs['side']) {
       if (className == UpDroidExplorer.className) {
-        UpDroidExplorer explorer = new UpDroidExplorer(ws, cs);
+        UpDroidExplorer explorer = new UpDroidExplorer(cs);
       }
     }
 

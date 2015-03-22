@@ -6,8 +6,6 @@ part of updroid_client;
 class UpDroidExplorer {
   static const String className = 'UpDroidExplorer';
 
-  WebSocket ws;
-  StreamController<CommanderMessage> cs;
   String workspacePath;
 
   DivElement editorDiv;
@@ -26,8 +24,10 @@ class UpDroidExplorer {
   Dropzone dzEditor;
   StreamSubscription outsideClickListener;
 
-  UpDroidExplorer(WebSocket ws, StreamController<CommanderMessage> cs) {
-    this.ws = ws;
+  WebSocket ws;
+  StreamController<CommanderMessage> cs;
+
+  UpDroidExplorer(StreamController<CommanderMessage> cs) {
     this.cs = cs;
 
     newFile = querySelector('#file');
@@ -46,9 +46,13 @@ class UpDroidExplorer {
     dzEditor = new Dropzone(editorDiv);
     fileName = querySelector('#filename');
 
-    registerExplorerEventHandlers();
+    // Create the server <-> client [WebSocket].
+    // Port 12060 is the default port that UpDroid uses.
+    String url = window.location.host;
+    url = url.split(':')[0];
+    ws = new WebSocket('ws://' + url + ':12060/explorer/1');
 
-    ws.send('[[EXPLORER_DIRECTORY_PATH]]');
+    registerExplorerEventHandlers();
   }
 
   /// Process messages according to the type.
@@ -68,6 +72,8 @@ class UpDroidExplorer {
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
     cs.stream.where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL').listen((m) => processMessage(m));
+
+    ws.onOpen.listen((e) => ws.send('[[EXPLORER_DIRECTORY_PATH]]'));
 
     ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_DIRECTORY_PATH').listen((um) {
       workspacePath = um.body;

@@ -32,14 +32,13 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-    DirectoryWatcher watcher = new DirectoryWatcher(dir.path);
 
     VirtualDirectory virDir;
     if (!results['serveronly']) {
       virDir = _getVirDir(results);
     }
 
-    _initServer(dir, virDir, watcher);
+    _initServer(dir, virDir);
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -59,19 +58,19 @@ class CmdrServer {
   }
 
   /// Initializes and HTTP server to serve the gui and handle [WebSocket] requests.
-  void _initServer(Directory dir, VirtualDirectory virDir, DirectoryWatcher watcher) {
+  void _initServer(Directory dir, VirtualDirectory virDir) {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
-          .listen((HttpRequest request) => _routeRequest(request, dir, virDir, watcher))
+          .listen((HttpRequest request) => _routeRequest(request, dir, virDir))
           .asFuture()  // Automatically cancels on error.
           .catchError((_) => help.debug("caught error", 1));
     });
   }
 
-  void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir, DirectoryWatcher watcher) {
+  void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir) {
     // WebSocket requests are considered "upgraded" HTTP requests.
     if (!WebSocketTransformer.isUpgradeRequest(request)) {
       _handleStandardRequest(request, virDir);
@@ -96,7 +95,7 @@ class CmdrServer {
       default:
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
+          .then((WebSocket ws) => _handleWebSocket(ws, dir));
     }
   }
 
@@ -110,7 +109,7 @@ class CmdrServer {
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
-  void _handleWebSocket(WebSocket socket, Directory dir, DirectoryWatcher watcher) {
+  void _handleWebSocket(WebSocket socket, Directory dir) {
     help.debug('Commander client connected.', 0);
     StreamController<String> processInput = new StreamController<String>.broadcast();
 
@@ -120,7 +119,7 @@ class CmdrServer {
 
       switch (um.header) {
         case 'CLIENT_CONFIG':
-          _initBackendClasses(um.body, dir, socket, watcher).then((value) {
+          _initBackendClasses(um.body, dir, socket).then((value) {
             socket.add('[[CLIENT_SERVER_READY]]');
           });
           break;
@@ -131,7 +130,7 @@ class CmdrServer {
     }).onDone(() => _cleanUpBackend());
   }
 
-  Future _initBackendClasses(String config, Directory dir, WebSocket ws, DirectoryWatcher watcher) {
+  Future _initBackendClasses(String config, Directory dir, WebSocket ws) {
     var completer = new Completer();
 
     Map tabs = JSON.decode(config);
@@ -139,11 +138,11 @@ class CmdrServer {
     for (String column in tabs.keys) {
       for (String guiName in tabs[column]) {
         if (guiName == CmdrExplorer.guiName) {
-          _explorers.add(new CmdrExplorer(dir, watcher));
+          _explorers.add(new CmdrExplorer(dir));
         } else if (guiName == CmdrEditor.guiName) {
           _editors.add(new CmdrEditor(dir));
         } else if (guiName == CmdrCamera.guiName) {
-          _cameras.add(new CmdrCamera(_cameras.length + 1));
+          //_cameras.add(new CmdrCamera(_cameras.length + 1));
         } else if (guiName == CmdrPty.guiName) {
           _ptys.add(new CmdrPty(_ptys.length + 1, dir.path));
         }

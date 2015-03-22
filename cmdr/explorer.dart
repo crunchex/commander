@@ -8,9 +8,10 @@ class CmdrExplorer {
   Directory _dir;
   DirectoryWatcher _watcher;
 
-  CmdrExplorer(Directory dir, DirectoryWatcher watcher) {
+  CmdrExplorer(Directory dir) {
     _dir = dir;
-    _watcher = watcher;
+
+    _watcher = new DirectoryWatcher(dir.path);
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests

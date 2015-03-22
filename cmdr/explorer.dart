@@ -4,6 +4,7 @@ class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';
 
   int editorNum = 1;
+
   Directory _dir;
   DirectoryWatcher _watcher;
 
@@ -24,44 +25,44 @@ class CmdrExplorer {
 
       switch (um.header) {
         case "INITIAL_DIRECTORY_LIST":
-          sendInitial(ws);
+          _sendInitial(ws);
           break;
 
         case 'EXPLORER_DIRECTORY_PATH':
-          sendPath(ws);
+          _sendPath(ws);
           break;
 
         case 'EXPLORER_DIRECTORY_LIST':
-          sendDirectory(ws);
+          _sendDirectory(ws);
           break;
 
         case 'EXPLORER_DIRECTORY_REFRESH':
-          refreshDirectory(ws);
+          _refreshDirectory(ws);
           break;
 
         case 'EXPLORER_NEW_FILE':
-          fsNewFile(um.body);
+          _fsNewFile(um.body);
           break;
 
         case 'EXPLORER_NEW_FOLDER':
-          fsNewFolder(um.body);
+          _fsNewFolder(um.body);
           // Empty folders don't trigger an incremental update, so we need to
           // refresh the entire workspace.
-          sendDirectory(ws);
+          _sendDirectory(ws);
           break;
 
         case 'EXPLORER_RENAME':
-          fsRename(um.body);
+          _fsRename(um.body);
           break;
 
         case 'EXPLORER_MOVE':
           // Currently implemented in the same way as RENAME as there is no
           // direct API for MOVE.
-          fsRename(um.body);
+          _fsRename(um.body);
           break;
 
         case 'EXPLORER_DELETE':
-          fsDelete(um.body, ws);
+          _fsDelete(um.body, ws);
           break;
 
         default:
@@ -72,29 +73,29 @@ class CmdrExplorer {
     });
   }
 
-  void sendInitial(WebSocket s) {
+  void _sendInitial(WebSocket s) {
     help.getDirectory(_dir).then((files) {
       s.add('[[INITIAL_DIRECTORY_LIST]]' + files.toString());
     });
   }
 
-  void sendDirectory(WebSocket s) {
+  void _sendDirectory(WebSocket s) {
     help.getDirectory(_dir).then((files) {
       s.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
     });
   }
 
-  void refreshDirectory(WebSocket s) {
+  void _refreshDirectory(WebSocket s) {
     help.getDirectory(_dir).then((files) {
       s.add('[[EXPLORER_DIRECTORY_REFRESH]]' + files.toString());
     });
   }
 
-  void sendPath(WebSocket s) {
+  void _sendPath(WebSocket s) {
     help.formattedMessage(s, 'EXPLORER_DIRECTORY_PATH', _dir.path);
   }
 
-  void fsNewFile(String path) {
+  void _fsNewFile(String path) {
     String fullPath = pathLib.join(path + '/untitled.py');
     File newFile = new File(fullPath);
 
@@ -108,7 +109,7 @@ class CmdrExplorer {
     newFile.create();
   }
 
-  void fsNewFolder(String path) {
+  void _fsNewFolder(String path) {
     String fullPath = path;
     Directory newFolder = new Directory(fullPath);
 
@@ -122,7 +123,7 @@ class CmdrExplorer {
     newFolder.createSync();
   }
 
-  void fsRename(String rename) {
+  void _fsRename(String rename) {
     List<String> renameList = rename.split(':divider:');
 
     if (!FileSystemEntity.isDirectorySync(renameList[0])) {
@@ -134,7 +135,7 @@ class CmdrExplorer {
     }
   }
 
-  void fsDelete(String path, WebSocket socket) {
+  void _fsDelete(String path, WebSocket socket) {
     // Can't simply just create a FileSystemEntity and delete it, since
     // it is an abstract class. This is a dumb way to create the proper
     // entity class.

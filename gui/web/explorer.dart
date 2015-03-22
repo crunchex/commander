@@ -43,7 +43,7 @@ class UpDroidExplorer {
     dzRecycle = new Dropzone(recycle);
 
     editorDiv = querySelector('#editor');
-    dzEditor = new Dropzone(editorDiv);
+    //dzEditor = new Dropzone(editorDiv);
     fileName = querySelector('#filename');
 
     // Create the server <-> client [WebSocket].
@@ -169,22 +169,22 @@ class UpDroidExplorer {
     });
 
     // Dragging through nested dropzones appears to be glitchy
-    dzEditor.onDragEnter.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
-      }
-    });
-
-    dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
-
-    dzEditor.onDrop.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
-        fileName.text = e.draggableElement.dataset['trueName'];
-      }
-    });
+//    dzEditor.onDragEnter.listen((e) {
+//      var isDir = e.draggableElement.dataset['isDir'];
+//      if (isDir == 'false') {
+//        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
+//      }
+//    });
+//
+//    dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
+//
+//    dzEditor.onDrop.listen((e) {
+//      var isDir = e.draggableElement.dataset['isDir'];
+//      if (isDir == 'false') {
+//        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
+//        fileName.text = e.draggableElement.dataset['trueName'];
+//      }
+//    });
   }
 
   /// Returns a list of file objects from the flattened string returned from

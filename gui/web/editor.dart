@@ -67,29 +67,34 @@ class UpDroidEditor {
   UpDroidEditor(StreamController<CommanderMessage> cs) {
     _cs = cs;
 
-    editorDiv = querySelector('#editor');
-    fileName = querySelector('#filename');
-    saveButton = querySelector('#button-save');
-    newButton = querySelector('#button-new');
-    saveAsButton = querySelector('#button-save-as');
-    saveCommit = querySelector('#save-as-commit');
-    themeButton = querySelector('#button-editor-theme');
-    modalSaveButton = querySelector('.modal-save');
-    modalDiscardButton = querySelector('.modal-discard');
-    overwriteCommit = querySelector('#warning button');
-    warning = querySelector('#warning');
+    DivElement colOneTabContent = querySelector('#col-1-tab-content');
+    UpDroidTab.setUpTabContainer().then((editorContainer) {
+      colOneTabContent.children.insert(0, editorContainer);
 
-    fontSizeInput = querySelector("#font-size-input");
-    fontSizeInput.placeholder = fontSize.toString();
+      editorDiv = querySelector('#editor');
+      fileName = querySelector('#filename');
+      saveButton = querySelector('#button-save');
+      newButton = querySelector('#button-new');
+      saveAsButton = querySelector('#button-save-as');
+      saveCommit = querySelector('#save-as-commit');
+      themeButton = querySelector('#button-editor-theme');
+      modalSaveButton = querySelector('.modal-save');
+      modalDiscardButton = querySelector('.modal-discard');
+      overwriteCommit = querySelector('#warning button');
+      warning = querySelector('#warning');
 
-    // Create the server <-> client [WebSocket].
-    // Port 12060 is the default port that UpDroid uses.
-    String url = window.location.host;
-    url = url.split(':')[0];
-    _ws = new WebSocket('ws://' + url + ':12060/editor/1');
+      fontSizeInput = querySelector('#font-size-input');
+      fontSizeInput.placeholder = fontSize.toString();
 
-    setUpEditor();
-    registerEditorEventHandlers();
+      // Create the server <-> client [WebSocket].
+      // Port 12060 is the default port that UpDroid uses.
+      String url = window.location.host;
+      url = url.split(':')[0];
+      _ws = new WebSocket('ws://' + url + ':12060/editor/1');
+
+      setUpEditor();
+      registerEditorEventHandlers();
+    });
   }
 
   /// Sets up the editor and styles.

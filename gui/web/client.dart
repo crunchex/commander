@@ -14,6 +14,7 @@ import 'lib/explorer_helper.dart';
 import 'lib/terminal/terminal.dart';
 import "package:path/path.dart" as pathLib;
 
+part 'tab.dart';
 part 'explorer.dart';
 part 'editor.dart';
 part 'console.dart';
@@ -112,12 +113,6 @@ class UpDroidClient {
   void _initializeTabs() {
     Map tabs = JSON.decode(_config);
 
-    for (String className in tabs['side']) {
-      if (className == UpDroidExplorer.className) {
-        UpDroidExplorer explorer = new UpDroidExplorer(cs);
-      }
-    }
-
     for (String className in tabs['left']) {
       if (className == UpDroidEditor.className) {
         UpDroidEditor editor = new UpDroidEditor(cs);
@@ -132,6 +127,12 @@ class UpDroidClient {
         UpDroidConsole console = new UpDroidConsole(i, cs);
       }
       i++;
+    }
+
+    for (String className in tabs['side']) {
+      if (className == UpDroidExplorer.className) {
+        UpDroidExplorer explorer = new UpDroidExplorer(cs);
+      }
     }
   }
 }

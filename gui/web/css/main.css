@@ -117,8 +117,8 @@ html, body {
 }
 
 #file-explorer-title {
-  display: block;
-  margin-bottom: 10px;
+  display: inline-block;
+  margin-right: 5px;
   text-align: center;
   vertical-align: middle;
   font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;

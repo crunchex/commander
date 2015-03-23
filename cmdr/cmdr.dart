@@ -6,7 +6,7 @@ import 'server.dart';
 
 void main(List<String> args) {
   CommandRunner runner = new CommandRunner("cmdr", "The UpDroid Command tool.")
-    ..addCommand(new GuiCommand());
+    ..addCommand(new CmdrGuiCommand());
 
     runner.run(args).catchError((error) {
       if (error is! UsageException) throw error;

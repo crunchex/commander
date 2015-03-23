@@ -1,8 +1,17 @@
-part of updroid_client;
+library updroid_console;
+
+import 'dart:html';
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'lib/updroid_message.dart';
+import 'lib/terminal/terminal.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket], into an UpDroid Commander tab.
 class UpDroidConsole {
+  static const String className = 'UpDroidConsole';
+
   StreamController<CommanderMessage> _cs;
   int _consoleNum;
   WebSocket _ws;
@@ -40,8 +49,6 @@ class UpDroidConsole {
     _initWebSocket('ws://' + url + ':1206$consoleNum/pty');
 
     _registerConsoleEventHandlers();
-
-    cs.add(new CommanderMessage('CLIENT', 'CONSOLE_READY'));
   }
 
   /// Toggles between a Solarized dark and light theme.

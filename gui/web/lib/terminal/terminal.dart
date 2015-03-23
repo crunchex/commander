@@ -229,6 +229,18 @@ class Terminal {
         char = Glyph.SPACE;
       }
 
+      if (code == 60) {
+        char = Glyph.LT;
+      }
+
+      if (code == 62) {
+        char = Glyph.GT;
+      }
+
+      if (code == 38) {
+        char = Glyph.AMP;
+      }
+
       if (code == 8 || code == 7) {
         continue;
       }

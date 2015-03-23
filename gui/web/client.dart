@@ -3,30 +3,20 @@ library updroid_client;
 import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
-import 'dart:js' as js;
-import 'package:ace/ace.dart' as ace;
-import 'package:bootjack/bootjack.dart';
-import 'package:ace/proxy.dart';
-import 'package:dnd/dnd.dart';
-import 'lib/updroid_message.dart';
-import 'lib/explorer_helper.dart';
-import 'lib/terminal/terminal.dart';
-import "package:path/path.dart" as pathLib;
 
-part 'explorer.dart';
-part 'editor.dart';
-part 'console.dart';
-part 'camera.dart';
+import 'editor.dart';
+import 'console.dart';
+import 'explorer.dart';
+import 'camera.dart';
+import 'lib/updroid_message.dart';
 
 class UpDroidClient {
-  UpDroidEditor editor;
-  UpDroidExplorer explorer;
-  UpDroidConsole console;
-  UpDroidCamera camera;
+  // TODO: find syntax to make this not such a long line.
+  static const String defaultConfig = '{"side":["UpDroidExplorer"],"left":["UpDroidEditor","UpDroidCamera"],"right":["UpDroidConsole","UpDroidConsole","UpDroidConsole","UpDroidConsole"]}';
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
+  String _config;
 
   String status;
   bool encounteredError;
@@ -34,6 +24,8 @@ class UpDroidClient {
   UpDroidClient() {
     this.status = 'DISCONNECTED';
     this.encounteredError = false;
+
+    _config = _getConfig();
 
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.
@@ -43,42 +35,14 @@ class UpDroidClient {
     // Port 12060 is the default port that UpDroid uses.
     String url = window.location.host;
     url = url.split(':')[0];
-    initWebSocket('ws://' + url + ':12060/pty');
+    initWebSocket('ws://' + url + ':12060/server/1');
 
     registerEventHandlers(ws, cs);
-    initializeClasses(ws, cs);
-  }
-
-  /// Initializes the main Commander classes.
-  void initializeClasses(WebSocket ws, StreamController<CommanderMessage> cs) {
-    editor = new UpDroidEditor(ws, cs);
-    explorer = new UpDroidExplorer(ws, cs);
-    for (int i = 1; i <= 4; i++) {
-      console = new UpDroidConsole(i, cs);
-    }
-    camera = new UpDroidCamera(1);
   }
 
   /// Process messages according to the type.
   void processMessage(CommanderMessage m) {
-    // The classes still need to be informed of connection status individually
-    // because they are initialized after first 'CONNECTED' broadcast.
-    // Subsequent connection notifications can be grouped together.
-    switch (m.type) {
-      case 'CONSOLE_READY':
-        //cs.add(new CommanderMessage('CONSOLE', status));
-        break;
-
-      case 'EXPLORER_READY':
-        //cs.add(new CommanderMessage('EXPLORER', status));
-        break;
-
-      case 'EDITOR_READY':
-        break;
-
-      default:
-        print('Client error: unrecognized message type: ' + m.type);
-    }
+    // TODO: evaluate whether this is necesary anymore.
   }
 
   void initWebSocket(String url, [int retrySeconds = 2]) {
@@ -88,6 +52,7 @@ class UpDroidClient {
 
     ws.onOpen.listen((e) {
       status = 'CONNECTED';
+      ws.send('[[CLIENT_CONFIG]]' + _config);
       cs.add(new CommanderMessage('ALL', status));
     });
 
@@ -106,6 +71,10 @@ class UpDroidClient {
       }
       encounteredError = true;
     });
+
+    ws.onMessage.transform(updroidTransformer)
+      .where((um) => um.header == 'CLIENT_SERVER_READY')
+      .listen((um) => _initializeTabs());
   }
 
   /// Sets up external event handlers for the various Commander classes. These
@@ -114,5 +83,46 @@ class UpDroidClient {
     cs.stream
         .where((m) => m.dest == 'CLIENT')
         .listen((m) => processMessage(m));
+  }
+
+  /// Returns a [Map] of all the tabs that [UpDroidClient] needs to spawn,
+  /// where key = side|left|right| and value = a list of UpDroidTab.className.
+  /// TODO: this function should retrieve information from some defaults or
+  /// a user account settings save.
+  String _getConfig([String config]) {
+    if (config == null) {
+      config = UpDroidClient.defaultConfig;
+    }
+
+    return config;
+  }
+
+  /// Initializes all classes based on the loaded configuration in [_config].
+  /// TODO: create an abstract class [UpDroidTab] that all others implement.
+  /// TODO: call a generic UpDroidTab constructor instead of ifs or switches.
+  void _initializeTabs() {
+    Map tabs = JSON.decode(_config);
+
+    for (String className in tabs['left']) {
+      if (className == UpDroidEditor.className) {
+        UpDroidEditor editor = new UpDroidEditor(cs);
+      } else if (className == UpDroidCamera.className) {
+        UpDroidCamera camera = new UpDroidCamera(1);
+      }
+    }
+
+    int i = 1;
+    for (String className in tabs['right']) {
+      if (className == UpDroidConsole.className) {
+        UpDroidConsole console = new UpDroidConsole(i, cs);
+      }
+      i++;
+    }
+
+    for (String className in tabs['side']) {
+      if (className == UpDroidExplorer.className) {
+        UpDroidExplorer explorer = new UpDroidExplorer(cs);
+      }
+    }
   }
 }

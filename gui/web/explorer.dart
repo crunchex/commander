@@ -1,11 +1,20 @@
-part of updroid_client;
+library updroid_explorer;
+
+import 'dart:html';
+import 'dart:async';
+
+import 'package:dnd/dnd.dart';
+import "package:path/path.dart" as pathLib;
+
+import 'lib/updroid_message.dart';
+import 'lib/explorer_helper.dart';
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests
 /// to the server side.
 class UpDroidExplorer {
-  WebSocket ws;
-  StreamController<CommanderMessage> cs;
+  static const String className = 'UpDroidExplorer';
+
   String workspacePath;
 
   DivElement editorDiv;
@@ -24,8 +33,10 @@ class UpDroidExplorer {
   Dropzone dzEditor;
   StreamSubscription outsideClickListener;
 
-  UpDroidExplorer(WebSocket ws, StreamController<CommanderMessage> cs) {
-    this.ws = ws;
+  WebSocket ws;
+  StreamController<CommanderMessage> cs;
+
+  UpDroidExplorer(StreamController<CommanderMessage> cs) {
     this.cs = cs;
 
     newFile = querySelector('#file');
@@ -40,23 +51,46 @@ class UpDroidExplorer {
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
 
-    editorDiv = querySelector('#editor');
-    dzEditor = new Dropzone(editorDiv);
-    fileName = querySelector('#filename');
+    // Create the server <-> client [WebSocket].
+    // Port 12060 is the default port that UpDroid uses.
+    String url = window.location.host;
+    url = url.split(':')[0];
+    ws = new WebSocket('ws://' + url + ':12060/explorer/1');
 
     registerExplorerEventHandlers();
-
-    cs.add(new CommanderMessage('CLIENT', 'EXPLORER_READY'));
   }
 
   /// Process messages according to the type.
   void processMessage(CommanderMessage m) {
     switch (m.type) {
       case 'CONNECTED':
-        ws.send('[[EXPLORER_DIRECTORY_PATH]]');
         break;
 
       case 'DISCONNECTED':
+        break;
+
+      case 'EDITOR_READY':
+        editorDiv = querySelector('#editor');
+        dzEditor = new Dropzone(editorDiv);
+        fileName = querySelector('#filename');
+
+        // Dragging through nested dropzones appears to be glitchy
+        dzEditor.onDragEnter.listen((e) {
+          var isDir = e.draggableElement.dataset['isDir'];
+          if (isDir == 'false') {
+            cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
+          }
+        });
+
+        dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
+
+        dzEditor.onDrop.listen((e) {
+          var isDir = e.draggableElement.dataset['isDir'];
+          if (isDir == 'false') {
+            cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
+            fileName.text = e.draggableElement.dataset['trueName'];
+          }
+        });
         break;
 
       default:
@@ -67,6 +101,8 @@ class UpDroidExplorer {
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
     cs.stream.where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL').listen((m) => processMessage(m));
+
+    ws.onOpen.listen((e) => ws.send('[[EXPLORER_DIRECTORY_PATH]]'));
 
     ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_DIRECTORY_PATH').listen((um) {
       workspacePath = um.body;
@@ -159,24 +195,6 @@ class UpDroidExplorer {
       }
 
       ws.send('[[EXPLORER_DELETE]]' + path);
-    });
-
-    // Dragging through nested dropzones appears to be glitchy
-    dzEditor.onDragEnter.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
-      }
-    });
-
-    dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
-
-    dzEditor.onDrop.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
-        fileName.text = e.draggableElement.dataset['trueName'];
-      }
     });
   }
 

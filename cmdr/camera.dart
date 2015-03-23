@@ -1,13 +1,15 @@
 part of updroid_server;
 
-class UpDroidCamera {
+class CmdrCamera {
+  static const String guiName = 'UpDroidCamera';
+
   int cameraNum = 1;
   WebSocket _ws;
   StreamController<List<int>> _transStream;
 
   Uint16List _streamHeader;
 
-  UpDroidCamera(this.cameraNum) {
+  CmdrCamera(this.cameraNum) {
     // TODO: this should be dynamically assigned when
     // multiple consoles are spawned.
 

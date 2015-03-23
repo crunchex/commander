@@ -54,10 +54,8 @@ class UpDroidEditor extends UpDroidTab {
   UpDroidEditor(StreamController<CommanderMessage> cs) {
     _cs = cs;
 
-    DivElement colOneTabContent = querySelector('#col-1-tab-content');
-    setUpTabContainer(1, 'Editor', active: true).then((editorContainer) {
-      colOneTabContent.children.insert(0, editorContainer);
-
+    addTabHandle(1, 'Editor', active: true);
+    setUpTabContainer(1, 'Editor', active: true).then((e) {
       _fileName = querySelector('#filename');
       _saveButton = querySelector('#button-save');
       _newButton = querySelector('#button-new');

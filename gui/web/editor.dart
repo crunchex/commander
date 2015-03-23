@@ -68,7 +68,7 @@ class UpDroidEditor extends UpDroidTab {
     _cs = cs;
 
     DivElement colOneTabContent = querySelector('#col-1-tab-content');
-    _setUpTabContainer(true).then((editorContainer) {
+    _setUpTabContainer(active: true).then((editorContainer) {
       colOneTabContent.children.insert(0, editorContainer);
 
       editorDiv = querySelector('#editor');

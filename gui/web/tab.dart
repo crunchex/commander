@@ -2,7 +2,7 @@ part of updroid_client;
 
 abstract class UpDroidTab {
 
-  Future _setUpTabContainer(bool active) {
+  Future _setUpTabContainer({bool active: false}) {
     Completer completer = new Completer();
 
     DivElement tabContainer = new DivElement()

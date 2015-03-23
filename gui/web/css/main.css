@@ -356,6 +356,11 @@ li input {
   box-shadow: none !important;
 }
 
+.nav-tabs>li>a.new-tab-button {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 #save-input {
   margin-left: 10px;
 }

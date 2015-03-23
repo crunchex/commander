@@ -1,4 +1,13 @@
-part of updroid_client;
+library updroid_explorer;
+
+import 'dart:html';
+import 'dart:async';
+
+import 'package:dnd/dnd.dart';
+import "package:path/path.dart" as pathLib;
+
+import 'lib/updroid_message.dart';
+import 'lib/explorer_helper.dart';
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests
@@ -42,10 +51,6 @@ class UpDroidExplorer {
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
 
-    editorDiv = querySelector('#editor');
-    dzEditor = new Dropzone(editorDiv);
-    fileName = querySelector('#filename');
-
     // Create the server <-> client [WebSocket].
     // Port 12060 is the default port that UpDroid uses.
     String url = window.location.host;
@@ -62,6 +67,30 @@ class UpDroidExplorer {
         break;
 
       case 'DISCONNECTED':
+        break;
+
+      case 'EDITOR_READY':
+        editorDiv = querySelector('#editor');
+        dzEditor = new Dropzone(editorDiv);
+        fileName = querySelector('#filename');
+
+        // Dragging through nested dropzones appears to be glitchy
+        dzEditor.onDragEnter.listen((e) {
+          var isDir = e.draggableElement.dataset['isDir'];
+          if (isDir == 'false') {
+            cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
+          }
+        });
+
+        dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
+
+        dzEditor.onDrop.listen((e) {
+          var isDir = e.draggableElement.dataset['isDir'];
+          if (isDir == 'false') {
+            cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
+            fileName.text = e.draggableElement.dataset['trueName'];
+          }
+        });
         break;
 
       default:
@@ -166,24 +195,6 @@ class UpDroidExplorer {
       }
 
       ws.send('[[EXPLORER_DELETE]]' + path);
-    });
-
-    // Dragging through nested dropzones appears to be glitchy
-    dzEditor.onDragEnter.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
-      }
-    });
-
-    dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
-
-    dzEditor.onDrop.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
-        fileName.text = e.draggableElement.dataset['trueName'];
-      }
     });
   }
 

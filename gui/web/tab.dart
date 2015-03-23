@@ -6,7 +6,7 @@ import 'dart:async';
 abstract class UpDroidTab {
   DivElement content;
 
-  void addTabHandle(int col, String title, {bool active: false}) {
+  void setUpTabHandle(int col, String title, {bool active: false}) {
     LIElement li = new LIElement();
     if (active) li.classes.add('active');
 
@@ -21,7 +21,7 @@ abstract class UpDroidTab {
     column.children.first.children.add(li);
   }
 
-  Future setUpTabContainer(int column, String title, {bool active: false}) {
+  Future setUpTabContainer(int col, String title, {bool active: false}) {
     Completer completer = new Completer();
 
     DivElement tabContainer = new DivElement()
@@ -53,7 +53,7 @@ abstract class UpDroidTab {
         ..classes.add('editor');
     tabContent.children.add(content);
 
-    DivElement colOneTabContent = querySelector('#col-$column-tab-content');
+    DivElement colOneTabContent = querySelector('#col-$col-tab-content');
     colOneTabContent.children.insert(0, tabContainer);
 
     completer.complete();

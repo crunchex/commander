@@ -55,7 +55,7 @@ class UpDroidEditor extends UpDroidTab {
     _cs = cs;
 
     DivElement colOneTabContent = querySelector('#col-1-tab-content');
-    setUpTabContainer(active: true).then((editorContainer) {
+    setUpTabContainer(1, 'Editor', active: true).then((editorContainer) {
       colOneTabContent.children.insert(0, editorContainer);
 
       _fileName = querySelector('#filename');

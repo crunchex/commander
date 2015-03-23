@@ -6,8 +6,10 @@ import 'dart:async';
 abstract class UpDroidTab {
   DivElement content;
 
-  Future setUpTabContainer({bool active: false}) {
+  Future setUpTabContainer(int column, String title, {bool active: false}) {
     Completer completer = new Completer();
+
+    _addTabHandle(column, title, active: true);
 
     DivElement tabContainer = new DivElement()
         ..id = 'tab-editor-container'
@@ -41,6 +43,21 @@ abstract class UpDroidTab {
 
     completer.complete(tabContainer);
     return completer.future;
+  }
+
+  void _addTabHandle(int col, String title, {bool active: false}) {
+    LIElement li = new LIElement();
+    if (active) li.classes.add('active');
+
+    AnchorElement a = new AnchorElement()
+        ..id = 'button-editor'
+        ..href = '#tab-editor-container'
+        ..dataset['toggle'] = 'tab'
+        ..text = 'Editor';
+    li.children.add(a);
+
+    DivElement column = querySelector('#column-$col');
+    column.children.first.children.add(li);
   }
 
   LIElement _createDropdownMenu(String title, List buttons) {

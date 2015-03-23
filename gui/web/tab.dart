@@ -6,8 +6,8 @@ abstract class UpDroidTab {
     Completer completer = new Completer();
 
     DivElement tabContainer = new DivElement()
-      ..id = 'tab-editor-container'
-      ..classes.add('tab-pane');
+        ..id = 'tab-editor-container'
+        ..classes.add('tab-pane');
 
     if (active) tabContainer.classes.add('active');
 
@@ -25,8 +25,8 @@ abstract class UpDroidTab {
     tabList.children.add(filename);
 
     DivElement tabContent = new DivElement()
-      ..classes.add('tab-content')
-      ..classes.add('active');
+        ..classes.add('tab-content')
+        ..classes.add('active');
     tabContainer.children.add(tabContent);
 
     DivElement content = new DivElement()
@@ -56,7 +56,7 @@ abstract class UpDroidTab {
     dropdown.children.add(dropdownMenu);
 
     for (String title in buttons) {
-      dropdownMenu.children.add(_createButton(title));
+      dropdownMenu.children.add(_createToggleItem(title));
     }
 
     return dropdown;
@@ -79,29 +79,36 @@ abstract class UpDroidTab {
         ..attributes['role'] = 'menu';
     dropdown.children.add(dropdownMenu);
 
-    LIElement buttonTheme = _createButton('Theme');
+    LIElement buttonTheme = _createToggleItem('Theme');
     buttonTheme.children[0].id = 'button-editor-theme';
     dropdownMenu.children.add(buttonTheme);
 
-    LIElement li = new LIElement();
-    li.style.textAlign = 'center';
-    DivElement d = new DivElement();
-    d.style.display = 'inline-block';
-    ParagraphElement p = new ParagraphElement();
-    p.style.display = 'inline-block';
-    p.text = 'Font Size';
-    d.children.add(p);
-    InputElement i = new InputElement();
-    i.id = 'font-size-input';
-    i.type = 'text';
-    d.children.add(i);
-    li.children.add(d);
-    buttonTheme.children.add(li);
+    LIElement li = _createInputItem();
+    dropdownMenu.children.add(li);
 
     return dropdown;
   }
 
-  LIElement _createButton(String title) {
+  LIElement _createInputItem() {
+    LIElement li = new LIElement()..style.textAlign = 'center';
+
+    DivElement d = new DivElement()..style.display = 'inline-block';
+    li.children.add(d);
+
+    ParagraphElement p = new ParagraphElement()
+        ..style.display = 'inline-block'
+        ..text = 'Font Size';
+    d.children.add(p);
+
+    InputElement i = new InputElement()
+        ..id = 'font-size-input'
+        ..type = 'text';
+    d.children.add(i);
+
+    return li;
+  }
+
+  LIElement _createToggleItem(String title) {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     LIElement buttonList = new LIElement();

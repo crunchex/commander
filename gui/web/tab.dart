@@ -10,11 +10,13 @@ abstract class UpDroidTab {
     LIElement li = new LIElement();
     if (active) li.classes.add('active');
 
+    String id = title.toLowerCase().replaceAll(' ', '-');
+
     AnchorElement a = new AnchorElement()
-        ..id = 'button-editor'
-        ..href = '#tab-editor-container'
+        ..id = 'button-$id'
+        ..href = '#tab-$id-container'
         ..dataset['toggle'] = 'tab'
-        ..text = 'Editor';
+        ..text = title;
     li.children.add(a);
 
     DivElement column = querySelector('#column-$col');
@@ -24,8 +26,10 @@ abstract class UpDroidTab {
   Future setUpTabContainer(int col, String title, {bool active: false}) {
     Completer completer = new Completer();
 
+    String id = title.toLowerCase().replaceAll(' ', '-');
+
     DivElement tabContainer = new DivElement()
-        ..id = 'tab-editor-container'
+        ..id = 'tab-$id-container'
         ..classes.add('tab-pane');
 
     if (active) tabContainer.classes.add('active');
@@ -49,8 +53,8 @@ abstract class UpDroidTab {
     tabContainer.children.add(tabContent);
 
     content = new DivElement()
-        ..id = 'editor'
-        ..classes.add('editor');
+        ..id = id
+        ..classes.add(id);
     tabContent.children.add(content);
 
     DivElement colOneTabContent = querySelector('#col-$col-tab-content');
@@ -88,6 +92,8 @@ abstract class UpDroidTab {
     LIElement dropdown = new LIElement();
     dropdown.classes.add('dropdown');
 
+    String id = title.toLowerCase().replaceAll(' ', '-');
+
     AnchorElement dropdownToggle = new AnchorElement()
         ..href = '#'
         ..classes.add('dropdown-toggle')
@@ -101,7 +107,7 @@ abstract class UpDroidTab {
     dropdown.children.add(dropdownMenu);
 
     LIElement buttonTheme = _createToggleItem('Theme');
-    buttonTheme.children[0].id = 'button-editor-theme';
+    buttonTheme.children[0].id = 'button-$id-theme';
     dropdownMenu.children.add(buttonTheme);
 
     LIElement li = _createInputItem();

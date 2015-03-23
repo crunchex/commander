@@ -240,7 +240,7 @@ class UpDroidEditor {
 
         // Determining the save path
         if(openFilePath == null) {
-          saveAsPath = pathLib.normalize(absolutePathPrefix + "${input.value}");
+          saveAsPath = pathLib.normalize(absolutePathPrefix + "/${input.value}");
         }
         else{
           saveAsPath = pathLib.dirname(openFilePath)+  "/${input.value}";

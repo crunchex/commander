@@ -122,6 +122,8 @@ class UpDroidEditor extends UpDroidTab {
         .where((m) => m.dest == 'EDITOR')
         .listen((m) => _processMessage(m));
 
+    _ws.onOpen.listen((e) => _ws.send('[[EDITOR_DIRECTORY_PATH]]'));
+
     // Editor receives the open file contents from the server.
     _ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EDITOR_FILE_TEXT')
@@ -133,7 +135,7 @@ class UpDroidEditor extends UpDroidTab {
         });
 
     _ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
+        .where((um) => um.header == 'EDITOR_DIRECTORY_PATH')
         .listen((um) => _absolutePathPrefix = um.body);
 
     _ws.onMessage.transform(updroidTransformer)

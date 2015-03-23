@@ -55,7 +55,7 @@ class UpDroidEditor extends UpDroidTab {
     _cs = cs;
 
     setUpTabHandle(1, 'Editor', active: true);
-    setUpTabContainer(1, 'Editor', active: true).then((e) {
+    setUpTabContainer(1, 'Editor', _getMenuConfig(), active: true).then((e) {
       _fileName = querySelector('#filename');
       _saveButton = querySelector('#button-save');
       _newButton = querySelector('#button-new');
@@ -347,4 +347,12 @@ class UpDroidEditor extends UpDroidTab {
 
   /// Resets the save point based on the Editor's current text.
   String _resetSavePoint() => _originalContents = _aceEditor.value;
+
+  List _getMenuConfig() {
+    List menu = [
+      {'title': 'File', 'items': [{'type': 'toggle', 'title': 'New'}, {'type': 'toggle', 'title': 'Save'}, {'type': 'toggle', 'title': 'Save As'}]},
+      {'title': 'Settings', 'items': [{'type': 'toggle', 'title': 'Theme'}, {'type': 'input', 'title': 'Font Size'}]}
+    ];
+    return menu;
+  }
 }

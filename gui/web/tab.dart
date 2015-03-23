@@ -23,7 +23,7 @@ abstract class UpDroidTab {
     column.children.first.children.add(li);
   }
 
-  Future setUpTabContainer(int col, String title, {bool active: false}) {
+  Future setUpTabContainer(int col, String title, List config, {bool active: false}) {
     Completer completer = new Completer();
 
     String id = title.toLowerCase().replaceAll(' ', '-');
@@ -41,8 +41,10 @@ abstract class UpDroidTab {
         ..attributes['role'] = 'tablist';
     tabContainer.children.add(tabList);
 
-    tabList.children.add(_createDropdownMenu('File', [{'type': 'toggle', 'title': 'New'}, {'type': 'toggle', 'title': 'Save'}, {'type': 'toggle', 'title': 'Save As'}]));
-    tabList.children.add(_createDropdownMenu('Settings', [{'type': 'toggle', 'title': 'Theme'}, {'type': 'input', 'title': 'Font Size'}]));
+    for (Map configItem in config) {
+      tabList.children.add(_createDropdownMenu(configItem));
+    }
+
     LIElement filename = new LIElement();
     filename.id = 'filename';
     tabList.children.add(filename);
@@ -64,7 +66,10 @@ abstract class UpDroidTab {
     return completer.future;
   }
 
-  LIElement _createDropdownMenu(String title, List items) {
+  LIElement _createDropdownMenu(Map config) {
+    String title = config['title'];
+    List items = config['items'];
+
     LIElement dropdown = new LIElement();
     dropdown.classes.add('dropdown');
 

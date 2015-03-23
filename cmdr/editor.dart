@@ -22,6 +22,10 @@ class CmdrEditor {
       help.debug('Editor incoming: ' + s, 0);
 
       switch (um.header) {
+        case 'EDITOR_DIRECTORY_PATH':
+          _sendPath(ws);
+          break;
+
         case 'EDITOR_REQUEST_LIST':
           _sendEditorList(ws);
           break;
@@ -38,6 +42,10 @@ class CmdrEditor {
           help.debug('Editor: message received without updroid header.', 1);
       }
     });
+  }
+
+  void _sendPath(WebSocket s) {
+    help.formattedMessage(s, 'EDITOR_DIRECTORY_PATH', _dir.path);
   }
 
   void _sendFileContents(WebSocket ws, String path) {

@@ -55,13 +55,13 @@ class UpDroidEditor extends UpDroidTab {
     _cs = cs;
 
     setUpTabHandle(1, 'Editor', active: true);
-    setUpTabContainer(1, 'Editor', active: true).then((e) {
+    setUpTabContainer(1, 'Editor', _getMenuConfig(), active: true).then((e) {
       _fileName = querySelector('#filename');
       _saveButton = querySelector('#button-save');
       _newButton = querySelector('#button-new');
       _saveAsButton = querySelector('#button-save-as');
       _saveCommit = querySelector('#save-as-commit');
-      _themeButton = querySelector('#button-editor-theme');
+      _themeButton = querySelector('#button-theme');
       _modalSaveButton = querySelector('.modal-save');
       _modalDiscardButton = querySelector('.modal-discard');
       _overwriteCommit = querySelector('#warning button');
@@ -122,6 +122,8 @@ class UpDroidEditor extends UpDroidTab {
         .where((m) => m.dest == 'EDITOR')
         .listen((m) => _processMessage(m));
 
+    _ws.onOpen.listen((e) => _ws.send('[[EDITOR_DIRECTORY_PATH]]'));
+
     // Editor receives the open file contents from the server.
     _ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EDITOR_FILE_TEXT')
@@ -133,7 +135,7 @@ class UpDroidEditor extends UpDroidTab {
         });
 
     _ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
+        .where((um) => um.header == 'EDITOR_DIRECTORY_PATH')
         .listen((um) => _absolutePathPrefix = um.body);
 
     _ws.onMessage.transform(updroidTransformer)
@@ -236,7 +238,7 @@ class UpDroidEditor extends UpDroidTab {
 
         // Determining the save path
         if (_openFilePath == null) {
-          saveAsPath = pathLib.normalize(_absolutePathPrefix + "${input.value}");
+          saveAsPath = pathLib.normalize(_absolutePathPrefix + "/${input.value}");
         }
         else {
           saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
@@ -347,4 +349,12 @@ class UpDroidEditor extends UpDroidTab {
 
   /// Resets the save point based on the Editor's current text.
   String _resetSavePoint() => _originalContents = _aceEditor.value;
+
+  List _getMenuConfig() {
+    List menu = [
+      {'title': 'File', 'items': [{'type': 'toggle', 'title': 'New'}, {'type': 'toggle', 'title': 'Save'}, {'type': 'toggle', 'title': 'Save As'}]},
+      {'title': 'Settings', 'items': [{'type': 'toggle', 'title': 'Theme'}, {'type': 'input', 'title': 'Font Size'}]}
+    ];
+    return menu;
+  }
 }

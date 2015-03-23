@@ -1,4 +1,11 @@
-part of updroid_client;
+library updroid_console;
+
+import 'dart:html';
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'lib/updroid_message.dart';
+import 'lib/terminal/terminal.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket], into an UpDroid Commander tab.

@@ -3,22 +3,12 @@ library updroid_client;
 import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
-import 'dart:js' as js;
-import 'package:ace/ace.dart' as ace;
-import 'package:bootjack/bootjack.dart';
-import 'package:ace/proxy.dart';
-import 'package:dnd/dnd.dart';
-import 'lib/updroid_message.dart';
-import 'lib/explorer_helper.dart';
-import 'lib/terminal/terminal.dart';
-import "package:path/path.dart" as pathLib;
 
-part 'tab.dart';
-part 'explorer.dart';
-part 'editor.dart';
-part 'console.dart';
-part 'camera.dart';
+import 'editor.dart';
+import 'console.dart';
+import 'explorer.dart';
+import 'camera.dart';
+import 'lib/updroid_message.dart';
 
 class UpDroidClient {
   // TODO: find syntax to make this not such a long line.

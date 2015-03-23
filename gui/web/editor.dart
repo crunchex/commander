@@ -1,4 +1,15 @@
-part of updroid_client;
+library updroid_editor;
+
+import 'dart:html';
+import 'dart:async';
+
+import 'package:ace/ace.dart' as ace;
+import 'package:bootjack/bootjack.dart';
+import 'package:ace/proxy.dart';
+import "package:path/path.dart" as pathLib;
+
+import 'lib/updroid_message.dart';
+import 'tab.dart';
 
 // Template for a new file.
 // TODO: make this contain boilerplate ROS code
@@ -33,7 +44,6 @@ class UpDroidEditor extends UpDroidTab {
   Map pathMap;
   String absolutePathPrefix;
 
-  DivElement editorDiv;
   AnchorElement saveButton;
   AnchorElement saveAsButton;
   AnchorElement newButton;
@@ -68,10 +78,9 @@ class UpDroidEditor extends UpDroidTab {
     _cs = cs;
 
     DivElement colOneTabContent = querySelector('#col-1-tab-content');
-    _setUpTabContainer(active: true).then((editorContainer) {
+    setUpTabContainer(active: true).then((editorContainer) {
       colOneTabContent.children.insert(0, editorContainer);
 
-      editorDiv = querySelector('#editor');
       fileName = querySelector('#filename');
       saveButton = querySelector('#button-save');
       newButton = querySelector('#button-new');
@@ -101,7 +110,7 @@ class UpDroidEditor extends UpDroidTab {
   void setUpEditor() {
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
 
-    aceEditor = ace.edit(editorDiv);
+    aceEditor = ace.edit(content);
     aceEditor
       ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
       ..fontSize = fontSize
@@ -114,11 +123,11 @@ class UpDroidEditor extends UpDroidTab {
   void processMessage(CommanderMessage m) {
     switch (m.type) {
       case 'CLASS_ADD':
-        editorDiv.classes.add(m.body);
+        content.classes.add(m.body);
         break;
 
       case 'CLASS_REMOVE':
-        editorDiv.classes.remove(m.body);
+        content.classes.remove(m.body);
         break;
 
       case 'OPEN_FILE':

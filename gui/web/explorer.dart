@@ -1,4 +1,13 @@
-part of updroid_client;
+library updroid_explorer;
+
+import 'dart:html';
+import 'dart:async';
+
+import 'package:dnd/dnd.dart';
+import "package:path/path.dart" as pathLib;
+
+import 'lib/updroid_message.dart';
+import 'lib/explorer_helper.dart';
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests

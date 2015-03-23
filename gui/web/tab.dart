@@ -1,8 +1,12 @@
-part of updroid_client;
+library updroid_tab;
+
+import 'dart:html';
+import 'dart:async';
 
 abstract class UpDroidTab {
+  DivElement content;
 
-  Future _setUpTabContainer({bool active: false}) {
+  Future setUpTabContainer({bool active: false}) {
     Completer completer = new Completer();
 
     DivElement tabContainer = new DivElement()
@@ -29,7 +33,7 @@ abstract class UpDroidTab {
         ..classes.add('active');
     tabContainer.children.add(tabContent);
 
-    DivElement content = new DivElement()
+    content = new DivElement()
         ..id = 'editor'
         ..classes.add('editor');
     tabContent.children.add(content);

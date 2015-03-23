@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content=="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UpDroid Commander</title>
+  <link rel="stylesheet" href="packages/bootjack/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/cosmos-bootstrap.min.css"></link>
+  <link rel="stylesheet" href="css/main.css"></link>
+</head>
+
+<body>
+
+  <!-- Modals -->
+
+  <div id="unsaved" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h3>Save Changes</h3>
+        </div>
+        <div class="modal-body">
+          <p>Unsaved changes detected. Save these changes?</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-warning modal-discard" data-dismiss="modal">Nope</button>
+          <button class="btn btn-primary modal-save" data-dismiss="modal">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="save-as" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h3>Save Changes</h3>
+        </div>
+        <div class="modal-body">
+          <div id="save-input">
+            <h3>Enter Filename:</h3><input id="save-as-input" type="text">
+          </div>
+          <div id="warning" class="hidden">
+            <h4>Filename exists.</h4><button type="button">Overwrite?</button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-warning modal-discard" data-dismiss="modal">Nope</button>
+          <button id="save-as-commit" class="btn btn-primary modal-save">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Nav -->
+
+  <nav id="navbar" class="navbar navbar-inverse" role="navigation">
+    <a class="nav navbar-nav navbar-left" href="#">
+      <img id="updroid" src="assets/updroid-commander-white.svg" alt="UpDroid Commander">
+    </a>
+    <ul class="nav navbar-nav navbar-right">
+ <!-- <li><a href="#">Store</a></li> -->
+      <li><a href="#">Forums</a></li>
+      <li><a href="http://wiki.updroid.com" target="_blank">Wiki</a></li>
+
+    </ul>
+  </nav>
+
+  <!-- Commander Body -->
+
+  <div class="container-fluid">
+    <div id="row-main" class="row">
+
+    <!-- Explorer -->
+
+      <div class="col-xs-2">
+          <div id="title-container">
+              <li id="file-explorer-title">UP-Root
+              </li>
+            <li id="new">New
+              <span id="folder" class="glyphicon glyphicon-folder-close"></span>
+              <span id="file" class="glyphicon glyphicon-file"></span>
+            </li>
+          <div id="file-explorer-hr-container">
+            <div id=new-file-drop>
+              <p>Top Level</p>
+            </div>
+          </div>
+          </div>
+        <div id='explorer-container' class="well well-sm">
+          <ul class="explorer" id="explorer-body" ></ul>
+        </div>
+        <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span></p>
+        <div id="control-buttons" class="btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
+          <button id="build-button" type="button" class="btn btn-default">Build <span id="trash" class="glyphicon glyphicon-ok"></span></button>
+          <button id="run-button" type="button" class="btn btn-default">Run <span id="trash" class="glyphicon glyphicon-play"></span></button>
+        </div>
+      </div>
+
+      <!-- Editor -->
+
+      <div id="column-1" class="col-xs-5 column-content">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="active"><a id="button-editor" href="#tab-editor-container" data-toggle="tab">Editor</a></li>
+          <li><a href="#video_tab" data-toggle="tab">Camera</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <div id="tab-editor-container" class="tab-pane active">
+            <ul class="nav nav-tabs inner-tabs" role="tablist">
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">File</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a role="button" href="#" id="button-new">New</a></li>
+                  <li><a href="#" id="button-save">Save</a></li>
+                  <li><a href="#" id="button-save-as">Save as</a></li>
+                </ul>
+              </li>
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" id="button-editor-theme">Theme</a></li>
+                    <li style="text-align: center">
+                      <div style="display: inline-block;">
+                        <p style="display: inline-block;">Font Size</p><input id="font-size-input" type="text">
+                      </div>
+                    </li>
+                </ul>
+              </li>
+              <li id="filename"></li>
+            </ul>
+
+            <div class="tab-content">
+              <div id="tab-editor" class="tab-pane active">
+                <div id="editor" class="editor"></div>
+              </div>
+            </div>
+          </div>
+
+       <!-- Add Video here -->
+
+          <div id="video_tab" class="tab-pane">
+            <ul class="nav nav-tabs inner-tabs" role="tablist">
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" id="button-console-theme-2">Quality</a></li>
+                </ul>
+              </li>
+            </ul>
+
+            <div class="tab-content tab-content2">
+              <canvas id="video-canvas" width="320" height="240">
+                <p>
+                  Please use a browser that supports the Canvas Element, like
+                  <a href="http://www.google.com/chrome">Chrome</a>,
+                  <a href="http://www.mozilla.com/firefox/">Firefox</a>,
+                  <a href="http://www.apple.com/safari/">Safari</a> or Internet Explorer 10
+                </p>
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Console -->
+
+      <div id="column-2" class="col-xs-5 column-content">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="active"><a id="button-console" href="#tab-console-container-1" data-toggle="tab">Console-A</a></li>
+          <li><a id="button-console" href="#tab-console-container-2" data-toggle="tab">Console-B</a></li>
+          <li><a id="button-console" href="#tab-console-container-3" data-toggle="tab">Console-C</a></li>
+          <li><a id="button-console" href="#tab-console-container-4" data-toggle="tab">Console-D</a></li>
+        </ul>
+
+        <div class="tab-content">
+
+          <!-- Console A -->
+
+          <div id="tab-console-container-1" class="tab-pane active">
+            <ul class="nav nav-tabs inner-tabs" role="tablist">
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" id="button-console-theme-1">Theme</a></li>
+                  <li><a href="#" id="button-console-blink-1">Cursor Blink</a></li>
+                </ul>
+              </li>
+              <li class="dropdown"><a id="console-help" href="#" class="dropdown-toggle" data-toggle="popover" data-content="Console only accepts commands that are command-line based. Curses-style programs, like vim, are not yet supported.">Help</a></li>
+            </ul>
+
+            <div class="tab-content">
+              <div tabindex="0" id="console-1"></div>
+            </div>
+          </div>
+
+          <!-- Console B -->
+
+          <div id="tab-console-container-2" class="tab-pane">
+            <ul class="nav nav-tabs inner-tabs" role="tablist">
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" id="button-console-theme-2">Theme</a></li>
+                  <li><a href="#" id="button-console-blink-2">Cursor Blink</a></li>
+                </ul>
+              </li>
+              <li class="dropdown"><a id="console-help-2" href="#" class="dropdown-toggle" data-toggle="popover" data-content="Console only accepts commands that are command-line based. Curses-style programs, like vim, are not yet supported.">Help</a></li>
+            </ul>
+
+            <div class="tab-content">
+              <div tabindex="0" id="console-2"></div>
+            </div>
+          </div>
+
+          <!-- Console C -->
+
+          <div id="tab-console-container-3" class="tab-pane">
+            <ul class="nav nav-tabs inner-tabs" role="tablist">
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" id="button-console-theme-3">Theme</a></li>
+                  <li><a href="#" id="button-console-blink-3">Cursor Blink</a></li>
+                </ul>
+              </li>
+              <li class="dropdown"><a id="console-help" href="#" class="dropdown-toggle" data-toggle="popover" data-content="Console only accepts commands that are command-line based. Curses-style programs, like vim, are not yet supported.">Help</a></li>
+            </ul>
+
+            <div class="tab-content">
+              <div tabindex="0" id="console-3"></div>
+            </div>
+          </div>
+
+          <!-- Console D -->
+
+          <div id="tab-console-container-4" class="tab-pane">
+            <ul class="nav nav-tabs inner-tabs" role="tablist">
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings</a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" id="button-console-theme-4">Theme</a></li>
+                  <li><a href="#" id="button-console-blink-4">Cursor Blink</a></li>
+                </ul>
+              </li>
+              <li class="dropdown"><a id="console-help" href="#" class="dropdown-toggle" data-toggle="popover" data-content="Console only accepts commands that are command-line based. Curses-style programs, like vim, are not yet supported.">Help</a></li>
+            </ul>
+
+            <div class="tab-content">
+              <div tabindex="0" id="console-4"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="container">
+      <p class="text-muted">Copyright 2014 UpDroid, Inc. All rights reserved.</p>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="src-min-noconflict/ace.js"></script>
+  <script type="text/javascript" src="./jsmpg.js"></script>
+  <script type="application/dart" src="main.dart"></script>
+  <script src="./packages/browser/dart.js"></script>
+
+</body>
+</html>

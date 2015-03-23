@@ -1,0 +1,469 @@
+@font-face {
+  font-family: RobotoCondensed-Light;
+  src: url(../assets/RobotoCondensed-Light.ttf);
+}
+
+@font-face {
+  font-family: RobotoCondensed-Regular;
+  src: url(../assets/RobotoCondensed-Regular.ttf);
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+
+html, body {
+  min-width: 1020px;
+  width: auto !important;
+}
+
+.navbar-collapse.collapse {
+  display: block !important;
+}
+
+.navbar-nav>li, .navbar-nav {
+  float: left !important;
+}
+
+.navbar-left {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+  margin-left: 15px !important;
+}
+
+.navbar-nav.navbar-right:last-child {
+  margin-right: 15px !important;
+  margin-bottom: 0px !important;
+}
+
+.navbar-right {
+  float: right !important;
+}
+
+#updroid {
+  height: 40px;
+}
+
+.btn-default {
+  color: #333;
+  background-color: #dddddd;
+  border-color: #ccc;
+}
+
+.filename {
+  margin-left: 6px;
+}
+
+.span-ondrag {
+  color: #268bd2;
+}
+
+.span-entered {
+  color: #ffffff;
+}
+
+#new {
+  display: inline-block;
+  padding: 2px 4px 2px 4px;
+  text-align: center;
+  color: #333333;
+  border: 1px solid #dddddd;
+  font-family: "Source Sans Pro", Calibri, Candara, Arial, sans-serif;
+  font-size: 15px;
+}
+
+#explorer-body > .explorer-li {
+    margin-left: -38px;
+}
+
+.explorer-ul > .explorer-li {
+    margin-left: -20px;
+}
+
+.explorer {
+  list-style-type: none;
+}
+
+#explorer-body .btn {
+  background-color: transparent;
+}
+
+#explorer-body {
+  display: inline-block;
+  float: left;
+  clear: both;
+}
+
+#explorer-body .btn:hover {
+  color: #268bd2;
+}
+
+#title-container{
+  padding-top: 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #e3e3e3;
+  border-bottom: none;
+  text-align: center;
+}
+
+#title-container li{
+  list-style-type: none;;
+}
+
+#file-explorer-title {
+  display: block;
+  margin-bottom: 10px;
+  text-align: center;
+  vertical-align: middle;
+  font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+}
+
+#file-explorer-title #folder {
+  margin-left: 4px;
+}
+
+#file-explorer-hr-container {
+}
+
+#new-file-drop {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+#new-file-drop p {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  text-align: center;
+}
+
+.file-drop-ondrag {
+  border-top-width: 2px;
+  background-color: #268bd2;
+}
+
+.file-drop-entered {
+  border-top-width: 2px;
+  background-color: #c6e9bb;
+}
+
+li input {
+  margin-left: 6px;
+  width: 50px;
+}
+
+#recycle {
+  margin-top: 20px;
+  padding: 2px;
+  text-align: center;
+  color: #333333;
+  border: 1px solid #dddddd;
+}
+
+#recycle.recycle-ondrag {
+  color: #268bd2;
+  border-color: #268bd2;
+}
+
+#recycle.recycle-entered {
+  color: #811819;
+  border-color: #811819;
+}
+
+#control-buttons {
+  border: 0 1px 1px 1px;
+  padding: none;
+  width: 100%
+}
+
+#build-button {
+  width: 49%;
+  color: #ffffff;
+  background-color: #268bd2;
+  margin-right:1px;
+}
+
+#run-button {
+  width: 49%;
+  color: #ffffff;
+  background-color: #859900;
+  margin-left: 1px;
+}
+
+.column-content .nav-tabs {
+  border-bottom-width: 0px;
+}
+
+.nav.nav-tabs.inner-tabs {
+  border-bottom-width: 1px;
+  border-color: #dddddd;
+}
+
+.inner-tabs .dropdown-toggle {
+  border-width: 0px 0px 1px 0px;
+  padding: 5px 10px 5px 10px;
+}
+
+
+
+.inner-tabs .dropdown-toggle:hover {
+  border-color: #dddddd;
+  background-color: #ffffff;
+  color: #dddddd;
+}
+
+.inner-tabs .dropdown-toggle:focus {
+  border-color: #dddddd;
+  background-color: #ffffff;
+  color: #2780e3;
+}
+
+.nav .open>a,
+.nav .open>a:hover,
+.nav .open>a:focus {
+  border-width: 0px 0px 1px 0px;
+  border-color: #dddddd;
+  background-color: transparent;
+}
+
+#video-canvas {
+  /* Always stretch the canvas to 640x480, regardless of its
+  internal size. */
+  width: 100%;
+  height: 450px;
+  border: 1px solid #dddddd;
+}
+
+.editor {
+  width: 100%;
+  height: 450px;
+  border: 1px solid #dddddd;
+}
+
+.editor.editor-ondrag {
+  border-color: #268bd2;
+}
+
+.editor.editor-entered {
+  border-color: #ffffff;
+}
+
+.editing{
+  width: 200%;
+}
+
+#filename{
+  font-size: 16px;
+  padding: 5px 20px 0 0;
+  float: right;
+}
+
+.tab-content {
+  border: 1px solid #dddddd;
+}
+
+/* workaround for strange height bug */
+/* remove this override to reproduce the problem */
+.tab-content2 {
+  height: 452px;
+}
+
+#row-main {
+  height: 100%;
+}
+
+#console-1 {
+  width: 100%;
+  height: 450px;
+  padding: 5px;
+  border: 1px solid #dddddd;
+  font-size: 11px;
+  font-family: "DejaVu Sans Mono", Liberation Mono, monospace;
+  overflow-y: auto;
+}
+
+#console-2 {
+  width: 100%;
+  height: 450px;
+  padding: 5px;
+  border: 1px solid #dddddd;
+  font-size: 11px;
+  font-family: "DejaVu Sans Mono", Liberation Mono, monospace;
+  overflow-y: auto;
+}
+
+#console-3 {
+  width: 100%;
+  height: 450px;
+  padding: 5px;
+  border: 1px solid #dddddd;
+  font-size: 11px;
+  font-family: "DejaVu Sans Mono", Liberation Mono, monospace;
+  overflow-y: auto;
+}
+
+#console-4 {
+  width: 100%;
+  height: 450px;
+  padding: 5px;
+  border: 1px solid #dddddd;
+  font-size: 11px;
+  font-family: "DejaVu Sans Mono", Liberation Mono, monospace;
+  overflow-y: auto;
+}
+
+.termrow {
+  height: 14px;
+}
+
+.pre-output {
+  padding: 0px;
+  margin: 0px;
+  border: none;
+  background-color: transparent;
+  font-size: 12px;
+  font-family: "Lucida Console", Monaco, monospace;
+  color: #93a1a1;
+}
+
+.prompt {
+  color: #859900;
+  display: inline;
+}
+
+.prompt-hidden {
+  color: #859900;
+  display: none;
+}
+
+.user-command {
+  color: #268bd2;
+}
+
+#input {
+  width: 388px;
+  padding: 0px;
+  background-color: transparent;
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#save-input {
+  margin-left: 10px;
+}
+
+#save-input > * {
+  padding: 10px;
+  display: inline-block;
+}
+
+.modal-content {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.modal-header {
+  padding: 5px;
+}
+
+.modal-header h3 {
+  margin-left: 20px;
+  font: 26px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+
+}
+
+.modal-body {
+  padding: 10px;
+}
+
+.modal-body p {
+  padding-left: 20px;
+}
+
+#warning{
+  margin-left: 52px;
+}
+
+#warning *{
+  display: inline-block;
+}
+
+#warning button{
+  margin-left: 20px;
+}
+
+.modal-footer {
+  padding: 5px;
+}
+
+.btn-warning {
+  padding: 5px 9px 5px 9px;
+  background-color: rgb(245, 245, 245);
+  border-color: #e3e3e3;
+  color: rgb(51, 51, 51);
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.btn-warning:hover {
+  background-color: #e3e3e3;
+  border-color: #e3e3e3;
+  color: rgb(51, 51, 51);
+}
+
+.btn-primary {
+  padding: 5px 9px 5px 9px;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.popover {
+    width: 500px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #fff;
+}
+
+.text-muted {
+  position: absolute;
+  bottom: 0px;
+  right: 10px;
+  font-size: 10px;
+}
+
+#explorer-container{
+  border: 0 1px 1px 1px;
+  max-height: 400px;
+  overflow: auto;
+  padding: none;
+}
+
+.explorer-li{
+  min-width: 200px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+#folder{
+  cursor: pointer;
+}
+
+#file{
+  cursor: pointer;
+}

@@ -4,6 +4,13 @@
 build/
 packages
 
+# Or the directories and files created by any UpDroid tools.
+bin/
+*.deb
+deploy/
+src-min-noconflict/
+
+
 # Or the files created by dart2js.
 *.dart.js
 *.dart.precompiled.js
@@ -16,3 +23,6 @@ pubspec.lock
 
 # Log files
 *.log
+
+# Mac OS X
+*.DS_Store

@@ -11,30 +11,7 @@ import "package:path/path.dart" as pathLib;
 import 'lib/updroid_message.dart';
 import 'tab.dart';
 
-// Template for a new file.
-// TODO: make this contain boilerplate ROS code
-const String ROS_TALKER =
-r'''
-#!/usr/bin/env python
-
-import rospy
-from std_msgs.msg import String
-
-def talker():
-    pub = rospy.Publisher('chatter', String, queue_size=10)
-    rospy.init_node('talker', anonymous=True)
-    r = rospy.Rate(10) # 10hz
-    while not rospy.is_shutdown():
-        str = "hello world %s"%rospy.get_time()
-        rospy.loginfo(str)
-        pub.publish(str)
-        r.sleep()
-
-if __name__ == '__main__':
-    try:
-        talker()
-    except rospy.ROSInterruptException: pass
-''';
+part 'lib/editor/templates.dart';
 
 /// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
 /// for the editor and an additional menu bar with some filesystem operations.
@@ -162,7 +139,7 @@ class UpDroidEditor extends UpDroidTab {
     _ws.onMessage.transform(updroidTransformer)
         .where((um) => um.header == 'EDITOR_NEW_FILENAME')
         .listen((um) {
-          var newText = ROS_TALKER;
+          var newText = RosTemplates.templateCode;
           var newPath = absolutePathPrefix + '/' + um.body;
           handleNewText(newPath, newText);
         });
@@ -200,7 +177,7 @@ class UpDroidEditor extends UpDroidTab {
     newButton.onClick.listen((e) {
       openFilePath = null;
       if (noUnsavedChanges()) {
-        aceEditor.setValue(ROS_TALKER, 1);
+        aceEditor.setValue(RosTemplates.templateCode, 1);
         fileName.text = "untitled";
       }
       else{
@@ -210,12 +187,12 @@ class UpDroidEditor extends UpDroidTab {
 
         unsavedSave = modalSaveButton.onClick.listen((e) {
           saveText();
-          aceEditor.setValue(ROS_TALKER, 1);
+          aceEditor.setValue(RosTemplates.templateCode, 1);
           fileName.text = "untitled";
           unsavedSave.cancel();
         });
         unsavedDiscard = modalDiscardButton.onClick.listen((e) {
-          aceEditor.setValue(ROS_TALKER, 1);
+          aceEditor.setValue(RosTemplates.templateCode, 1);
           fileName.text = "untitled";
           unsavedDiscard.cancel();
         });

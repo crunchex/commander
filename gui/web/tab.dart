@@ -41,8 +41,8 @@ abstract class UpDroidTab {
         ..attributes['role'] = 'tablist';
     tabContainer.children.add(tabList);
 
-    tabList.children.add(_createDropdownMenu('File', ['New', 'Save', 'Save As']));
-    tabList.children.add(_createDropdown2('Settings'));
+    tabList.children.add(_createDropdownMenu('File', [{'type': 'toggle', 'title': 'New'}, {'type': 'toggle', 'title': 'Save'}, {'type': 'toggle', 'title': 'Save As'}]));
+    tabList.children.add(_createDropdownMenu('Settings', [{'type': 'toggle', 'title': 'Theme'}, {'type': 'input', 'title': 'Font Size'}]));
     LIElement filename = new LIElement();
     filename.id = 'filename';
     tabList.children.add(filename);
@@ -64,7 +64,7 @@ abstract class UpDroidTab {
     return completer.future;
   }
 
-  LIElement _createDropdownMenu(String title, List buttons) {
+  LIElement _createDropdownMenu(String title, List items) {
     LIElement dropdown = new LIElement();
     dropdown.classes.add('dropdown');
 
@@ -80,55 +80,32 @@ abstract class UpDroidTab {
         ..attributes['role'] = 'menu';
     dropdown.children.add(dropdownMenu);
 
-    for (String title in buttons) {
-      dropdownMenu.children.add(_createToggleItem(title));
+    for (Map item in items) {
+      if (item['type'] == 'toggle') {
+        dropdownMenu.children.add(_createToggleItem(item['title']));
+      } else if (item['type'] == 'input') {
+        dropdownMenu.children.add(_createInputItem(item['title']));
+      }
     }
 
     return dropdown;
   }
 
-  /// Special method specific to editor.
-  LIElement _createDropdown2(String title) {
-    LIElement dropdown = new LIElement();
-    dropdown.classes.add('dropdown');
-
-    String id = title.toLowerCase().replaceAll(' ', '-');
-
-    AnchorElement dropdownToggle = new AnchorElement()
-        ..href = '#'
-        ..classes.add('dropdown-toggle')
-        ..dataset['toggle'] = 'dropdown'
-        ..text = title;
-    dropdown.children.add(dropdownToggle);
-
-    UListElement dropdownMenu = new UListElement()
-        ..classes.add('dropdown-menu')
-        ..attributes['role'] = 'menu';
-    dropdown.children.add(dropdownMenu);
-
-    LIElement buttonTheme = _createToggleItem('Theme');
-    buttonTheme.children[0].id = 'button-$id-theme';
-    dropdownMenu.children.add(buttonTheme);
-
-    LIElement li = _createInputItem();
-    dropdownMenu.children.add(li);
-
-    return dropdown;
-  }
-
-  LIElement _createInputItem() {
+  LIElement _createInputItem(String title) {
     LIElement li = new LIElement()..style.textAlign = 'center';
 
     DivElement d = new DivElement()..style.display = 'inline-block';
     li.children.add(d);
 
+    String id = title.toLowerCase().replaceAll(' ', '-');
+
     ParagraphElement p = new ParagraphElement()
         ..style.display = 'inline-block'
-        ..text = 'Font Size';
+        ..text = title;
     d.children.add(p);
 
     InputElement i = new InputElement()
-        ..id = 'font-size-input'
+        ..id = '$id-input'
         ..type = 'text';
     d.children.add(i);
 

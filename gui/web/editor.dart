@@ -61,7 +61,7 @@ class UpDroidEditor extends UpDroidTab {
       _newButton = querySelector('#button-new');
       _saveAsButton = querySelector('#button-save-as');
       _saveCommit = querySelector('#save-as-commit');
-      _themeButton = querySelector('#button-editor-theme');
+      _themeButton = querySelector('#button-theme');
       _modalSaveButton = querySelector('.modal-save');
       _modalDiscardButton = querySelector('.modal-discard');
       _overwriteCommit = querySelector('#warning button');

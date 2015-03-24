@@ -5,7 +5,7 @@ import 'dart:async';
 
 abstract class UpDroidTab {
 
-  void setUpTabHandle(int col, String title, {bool active: false}) {
+  void setUpTabHandle(int num, int col, String title, {bool active: false}) {
     LIElement li = new LIElement();
     if (active) li.classes.add('active');
 
@@ -32,7 +32,6 @@ abstract class UpDroidTab {
     DivElement tabContainer = new DivElement()
         ..id = 'tab-$id-container'
         ..classes.add('tab-pane');
-
     if (active) tabContainer.classes.add('active');
 
     UListElement tabList = new UListElement()
@@ -52,8 +51,8 @@ abstract class UpDroidTab {
     configRefs['extra'] = extra;
 
     DivElement tabContent = new DivElement()
-        ..classes.add('tab-content')
-        ..classes.add('active');
+        ..classes.add('tab-content');
+    if (active) tabContent.classes.add('active');
     tabContainer.children.add(tabContent);
 
     DivElement content = new DivElement()

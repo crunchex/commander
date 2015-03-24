@@ -53,11 +53,11 @@ class UpDroidEditor extends UpDroidTab {
   String _openFilePath;
   String _originalContents;
 
-  UpDroidEditor(StreamController<CommanderMessage> cs) {
+  UpDroidEditor(int num, int col, StreamController<CommanderMessage> cs) {
     _cs = cs;
 
-    setUpTabHandle(1, 'Editor', active: true);
-    setUpTabContainer(1, 'Editor', _getMenuConfig(), active: true).then((Map configRefs) {
+    setUpTabHandle(num, col, 'Editor', active: true);
+    setUpTabContainer(col, 'Editor', _getMenuConfig(), active: true).then((Map configRefs) {
       setUpUI(configRefs);
 
       _fontSizeInput.placeholder = _fontSize.toString();
@@ -66,7 +66,7 @@ class UpDroidEditor extends UpDroidTab {
       // Port 12060 is the default port that UpDroid uses.
       String url = window.location.host;
       url = url.split(':')[0];
-      _ws = new WebSocket('ws://' + url + ':12060/editor/1');
+      _ws = new WebSocket('ws://' + url + ':12060/editor/$num');
 
       _setUpEditor();
       _registerEditorEventHandlers();

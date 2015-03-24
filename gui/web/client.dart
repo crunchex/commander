@@ -12,7 +12,7 @@ import 'lib/updroid_message.dart';
 
 class UpDroidClient {
   // TODO: find syntax to make this not such a long line.
-  static const String defaultConfig = '{"side":["UpDroidExplorer"],"left":["UpDroidEditor", "UpDroidCamera"],"right":["UpDroidConsole","UpDroidConsole","UpDroidConsole","UpDroidConsole"]}';
+  static const String defaultConfig = '{"0":["UpDroidExplorer"],"1":["UpDroidEditor", "UpDroidCamera"],"2":["UpDroidConsole","UpDroidConsole","UpDroidConsole","UpDroidConsole"]}';
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
@@ -113,7 +113,7 @@ class UpDroidClient {
         if (guiName == UpDroidExplorer.className) {
           _explorers.add(new UpDroidExplorer(cs));
         } else if (guiName == UpDroidEditor.className) {
-          _editors.add(new UpDroidEditor(cs));
+          _editors.add(new UpDroidEditor(_editors.length + 1, int.parse(column), cs));
         } else if (guiName == UpDroidCamera.className) {
           _cameras.add(new UpDroidCamera(_cameras.length + 1));
         } else if (guiName == UpDroidConsole.className) {

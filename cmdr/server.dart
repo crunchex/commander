@@ -92,6 +92,12 @@ class CmdrServer {
           .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
         break;
 
+      case 'camera':
+        WebSocketTransformer
+          .upgrade(request)
+          .then((WebSocket ws) => _cameras[objectID].handleWebSocket(ws, request));
+        break;
+
       default:
         WebSocketTransformer
           .upgrade(request)
@@ -100,6 +106,12 @@ class CmdrServer {
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
+    if (request.uri.pathSegments[0] == 'video') {
+      int objectID = int.parse(request.uri.pathSegments[1]) - 1;
+      _cameras[objectID].handleVideoFeed(request);
+      return;
+    }
+
     help.debug("${request.method} request for: ${request.uri.path}", 0);
 
     if (virDir != null) {
@@ -142,7 +154,7 @@ class CmdrServer {
         } else if (guiName == CmdrEditor.guiName) {
           _editors.add(new CmdrEditor(dir));
         } else if (guiName == CmdrCamera.guiName) {
-          //_cameras.add(new CmdrCamera(_cameras.length + 1));
+          _cameras.add(new CmdrCamera(_cameras.length + 1));
         } else if (guiName == CmdrPty.guiName) {
           _ptys.add(new CmdrPty(_ptys.length + 1, dir.path));
         }

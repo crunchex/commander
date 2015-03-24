@@ -4,7 +4,6 @@ import 'dart:html';
 import 'dart:async';
 
 abstract class UpDroidTab {
-  DivElement content;
 
   void setUpTabHandle(int col, String title, {bool active: false}) {
     LIElement li = new LIElement();
@@ -26,6 +25,8 @@ abstract class UpDroidTab {
   Future setUpTabContainer(int col, String title, List config, {bool active: false}) {
     Completer completer = new Completer();
 
+    Map configRefs = new Map();
+
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     DivElement tabContainer = new DivElement()
@@ -42,31 +43,33 @@ abstract class UpDroidTab {
     tabContainer.children.add(tabList);
 
     for (Map configItem in config) {
-      tabList.children.add(_createDropdownMenu(configItem));
+      tabList.children.add(_createDropdownMenu(configItem, configRefs));
     }
 
     LIElement filename = new LIElement();
     filename.id = 'filename';
     tabList.children.add(filename);
+    configRefs['filename'] = filename;
 
     DivElement tabContent = new DivElement()
         ..classes.add('tab-content')
         ..classes.add('active');
     tabContainer.children.add(tabContent);
 
-    content = new DivElement()
+    DivElement content = new DivElement()
         ..id = id
         ..classes.add(id);
     tabContent.children.add(content);
+    configRefs['content'] = content;
 
     DivElement colOneTabContent = querySelector('#col-$col-tab-content');
     colOneTabContent.children.insert(0, tabContainer);
 
-    completer.complete();
+    completer.complete(configRefs);
     return completer.future;
   }
 
-  LIElement _createDropdownMenu(Map config) {
+  LIElement _createDropdownMenu(Map config, Map configRefs) {
     String title = config['title'];
     List items = config['items'];
 
@@ -85,18 +88,20 @@ abstract class UpDroidTab {
         ..attributes['role'] = 'menu';
     dropdown.children.add(dropdownMenu);
 
-    for (Map item in items) {
-      if (item['type'] == 'toggle') {
-        dropdownMenu.children.add(_createToggleItem(item['title']));
-      } else if (item['type'] == 'input') {
-        dropdownMenu.children.add(_createInputItem(item['title']));
+    LIElement item;
+    for (Map i in items) {
+      if (i['type'] == 'toggle') {
+        item = _createToggleItem(i['title'], configRefs);
+      } else if (i['type'] == 'input') {
+        item = _createInputItem(i['title'], configRefs);
       }
+      dropdownMenu.children.add(item);
     }
 
     return dropdown;
   }
 
-  LIElement _createInputItem(String title) {
+  LIElement _createInputItem(String title, Map configRefs) {
     LIElement li = new LIElement()..style.textAlign = 'center';
 
     DivElement d = new DivElement()..style.display = 'inline-block';
@@ -113,11 +118,12 @@ abstract class UpDroidTab {
         ..id = '$id-input'
         ..type = 'text';
     d.children.add(i);
+    configRefs[id] = i;
 
     return li;
   }
 
-  LIElement _createToggleItem(String title) {
+  LIElement _createToggleItem(String title, Map configRefs) {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     LIElement buttonList = new LIElement();
@@ -127,6 +133,7 @@ abstract class UpDroidTab {
         ..attributes['role'] = 'button'
         ..text = title;
     buttonList.children.add(button);
+    configRefs[id] = button;
 
     return buttonList;
   }

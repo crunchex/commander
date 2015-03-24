@@ -24,6 +24,7 @@ class UpDroidEditor extends UpDroidTab {
   Map _pathMap;
   String _absolutePathPrefix;
 
+  DivElement _content;
   AnchorElement _saveButton;
   AnchorElement _saveAsButton;
   AnchorElement _newButton;
@@ -55,13 +56,14 @@ class UpDroidEditor extends UpDroidTab {
     _cs = cs;
 
     setUpTabHandle(1, 'Editor', active: true);
-    setUpTabContainer(1, 'Editor', _getMenuConfig(), active: true).then((e) {
-      _fileName = querySelector('#filename');
-      _saveButton = querySelector('#button-save');
-      _newButton = querySelector('#button-new');
-      _saveAsButton = querySelector('#button-save-as');
+    setUpTabContainer(1, 'Editor', _getMenuConfig(), active: true).then((Map configRefs) {
+      _content = configRefs['content'];
+      _fileName = configRefs['filename'];
+      _saveButton = configRefs['save'];
+      _newButton = configRefs['new'];
+      _saveAsButton = configRefs['save-as'];
       _saveCommit = querySelector('#save-as-commit');
-      _themeButton = querySelector('#button-theme');
+      _themeButton = configRefs['theme'];
       _modalSaveButton = querySelector('.modal-save');
       _modalDiscardButton = querySelector('.modal-discard');
       _overwriteCommit = querySelector('#warning button');
@@ -87,7 +89,7 @@ class UpDroidEditor extends UpDroidTab {
   void _setUpEditor() {
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
 
-    _aceEditor = ace.edit(content);
+    _aceEditor = ace.edit(_content);
     _aceEditor
       ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
       ..fontSize = _fontSize
@@ -100,11 +102,11 @@ class UpDroidEditor extends UpDroidTab {
   void _processMessage(CommanderMessage m) {
     switch (m.type) {
       case 'CLASS_ADD':
-        content.classes.add(m.body);
+        _content.classes.add(m.body);
         break;
 
       case 'CLASS_REMOVE':
-        content.classes.remove(m.body);
+        _content.classes.remove(m.body);
         break;
 
       case 'OPEN_FILE':

@@ -7,6 +7,22 @@ import 'dart:async';
 /// and menu bar in the UpDroid Commander GUI.
 abstract class UpDroidTab {
 
+  void destroyTab(int num, int col, String title) {
+    String id = title.toLowerCase().replaceAll(' ', '-');
+
+    DivElement column = querySelector('#column-$col');
+    column.children.first.children.removeWhere((Element e) {
+      print('removing tab');
+      return e.children.first.id == 'button-$id-$num';
+    });
+
+    DivElement colOneTabContent = querySelector('#col-$col-tab-content');
+    colOneTabContent.children.removeWhere((Element e) {
+      print('removing tab content');
+      return e.id == 'tab-$id-$num-container';
+    });
+  }
+
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
   void setUpTabHandle(int num, int col, String title, bool active) {
     LIElement li = new LIElement();
@@ -15,7 +31,7 @@ abstract class UpDroidTab {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     AnchorElement a = new AnchorElement()
-        ..id = 'button-$id'
+        ..id = 'button-$id-$num'
         ..href = '#tab-$id-$num-container'
         ..dataset['toggle'] = 'tab'
         ..text = title;

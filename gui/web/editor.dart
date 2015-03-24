@@ -20,6 +20,8 @@ class UpDroidEditor extends UpDroidTab {
 
   WebSocket _ws;
   StreamController<CommanderMessage> _cs;
+  int _num;
+  int _col;
 
   Map _pathMap;
   String _absolutePathPrefix;
@@ -29,6 +31,7 @@ class UpDroidEditor extends UpDroidTab {
   AnchorElement _newButton;
   AnchorElement _saveButton;
   AnchorElement _saveAsButton;
+  AnchorElement _closeTabButton;
   AnchorElement _themeButton;
   InputElement _fontSizeInput;
 
@@ -54,10 +57,12 @@ class UpDroidEditor extends UpDroidTab {
   String _originalContents;
 
   UpDroidEditor(int num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
+    _num = num;
+    _col = col;
     _cs = cs;
 
-    setUpTabHandle(num, col, 'Editor', active);
-    setUpTabContainer(num, col, 'Editor', _getMenuConfig(), active).then((Map configRefs) {
+    setUpTabHandle(_num, _col, 'Editor', active);
+    setUpTabContainer(_num, _col, 'Editor', _getMenuConfig(), active).then((Map configRefs) {
       setUpUI(configRefs);
 
       _fontSizeInput.placeholder = _fontSize.toString();
@@ -66,7 +71,7 @@ class UpDroidEditor extends UpDroidTab {
       // Port 12060 is the default port that UpDroid uses.
       String url = window.location.host;
       url = url.split(':')[0];
-      _ws = new WebSocket('ws://' + url + ':12060/editor/$num');
+      _ws = new WebSocket('ws://' + url + ':12060/editor/$_num');
 
       _setUpEditor();
       _registerEditorEventHandlers();
@@ -81,6 +86,7 @@ class UpDroidEditor extends UpDroidTab {
     _newButton = configRefs['new'];
     _saveButton = configRefs['save'];
     _saveAsButton = configRefs['save-as'];
+    _closeTabButton = configRefs['close-tab'];
     _themeButton = configRefs['theme'];
     _fontSizeInput = configRefs['font-size'];
 
@@ -182,6 +188,11 @@ class UpDroidEditor extends UpDroidTab {
           }
         }
       });
+    });
+
+    _closeTabButton.onClick.listen((e) {
+      destroyTab(_num, _col, 'Editor');
+      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: 'EDITOR_$_num'));
     });
 
     _newButton.onClick.listen((e) {
@@ -360,8 +371,14 @@ class UpDroidEditor extends UpDroidTab {
 
   List _getMenuConfig() {
     List menu = [
-      {'title': 'File', 'items': [{'type': 'toggle', 'title': 'New'}, {'type': 'toggle', 'title': 'Save'}, {'type': 'toggle', 'title': 'Save As'}]},
-      {'title': 'Settings', 'items': [{'type': 'toggle', 'title': 'Theme'}, {'type': 'input', 'title': 'Font Size'}]}
+      {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'New'},
+        {'type': 'toggle', 'title': 'Save'},
+        {'type': 'toggle', 'title': 'Save As'},
+        {'type': 'toggle', 'title': 'Close Tab'}]},
+      {'title': 'Settings', 'items': [
+        {'type': 'toggle', 'title': 'Theme'},
+        {'type': 'input', 'title': 'Font Size'}]}
     ];
     return menu;
   }

@@ -136,6 +136,10 @@ class CmdrServer {
           });
           break;
 
+        case 'CLOSE_TAB':
+          _closeTab(um.body);
+          break;
+
         default:
           help.debug('Message received without updroid header.', 1);
       }
@@ -163,6 +167,18 @@ class CmdrServer {
 
     completer.complete();
     return completer.future;
+  }
+
+  void _closeTab(String id) {
+    List idList = id.split('_');
+    String type = idList[0];
+    int num = int.parse(idList[1]);
+
+    switch (type) {
+      case 'EDITOR':
+        _editors.removeAt(num - 1);
+        break;
+    }
   }
 
   void _cleanUpBackend() {

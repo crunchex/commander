@@ -47,7 +47,14 @@ class UpDroidClient {
 
   /// Process messages according to the type.
   void processMessage(CommanderMessage m) {
-    // TODO: evaluate whether this is necesary anymore.
+    switch (m.type) {
+      case 'CLOSE_TAB':
+        _closeTab(m.body);
+        break;
+
+      default:
+        print('Client warning: received unrecognized message type ${m.type}');
+    }
   }
 
   void initWebSocket(String url, [int retrySeconds = 2]) {
@@ -125,5 +132,19 @@ class UpDroidClient {
         }
       }
     }
+  }
+
+  void _closeTab(String id) {
+    List idList = id.split('_');
+    String type = idList[0];
+    int num = int.parse(idList[1]);
+
+    switch (type) {
+      case 'EDITOR':
+        _editors.removeAt(num - 1);
+        break;
+    }
+
+    ws.send('[[CLOSE_TAB]]' + id);
   }
 }

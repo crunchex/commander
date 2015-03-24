@@ -8,6 +8,13 @@ import 'dart:async';
 abstract class UpDroidTab {
   LIElement _tabHandle;
   DivElement _tabContainer;
+  DivElement _tabContent;
+
+  void makeTabActive() {
+    _tabHandle.classes.add('active');
+    _tabContainer.classes.add('active');
+    _tabContent.classes.add('active');
+  }
 
   void destroyTab() {
     _tabHandle.remove();
@@ -62,15 +69,15 @@ abstract class UpDroidTab {
     tabList.children.add(extra);
     configRefs['extra'] = extra;
 
-    DivElement tabContent = new DivElement()
+    _tabContent = new DivElement()
         ..classes.add('tab-content');
-    if (active) tabContent.classes.add('active');
-    _tabContainer.children.add(tabContent);
+    if (active) _tabContent.classes.add('active');
+    _tabContainer.children.add(_tabContent);
 
     DivElement content = new DivElement()
         ..id = id
         ..classes.add(id);
-    tabContent.children.add(content);
+    _tabContent.children.add(content);
     configRefs['content'] = content;
 
     DivElement colOneTabContent = querySelector('#col-$col-tab-content');

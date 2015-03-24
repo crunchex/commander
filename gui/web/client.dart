@@ -145,6 +145,10 @@ class UpDroidClient {
         break;
     }
 
+    // TODO: need to be able to select last tab in the column
+    // of the tab that's being closed.
+    _editors.last.makeTabActive();
+
     ws.send('[[CLOSE_TAB]]' + id);
   }
 }

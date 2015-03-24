@@ -28,6 +28,7 @@ class CmdrCamera {
     _runFFMpeg();
   }
 
+  /// Route websocket connections to messages (cmdr) and video data (input).
   void handleWebSocket(WebSocket ws, HttpRequest request) {
     String type = request.uri.pathSegments[2];
     if (type == 'cmdr') {
@@ -40,6 +41,7 @@ class CmdrCamera {
     }
   }
 
+  /// Set up a listener for incoming video data from ffmpeg.
   void handleVideoFeed(HttpRequest request) {
     request.listen((data) {
       _transStream.add(data);

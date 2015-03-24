@@ -16,7 +16,12 @@ class UpDroidClient {
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
+
   String _config;
+  List<UpDroidExplorer> _explorers = [];
+  List<UpDroidEditor> _editors = [];
+  List<UpDroidConsole> _consoles = [];
+  List<UpDroidCamera> _cameras = [];
 
   String status;
   bool encounteredError;
@@ -103,25 +108,17 @@ class UpDroidClient {
   void _initializeTabs() {
     Map tabs = JSON.decode(_config);
 
-    for (String className in tabs['left']) {
-      if (className == UpDroidEditor.className) {
-        UpDroidEditor editor = new UpDroidEditor(cs);
-      } else if (className == UpDroidCamera.className) {
-        UpDroidCamera camera = new UpDroidCamera(1);
-      }
-    }
-
-    int i = 1;
-    for (String className in tabs['right']) {
-      if (className == UpDroidConsole.className) {
-        UpDroidConsole console = new UpDroidConsole(i, cs);
-      }
-      i++;
-    }
-
-    for (String className in tabs['side']) {
-      if (className == UpDroidExplorer.className) {
-        UpDroidExplorer explorer = new UpDroidExplorer(cs);
+    for (String column in tabs.keys) {
+      for (String guiName in tabs[column]) {
+        if (guiName == UpDroidExplorer.className) {
+          _explorers.add(new UpDroidExplorer(cs));
+        } else if (guiName == UpDroidEditor.className) {
+          _editors.add(new UpDroidEditor(cs));
+        } else if (guiName == UpDroidCamera.className) {
+          _cameras.add(new UpDroidCamera(_cameras.length + 1));
+        } else if (guiName == UpDroidConsole.className) {
+          _consoles.add(new UpDroidConsole(_consoles.length + 1, cs));
+        }
       }
     }
   }

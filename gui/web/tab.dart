@@ -3,8 +3,11 @@ library updroid_tab;
 import 'dart:html';
 import 'dart:async';
 
+/// [UpDroidTab] contains methods to generate [Element]s that make up a tab
+/// and menu bar in the UpDroid Commander GUI.
 abstract class UpDroidTab {
 
+  /// Takes a [num], [col], and [title] to add a new tab for the specified column.
   void setUpTabHandle(int num, int col, String title, {bool active: false}) {
     LIElement li = new LIElement();
     if (active) li.classes.add('active');
@@ -22,7 +25,9 @@ abstract class UpDroidTab {
     column.children.first.children.add(li);
   }
 
-  Future setUpTabContainer(int col, String title, List config, {bool active: false}) {
+  /// Takes a [num], [col], [title], [config], and [active] to generate the menu bar and menu items
+  /// for a tab. Returns a [Map] of references to the new [Element]s as a [Future].
+  Future<Map> setUpTabContainer(int col, String title, List config, {bool active: false}) {
     Completer completer = new Completer();
 
     Map configRefs = new Map();
@@ -68,6 +73,7 @@ abstract class UpDroidTab {
     return completer.future;
   }
 
+  /// Generates a dropdown menu and returns the new [LIElement].
   LIElement _createDropdownMenu(Map config, Map configRefs) {
     String title = config['title'];
     List items = config['items'];
@@ -100,6 +106,8 @@ abstract class UpDroidTab {
     return dropdown;
   }
 
+  /// Generates an input item (label and input field) and returns
+  /// the new [LIElement].
   LIElement _createInputItem(String title, Map configRefs) {
     LIElement li = new LIElement()..style.textAlign = 'center';
 
@@ -122,6 +130,7 @@ abstract class UpDroidTab {
     return li;
   }
 
+  /// Generates a toggle item (button) and returns the new [LIElement].
   LIElement _createToggleItem(String title, Map configRefs) {
     String id = title.toLowerCase().replaceAll(' ', '-');
 

@@ -70,8 +70,8 @@ class CmdrExplorer {
           help.debug('Explorer: message received without updroid header.', 1);
       }
 
-      _watcher.events.listen((e) => help.formattedFsUpdate(ws, e));
     });
+    _watcher.events.listen((e) => help.formattedFsUpdate(ws, e));
   }
 
   void _sendInitial(WebSocket s) {

@@ -25,15 +25,16 @@ class UpDroidEditor extends UpDroidTab {
   String _absolutePathPrefix;
 
   DivElement _content;
+  LIElement _fileName;
+  AnchorElement _newButton;
   AnchorElement _saveButton;
   AnchorElement _saveAsButton;
-  AnchorElement _newButton;
   AnchorElement _themeButton;
+  InputElement _fontSizeInput;
+
+  Element _saveCommit;
   ButtonElement _modalSaveButton;
   ButtonElement _modalDiscardButton;
-  InputElement _fontSizeInput;
-  LIElement _fileName;
-  Element _saveCommit;
   Element _warning;
   Element _overwriteCommit;
   Modal _curModal;
@@ -59,17 +60,18 @@ class UpDroidEditor extends UpDroidTab {
     setUpTabContainer(1, 'Editor', _getMenuConfig(), active: true).then((Map configRefs) {
       _content = configRefs['content'];
       _fileName = configRefs['filename'];
-      _saveButton = configRefs['save'];
       _newButton = configRefs['new'];
+      _saveButton = configRefs['save'];
       _saveAsButton = configRefs['save-as'];
-      _saveCommit = querySelector('#save-as-commit');
       _themeButton = configRefs['theme'];
+      _fontSizeInput = configRefs['font-size'];
+
+      _saveCommit = querySelector('#save-as-commit');
       _modalSaveButton = querySelector('.modal-save');
       _modalDiscardButton = querySelector('.modal-discard');
       _overwriteCommit = querySelector('#warning button');
       _warning = querySelector('#warning');
 
-      _fontSizeInput = querySelector('#font-size-input');
       _fontSizeInput.placeholder = _fontSize.toString();
 
       // Create the server <-> client [WebSocket].

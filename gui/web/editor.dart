@@ -59,7 +59,7 @@ class UpDroidEditor extends UpDroidTab {
     setUpTabHandle(1, 'Editor', active: true);
     setUpTabContainer(1, 'Editor', _getMenuConfig(), active: true).then((Map configRefs) {
       _content = configRefs['content'];
-      _fileName = configRefs['filename'];
+      _fileName = configRefs['extra'];
       _newButton = configRefs['new'];
       _saveButton = configRefs['save'];
       _saveAsButton = configRefs['save-as'];

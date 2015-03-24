@@ -46,10 +46,10 @@ abstract class UpDroidTab {
       tabList.children.add(_createDropdownMenu(configItem, configRefs));
     }
 
-    LIElement filename = new LIElement();
-    filename.id = 'filename';
-    tabList.children.add(filename);
-    configRefs['filename'] = filename;
+    LIElement extra = new LIElement();
+    extra.id = 'filename';
+    tabList.children.add(extra);
+    configRefs['extra'] = extra;
 
     DivElement tabContent = new DivElement()
         ..classes.add('tab-content')

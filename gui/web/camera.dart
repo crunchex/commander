@@ -22,12 +22,11 @@ class UpDroidCamera {
     url = url.split(':')[0];
     _ws = new WebSocket('ws://' + url + ':12060/camera/$cameraNum/cmdr');
 
-    registerEventHandlers(canvas);
+    _registerEventHandlers(canvas);
   }
 
-  void registerEventHandlers(CanvasElement canvas) {
+  void _registerEventHandlers(CanvasElement canvas) {
     _ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'CAMERA_READY').listen((um) {
-      print('received message');
       _startPlayer(canvas);
     });
   }

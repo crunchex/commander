@@ -6,27 +6,18 @@ import 'dart:async';
 /// [UpDroidTab] contains methods to generate [Element]s that make up a tab
 /// and menu bar in the UpDroid Commander GUI.
 abstract class UpDroidTab {
+  LIElement _tabHandle;
+  DivElement _tabContainer;
 
-  void destroyTab(int num, int col, String title) {
-    String id = title.toLowerCase().replaceAll(' ', '-');
-
-    DivElement column = querySelector('#column-$col');
-    column.children.first.children.removeWhere((Element e) {
-      print('removing tab');
-      return e.children.first.id == 'button-$id-$num';
-    });
-
-    DivElement colOneTabContent = querySelector('#col-$col-tab-content');
-    colOneTabContent.children.removeWhere((Element e) {
-      print('removing tab content');
-      return e.id == 'tab-$id-$num-container';
-    });
+  void destroyTab() {
+    _tabHandle.remove();
+    _tabContainer.remove();
   }
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
   void setUpTabHandle(int num, int col, String title, bool active) {
-    LIElement li = new LIElement();
-    if (active) li.classes.add('active');
+    _tabHandle = new LIElement();
+    if (active) _tabHandle.classes.add('active');
 
     String id = title.toLowerCase().replaceAll(' ', '-');
 
@@ -35,10 +26,10 @@ abstract class UpDroidTab {
         ..href = '#tab-$id-$num-container'
         ..dataset['toggle'] = 'tab'
         ..text = title;
-    li.children.add(a);
+    _tabHandle.children.add(a);
 
     DivElement column = querySelector('#column-$col');
-    column.children.first.children.add(li);
+    column.children.first.children.add(_tabHandle);
   }
 
   /// Takes a [num], [col], [title], [config], and [active] to generate the menu bar and menu items
@@ -50,17 +41,17 @@ abstract class UpDroidTab {
 
     String id = title.toLowerCase().replaceAll(' ', '-');
 
-    DivElement tabContainer = new DivElement()
+    _tabContainer = new DivElement()
         ..id = 'tab-$id-$num-container'
         ..classes.add('tab-pane');
-    if (active) tabContainer.classes.add('active');
+    if (active) _tabContainer.classes.add('active');
 
     UListElement tabList = new UListElement()
         ..classes.add('nav')
         ..classes.add('nav-tabs')
         ..classes.add('inner-tabs')
         ..attributes['role'] = 'tablist';
-    tabContainer.children.add(tabList);
+    _tabContainer.children.add(tabList);
 
     for (Map configItem in config) {
       tabList.children.add(_createDropdownMenu(configItem, configRefs));
@@ -74,7 +65,7 @@ abstract class UpDroidTab {
     DivElement tabContent = new DivElement()
         ..classes.add('tab-content');
     if (active) tabContent.classes.add('active');
-    tabContainer.children.add(tabContent);
+    _tabContainer.children.add(tabContent);
 
     DivElement content = new DivElement()
         ..id = id
@@ -83,7 +74,7 @@ abstract class UpDroidTab {
     configRefs['content'] = content;
 
     DivElement colOneTabContent = querySelector('#col-$col-tab-content');
-    colOneTabContent.children.insert(0, tabContainer);
+    colOneTabContent.children.insert(0, _tabContainer);
 
     completer.complete(configRefs);
     return completer.future;

@@ -58,19 +58,7 @@ class UpDroidEditor extends UpDroidTab {
 
     setUpTabHandle(1, 'Editor', active: true);
     setUpTabContainer(1, 'Editor', _getMenuConfig(), active: true).then((Map configRefs) {
-      _content = configRefs['content'];
-      _fileName = configRefs['extra'];
-      _newButton = configRefs['new'];
-      _saveButton = configRefs['save'];
-      _saveAsButton = configRefs['save-as'];
-      _themeButton = configRefs['theme'];
-      _fontSizeInput = configRefs['font-size'];
-
-      _saveCommit = querySelector('#save-as-commit');
-      _modalSaveButton = querySelector('.modal-save');
-      _modalDiscardButton = querySelector('.modal-discard');
-      _overwriteCommit = querySelector('#warning button');
-      _warning = querySelector('#warning');
+      setUpUI(configRefs);
 
       _fontSizeInput.placeholder = _fontSize.toString();
 
@@ -85,6 +73,22 @@ class UpDroidEditor extends UpDroidTab {
 
       _cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY'));
     });
+  }
+
+  void setUpUI(Map configRefs) {
+    _content = configRefs['content'];
+    _fileName = configRefs['extra'];
+    _newButton = configRefs['new'];
+    _saveButton = configRefs['save'];
+    _saveAsButton = configRefs['save-as'];
+    _themeButton = configRefs['theme'];
+    _fontSizeInput = configRefs['font-size'];
+
+    _saveCommit = querySelector('#save-as-commit');
+    _modalSaveButton = querySelector('.modal-save');
+    _modalDiscardButton = querySelector('.modal-discard');
+    _overwriteCommit = querySelector('#warning button');
+    _warning = querySelector('#warning');
   }
 
   /// Sets up the editor and styles.

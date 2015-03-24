@@ -53,11 +53,11 @@ class UpDroidEditor extends UpDroidTab {
   String _openFilePath;
   String _originalContents;
 
-  UpDroidEditor(int num, int col, StreamController<CommanderMessage> cs) {
+  UpDroidEditor(int num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
     _cs = cs;
 
-    setUpTabHandle(num, col, 'Editor', active: true);
-    setUpTabContainer(col, 'Editor', _getMenuConfig(), active: true).then((Map configRefs) {
+    setUpTabHandle(num, col, 'Editor', active);
+    setUpTabContainer(num, col, 'Editor', _getMenuConfig(), active).then((Map configRefs) {
       setUpUI(configRefs);
 
       _fontSizeInput.placeholder = _fontSize.toString();

@@ -8,7 +8,7 @@ import 'dart:async';
 abstract class UpDroidTab {
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
-  void setUpTabHandle(int num, int col, String title, {bool active: false}) {
+  void setUpTabHandle(int num, int col, String title, bool active) {
     LIElement li = new LIElement();
     if (active) li.classes.add('active');
 
@@ -16,7 +16,7 @@ abstract class UpDroidTab {
 
     AnchorElement a = new AnchorElement()
         ..id = 'button-$id'
-        ..href = '#tab-$id-container'
+        ..href = '#tab-$id-$num-container'
         ..dataset['toggle'] = 'tab'
         ..text = title;
     li.children.add(a);
@@ -27,7 +27,7 @@ abstract class UpDroidTab {
 
   /// Takes a [num], [col], [title], [config], and [active] to generate the menu bar and menu items
   /// for a tab. Returns a [Map] of references to the new [Element]s as a [Future].
-  Future<Map> setUpTabContainer(int col, String title, List config, {bool active: false}) {
+  Future<Map> setUpTabContainer(int num, int col, String title, List config, bool active) {
     Completer completer = new Completer();
 
     Map configRefs = new Map();
@@ -35,7 +35,7 @@ abstract class UpDroidTab {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     DivElement tabContainer = new DivElement()
-        ..id = 'tab-$id-container'
+        ..id = 'tab-$id-$num-container'
         ..classes.add('tab-pane');
     if (active) tabContainer.classes.add('active');
 

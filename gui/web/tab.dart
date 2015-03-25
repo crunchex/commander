@@ -32,7 +32,7 @@ abstract class UpDroidTab {
         ..id = 'button-$id-$num'
         ..href = '#tab-$id-$num-container'
         ..dataset['toggle'] = 'tab'
-        ..text = title;
+        ..text = '$title-$num';
     _tabHandle.children.add(a);
 
     DivElement column = querySelector('#column-$col');

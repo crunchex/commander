@@ -140,6 +140,10 @@ class CmdrServer {
           _closeTab(um.body);
           break;
 
+        case 'OPEN_TAB':
+          _openTab(um.body, dir);
+          break;
+
         default:
           help.debug('Message received without updroid header.', 1);
       }
@@ -167,6 +171,10 @@ class CmdrServer {
 
     completer.complete();
     return completer.future;
+  }
+
+  void _openTab(String id, Directory dir) {
+    _editors.add(new CmdrEditor(dir));
   }
 
   void _closeTab(String id) {

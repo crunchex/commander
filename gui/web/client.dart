@@ -22,6 +22,8 @@ class UpDroidClient {
   List<UpDroidEditor> _editors = [];
   List<UpDroidConsole> _consoles = [];
   List<UpDroidCamera> _cameras = [];
+  AnchorElement _newButtonLeft;
+  AnchorElement _newButtonRight;
 
   String status;
   bool encounteredError;
@@ -29,6 +31,9 @@ class UpDroidClient {
   UpDroidClient() {
     this.status = 'DISCONNECTED';
     this.encounteredError = false;
+
+    _newButtonLeft = querySelector('#column-1-new');
+    _newButtonRight = querySelector('#column-2-new');
 
     _config = _getConfig();
 
@@ -95,6 +100,14 @@ class UpDroidClient {
     cs.stream
         .where((m) => m.dest == 'CLIENT')
         .listen((m) => processMessage(m));
+
+    _newButtonLeft.onClick.listen((e) {
+      _openTab('UpDroidEditor', 1);
+    });
+
+    _newButtonRight.onClick.listen((e) {
+      _openTab('UpDroidEditor', 2);
+    });
   }
 
   /// Returns a [Map] of all the tabs that [UpDroidClient] needs to spawn,
@@ -132,6 +145,20 @@ class UpDroidClient {
         }
       }
     }
+  }
+
+  void _openTab(String id, int column) {
+    if (_editors.isEmpty) {
+      _editors.add(new UpDroidEditor(_editors.length + 1, column, cs, active: true));
+    } else {
+      _editors.add(new UpDroidEditor(_editors.length + 1, column, cs));
+    }
+
+    // TODO: need to be able to select last tab in the column
+    // of the tab that's being closed.
+    //_editors.last.makeTabActive();
+
+    ws.send('[[OPEN_TAB]]' + id);
   }
 
   void _closeTab(String id) {

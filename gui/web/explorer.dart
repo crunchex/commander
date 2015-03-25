@@ -70,7 +70,7 @@ class UpDroidExplorer {
         break;
 
       case 'EDITOR_READY':
-        editorDiv = querySelector('#editor');
+        editorDiv = querySelector('.tab-content active');
         dzEditor = new Dropzone(editorDiv);
         fileName = querySelector('#filename');
 

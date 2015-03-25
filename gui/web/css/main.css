@@ -265,11 +265,11 @@ li input {
 }
 
 .editor.editor-ondrag {
-  border-color: #268bd2;
+  border: 10px solid #268bd2;
 }
 
 .editor.editor-entered {
-  border-color: #ffffff;
+  border: 10px solid #ffffff;
 }
 
 .editing{

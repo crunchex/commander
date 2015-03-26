@@ -17,10 +17,11 @@ part 'lib/editor/templates.dart';
 /// for the editor and an additional menu bar with some filesystem operations.
 class UpDroidEditor extends UpDroidTab {
   static const String className = 'UpDroidEditor';
+  String type = 'UpDroidEditor';
 
   WebSocket _ws;
   StreamController<CommanderMessage> _cs;
-  int _num;
+  int num;
   int _col;
 
   Map _pathMap;
@@ -56,13 +57,12 @@ class UpDroidEditor extends UpDroidTab {
   String _openFilePath;
   String _originalContents;
 
-  UpDroidEditor(int num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
-    _num = num;
+  UpDroidEditor(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
     _col = col;
     _cs = cs;
 
-    setUpTabHandle(_num, _col, 'Editor', active);
-    setUpTabContainer(_num, _col, 'Editor', _getMenuConfig(), active).then((Map configRefs) {
+    setUpTabHandle(num, _col, 'Editor', active);
+    setUpTabContainer(num, _col, 'Editor', _getMenuConfig(), active).then((Map configRefs) {
       setUpUI(configRefs);
 
       _fontSizeInput.placeholder = _fontSize.toString();
@@ -71,7 +71,7 @@ class UpDroidEditor extends UpDroidTab {
       // Port 12060 is the default port that UpDroid uses.
       String url = window.location.host;
       url = url.split(':')[0];
-      _ws = new WebSocket('ws://' + url + ':12060/editor/$_num');
+      _ws = new WebSocket('ws://' + url + ':12060/editor/$num');
 
       _setUpEditor();
       _registerEditorEventHandlers();
@@ -192,7 +192,7 @@ class UpDroidEditor extends UpDroidTab {
 
     _closeTabButton.onClick.listen((e) {
       destroyTab();
-      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: 'EDITOR_$_num'));
+      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: 'EDITOR_$num'));
     });
 
     _newButton.onClick.listen((e) {

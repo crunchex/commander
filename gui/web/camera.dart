@@ -10,16 +10,17 @@ import 'tab.dart';
 /// to render a video stream from a websocket onto a canvas element.
 class UpDroidCamera extends UpDroidTab {
   static const String className = 'UpDroidCamera';
-  int _num;
+  String type = 'UpDroidCamera';
+
+  int num;
   int _col;
   WebSocket _ws;
 
-  UpDroidCamera(int num, int col, {bool active: false}) {
-    _num = num;
+  UpDroidCamera(this.num, int col, {bool active: false}) {
     _col = col;
 
-    setUpTabHandle(_num, _col, 'Camera', active);
-    setUpTabContainer(_num, _col, 'Camera', _getMenuConfig(), active).then((Map configRefs) {
+    setUpTabHandle(num, _col, 'Camera', active);
+    setUpTabContainer(num, _col, 'Camera', _getMenuConfig(), active).then((Map configRefs) {
 
       DivElement content = configRefs['content'];
       CanvasElement canvas = new CanvasElement()
@@ -34,7 +35,7 @@ class UpDroidCamera extends UpDroidTab {
       // Port 12060 is the default port that UpDroid uses.
       String url = window.location.host;
       url = url.split(':')[0];
-      _ws = new WebSocket('ws://' + url + ':12060/camera/$_num/cmdr');
+      _ws = new WebSocket('ws://' + url + ':12060/camera/$num/cmdr');
 
       _registerEventHandlers(canvas);
     });
@@ -55,7 +56,7 @@ class UpDroidCamera extends UpDroidTab {
   void _startPlayer(CanvasElement canvas) {
     String url = window.location.host;
     url = url.split(':')[0];
-    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/camera/$_num/input']);
+    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/camera/$num/input']);
 
     var options = new js.JsObject.jsify({'canvas': canvas});
 

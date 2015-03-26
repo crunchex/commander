@@ -12,9 +12,10 @@ import 'tab.dart';
 /// and [WebSocket], into an UpDroid Commander tab.
 class UpDroidConsole extends UpDroidTab {
   static const String className = 'UpDroidConsole';
+  String type = 'UpDroidConsole';
 
   StreamController<CommanderMessage> _cs;
-  int _num;
+  int num;
   int _col;
   WebSocket _ws;
   Terminal _term;
@@ -25,13 +26,12 @@ class UpDroidConsole extends UpDroidTab {
   bool _blink;
   bool _lightTheme;
 
-  UpDroidConsole(int num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
-    _num = num;
+  UpDroidConsole(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
     _col = col;
     _cs = cs;
 
-    setUpTabHandle(_num, _col, 'Console', active);
-    setUpTabContainer(_num, _col, 'Console', _getMenuConfig(), active).then((Map configRefs) {
+    setUpTabHandle(num, _col, 'Console', active);
+    setUpTabContainer(num, _col, 'Console', _getMenuConfig(), active).then((Map configRefs) {
       _console = configRefs['content'];
       _themeButton = configRefs['theme'];
       _blinkButton = configRefs['cursor-blink'];
@@ -49,7 +49,7 @@ class UpDroidConsole extends UpDroidTab {
       // Since the port here needs to be dynamic, the default needs to be replaced.
       String url = window.location.host;
       url = url.split(':')[0];
-      _initWebSocket('ws://' + url + ':1206$_num/pty');
+      _initWebSocket('ws://' + url + ':1206$num/pty');
 
       _registerConsoleEventHandlers();
     });
@@ -96,7 +96,7 @@ class UpDroidConsole extends UpDroidTab {
     _ws.binaryType = "arraybuffer";
 
     _ws.onClose.listen((e) {
-      print('Console-$_num disconnected. Retrying...');
+      print('Console-$num disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }
@@ -104,7 +104,7 @@ class UpDroidConsole extends UpDroidTab {
     });
 
     _ws.onError.listen((e) {
-      print('Console-$_num disconnected. Retrying...');
+      print('Console-$num disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }

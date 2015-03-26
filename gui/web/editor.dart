@@ -263,7 +263,7 @@ class UpDroidEditor extends UpDroidTab {
 
         // Determining the save path
         if (_openFilePath == null) {
-          saveAsPath = pathLib.normalize(_absolutePathPrefix + "/${input.value}");
+          saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
         }
         else {
           saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
@@ -275,6 +275,9 @@ class UpDroidEditor extends UpDroidTab {
             window.alert("That filename already exists as a directory");
             input.value = "";
           }
+
+          // TODO: warning doesn't clear if user doesn't commit overwrite
+
           else if (_pathMap[saveAsPath] == 'file') {
             _warning.classes.remove('hidden');
             _overwrite = _overwriteCommit.onClick.listen((e){

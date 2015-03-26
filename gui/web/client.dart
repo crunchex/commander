@@ -101,12 +101,16 @@ class UpDroidClient {
       .listen((um) => _initializeTabs(config));
 
     _newButtonLeft.onClick.listen((e) {
+      if (_tabs[1].length >= 4) return;
+
       String classType = 'UpDroidEditor';
       int id = _getAvailableId(classType);
       _openTab(1, id, classType);
     });
 
     _newButtonRight.onClick.listen((e) {
+      if (_tabs[2].length >= 4) return;
+
       String classType = 'UpDroidEditor';
       int id = _getAvailableId(classType);
       _openTab(2, id, classType);

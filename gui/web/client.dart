@@ -161,7 +161,6 @@ class UpDroidClient {
     int i = 0;
     for (List column in config) {
       for (Map tab in config[i]) {
-        print('col: $i, ${tab.toString()}');
         _openTab(i + 1, tab['id'], tab['class']);
       }
       i++;

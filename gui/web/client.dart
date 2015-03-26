@@ -130,8 +130,7 @@ class UpDroidClient {
       [
         {'id': 1, 'class': 'UpDroidConsole'},
         {'id': 2, 'class': 'UpDroidConsole'},
-        {'id': 3, 'class': 'UpDroidConsole'},
-        {'id': 4, 'class': 'UpDroidConsole'}]
+        {'id': 3, 'class': 'UpDroidConsole'}]
     ];
 
     return JSON.encode(listConfig);
@@ -177,7 +176,7 @@ class UpDroidClient {
     } else if (className == UpDroidCamera.className) {
       _tabs[column].add(new UpDroidCamera(id, column));
     } else if (className == UpDroidConsole.className) {
-      _tabs[column].add(new UpDroidConsole(id, cs));
+      _tabs[column].add(new UpDroidConsole(id, column, cs));
     }
 
     // TODO: need to be able to select last tab in the column

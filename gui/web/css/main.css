@@ -276,6 +276,10 @@ li input {
   width: 200%;
 }
 
+.highlighted {
+  background-color: #ecc4a3;
+}
+
 #filename{
   font-size: 16px;
   padding: 5px 20px 0 0;

@@ -21,6 +21,7 @@ class UpDroidConsole extends UpDroidTab {
   Terminal _term;
 
   DivElement _console;
+  AnchorElement _closeTabButton;
   AnchorElement _themeButton;
   AnchorElement _blinkButton;
   bool _blink;
@@ -33,6 +34,7 @@ class UpDroidConsole extends UpDroidTab {
     setUpTabHandle(num, _col, 'Console', active);
     setUpTabContainer(num, _col, 'Console', _getMenuConfig(), active).then((Map configRefs) {
       _console = configRefs['content'];
+      _closeTabButton = configRefs['close-tab'];
       _themeButton = configRefs['theme'];
       _blinkButton = configRefs['cursor-blink'];
 
@@ -78,6 +80,11 @@ class UpDroidConsole extends UpDroidTab {
       _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
     });
 
+    _closeTabButton.onClick.listen((e) {
+      destroyTab();
+      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
+    });
+
     _themeButton.onClick.listen((e) {
       _toggleTheme();
       e.preventDefault();
@@ -114,6 +121,8 @@ class UpDroidConsole extends UpDroidTab {
 
   List _getMenuConfig() {
     List menu = [
+      {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'Close Tab'}]},
       {'title': 'Settings', 'items': [
         {'type': 'toggle', 'title': 'Theme'},
         {'type': 'toggle', 'title': 'Cursor Blink'}]}

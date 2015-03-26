@@ -194,6 +194,10 @@ class CmdrServer {
       case 'UpDroidCamera':
         _cameras.removeAt(num - 1);
         break;
+
+      case 'UpDroidConsole':
+        _ptys.removeAt(num - 1);
+        break;
     }
   }
 

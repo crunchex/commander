@@ -366,7 +366,6 @@ class UpDroidExplorer {
       currentSelected = div;
       div.parent.dataset['isDir'] == 'true' ? currentSelectedPath = div.parent.dataset['path'] :
         currentSelectedPath = pathLib.dirname(div.parent.dataset['path']);
-      print(currentSelectedPath);
     });
   }
 

@@ -17,7 +17,7 @@ class UpDroidClient {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 
-  Map _tabs;
+  List _tabs;
 
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
@@ -29,7 +29,7 @@ class UpDroidClient {
     this.status = 'DISCONNECTED';
     this.encounteredError = false;
 
-    _tabs = {0: [], 1: [], 2: []};
+    _tabs = [[], [], []];
 
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
@@ -67,7 +67,8 @@ class UpDroidClient {
     ws = new WebSocket(url);
 
     ws.onOpen.listen((e) {
-      status = 'CONNECTED';;
+      status = 'CONNECTED';
+      ws.send('[[CLIENT_CONFIG]]');
       cs.add(new CommanderMessage('ALL', status));
     });
 
@@ -116,31 +117,29 @@ class UpDroidClient {
   /// where key = side|left|right| and value = a list of IDs and UpDroidTab.className.
   /// TODO: this function should retrieve information from some defaults or
   /// a user account settings save.
-  String _getConfig([String strConfig]) {
+  String _getConfig([String strConfig = '']) {
     // TODO: the default should eventually be JSON'd.
     //if (strConfig == null) strConfig = UpDroidClient.defaultConfig;
-    if (strConfig == null) {
-      Map strConfig = {
-        0: [
-          {'id': 1, 'class': 'UpDroidExplorer'}],
-        1: [
-          {'id': 1, 'class': 'UpDroidCamera'},
-          {'id': 1, 'class': 'UpDroidEditor'},
-          {'id': 2, 'class': 'UpDroidEditor'}],
-        2: [
-          {'id': 1, 'class': 'UpDroidConsole'},
-          {'id': 2, 'class': 'UpDroidConsole'},
-          {'id': 3, 'class': 'UpDroidConsole'},
-          {'id': 4, 'class': 'UpDroidConsole'}]
-      };
-    }
+    if (strConfig != '') return strConfig;
 
-    return JSON.encode(strConfig);
+    List listConfig = [
+      [
+        {'id': 1, 'class': 'UpDroidCamera'},
+        {'id': 1, 'class': 'UpDroidEditor'},
+        {'id': 2, 'class': 'UpDroidEditor'}],
+      [
+        {'id': 1, 'class': 'UpDroidConsole'},
+        {'id': 2, 'class': 'UpDroidConsole'},
+        {'id': 3, 'class': 'UpDroidConsole'},
+        {'id': 4, 'class': 'UpDroidConsole'}]
+    ];
+
+    return JSON.encode(listConfig);
   }
 
   int _getAvailableId(String className) {
     for (int i = 1; i <= 10; i++) {
-      for (int column in _tabs.keys) {
+      for (int column in _tabs) {
         for (Map tab in _tabs[column]) {
           if (tab['class'] == className && tab['id'] != i) {
             return i;
@@ -156,22 +155,27 @@ class UpDroidClient {
   /// TODO: create an abstract class [UpDroidTab] that all others implement.
   /// TODO: call a generic UpDroidTab constructor instead of ifs or switches.
   void _initializeTabs(String strConfig) {
-    Map config = JSON.decode(strConfig);
+    List config = JSON.decode(strConfig);
 
-    for (int column in config.keys) {
-      for (Map tab in config[column]) {
-        _openTab(column, tab['id'], tab['class']);
+    _tabs[0].add(new UpDroidExplorer(cs));
+
+    int i = 0;
+    for (List column in config) {
+      for (Map tab in config[i]) {
+        print('col: $i, ${tab.toString()}');
+        _openTab(i + 1, tab['id'], tab['class']);
       }
+      i++;
     }
   }
 
   void _openTab(int column, int id, String className) {
-    if (className == UpDroidExplorer.className) {
-      _tabs[column].add(new UpDroidExplorer(cs));
-    } else if (className == UpDroidEditor.className) {
+    ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
+
+    if (className == UpDroidEditor.className) {
       _tabs[column].add(new UpDroidEditor(id, column, cs));
     } else if (className == UpDroidCamera.className) {
-      _tabs[column].add(new UpDroidCamera(id));
+      _tabs[column].add(new UpDroidCamera(id, column));
     } else if (className == UpDroidConsole.className) {
       _tabs[column].add(new UpDroidConsole(id, cs));
     }
@@ -179,8 +183,6 @@ class UpDroidClient {
     // TODO: need to be able to select last tab in the column
     // of the tab that's being closed.
     //_editors.last.makeTabActive();
-
-    ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
   }
 
   void _closeTab(String id) {

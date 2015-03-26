@@ -16,6 +16,12 @@ abstract class UpDroidTab {
     _tabContent.classes.add('active');
   }
 
+  void makeTabInactive() {
+    _tabHandle.classes.remove('active');
+    _tabContainer.classes.remove('active');
+    _tabContent.classes.remove('active');
+  }
+
   void destroyTab() {
     _tabHandle.remove();
     _tabContainer.remove();

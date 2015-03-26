@@ -34,7 +34,7 @@ class UpDroidConsole extends UpDroidTab {
     setUpTabContainer(_num, _col, 'Console', _getMenuConfig(), active).then((Map configRefs) {
       _console = configRefs['content'];
       _themeButton = configRefs['theme'];
-      _blinkButton = configRefs['blink'];
+      _blinkButton = configRefs['cursor-blink'];
 
       _term = new Terminal(_console);
       _term

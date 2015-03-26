@@ -170,17 +170,15 @@ class UpDroidClient {
   void _openTab(int column, int id, String className) {
     ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
 
-    if (className == UpDroidEditor.className) {
-      _tabs[column].add(new UpDroidEditor(id, column, cs));
-    } else if (className == UpDroidCamera.className) {
-      _tabs[column].add(new UpDroidCamera(id, column));
-    } else if (className == UpDroidConsole.className) {
-      _tabs[column].add(new UpDroidConsole(id, column, cs));
-    }
+    if (_tabs[column].isNotEmpty) _tabs[column].last.makeTabInactive();
 
-    // TODO: need to be able to select last tab in the column
-    // of the tab that's being closed.
-    //_editors.last.makeTabActive();
+    if (className == UpDroidEditor.className) {
+      _tabs[column].add(new UpDroidEditor(id, column, cs, active: true));
+    } else if (className == UpDroidCamera.className) {
+      _tabs[column].add(new UpDroidCamera(id, column, active: true));
+    } else if (className == UpDroidConsole.className) {
+      _tabs[column].add(new UpDroidConsole(id, column, cs, active: true));
+    }
   }
 
   void _closeTab(String id) {

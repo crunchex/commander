@@ -75,6 +75,10 @@ class UpDroidExplorer {
         editorDiv = querySelector('.tab-pane .active');
         dzEditor = new Dropzone(editorDiv);
         fileName = querySelector('#filename');
+        break;
+
+      case 'REQUEST_PARENT_PATH':
+        cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH', body: currentSelectedPath));
 
         // Dragging through nested dropzones appears to be glitchy
         dzEditor.onDragEnter.listen((e) {

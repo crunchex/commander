@@ -55,6 +55,7 @@ class UpDroidEditor extends UpDroidTab {
   ace.Editor _aceEditor;
   String _openFilePath;
   String _originalContents;
+  String _currentParPath;
 
   UpDroidEditor(int num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
     _num = num;
@@ -123,6 +124,10 @@ class UpDroidEditor extends UpDroidTab {
 
       case 'OPEN_FILE':
         _ws.send('[[EDITOR_OPEN]]' + m.body);
+        break;
+
+      case 'PARENT_PATH':
+        _currentParPath = m.body;
         break;
 
       default:
@@ -229,6 +234,7 @@ class UpDroidEditor extends UpDroidTab {
     /// Save as click handler
 
     _saveAsButton.onClick.listen((e) {
+      _cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
       _ws.send("[[EDITOR_REQUEST_LIST]]");
       var input = querySelector('#save-as-input');
       String saveAsPath = '';

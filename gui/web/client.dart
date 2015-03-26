@@ -187,7 +187,7 @@ class UpDroidClient {
     if (className == UpDroidEditor.className) {
       _tabs[column].add(new UpDroidEditor(id, column, cs, active: true));
     } else if (className == UpDroidCamera.className) {
-      _tabs[column].add(new UpDroidCamera(id, column, active: true));
+      _tabs[column].add(new UpDroidCamera(id, column, cs, active: true));
     } else if (className == UpDroidConsole.className) {
       _tabs[column].add(new UpDroidConsole(id, column, cs, active: true));
     }

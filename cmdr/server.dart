@@ -190,6 +190,10 @@ class CmdrServer {
       case 'UpDroidEditor':
         _editors.removeAt(num - 1);
         break;
+
+      case 'UpDroidCamera':
+        _cameras.removeAt(num - 1);
+        break;
     }
   }
 

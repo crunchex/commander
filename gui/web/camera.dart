@@ -1,6 +1,7 @@
 library updroid_camera;
 
 import 'dart:html';
+import 'dart:async';
 import 'dart:js' as js;
 
 import 'lib/updroid_message.dart';
@@ -15,12 +16,18 @@ class UpDroidCamera extends UpDroidTab {
   int num;
   int _col;
   WebSocket _ws;
+  StreamController<CommanderMessage> _cs;
 
-  UpDroidCamera(this.num, int col, {bool active: false}) {
+  AnchorElement _closeTabButton;
+
+  UpDroidCamera(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
     _col = col;
+    _cs = cs;
 
     setUpTabHandle(num, _col, 'Camera', active);
     setUpTabContainer(num, _col, 'Camera', _getMenuConfig(), active).then((Map configRefs) {
+
+      _closeTabButton = configRefs['close-tab'];
 
       DivElement content = configRefs['content'];
       CanvasElement canvas = new CanvasElement()
@@ -45,6 +52,11 @@ class UpDroidCamera extends UpDroidTab {
     _ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'CAMERA_READY').listen((um) {
       _startPlayer(canvas);
     });
+
+    _closeTabButton.onClick.listen((e) {
+      destroyTab();
+      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
+    });
   }
 
   void _drawLoading(CanvasElement canvas) {
@@ -66,6 +78,8 @@ class UpDroidCamera extends UpDroidTab {
 
   List _getMenuConfig() {
     List menu = [
+      {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'Close Tab'}]},
       {'title': 'Settings', 'items': [
         {'type': 'toggle', 'title': 'Quality'},
         {'type': 'toggle', 'title': 'Aspect Ratio'},

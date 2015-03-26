@@ -198,15 +198,15 @@ class UpDroidClient {
     String type = idList[0];
     int num = int.parse(idList[1]);
 
-    switch (type) {
-      case 'EDITOR':
-        //_editors.removeAt(num - 1);
-        break;
+    // Add all used ids for [className] to ids.
+    for (int i = 1; i <= 2; i++) {
+      for (int j = 0; j < _tabs[i].length; j++) {
+        if (_tabs[i][j].type == type && _tabs[i][j].num == num) {
+          _tabs[i].removeAt(j);
+          _tabs[i].last.makeTabActive();
+        }
+      }
     }
-
-    // TODO: need to be able to select last tab in the column
-    // of the tab that's being closed.
-    //_editors.last.makeTabActive();
 
     ws.send('[[CLOSE_TAB]]' + id);
   }

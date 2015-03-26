@@ -192,7 +192,7 @@ class UpDroidEditor extends UpDroidTab {
 
     _closeTabButton.onClick.listen((e) {
       destroyTab();
-      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: 'EDITOR_$num'));
+      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
     });
 
     _newButton.onClick.listen((e) {

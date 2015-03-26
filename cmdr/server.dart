@@ -187,7 +187,7 @@ class CmdrServer {
     int num = int.parse(idList[1]);
 
     switch (type) {
-      case 'EDITOR':
+      case 'UpDroidEditor':
         _editors.removeAt(num - 1);
         break;
     }

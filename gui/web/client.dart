@@ -17,7 +17,7 @@ class UpDroidClient {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 
-  List _tabs;
+  List<List> _tabs;
 
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
@@ -137,17 +137,25 @@ class UpDroidClient {
   }
 
   int _getAvailableId(String className) {
-    for (int i = 1; i <= 10; i++) {
-      for (int column in _tabs) {
-        for (Map tab in _tabs[column]) {
-          if (tab['class'] == className && tab['id'] != i) {
-            return i;
-          }
-        }
-      }
+    List ids = [];
+
+    // Add all used ids for [className] to ids.
+    for (int i = 1; i <= 2; i++) {
+      _tabs[i].forEach((tab) {
+        if (tab.type == className) ids.add(tab.num);
+      });
     }
 
-    return 0;
+    // Find the lowest unused ID possible.
+    int id = 0;
+    bool found = false;
+    while (!found) {
+      id++;
+      if (!ids.contains(id))
+        break;
+    }
+
+    return id;
   }
 
   /// Initializes all classes based on the loaded configuration in [_config].

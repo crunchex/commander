@@ -88,12 +88,6 @@ class UpDroidClient {
       }
       encounteredError = true;
     });
-
-    ws.onMessage.transform(updroidTransformer)
-      .where((um) => um.header == 'CLIENT_SERVER_READY')
-      .listen((um) => _initializeTabs());
-
-
   }
 
   /// Sets up external event handlers for the various Commander classes. These

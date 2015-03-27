@@ -71,6 +71,8 @@ class CmdrServer {
   }
 
   void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir) {
+    help.debug(request.uri.path, 0);
+
     // WebSocket requests are considered "upgraded" HTTP requests.
     if (!WebSocketTransformer.isUpgradeRequest(request)) {
       _handleStandardRequest(request, virDir);
@@ -131,7 +133,7 @@ class CmdrServer {
 
       switch (um.header) {
         case 'CLIENT_CONFIG':
-          _initBackendClasses(um.body, dir, socket).then((value) {
+          _initBackendClasses(dir).then((value) {
             socket.add('[[CLIENT_SERVER_READY]]');
           });
           break;
@@ -140,33 +142,43 @@ class CmdrServer {
           _closeTab(um.body);
           break;
 
+        case 'OPEN_TAB':
+          _openTab(um.body, dir);
+          break;
+
         default:
           help.debug('Message received without updroid header.', 1);
       }
     }).onDone(() => _cleanUpBackend());
   }
 
-  Future _initBackendClasses(String config, Directory dir, WebSocket ws) {
+  Future _initBackendClasses(Directory dir) {
     var completer = new Completer();
 
-    Map tabs = JSON.decode(config);
-
-    for (String column in tabs.keys) {
-      for (String guiName in tabs[column]) {
-        if (guiName == CmdrExplorer.guiName) {
-          _explorers.add(new CmdrExplorer(dir));
-        } else if (guiName == CmdrEditor.guiName) {
-          _editors.add(new CmdrEditor(dir));
-        } else if (guiName == CmdrCamera.guiName) {
-          _cameras.add(new CmdrCamera(_cameras.length + 1));
-        } else if (guiName == CmdrPty.guiName) {
-          _ptys.add(new CmdrPty(_ptys.length + 1, dir.path));
-        }
-      }
-    }
+    _explorers.add(new CmdrExplorer(dir));
 
     completer.complete();
     return completer.future;
+  }
+
+  void _openTab(String id, Directory dir) {
+    List idList = id.split('-');
+    int col = int.parse(idList[0]);
+    int num = int.parse(idList[1]);
+    String type = idList[2];
+
+    switch (type) {
+      case 'UpDroidEditor':
+        _editors.add(new CmdrEditor(dir));
+        break;
+      case 'UpDroidCamera':
+        _cameras.add(new CmdrCamera(num));
+        break;
+
+      case 'UpDroidConsole':
+        _ptys.add(new CmdrPty(num, dir.path));
+        break;
+    }
   }
 
   void _closeTab(String id) {
@@ -175,8 +187,16 @@ class CmdrServer {
     int num = int.parse(idList[1]);
 
     switch (type) {
-      case 'EDITOR':
+      case 'UpDroidEditor':
         _editors.removeAt(num - 1);
+        break;
+
+      case 'UpDroidCamera':
+        _cameras.removeAt(num - 1);
+        break;
+
+      case 'UpDroidConsole':
+        _ptys.removeAt(num - 1);
         break;
     }
   }

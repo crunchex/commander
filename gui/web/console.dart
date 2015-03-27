@@ -6,49 +6,56 @@ import 'dart:typed_data';
 
 import 'lib/updroid_message.dart';
 import 'lib/terminal/terminal.dart';
+import 'tab.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket], into an UpDroid Commander tab.
-class UpDroidConsole {
+class UpDroidConsole extends UpDroidTab {
   static const String className = 'UpDroidConsole';
+  String type = 'UpDroidConsole';
 
   StreamController<CommanderMessage> _cs;
-  int _consoleNum;
+  int num;
+  int _col;
   WebSocket _ws;
   Terminal _term;
 
   DivElement _console;
-  AnchorElement _consoleButton;
+  AnchorElement _closeTabButton;
   AnchorElement _themeButton;
   AnchorElement _blinkButton;
   bool _blink;
   bool _lightTheme;
 
-  UpDroidConsole(int consoleNum, StreamController<CommanderMessage> cs) {
-    _consoleNum = consoleNum;
+  UpDroidConsole(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
+    _col = col;
     _cs = cs;
 
-    _console = querySelector('#console-$consoleNum');
-    _consoleButton = querySelector('#button-console-$consoleNum');
-    _themeButton = querySelector('#button-console-theme-$consoleNum');
-    _blinkButton = querySelector('#button-console-blink-$consoleNum');
+    setUpTabHandle(num, _col, 'Console', active);
+    setUpTabContainer(num, _col, 'Console', _getMenuConfig(), active).then((Map configRefs) {
+      _console = configRefs['content'];
+      _console.tabIndex = 0;
+      _closeTabButton = configRefs['close-tab'];
+      _themeButton = configRefs['theme'];
+      _blinkButton = configRefs['cursor-blink'];
 
-    _term = new Terminal(_console);
-    _term
-        ..scrollSpeed = 3
-        ..cursorBlink = true
-        ..theme = new Theme.SolarizedDark();
+      _term = new Terminal(_console);
+      _term
+          ..scrollSpeed = 3
+          ..cursorBlink = true
+          ..theme = new Theme.SolarizedDark();
 
-    _blink = true;
-    _lightTheme = false;
+      _blink = true;
+      _lightTheme = false;
 
-    // window.location.host returns whatever is in the URL bar (including port).
-    // Since the port here needs to be dynamic, the default needs to be replaced.
-    String url = window.location.host;
-    url = url.split(':')[0];
-    _initWebSocket('ws://' + url + ':1206$consoleNum/pty');
+      // window.location.host returns whatever is in the URL bar (including port).
+      // Since the port here needs to be dynamic, the default needs to be replaced.
+      String url = window.location.host;
+      url = url.split(':')[0];
+      _initWebSocket('ws://' + url + ':1206$num/pty');
 
-    _registerConsoleEventHandlers();
+      _registerConsoleEventHandlers();
+    });
   }
 
   /// Toggles between a Solarized dark and light theme.
@@ -74,6 +81,11 @@ class UpDroidConsole {
       _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
     });
 
+    _closeTabButton.onClick.listen((e) {
+      destroyTab();
+      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
+    });
+
     _themeButton.onClick.listen((e) {
       _toggleTheme();
       e.preventDefault();
@@ -92,7 +104,7 @@ class UpDroidConsole {
     _ws.binaryType = "arraybuffer";
 
     _ws.onClose.listen((e) {
-      print('Console-$_consoleNum disconnected. Retrying...');
+      print('Console-$num disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }
@@ -100,11 +112,22 @@ class UpDroidConsole {
     });
 
     _ws.onError.listen((e) {
-      print('Console-$_consoleNum disconnected. Retrying...');
+      print('Console-$num disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }
       encounteredError = true;
     });
+  }
+
+  List _getMenuConfig() {
+    List menu = [
+      {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'Close Tab'}]},
+      {'title': 'Settings', 'items': [
+        {'type': 'toggle', 'title': 'Theme'},
+        {'type': 'toggle', 'title': 'Cursor Blink'}]}
+    ];
+    return menu;
   }
 }

@@ -305,7 +305,7 @@ li input {
   height: 100%;
 }
 
-#console-1, #console-2, #console-3, #console-4 {
+.console {
   width: 100%;
   min-height: 100px;
   height: 100%;

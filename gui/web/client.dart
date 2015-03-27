@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'tab.dart';
+import 'modal.dart';
 import 'editor.dart';
 import 'console.dart';
 import 'explorer.dart';

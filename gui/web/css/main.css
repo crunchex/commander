@@ -286,6 +286,10 @@ li input {
   float: right;
 }
 
+.new-tab-button:hover {
+  cursor: pointer;
+}
+
 .tab-content {
   border: 1px solid #dddddd;
   height: 100%;

@@ -89,12 +89,6 @@ class UpDroidClient {
       }
       encounteredError = true;
     });
-
-    ws.onMessage.transform(updroidTransformer)
-      .where((um) => um.header == 'CLIENT_SERVER_READY')
-      .listen((um) => _initializeTabs());
-
-
   }
 
   /// Sets up external event handlers for the various Commander classes. These
@@ -190,7 +184,11 @@ class UpDroidClient {
   void _openTab(int column, int id, String className) {
     ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
 
-    if (_tabs[column].isNotEmpty) _tabs[column].last.makeTabInactive();
+    if (_tabs[column].isNotEmpty) {
+      for (var tab in _tabs[column]) {
+        tab.makeTabInactive();
+      }
+    }
 
     if (className == UpDroidEditor.className) {
       _tabs[column].add(new UpDroidEditor(id, column, cs, active: true));

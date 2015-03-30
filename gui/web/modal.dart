@@ -1,7 +1,7 @@
 library updroid_modal;
 
 import 'dart:html';
-import 'dart:async';
+// import 'dart:async';
 
 /// [UpDroidTab] contains methods to generate [Element]s that make up a tab
 /// and menu bar in the UpDroid Commander GUI.
@@ -76,14 +76,48 @@ abstract class UpDroidModal {
       // footer
 
       var discard = createButton('discard');
-      var save = createButton('save');
-      _modalFooter.children.insertAll(0, [save, discard]);
+      _modalFooter.children.add(discard);
 
     }
 
     else if(type == "tabSelector") {
       _modalBase.id = "tab-selector";
 
+      // Head
+      var closer = createClose();
+      var h3 = new Element.tag('h3');
+      h3.text = ('Select Tab: ');
+      _modalHead.children.insert(0, closer);
+      _modalHead.children.insert(1, h3);
+
+      // Body
+      var selectorWrap = new DivElement();
+      selectorWrap
+        ..classes.add('btn-group')
+        ..attributes['role'] = 'group'
+        ..attributes['aria-label'] = '...';
+      _modalBody.children.add(selectorWrap);
+      var sEditor = new ButtonElement();
+      sEditor
+        ..id = 'select-editor'
+        ..attributes['type'] = 'button'
+        ..classes.addAll(['btn', 'btn-default']);
+      var sConsole = new ButtonElement();
+      sConsole
+        ..id = 'select-console'
+        ..attributes['type'] = 'button'
+        ..classes.addAll(['btn', 'btn-default']);
+      var sVideo = new ButtonElement();
+      sVideo
+        ..id = 'select-video'
+        ..attributes['type'] = 'button'
+        ..classes.addAll(['btn', 'btn-default']);
+      selectorWrap.children.addAll([sEditor, sConsole, sVideo]);
+
+      // Footer
+      var discard = createButton('discard');
+      var save = createButton('save');
+      _modalFooter.children.insertAll(0, [save, discard]);
     }
   }
 

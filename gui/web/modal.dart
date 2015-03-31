@@ -5,12 +5,13 @@ import 'dart:html';
 
 /// [UpDroidTab] contains methods to generate [Element]s that make up a tab
 /// and menu bar in the UpDroid Commander GUI.
-DivElement _modalWrapper;
-DivElement _modalHead;
-DivElement _modalBody;
-DivElement _modalFooter;
-DivElement _modalBase;
 abstract class UpDroidModal {
+  DivElement _modalWrapper;
+  DivElement _modalHead;
+  DivElement _modalBody;
+  DivElement _modalFooter;
+  DivElement _modalBase;
+
   void createModal(String type) {
     // only checks one part of modal since all are created together
     if (_modalHead != null) {

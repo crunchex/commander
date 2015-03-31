@@ -3,8 +3,8 @@ library updroid_modal;
 import 'dart:html';
 // import 'dart:async';
 
-/// [UpDroidTab] contains methods to generate [Element]s that make up a tab
-/// and menu bar in the UpDroid Commander GUI.
+/// [UpDroidModal] contains methods to generate [Element]s that make up
+/// a modal in the UpDroid Commander GUI.
 abstract class UpDroidModal {
   DivElement _modalWrapper;
   DivElement _modalHead;

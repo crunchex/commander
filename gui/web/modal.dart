@@ -1,18 +1,33 @@
 library updroid_modal;
 
 import 'dart:html';
-// import 'dart:async';
+import 'dart:async';
+
+import 'package:bootjack/bootjack.dart';
+
+import 'lib/updroid_message.dart';
 
 /// [UpDroidModal] contains methods to generate [Element]s that make up
 /// a modal in the UpDroid Commander GUI.
 class UpDroidModal {
+  int _side;
+  StreamController<CommanderMessage> _cs;
+
   DivElement _modalWrapper;
   DivElement _modalHead;
   DivElement _modalBody;
   DivElement _modalFooter;
   DivElement _modalBase;
 
-  UpDroidModal(String type) {
+  List<StreamSubscription<Event>> _buttonListeners;
+
+  Modal _modal;
+
+  UpDroidModal(String type, int side, StreamController<CommanderMessage> cs) {
+    _side = side;
+    _cs = cs;
+    _buttonListeners = [];
+
     createModal(type);
   }
 
@@ -110,6 +125,11 @@ class UpDroidModal {
         ..id = 'select-editor'
         ..attributes['type'] = 'button'
         ..classes.addAll(['btn', 'btn-default']);
+      _buttonListeners.add(sEditor.onClick.listen((e) {
+        _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_side}_UpDroidEditor'));
+        destroyModal();
+      }));
+
       var sConsole = new ButtonElement();
       sConsole
         ..text = 'Console'
@@ -128,9 +148,18 @@ class UpDroidModal {
       var discard = createButton('discard');
       _modalFooter.children.add(discard);
     }
+
+    _modal = new Modal(querySelector('.modal-base'));
+    _modal.show();
   }
 
   void destroyModal() {
+    _buttonListeners.forEach((e) {
+      e.cancel();
+    });
+
+    _modal.hide();
+
     _modalHead.remove();
     _modalBody.remove();
     _modalFooter.remove();

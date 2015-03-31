@@ -27,7 +27,6 @@ class UpDroidClient {
   String status;
   bool encounteredError;
   String currentPath;
-  Modal modal;
 
   ElementStream chooseEditor;
   ElementStream chooseConsole;
@@ -62,6 +61,15 @@ class UpDroidClient {
     switch (m.type) {
       case 'CLOSE_TAB':
         _closeTab(m.body);
+        break;
+
+      case 'OPEN_TAB':
+        List idList = m.body.split('_');
+        int side = int.parse(idList[0]);
+        String type = idList[1];
+
+        int id = _getAvailableId(type);
+        _openTab(side, id, type);
         break;
 
       default:
@@ -111,13 +119,7 @@ class UpDroidClient {
     _newButtonLeft.onClick.listen((e) {
       if (_tabs[1].length >= 4) return;
 
-      UpDroidModal modalHtml = new UpDroidModal('tabSelector');
-      modal = new Modal(querySelector('.modal-base'));
-      modal.show();
-
-      String classType = 'UpDroidConsole';
-      int id = _getAvailableId(classType);
-      _openTab(1, id, classType);
+      new UpDroidModal('tabSelector', 1, cs);
     });
 
     _newButtonRight.onClick.listen((e) {

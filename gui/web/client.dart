@@ -65,11 +65,11 @@ class UpDroidClient {
 
       case 'OPEN_TAB':
         List idList = m.body.split('_');
-        int side = int.parse(idList[0]);
-        String type = idList[1];
+        int column = int.parse(idList[0]);
+        String className = idList[1];
 
-        int id = _getAvailableId(type);
-        _openTab(side, id, type);
+        int id = _getAvailableId(className);
+        _openTab(column, id, className);
         break;
 
       default:

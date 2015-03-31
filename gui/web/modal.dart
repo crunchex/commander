@@ -75,7 +75,7 @@ abstract class UpDroidModal {
     } else if (type == 'save') {
       button.classes.addAll(['btn', 'btn-primary', 'modal-save']);
       button.text = "Save";
-      button.attributes['data-dismis'] = 'modal';
+      button.attributes['data-dismiss'] = 'modal';
     }
     return button;
   }

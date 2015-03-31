@@ -5,18 +5,28 @@ import 'dart:html';
 
 /// [UpDroidTab] contains methods to generate [Element]s that make up a tab
 /// and menu bar in the UpDroid Commander GUI.
-abstract class UpDroidModal {
-  DivElement _modalWrapper = querySelector('.modal_content');
+  DivElement _modalWrapper;
   DivElement _modalHead;
   DivElement _modalBody;
   DivElement _modalFooter;
-  DivElement _modalBase = querySelector('.modal-base');
+  DivElement _modalBase;
+  abstract class UpDroidModal {
 
 
   void createModal (String type) {
+    // only checks one part of modal since all are created together
+    if(_modalHead != null) {
+      destroyModal();
+    }
+
+    _modalBase = querySelector('.modal-base');
+    _modalWrapper = querySelector('.modal-content');
     _modalHead =  new DivElement();
+    _modalHead.classes.add('modal-header');
     _modalBody = new DivElement();
+    _modalBody.classes.add('modal-body');
     _modalFooter = new DivElement();
+    _modalFooter.classes.add('modal-footer');
     _modalWrapper.children.insert(0, _modalHead);
     _modalWrapper.children.insert(1, _modalBody);
     _modalWrapper.children.insert(2, _modalFooter);
@@ -73,10 +83,11 @@ abstract class UpDroidModal {
       _modalBody.children.add(saveInput);
       _modalBody.children.add(warning);
 
-      // footer
+      // Footer
 
       var discard = createButton('discard');
-      _modalFooter.children.add(discard);
+      var save = createButton('save');
+      _modalFooter.children.insertAll(0, [save, discard]);
 
     }
 
@@ -92,23 +103,24 @@ abstract class UpDroidModal {
 
       // Body
       var selectorWrap = new DivElement();
-      selectorWrap
-        ..classes.add('btn-group')
-        ..attributes['role'] = 'group'
-        ..attributes['aria-label'] = '...';
+      selectorWrap.id = "selector-wrapper";
+
       _modalBody.children.add(selectorWrap);
       var sEditor = new ButtonElement();
       sEditor
+        ..text = 'Editor'
         ..id = 'select-editor'
         ..attributes['type'] = 'button'
         ..classes.addAll(['btn', 'btn-default']);
       var sConsole = new ButtonElement();
       sConsole
+          ..text = 'Console'
         ..id = 'select-console'
         ..attributes['type'] = 'button'
         ..classes.addAll(['btn', 'btn-default']);
       var sVideo = new ButtonElement();
       sVideo
+          ..text = 'Video'
         ..id = 'select-video'
         ..attributes['type'] = 'button'
         ..classes.addAll(['btn', 'btn-default']);
@@ -116,8 +128,7 @@ abstract class UpDroidModal {
 
       // Footer
       var discard = createButton('discard');
-      var save = createButton('save');
-      _modalFooter.children.insertAll(0, [save, discard]);
+      _modalFooter.children.add(discard);
     }
   }
 
@@ -152,10 +163,4 @@ abstract class UpDroidModal {
     }
     return button;
   }
-
-
-
-
-
-
-  }
+}

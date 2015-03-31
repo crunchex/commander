@@ -405,6 +405,20 @@ li input {
   padding: 5px;
 }
 
+#selector-wrapper {
+  text-align: center;
+}
+
+#selector-wrapper button{
+  margin-left: 20px;
+  width: 150px;
+  background-color: #E7F4FE;
+}
+
+#selector-wrapper button:hover{
+  background-color: #003366;
+}
+
 .btn-warning {
   padding: 5px 9px 5px 9px;
   background-color: rgb(245, 245, 245);

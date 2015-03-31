@@ -11,8 +11,9 @@ import 'console.dart';
 import 'explorer.dart';
 import 'camera.dart';
 import 'lib/updroid_message.dart';
+import 'package:bootjack/bootjack.dart';
 
-class UpDroidClient {
+class UpDroidClient extends UpDroidModal{
   // TODO: find syntax to make this not such a long line.
 
   WebSocket ws;
@@ -26,6 +27,12 @@ class UpDroidClient {
   String status;
   bool encounteredError;
   String currentPath;
+  Modal modal;
+
+  ElementStream chooseEditor;
+  ElementStream chooseConsole;
+  ElementStream chooseVideo;
+
 
   UpDroidClient() {
     this.status = 'DISCONNECTED';
@@ -35,6 +42,7 @@ class UpDroidClient {
 
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
+    modal = new Modal(querySelector('.modal-base'));
 
     String config = _getConfig();
 
@@ -105,6 +113,9 @@ class UpDroidClient {
     _newButtonLeft.onClick.listen((e) {
       if (_tabs[1].length >= 4) return;
 
+      createModal('tabSelector');
+
+      modal.show();
       String classType = 'UpDroidConsole';
       int id = _getAvailableId(classType);
       _openTab(1, id, classType);

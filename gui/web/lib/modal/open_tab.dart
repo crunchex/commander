@@ -21,6 +21,9 @@ class UpDroidOpenTabModal extends UpDroidModal {
 
     // Head
     var closer = _createClose();
+    _buttonListeners.add(closer.onClick.listen((e) {
+      _destroyModal();
+    }));
     var h3 = new Element.tag('h3');
     h3.text = ('Select Tab: ');
     _modalHead.children.insert(0, closer);
@@ -68,6 +71,9 @@ class UpDroidOpenTabModal extends UpDroidModal {
 
     // Footer
     var discard = _createButton('discard');
+    _buttonListeners.add(discard.onClick.listen((e) {
+      _destroyModal();
+    }));
     _modalFooter.children.add(discard);
   }
 }

@@ -33,12 +33,7 @@ class CmdrServer {
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
 
-    VirtualDirectory virDir;
-    if (!results['serveronly']) {
-      virDir = _getVirDir(results);
-    }
-
-    _initServer(dir, virDir);
+    _initServer(dir, _getVirDir(results));
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].

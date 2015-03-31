@@ -48,12 +48,22 @@ class UpDroidOpenTabModal extends UpDroidModal {
       ..id = 'select-console'
       ..attributes['type'] = 'button'
       ..classes.addAll(['btn', 'btn-default']);
+    _buttonListeners.add(sConsole.onClick.listen((e) {
+      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_side}_UpDroidConsole'));
+      _destroyModal();
+    }));
+
     var sVideo = new ButtonElement();
     sVideo
       ..text = 'Video'
       ..id = 'select-video'
       ..attributes['type'] = 'button'
       ..classes.addAll(['btn', 'btn-default']);
+    _buttonListeners.add(sVideo.onClick.listen((e) {
+      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_side}_UpDroidCamera'));
+      _destroyModal();
+    }));
+
     selectorWrap.children.addAll([sEditor, sConsole, sVideo]);
 
     // Footer

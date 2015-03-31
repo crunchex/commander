@@ -28,13 +28,13 @@ class UpDroidModal {
     _cs = cs;
     _buttonListeners = [];
 
-    createModal(type);
+    _createModal(type);
   }
 
-  void createModal(String type) {
+  void _createModal(String type) {
     // only checks one part of modal since all are created together
     if (_modalHead != null) {
-      destroyModal();
+      _destroyModal();
     }
 
     _modalBase = querySelector('.modal-base');
@@ -52,7 +52,7 @@ class UpDroidModal {
     if (type == "unsaved") {
       _modalBase.id = "unsaved";
 
-      var closer = createClose();
+      var closer = _createClose();
       var h3 = new Element.tag('h3');
       h3.text = ('Save Changes?');
       _modalHead.children.insert(0, closer);
@@ -62,13 +62,13 @@ class UpDroidModal {
       p.text = "Unsaved changes detected.  Save these changes?";
       _modalBody.children.add(p);
 
-      var discard = createButton('discard');
-      var save = createButton('save');
+      var discard = _createButton('discard');
+      var save = _createButton('save');
       _modalFooter.children.insertAll(0, [save, discard]);
     } else if (type == "saveAs") {
       _modalBase.id = "save-as";
 
-      var closer = createClose();
+      var closer = _createClose();
       var h3 = new Element.tag('h3');
       h3.text = ('Save Changes?');
       _modalHead.children.insert(0, closer);
@@ -101,14 +101,14 @@ class UpDroidModal {
 
       // Footer
 
-      var discard = createButton('discard');
-      var save = createButton('save');
+      var discard = _createButton('discard');
+      var save = _createButton('save');
       _modalFooter.children.insertAll(0, [save, discard]);
     } else if (type == "tabSelector") {
       _modalBase.id = "tab-selector";
 
       // Head
-      var closer = createClose();
+      var closer = _createClose();
       var h3 = new Element.tag('h3');
       h3.text = ('Select Tab: ');
       _modalHead.children.insert(0, closer);
@@ -127,7 +127,7 @@ class UpDroidModal {
         ..classes.addAll(['btn', 'btn-default']);
       _buttonListeners.add(sEditor.onClick.listen((e) {
         _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_side}_UpDroidEditor'));
-        destroyModal();
+        _destroyModal();
       }));
 
       var sConsole = new ButtonElement();
@@ -145,7 +145,7 @@ class UpDroidModal {
       selectorWrap.children.addAll([sEditor, sConsole, sVideo]);
 
       // Footer
-      var discard = createButton('discard');
+      var discard = _createButton('discard');
       _modalFooter.children.add(discard);
     }
 
@@ -153,7 +153,7 @@ class UpDroidModal {
     _modal.show();
   }
 
-  void destroyModal() {
+  void _destroyModal() {
     _buttonListeners.forEach((e) {
       e.cancel();
     });
@@ -167,7 +167,7 @@ class UpDroidModal {
 
   // Helper, creates 'X' close button
 
-  Element createClose() {
+  Element _createClose() {
     var button = new ButtonElement();
     button.attributes['type'] = 'button';
     button.attributes['data-dismiss'] = 'modal';
@@ -176,7 +176,7 @@ class UpDroidModal {
     return button;
   }
 
-  ButtonElement createButton(String type) {
+  ButtonElement _createButton(String type) {
     var button = new ButtonElement();
     if (type == 'discard') {
       button.classes.addAll(['btn', 'btn-warning', 'modal-discard']);

@@ -7,6 +7,8 @@ import 'package:bootjack/bootjack.dart';
 
 import 'lib/updroid_message.dart';
 
+part 'lib/modal/unsaved.dart';
+part 'lib/modal/saved.dart';
 part 'lib/modal/open_tab.dart';
 
 /// [UpDroidModal] contains methods to generate [Element]s that make up
@@ -22,7 +24,7 @@ abstract class UpDroidModal {
 
   Modal _modal;
 
-  void _createModal(String type) {
+  void _createModal() {
     // only checks one part of modal since all are created together
     if (_modalHead != null) {
       _destroyModal();
@@ -39,63 +41,6 @@ abstract class UpDroidModal {
     _modalWrapper.children.insert(0, _modalHead);
     _modalWrapper.children.insert(1, _modalBody);
     _modalWrapper.children.insert(2, _modalFooter);
-
-    if (type == "unsaved") {
-      _modalBase.id = "unsaved";
-
-      var closer = _createClose();
-      var h3 = new Element.tag('h3');
-      h3.text = ('Save Changes?');
-      _modalHead.children.insert(0, closer);
-      _modalHead.children.insert(1, h3);
-
-      var p = new Element.p();
-      p.text = "Unsaved changes detected.  Save these changes?";
-      _modalBody.children.add(p);
-
-      var discard = _createButton('discard');
-      var save = _createButton('save');
-      _modalFooter.children.insertAll(0, [save, discard]);
-    } else if (type == "saveAs") {
-      _modalBase.id = "save-as";
-
-      var closer = _createClose();
-      var h3 = new Element.tag('h3');
-      h3.text = ('Save Changes?');
-      _modalHead.children.insert(0, closer);
-      _modalHead.children.insert(1, h3);
-
-      DivElement saveInput = new DivElement();
-      saveInput.id = 'save-input';
-
-      // save input section
-      var askName = new Element.tag('h3');
-      askName.text = "Enter Filename: ";
-      var input = new InputElement();
-      input.id = "save-as-input";
-      input.attributes['type'] = 'text';
-      saveInput.children.addAll([askName, input]);
-
-      // overwrite warning
-      DivElement warning = new DivElement()
-        ..classes.add('hidden')
-        ..id = 'warning';
-      var h4 = new Element.tag('h4');
-      h4.text = 'Filename exists.';
-      var overwrite = new ButtonElement();
-      overwrite.text = "Overwrite?";
-      overwrite.attributes['type'] = 'button';
-      warning.children.addAll([h4, overwrite]);
-
-      _modalBody.children.add(saveInput);
-      _modalBody.children.add(warning);
-
-      // Footer
-
-      var discard = _createButton('discard');
-      var save = _createButton('save');
-      _modalFooter.children.insertAll(0, [save, discard]);
-    }
   }
 
   void _destroyModal() {

@@ -118,7 +118,7 @@ class UpDroidClient {
     _newButtonLeft.onClick.listen((e) {
       if (_tabs[1].length >= 4) return;
 
-      new UpDroidOpenTabModal('tabSelector', 1, cs);
+      new UpDroidOpenTabModal(1, cs);
     });
 
     _newButtonRight.onClick.listen((e) {

@@ -5,12 +5,16 @@ import 'dart:html';
 
 /// [UpDroidModal] contains methods to generate [Element]s that make up
 /// a modal in the UpDroid Commander GUI.
-abstract class UpDroidModal {
+class UpDroidModal {
   DivElement _modalWrapper;
   DivElement _modalHead;
   DivElement _modalBody;
   DivElement _modalFooter;
   DivElement _modalBase;
+
+  UpDroidModal(String type) {
+    createModal(type);
+  }
 
   void createModal(String type) {
     // only checks one part of modal since all are created together

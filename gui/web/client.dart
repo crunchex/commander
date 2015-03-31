@@ -11,7 +11,6 @@ import 'explorer.dart';
 import 'camera.dart';
 import 'modal.dart';
 import 'lib/updroid_message.dart';
-import 'package:bootjack/bootjack.dart';
 
 class UpDroidClient {
   // TODO: find syntax to make this not such a long line.

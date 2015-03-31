@@ -5,23 +5,21 @@ import 'dart:html';
 
 /// [UpDroidTab] contains methods to generate [Element]s that make up a tab
 /// and menu bar in the UpDroid Commander GUI.
-  DivElement _modalWrapper;
-  DivElement _modalHead;
-  DivElement _modalBody;
-  DivElement _modalFooter;
-  DivElement _modalBase;
-  abstract class UpDroidModal {
-
-
-  void createModal (String type) {
+DivElement _modalWrapper;
+DivElement _modalHead;
+DivElement _modalBody;
+DivElement _modalFooter;
+DivElement _modalBase;
+abstract class UpDroidModal {
+  void createModal(String type) {
     // only checks one part of modal since all are created together
-    if(_modalHead != null) {
+    if (_modalHead != null) {
       destroyModal();
     }
 
     _modalBase = querySelector('.modal-base');
     _modalWrapper = querySelector('.modal-content');
-    _modalHead =  new DivElement();
+    _modalHead = new DivElement();
     _modalHead.classes.add('modal-header');
     _modalBody = new DivElement();
     _modalBody.classes.add('modal-body');
@@ -31,7 +29,7 @@ import 'dart:html';
     _modalWrapper.children.insert(1, _modalBody);
     _modalWrapper.children.insert(2, _modalFooter);
 
-    if(type == "unsaved") {
+    if (type == "unsaved") {
       _modalBase.id = "unsaved";
 
       var closer = createClose();
@@ -47,9 +45,7 @@ import 'dart:html';
       var discard = createButton('discard');
       var save = createButton('save');
       _modalFooter.children.insertAll(0, [save, discard]);
-    }
-
-    else if(type == "saveAs") {
+    } else if (type == "saveAs") {
       _modalBase.id = "save-as";
 
       var closer = createClose();
@@ -88,10 +84,7 @@ import 'dart:html';
       var discard = createButton('discard');
       var save = createButton('save');
       _modalFooter.children.insertAll(0, [save, discard]);
-
-    }
-
-    else if(type == "tabSelector") {
+    } else if (type == "tabSelector") {
       _modalBase.id = "tab-selector";
 
       // Head
@@ -114,13 +107,13 @@ import 'dart:html';
         ..classes.addAll(['btn', 'btn-default']);
       var sConsole = new ButtonElement();
       sConsole
-          ..text = 'Console'
+        ..text = 'Console'
         ..id = 'select-console'
         ..attributes['type'] = 'button'
         ..classes.addAll(['btn', 'btn-default']);
       var sVideo = new ButtonElement();
       sVideo
-          ..text = 'Video'
+        ..text = 'Video'
         ..id = 'select-video'
         ..attributes['type'] = 'button'
         ..classes.addAll(['btn', 'btn-default']);
@@ -151,12 +144,11 @@ import 'dart:html';
 
   ButtonElement createButton(String type) {
     var button = new ButtonElement();
-    if(type == 'discard') {
+    if (type == 'discard') {
       button.classes.addAll(['btn', 'btn-warning', 'modal-discard']);
       button.text = "Nope";
       button.attributes['data-dismiss'] = 'modal';
-    }
-    else if(type == 'save') {
+    } else if (type == 'save') {
       button.classes.addAll(['btn', 'btn-primary', 'modal-save']);
       button.text = "Save";
       button.attributes['data-dismis'] = 'modal';

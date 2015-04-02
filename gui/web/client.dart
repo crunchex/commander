@@ -116,12 +116,14 @@ class UpDroidClient {
       .listen((um) => _initializeTabs(config));
 
     _newButtonLeft.onClick.listen((e) {
+      e.preventDefault();
       if (_tabs[1].length >= 4) return;
 
       new UpDroidOpenTabModal(1, cs);
     });
 
     _newButtonRight.onClick.listen((e) {
+      e.preventDefault();
       if (_tabs[2].length >= 4) return;
 
       new UpDroidOpenTabModal(2, cs);

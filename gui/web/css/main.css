@@ -213,6 +213,12 @@ li div input {
   margin-left: 1px;
 }
 
+#upload {
+  width: 99%;
+  background-color: #6600FF;
+  color: white;
+}
+
 .column-content .nav-tabs {
   border-bottom-width: 0px;
 }
@@ -464,6 +470,7 @@ li div input {
 
 #explorer-container{
   border: 0 1px 1px 1px;
+  min-height: 300px;
   max-height: 400px;
   overflow: auto;
   padding: none;

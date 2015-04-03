@@ -170,9 +170,9 @@ html, body {
   background-color: #c6e9bb;
 }
 
-li input {
+li div input {
   margin-left: 6px;
-  width: 50px;
+  width: 100px;
 }
 
 #recycle {

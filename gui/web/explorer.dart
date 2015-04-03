@@ -393,8 +393,6 @@ class UpDroidExplorer {
         }
       });
 
-      // TODO: this only works in Chromium
-
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {

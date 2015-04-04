@@ -466,8 +466,10 @@ class UpDroidExplorer {
       cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      ElementList<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
-      for (SpanElement span in folderList) {
+      for (SpanElement span in spanList) {
+        span.classes.add('span-ondrag');
+      }
+      for (SpanElement span in closedList) {
         span.classes.add('span-ondrag');
       }
     });
@@ -477,10 +479,13 @@ class UpDroidExplorer {
       cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      ElementList<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
-      for (SpanElement span in folderList) {
+      for (SpanElement span in spanList) {
         span.classes.remove('span-ondrag');
       }
+      for (SpanElement span in closedList) {
+        span.classes.remove('span-ondrag');
+      }
+
     });
   }
 
@@ -495,8 +500,10 @@ class UpDroidExplorer {
       newFileDrop.classes.add('file-drop-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      ElementList<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
-      for (SpanElement span in folderList) {
+      for (SpanElement span in spanList) {
+        span.classes.add('span-ondrag');
+      }
+      for (SpanElement span in closedList) {
         span.classes.add('span-ondrag');
       }
     });
@@ -505,8 +512,10 @@ class UpDroidExplorer {
       newFileDrop.classes.remove('file-drop-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      ElementList<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
-      for (SpanElement span in folderList) {
+      for (SpanElement span in spanList) {
+        span.classes.remove('span-ondrag');
+      }
+      for (SpanElement span in closedList) {
         span.classes.remove('span-ondrag');
       }
     });
@@ -524,8 +533,10 @@ class UpDroidExplorer {
       recycle.classes.add('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      ElementList<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
-      for (SpanElement span in folderList) {
+      for (SpanElement span in spanList) {
+        span.classes.add('span-ondrag');
+      }
+      for (SpanElement span in closedList) {
         span.classes.add('span-ondrag');
       }
       if (!file.isDirectory) {
@@ -538,8 +549,10 @@ class UpDroidExplorer {
       recycle.classes.remove('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      ElementList<SpanElement> folderList = new List.from(spanList)..addAll(closedList);
-      for (SpanElement span in folderList) {
+      for (SpanElement span in spanList) {
+        span.classes.remove('span-ondrag');
+      }
+      for (SpanElement span in closedList) {
         span.classes.remove('span-ondrag');
       }
       if (!file.isDirectory) {

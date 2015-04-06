@@ -10,6 +10,8 @@ abstract class UpDroidTab {
   DivElement _tabContainer;
   DivElement _tabContent;
 
+  AnchorElement tabHandleButton;
+
   void makeTabActive() {
     _tabHandle.classes.add('active');
     _tabContainer.classes.add('active');
@@ -34,12 +36,12 @@ abstract class UpDroidTab {
 
     String id = title.toLowerCase().replaceAll(' ', '-');
 
-    AnchorElement a = new AnchorElement()
+    tabHandleButton = new AnchorElement()
         ..id = 'button-$id-$num'
         ..href = '#tab-$id-$num-container'
         ..dataset['toggle'] = 'tab'
         ..text = '$title-$num';
-    _tabHandle.children.add(a);
+    _tabHandle.children.add(tabHandleButton);
 
     DivElement column = querySelector('#column-$col');
     column.children.first.children.add(_tabHandle);

@@ -125,6 +125,15 @@ class UpDroidExplorer {
 
     ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_REMOVE').listen((um) => removeUpdate(um.body));
 
+    newFileDrop.onClick.listen((e){
+      if(currentSelected != null) {
+        currentSelected.classes.remove('highlighted');
+      }
+      currentSelected = null;
+      currentSelectedPath = workspacePath;
+
+    });
+
     dzRootLineContainer.onDragEnter.listen((e) => newFileDrop.classes.add('file-drop-entered'));
     dzRootLineContainer.onDragLeave.listen((e) => newFileDrop.classes.remove('file-drop-entered'));
 
@@ -179,6 +188,8 @@ class UpDroidExplorer {
         ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
       }
     });
+
+
 
     newFolder.onDoubleClick.listen((e) {
       ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');

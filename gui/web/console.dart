@@ -95,6 +95,11 @@ class UpDroidConsole extends UpDroidTab {
       _toggleBlink();
       e.preventDefault();
     });
+
+    tabHandleButton.onDoubleClick.listen((e) {
+      e.preventDefault();
+      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidConsole'));
+    });
   }
 
   void _initWebSocket(String url, [int retrySeconds = 2]) {

@@ -15,6 +15,9 @@ class UpDroidBuildResultsModal extends UpDroidModal {
     _modalBase.id = "build-results";
 
     var closer = _createClose();
+    _buttonListeners.add(closer.onClick.listen((e) {
+      _destroyModal();
+    }));
     var h3 = new Element.tag('h3');
     h3.text = ('Build Results');
     _modalHead.children.insert(0, closer);
@@ -33,6 +36,9 @@ class UpDroidBuildResultsModal extends UpDroidModal {
     }
 
     var okay = _createButton('okay');
+    _buttonListeners.add(okay.onClick.listen((e) {
+      _destroyModal();
+    }));
     _modalFooter.children.insert(0, okay);
   }
 }

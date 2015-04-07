@@ -11,6 +11,7 @@ import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
+import 'catkin.dart';
 import 'lib/server_helper.dart' as help;
 
 part 'pty.dart';
@@ -130,6 +131,12 @@ class CmdrServer {
         case 'CLIENT_CONFIG':
           _initBackendClasses(dir).then((value) {
             socket.add('[[CLIENT_SERVER_READY]]');
+          });
+          break;
+
+        case 'WORKSPACE_BUILD':
+          Catkin.buildWorkspace(dir.path).then((result) {
+            socket.add('[[BUILD_RESULT]]' + result);
           });
           break;
 

@@ -32,8 +32,8 @@ class UpDroidExplorer {
 
   Dropzone dzRootLineContainer;
   Dropzone dzRecycle;
-  Dropzone dzEditor;
   StreamSubscription outsideClickListener;
+  Map editors = {};
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
@@ -72,9 +72,13 @@ class UpDroidExplorer {
         break;
 
       case 'EDITOR_READY':
-        editorDiv = querySelector('.tab-pane .active');
-        dzEditor = new Dropzone(editorDiv);
-        fileName = querySelector('#filename');
+        var info = [m.body[0], m.body[1]]; //f,
+        var dropDiv = m.body[2];
+
+        var dzEditor = new Dropzone(dropDiv);
+        createEditorListeners(dzEditor);
+        editors.putIfAbsent(dzEditor, () => info);
+        print(editors);
         break;
 
       case 'REQUEST_PARENT_PATH':
@@ -85,6 +89,10 @@ class UpDroidExplorer {
         print('Explorer error: unrecognized message type: ' + m.type);
     }
     // Dragging through nested dropzones appears to be glitchy
+
+  }
+
+  void createEditorListeners(Dropzone dzEditor) {
     dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
@@ -98,7 +106,7 @@ class UpDroidExplorer {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
         cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
-        fileName.text = e.draggableElement.dataset['trueName'];
+        editors[dzEditor][1].text = e.draggableElement.dataset['trueName'];
       }
     });
   }

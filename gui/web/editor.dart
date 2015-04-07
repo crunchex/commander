@@ -77,7 +77,7 @@ class UpDroidEditor extends UpDroidTab {
       _setUpEditor();
       _registerEditorEventHandlers();
 
-      _cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY'));
+      _cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [num, _fileName, _content]));
     });
   }
 

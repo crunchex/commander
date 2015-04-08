@@ -123,7 +123,9 @@ class UpDroidEditor extends UpDroidTab {
         break;
 
       case 'OPEN_FILE':
-        _ws.send('[[EDITOR_OPEN]]' + m.body);
+        if(num == m.body[0]) {
+          _ws.send('[[EDITOR_OPEN]]' + m.body[1]);
+        }
         break;
 
       case 'PARENT_PATH':

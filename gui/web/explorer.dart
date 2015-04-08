@@ -34,6 +34,7 @@ class UpDroidExplorer {
   Dropzone dzRecycle;
   StreamSubscription outsideClickListener;
   Map editors = {};
+  Map editorListeners = {};
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
@@ -72,7 +73,7 @@ class UpDroidExplorer {
         break;
 
       case 'EDITOR_READY':
-        var info = [m.body[0], m.body[1]]; //f,
+        var info = [m.body[0] , m.body[1]]; // Editor num, fileName element
         var dropDiv = m.body[2];
 
         var dzEditor = new Dropzone(dropDiv);
@@ -105,7 +106,8 @@ class UpDroidExplorer {
     dzEditor.onDrop.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
+        var num = editors[dzEditor][0];
+        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: [num, e.draggableElement.dataset['path']]));
         editors[dzEditor][1].text = e.draggableElement.dataset['trueName'];
       }
     });

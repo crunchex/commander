@@ -11,7 +11,7 @@ import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
-import 'lib/catkin.dart';
+import 'lib/ros.dart';
 import 'lib/server_helper.dart' as help;
 
 part 'pty.dart';
@@ -133,7 +133,7 @@ class CmdrServer {
           break;
 
         case 'WORKSPACE_BUILD':
-          Catkin.buildWorkspace(dir.path).then((result) {
+          Ros.buildWorkspace(dir.path).then((result) {
             socket.add('[[BUILD_RESULT]]' + result);
           });
           break;
@@ -142,11 +142,11 @@ class CmdrServer {
           List runArgs = um.body.split('++');
           String package = runArgs[0];
           String node = runArgs[1];
-          Catkin.runNode(package, node);
+          Ros.runNode(package, node);
           break;
 
         case 'CATKIN_NODE_LIST':
-          Catkin.nodeList(dir, socket);
+          Ros.nodeList(dir, socket);
           break;
 
         case 'CLOSE_TAB':

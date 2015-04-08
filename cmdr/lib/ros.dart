@@ -1,4 +1,4 @@
-library catkin;
+library ros;
 
 import 'dart:io';
 import 'dart:async';
@@ -6,7 +6,7 @@ import 'dart:convert';
 
 import 'server_helper.dart' as help;
 
-abstract class Catkin {
+abstract class Ros {
   static Future<String> buildWorkspace(String dirPath) {
     Completer completer = new Completer();
 

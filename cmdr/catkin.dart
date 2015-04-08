@@ -75,18 +75,20 @@ abstract class Catkin {
   }
 
   static void runNode(String package, String node) {
-    Process.run('pgrep', ['roscore'], runInShell: true).then((result) {
+    Process.run('pgrep', ['roscore']).then((result) {
       if (result.stdout == '') {
-        _runRosCore().then((result) {
-          Process.run('rosrun', [package, node], runInShell: true);
+        Process.start('roscore', [], mode: ProcessStartMode.DETACHED).then((result) {
+          Process.run('rosrun', [package, node]).then((result) {
+            help.debug(result.stdout, 0);
+            help.debug(result.stderr, 0);
+          });
         });
       } else {
-        Process.run('rosrun', [package, node], runInShell: true);
+        Process.run('rosrun', [package, node]).then((result) {
+          help.debug(result.stdout, 0);
+          help.debug(result.stderr, 0);
+        });
       }
     });
-  }
-
-  static Future<ProcessResult> _runRosCore() {
-    return Process.run('roscore', [], runInShell: true);
   }
 }

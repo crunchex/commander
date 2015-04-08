@@ -32,8 +32,9 @@ class UpDroidExplorer {
 
   Dropzone dzRootLineContainer;
   Dropzone dzRecycle;
-  Dropzone dzEditor;
   StreamSubscription outsideClickListener;
+  Map editors = {};
+  Map editorListeners = {};
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
@@ -72,35 +73,52 @@ class UpDroidExplorer {
         break;
 
       case 'EDITOR_READY':
-        editorDiv = querySelector('.tab-pane .active');
-        dzEditor = new Dropzone(editorDiv);
-        fileName = querySelector('#filename');
+        var num = m.body[0]; // Editor num
+        var dropDiv = m.body[1];
+
+        var dzEditor = new Dropzone(dropDiv);
+        editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
+        editors.putIfAbsent(dzEditor, () => num);
+        cs.add(new CommanderMessage('EDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
         break;
 
       case 'REQUEST_PARENT_PATH':
         cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH', body: currentSelectedPath));
         break;
 
+      case 'REMOVE_EDITOR':
+        editors.remove(m.body);
+        for (var stream in editorListeners[m.body]) {
+          stream.cancel();
+        }
+        editorListeners.remove(m.body);
+        break;
+
       default:
         print('Explorer error: unrecognized message type: ' + m.type);
     }
     // Dragging through nested dropzones appears to be glitchy
-    dzEditor.onDragEnter.listen((e) {
+
+  }
+
+  List <StreamSubscription> createEditorListeners(Dropzone dzEditor) {
+    var enter = dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
         cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
       }
     });
 
-    dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
+    var leave = dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
 
-    dzEditor.onDrop.listen((e) {
+    var drop = dzEditor.onDrop.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
-        fileName.text = e.draggableElement.dataset['trueName'];
+        var num = editors[dzEditor];
+        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: [num, e.draggableElement.dataset['path']]));
       }
     });
+    return [enter, leave, drop];
   }
 
   /// Sets up the event handlers for the file explorer. Mostly mouse events.

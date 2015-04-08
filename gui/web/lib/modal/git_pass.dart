@@ -29,9 +29,8 @@ class UpDroidGitPassModal extends UpDroidModal {
     // password input section
     var askPassword = new Element.tag('h3');
     askPassword.text = "Git needs your password: ";
-    var input = new InputElement();
+    PasswordInputElement input = new InputElement(type:'password');
     input.id = "pass-input";
-    input.attributes['type'] = 'text';
     passInput.children.addAll([askPassword, input]);
 
     _modalBody.children.add(passInput);

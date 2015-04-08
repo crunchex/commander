@@ -172,7 +172,7 @@ html, body {
 
 li div input {
   margin-left: 6px;
-  width: 100px;
+  width: 50px;
 }
 
 #recycle {
@@ -286,10 +286,10 @@ li div input {
   background-color: #ecc4a3;
 }
 
-#filename{
+.editor-file-name {
   font-size: 16px;
   padding: 5px 20px 0 0;
-  float: right;
+  float: right !important;
 }
 
 .new-tab-button:hover {

@@ -79,29 +79,28 @@ class UpDroidExplorer {
 
       case 'REQUEST_PARENT_PATH':
         cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH', body: currentSelectedPath));
-
-        // Dragging through nested dropzones appears to be glitchy
-        dzEditor.onDragEnter.listen((e) {
-          var isDir = e.draggableElement.dataset['isDir'];
-          if (isDir == 'false') {
-            cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
-          }
-        });
-
-        dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
-
-        dzEditor.onDrop.listen((e) {
-          var isDir = e.draggableElement.dataset['isDir'];
-          if (isDir == 'false') {
-            cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
-            fileName.text = e.draggableElement.dataset['trueName'];
-          }
-        });
         break;
 
       default:
         print('Explorer error: unrecognized message type: ' + m.type);
     }
+    // Dragging through nested dropzones appears to be glitchy
+    dzEditor.onDragEnter.listen((e) {
+      var isDir = e.draggableElement.dataset['isDir'];
+      if (isDir == 'false') {
+        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
+      }
+    });
+
+    dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
+
+    dzEditor.onDrop.listen((e) {
+      var isDir = e.draggableElement.dataset['isDir'];
+      if (isDir == 'false') {
+        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: e.draggableElement.dataset['path']));
+        fileName.text = e.draggableElement.dataset['trueName'];
+      }
+    });
   }
 
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
@@ -124,6 +123,15 @@ class UpDroidExplorer {
     ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_ADD').listen((um) => addUpdate(um.body));
 
     ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_REMOVE').listen((um) => removeUpdate(um.body));
+
+    newFileDrop.onClick.listen((e){
+      if(currentSelected != null) {
+        currentSelected.classes.remove('highlighted');
+      }
+      currentSelected = null;
+      currentSelectedPath = workspacePath;
+
+    });
 
     dzRootLineContainer.onDragEnter.listen((e) => newFileDrop.classes.add('file-drop-entered'));
     dzRootLineContainer.onDragLeave.listen((e) => newFileDrop.classes.remove('file-drop-entered'));
@@ -179,6 +187,8 @@ class UpDroidExplorer {
         ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
       }
     });
+
+
 
     newFolder.onDoubleClick.listen((e) {
       ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');

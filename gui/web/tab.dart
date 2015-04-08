@@ -74,6 +74,7 @@ abstract class UpDroidTab {
 
     LIElement extra = new LIElement();
     extra.id = 'filename-$num';
+    extra.classes.add('editor-file-name');
     tabList.children.add(extra);
     configRefs['extra'] = extra;
 

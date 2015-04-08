@@ -51,7 +51,7 @@ class UpDroidOpenTabModal extends UpDroidModal {
     selectorWrap.children.addAll([sEditor, sConsole, sVideo]);
 
     // Footer
-    ButtonElement discard = _createButton('discard');
+    ButtonElement discard = _createButton('warning', 'Discard');
     _modalFooter.children.add(discard);
 
     _setUpListeners(closer, sEditor, sConsole, sVideo, discard);

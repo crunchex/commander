@@ -66,25 +66,12 @@ abstract class UpDroidModal {
     return button;
   }
 
-  ButtonElement _createButton(String type) {
-    var button = new ButtonElement();
-    if (type == 'discard') {
-      button.classes.addAll(['btn', 'btn-warning', 'modal-discard']);
-      button.text = "Nope";
-      button.attributes['data-dismiss'] = 'modal';
-    } else if (type == 'save') {
-      button.classes.addAll(['btn', 'btn-primary', 'modal-save']);
-      button.text = "Save";
-      button.attributes['data-dismiss'] = 'modal';
-    } else if (type == 'okay') {
-      button.classes.addAll(['btn', 'btn-primary', 'modal-save']);
-      button.text = "Okay";
-      button.attributes['data-dismiss'] = 'modal';
-    } else if (type == 'submit') {
-      button.classes.addAll(['btn', 'btn-primary', 'modal-save']);
-      button.text = "Submit";
-      button.attributes['data-dismiss'] = 'modal';
-    }
+  /// Returns ButtonElement for a button of [type] with [text].
+  ButtonElement _createButton(String type, String text) {
+    ButtonElement button = new ButtonElement()
+      ..classes.addAll(['btn', 'btn-$type'])
+      ..text = text
+      ..attributes['data-dismiss'] = 'modal';
     return button;
   }
 }

@@ -36,7 +36,7 @@ class UpDroidGitPassModal extends UpDroidModal {
     _modalBody.children.add(passInput);
 
     // Footer
-    var submit = _createButton('submit');
+    var submit = _createButton('primary', 'Submit');
     _buttonListeners.add(submit.onClick.listen((e) {
       cs.add(new CommanderMessage('CLIENT', 'GIT_PASSWORD', body: input.value));
       _destroyModal();

@@ -35,7 +35,7 @@ class UpDroidBuildResultsModal extends UpDroidModal {
       _modalBody.children.add(pre);
     }
 
-    var okay = _createButton('okay');
+    var okay = _createButton('primary', 'Okay');
     _buttonListeners.add(okay.onClick.listen((e) {
       _destroyModal();
     }));

@@ -47,8 +47,8 @@ class UpDroidSavedModal extends UpDroidModal {
 
     // Footer
 
-    var discard = _createButton('discard');
-    var save = _createButton('save');
+    var discard = _createButton('warning', 'Discard');
+    var save = _createButton('primary', 'Save');
     _modalFooter.children.insertAll(0, [save, discard]);
   }
 }

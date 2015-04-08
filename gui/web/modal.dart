@@ -28,11 +28,6 @@ abstract class UpDroidModal {
   Modal _modal;
 
   void _createModal() {
-    // only checks one part of modal since all are created together
-    if (_modalHead != null) {
-      _destroyModal();
-    }
-
     _modalBase = querySelector('.modal-base');
     _modalWrapper = querySelector('.modal-content');
     _modalHead = new DivElement();

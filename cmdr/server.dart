@@ -12,6 +12,7 @@ import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
 import 'lib/ros.dart';
+import 'lib/git.dart';
 import 'lib/server_helper.dart' as help;
 
 part 'pty.dart';
@@ -147,6 +148,14 @@ class CmdrServer {
 
         case 'CATKIN_NODE_LIST':
           Ros.nodeList(dir, socket);
+          break;
+
+        case 'GIT_PUSH':
+          List runArgs = um.body.split('++');
+          String dirPath = runArgs[0];
+          String password = runArgs[1];
+          //help.debug('dirPath: $dirPath, password: $password', 0);
+          Git.push(dirPath, password);
           break;
 
         case 'CLOSE_TAB':

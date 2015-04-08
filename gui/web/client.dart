@@ -24,6 +24,7 @@ class UpDroidClient {
   AnchorElement _newButtonRight;
   ButtonElement _buildButton;
   ButtonElement _runButton;
+  ButtonElement _uploadButton;
 
   String status;
   bool encounteredError;
@@ -43,6 +44,7 @@ class UpDroidClient {
     _newButtonRight = querySelector('#column-2-new');
     _buildButton = querySelector('#build-button');
     _runButton = querySelector('#run-button');
+    _uploadButton = querySelector('#upload');
 
     String config = _getConfig();
 
@@ -73,6 +75,11 @@ class UpDroidClient {
 
         int id = _getAvailableId(className);
         _openTab(column, id, className);
+        break;
+
+      case 'GIT_PASSWORD':
+        // TODO: need a more reliable handle to Explorer.
+        ws.send('[[GIT_PUSH]]' + '${_tabs[0].first.currentSelectedPath}++${m.body}');
         break;
 
       default:
@@ -152,6 +159,10 @@ class UpDroidClient {
 
     _runButton.onClick.listen((e) {
       ws.send('[[CATKIN_NODE_LIST]]');
+    });
+
+    _uploadButton.onClick.listen((e) {
+      new UpDroidGitPassModal(cs);
     });
   }
 

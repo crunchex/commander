@@ -77,10 +77,9 @@ class UpDroidExplorer {
         var dropDiv = m.body[1];
 
         var dzEditor = new Dropzone(dropDiv);
-        createEditorListeners(dzEditor);
+        editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
         editors.putIfAbsent(dzEditor, () => num);
         cs.add(new CommanderMessage('EDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
-        print(editors);
         break;
 
       case 'REQUEST_PARENT_PATH':
@@ -89,6 +88,10 @@ class UpDroidExplorer {
 
       case 'REMOVE_EDITOR':
         editors.remove(m.body);
+        for (var stream in editorListeners[m.body]) {
+          stream.cancel();
+        }
+        editorListeners.remove(m.body);
         break;
 
       default:
@@ -98,25 +101,24 @@ class UpDroidExplorer {
 
   }
 
-  void createEditorListeners(Dropzone dzEditor) {
-    dzEditor.onDragEnter.listen((e) {
+  List <StreamSubscription> createEditorListeners(Dropzone dzEditor) {
+    var enter = dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
         cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
       }
     });
 
-    dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
+    var leave = dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
 
-    dzEditor.onDrop.listen((e) {
+    var drop = dzEditor.onDrop.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
         var num = editors[dzEditor];
         cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: [num, e.draggableElement.dataset['path']]));
       }
     });
-
-
+    return [enter, leave, drop];
   }
 
   /// Sets up the event handlers for the file explorer. Mostly mouse events.

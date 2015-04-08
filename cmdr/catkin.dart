@@ -28,7 +28,6 @@ abstract class Catkin {
 
     Directory src = new Directory('${workspace.path}/src');
 
-    // Scan for Python nodes with a main function.
     help.getDirectory(src).then((fsEntities) {
       Directory package;
       fsEntities.forEach((f) {
@@ -43,29 +42,40 @@ abstract class Catkin {
             List<String> contents = f.readAsLinesSync();
             contents.forEach((line) {
               if (line.contains('add_executable') && !line.contains('#')) {
-                String execName = line.substring(line.indexOf('(') + 1, line.indexOf(' '));
-                nodeList.add({'package': package.path.split('/').last, 'node': execName});
+                String execName =
+                    line.substring(line.indexOf('(') + 1, line.indexOf(' '));
+                nodeList.add({
+                  'package': package.path.split('/').last,
+                  'node': execName
+                });
               }
             });
           }
 
           // Scan for Python nodes with a main function.
           if (filename.contains('.py')) {
-            String contents = f.readAsStringSync();
-            if (contents.contains('__main__')) {
-              // Get the parent package name.
-              Directory parent = f.parent;
-              while (true) {
-                String parentName = parent.path.split('/').last;
-                if (parentName != 'src' && parentName != 'scripts') {
-                  package = parent;
-                  break;
-                }
-                parent = parent.parent;
-              }
+            List<String> contents = f.readAsLinesSync();
+            contents.forEach((line) {
+              if (line.contains('rospy.init_node') && !line.contains('#')) {
+                String execName = line.substring(line.indexOf('\'') + 1);
+                execName = execName.substring(0, execName.indexOf('\'')) + '.py';
 
-              nodeList.add({'package': package.path.split('/').last, 'node': filename});
-            }
+                // Get the parent package name.
+                Directory parent = f.parent;
+                while (true) {
+                  String parentName = parent.path.split('/').last;
+                  if (parentName != 'src' && parentName != 'scripts') {
+                    package = parent;
+                    break;
+                  }
+                  parent = parent.parent;
+                }
+                nodeList.add({
+                  'package': package.path.split('/').last,
+                  'node': execName
+                });
+              }
+            });
           }
         }
       });
@@ -77,7 +87,9 @@ abstract class Catkin {
   static void runNode(String package, String node) {
     Process.run('pgrep', ['roscore']).then((result) {
       if (result.stdout == '') {
-        Process.start('roscore', [], mode: ProcessStartMode.DETACHED).then((result) {
+        Process
+            .start('roscore', [], mode: ProcessStartMode.DETACHED)
+            .then((result) {
           Process.run('rosrun', [package, node]).then((result) {
             help.debug(result.stdout, 0);
             help.debug(result.stderr, 0);

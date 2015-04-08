@@ -29,13 +29,16 @@ abstract class UpDroidModal {
 
   void _createModal() {
     _modalBase = querySelector('.modal-base');
+
     _modalWrapper = querySelector('.modal-content');
-    _modalHead = new DivElement();
-    _modalHead.classes.add('modal-header');
-    _modalBody = new DivElement();
-    _modalBody.classes.add('modal-body');
-    _modalFooter = new DivElement();
-    _modalFooter.classes.add('modal-footer');
+
+    _modalHead = new DivElement()
+      ..classes.add('modal-header');
+    _modalBody = new DivElement()
+      ..classes.add('modal-body');
+    _modalFooter = new DivElement()
+      ..classes.add('modal-footer');
+
     _modalWrapper.children.insert(0, _modalHead);
     _modalWrapper.children.insert(1, _modalBody);
     _modalWrapper.children.insert(2, _modalFooter);
@@ -53,14 +56,13 @@ abstract class UpDroidModal {
     _modalFooter.remove();
   }
 
-  // Helper, creates 'X' close button
-
-  Element _createClose() {
-    var button = new ButtonElement();
-    button.attributes['type'] = 'button';
-    button.attributes['data-dismiss'] = 'modal';
-    button.classes.add('close');
-    button.append(new DocumentFragment.html('&times'));
+  /// Returns ButtonElement for an 'X' close button at the modal corner.
+  ButtonElement _createClose() {
+    ButtonElement button = new ButtonElement()
+     ..attributes['type'] = 'button'
+     ..attributes['data-dismiss'] = 'modal'
+     ..classes.add('close')
+     ..append(new DocumentFragment.html('&times'));
     return button;
   }
 

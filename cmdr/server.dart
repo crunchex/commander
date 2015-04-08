@@ -67,8 +67,6 @@ class CmdrServer {
   }
 
   void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir) {
-    help.debug(request.uri.path, 0);
-
     // WebSocket requests are considered "upgraded" HTTP requests.
     if (!WebSocketTransformer.isUpgradeRequest(request)) {
       _handleStandardRequest(request, virDir);
@@ -138,6 +136,17 @@ class CmdrServer {
           Catkin.buildWorkspace(dir.path).then((result) {
             socket.add('[[BUILD_RESULT]]' + result);
           });
+          break;
+
+        case 'CATKIN_RUN':
+          List runArgs = um.body.split('++');
+          String package = runArgs[0];
+          String node = runArgs[1];
+          Catkin.runNode(package, node);
+          break;
+
+        case 'CATKIN_NODE_LIST':
+          Catkin.nodeList(dir, socket);
           break;
 
         case 'CLOSE_TAB':

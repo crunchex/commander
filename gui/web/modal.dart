@@ -11,6 +11,7 @@ part 'lib/modal/unsaved.dart';
 part 'lib/modal/saved.dart';
 part 'lib/modal/open_tab.dart';
 part 'lib/modal/build_results.dart';
+part 'lib/modal/run_node.dart';
 
 /// [UpDroidModal] contains methods to generate [Element]s that make up
 /// a modal in the UpDroid Commander GUI.

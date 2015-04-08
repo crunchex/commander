@@ -2,6 +2,7 @@ library updroid_editor;
 
 import 'dart:html';
 import 'dart:async';
+import 'package:dnd/dnd.dart';
 
 import 'package:ace/ace.dart' as ace;
 import 'package:bootjack/bootjack.dart';
@@ -42,6 +43,7 @@ class UpDroidEditor extends UpDroidTab {
   Element _warning;
   Element _overwriteCommit;
   Modal _curModal;
+  Dropzone linkedDropzone;
 
   int _fontSize = 14;
 
@@ -133,6 +135,12 @@ class UpDroidEditor extends UpDroidTab {
         _currentParPath = m.body;
         break;
 
+      case 'PASS_EDITOR_INFO':
+        if(num == m.body[0]){
+          linkedDropzone = m.body[1];
+        }
+        break;
+
       default:
         print('Client error: unrecognized message type: ' + m.type);
     }
@@ -206,6 +214,7 @@ class UpDroidEditor extends UpDroidTab {
     _closeTabButton.onClick.listen((e) {
       destroyTab();
       _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
+      _cs.add(new CommanderMessage('EXPLORER', 'REMOVE_EDITOR', body: linkedDropzone));
     });
 
     _newButton.onClick.listen((e) {

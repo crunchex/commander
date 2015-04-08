@@ -79,11 +79,16 @@ class UpDroidExplorer {
         var dzEditor = new Dropzone(dropDiv);
         createEditorListeners(dzEditor);
         editors.putIfAbsent(dzEditor, () => num);
+        cs.add(new CommanderMessage('EDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
         print(editors);
         break;
 
       case 'REQUEST_PARENT_PATH':
         cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH', body: currentSelectedPath));
+        break;
+
+      case 'REMOVE_EDITOR':
+        editors.remove(m.body);
         break;
 
       default:
@@ -110,6 +115,8 @@ class UpDroidExplorer {
         cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: [num, e.draggableElement.dataset['path']]));
       }
     });
+
+
   }
 
   /// Sets up the event handlers for the file explorer. Mostly mouse events.

@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 
-import 'lib/server_helper.dart' as help;
+import 'server_helper.dart' as help;
 
 abstract class Catkin {
   static Future<String> buildWorkspace(String dirPath) {

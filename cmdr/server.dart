@@ -67,8 +67,6 @@ class CmdrServer {
   }
 
   void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir) {
-    help.debug(request.uri.path, 0);
-
     // WebSocket requests are considered "upgraded" HTTP requests.
     if (!WebSocketTransformer.isUpgradeRequest(request)) {
       _handleStandardRequest(request, virDir);

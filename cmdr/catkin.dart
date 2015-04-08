@@ -34,7 +34,6 @@ abstract class Catkin {
       fsEntities.forEach((f) {
         if (FileSystemEntity.isFileSync(f.path)) {
           String filename = f.path.split('/').last;
-          help.debug('filename: $filename', 0);
 
           if (filename == 'CMakeLists.txt') {
             // Get the parent package name.
@@ -44,7 +43,6 @@ abstract class Catkin {
             List<String> contents = f.readAsLinesSync();
             contents.forEach((line) {
               if (line.contains('add_executable') && !line.contains('#')) {
-                help.debug('line: $line', 0);
                 String execName = line.substring(line.indexOf('(') + 1, line.indexOf(' '));
                 nodeList.add({'package': package.path.split('/').last, 'node': execName});
               }

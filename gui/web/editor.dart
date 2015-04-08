@@ -77,7 +77,7 @@ class UpDroidEditor extends UpDroidTab {
       _setUpEditor();
       _registerEditorEventHandlers();
 
-      _cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [num, _fileName, _content]));
+      _cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [num, _content]));
     });
   }
 
@@ -125,6 +125,7 @@ class UpDroidEditor extends UpDroidTab {
       case 'OPEN_FILE':
         if(num == m.body[0]) {
           _ws.send('[[EDITOR_OPEN]]' + m.body[1]);
+          _fileName.text = pathLib.basename(m.body[1]);
         }
         break;
 

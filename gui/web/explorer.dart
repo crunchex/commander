@@ -73,12 +73,12 @@ class UpDroidExplorer {
         break;
 
       case 'EDITOR_READY':
-        var info = [m.body[0] , m.body[1]]; // Editor num, fileName element
-        var dropDiv = m.body[2];
+        var num = m.body[0]; // Editor num
+        var dropDiv = m.body[1];
 
         var dzEditor = new Dropzone(dropDiv);
         createEditorListeners(dzEditor);
-        editors.putIfAbsent(dzEditor, () => info);
+        editors.putIfAbsent(dzEditor, () => num);
         print(editors);
         break;
 
@@ -106,9 +106,8 @@ class UpDroidExplorer {
     dzEditor.onDrop.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        var num = editors[dzEditor][0];
+        var num = editors[dzEditor];
         cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: [num, e.draggableElement.dataset['path']]));
-        editors[dzEditor][1].text = e.draggableElement.dataset['trueName'];
       }
     });
   }

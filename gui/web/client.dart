@@ -23,6 +23,7 @@ class UpDroidClient {
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
   ButtonElement _buildButton;
+  ButtonElement _runButton;
 
   String status;
   bool encounteredError;
@@ -41,6 +42,7 @@ class UpDroidClient {
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
     _buildButton = querySelector('#build-button');
+    _runButton = querySelector('#run-button');
 
     String config = _getConfig();
 
@@ -124,6 +126,12 @@ class UpDroidClient {
         new UpDroidBuildResultsModal(um.body);
       });
 
+    ws.onMessage.transform(updroidTransformer)
+      .where((um) => um.header == 'CATKIN_NODE_LIST')
+      .listen((um) {
+        new UpDroidRunNodeModal(JSON.decode(um.body), ws);
+      });
+
     _newButtonLeft.onClick.listen((e) {
       e.preventDefault();
       if (_tabs[1].length >= 4) return;
@@ -140,6 +148,10 @@ class UpDroidClient {
 
     _buildButton.onClick.listen((e) {
       ws.send('[[WORKSPACE_BUILD]]');
+    });
+
+    _runButton.onClick.listen((e) {
+      ws.send('[[CATKIN_NODE_LIST]]');
     });
   }
 

@@ -140,6 +140,17 @@ class CmdrServer {
           });
           break;
 
+        case 'CATKIN_RUN':
+          List runArgs = um.body.split('++');
+          String package = runArgs[0];
+          String node = runArgs[1];
+          Catkin.runNode(package, node);
+          break;
+
+        case 'CATKIN_NODE_LIST':
+          Catkin.nodeList(dir, socket);
+          break;
+
         case 'CLOSE_TAB':
           _closeTab(um.body);
           break;

@@ -12,6 +12,7 @@ part 'lib/modal/saved.dart';
 part 'lib/modal/open_tab.dart';
 part 'lib/modal/build_results.dart';
 part 'lib/modal/run_node.dart';
+part 'lib/modal/git_pass.dart';
 
 /// [UpDroidModal] contains methods to generate [Element]s that make up
 /// a modal in the UpDroid Commander GUI.
@@ -81,6 +82,10 @@ abstract class UpDroidModal {
     } else if (type == 'okay') {
       button.classes.addAll(['btn', 'btn-primary', 'modal-save']);
       button.text = "Okay";
+      button.attributes['data-dismiss'] = 'modal';
+    } else if (type == 'submit') {
+      button.classes.addAll(['btn', 'btn-primary', 'modal-save']);
+      button.text = "Submit";
       button.attributes['data-dismiss'] = 'modal';
     }
     return button;

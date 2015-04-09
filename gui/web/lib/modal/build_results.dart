@@ -10,8 +10,6 @@ class UpDroidBuildResultsModal extends UpDroidModal {
   }
 
   void _setupBody(String results) {
-    _modalBase.id = "build-results";
-
     ParagraphElement p = new ParagraphElement();
     if (results == '') {
       p.text = 'Success!';
@@ -26,7 +24,7 @@ class UpDroidBuildResultsModal extends UpDroidModal {
   }
 
   void _setupFooter() {
-    var okay = _createButton('primary', 'Okay');
+    ButtonElement okay = _createButton('primary', 'Okay');
     _modalFooter.children.insert(0, okay);
   }
 }

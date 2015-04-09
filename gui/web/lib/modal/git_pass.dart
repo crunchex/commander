@@ -19,7 +19,7 @@ class UpDroidGitPassModal extends UpDroidModal {
     passInput.id = 'git-pass-input';
 
     // password input section
-    var askPassword = new Element.tag('h3');
+    HeadingElement askPassword = new HeadingElement.h3();
     askPassword.text = "Git needs your password: ";
     _input = new InputElement(type:'password')
       ..id = "pass-input";
@@ -29,7 +29,7 @@ class UpDroidGitPassModal extends UpDroidModal {
   }
 
   void _setupFooter() {
-    var submit = _createButton('primary', 'Submit', method: () {
+    ButtonElement submit = _createButton('primary', 'Submit', method: () {
       _cs.add(new CommanderMessage('CLIENT', 'GIT_PASSWORD', body: _input.value));
     });
     _modalFooter.children.insert(0, submit);

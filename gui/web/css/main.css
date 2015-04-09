@@ -50,11 +50,11 @@ html, body {
 .navbar-left {
   margin-top: 5px !important;
   margin-bottom: 5px !important;
-  margin-left: 15px !important;
+  margin-left: 10px !important;
 }
 
 .navbar-nav.navbar-right:last-child {
-  margin-right: 15px !important;
+  margin-right: 10px !important;
   margin-bottom: 0px !important;
 }
 

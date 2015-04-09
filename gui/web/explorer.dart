@@ -36,6 +36,7 @@ class UpDroidExplorer {
   Map editors = {};
   Map editorListeners = {};
   Map fileInfo = {};
+  Map pathToFile = {};
   Map ulInfo = {};
 
   WebSocket ws;
@@ -271,6 +272,7 @@ class UpDroidExplorer {
         ..classes.add('explorer-li');
 
     fileInfo.putIfAbsent(li, () => [file.name, file.path]);
+    pathToFile.putIfAbsent(file.path, () => li);
     // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
     SpanElement glyph = new SpanElement();
@@ -625,14 +627,17 @@ class UpDroidExplorer {
   /// Handles an Explorer remove update for a single file.
 
   void removeUpdate(String path) {
-    LIElement li = querySelector("[data-path='$path']");
+    LIElement li = pathToFile[path];
 
     // Case to deal with removeUpdate grabbing null objects when items are renamed
     if (li == null) {
-    } else {
+    }
+    else {
       UListElement ul = li.parent;
       ul.children.remove(li);
     }
+    fileInfo.remove(li);
+    print(path);
   }
 
 
@@ -660,12 +665,7 @@ class UpDroidExplorer {
       dirElement = querySelector('#explorer-body');
       dirElement.append(li);
     } else if (!file.path.contains('/.') && !file.path.contains('CMakeLists.txt')) {
-      var validPath = removeSpaces(truePath);
-      var validParent = removeSpaces(file.parentDir);
-      print(ulInfo);
-      print(pathLib.dirname(file.path));
       dirElement = ulInfo[pathLib.dirname(file.path)];
-      print(dirElement);
       dirElement.append(li);
     }
 

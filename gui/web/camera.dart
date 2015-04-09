@@ -77,7 +77,7 @@ class UpDroidCamera extends UpDroidTab {
 
     var options = new js.JsObject.jsify({'canvas': canvas});
 
-    js.JsObject player = new js.JsObject(js.context['jsmpeg'], [client, options]);
+    new js.JsObject(js.context['jsmpeg'], [client, options]);
 
   }
 

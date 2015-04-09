@@ -219,12 +219,10 @@ class UpDroidClient {
 
     _tabs[0].add(new UpDroidExplorer(cs));
 
-    int i = 0;
-    for (List column in config) {
+    for (int i = 0; i < config.length; i++) {
       for (Map tab in config[i]) {
         _openTab(i + 1, tab['id'], tab['class']);
       }
-      i++;
     }
   }
 

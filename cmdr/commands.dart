@@ -12,6 +12,6 @@ class CmdrGuiCommand extends Command {
 
   void run() {
     help.enableDebug(argResults['debug']);
-    CmdrServer server = new CmdrServer(argResults);
+    new CmdrServer(argResults);
   }
 }

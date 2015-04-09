@@ -595,7 +595,6 @@ class UpDroidExplorer {
     var parentPath = pathLib.dirname(sFile.path);
 
     // Try to detect the parent, and if it doesn't exist then create the element for it.
-    LIElement li = querySelector("[data-path='$parentPath']");
     String curPath = '';
 
     // Iterate through the path checking to see if the folder exists

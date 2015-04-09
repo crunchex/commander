@@ -18,7 +18,6 @@ class CmdrExplorer {
   /// it receives or local events that it detects.
   void handleWebSocket(WebSocket ws) {
     help.debug('Explorer client connected.', 0);
-    StreamController<String> processInput = new StreamController<String>.broadcast();
 
     ws.listen((String s) {
       help.UpDroidMessage um = new help.UpDroidMessage(s);

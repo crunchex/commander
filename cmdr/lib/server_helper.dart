@@ -24,16 +24,16 @@ void debug(String logstring, int level) {
   if (!debugFlag) {
     return;
   }
-  
+
   switch (level) {
     case 0:
       log.info(logstring);
       break;
-      
+
     case 1:
       log.severe(logstring);
       break;
-      
+
     default:
       log.severe('Debug level not specified - fix this!');
       log.severe(logstring);
@@ -43,7 +43,6 @@ void debug(String logstring, int level) {
 /// Convenience method for a formatted socket message.
 void formattedMessage(WebSocket socket, String header, String body) {
   socket.add('[[$header]]$body');
-  String msg = '[[$header]]$body';
 }
 
 /// Helper method to grab file name in case of spaces.
@@ -80,7 +79,7 @@ Future<List<FileSystemEntity>> getDirectory(Directory dir) {
 var files = <FileSystemEntity>[];
 var completer = new Completer();
 var lister = dir.list(recursive: true);
-lister.listen ( 
+lister.listen (
     (file) => files.add(file),
     // Should also register onError.
     onDone:   () => completer.complete(files)
@@ -93,12 +92,12 @@ return completer.future;
 /// from the UpDroid client.
 class UpDroidMessage {
   final String s;
-  
+
   UpDroidMessage(this.s);
-  
+
   String get header => createHeader();
   String get body => createBody();
-  
+
   String createHeader() {
     var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
     return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');

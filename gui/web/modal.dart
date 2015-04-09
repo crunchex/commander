@@ -82,7 +82,7 @@ abstract class UpDroidModal {
      ..append(new DocumentFragment.html('&times'));
 
     _buttonListeners.add(button.onClick.listen((e) {
-      method();
+      if (method != null) method();
       _destroyModal();
     }));
 

@@ -7,7 +7,7 @@ class UpDroidGitPassModal extends UpDroidModal {
   UpDroidGitPassModal(StreamController<CommanderMessage> cs) {
     _cs = cs;
 
-    _initModal('Git Push to Remote');
+    _setupHead('Git Push to Remote');
     _setupBody();
     _setupFooter();
 

@@ -2,7 +2,7 @@ part of updroid_modal;
 
 class UpDroidUnsavedModal extends UpDroidModal {
   UpDroidUnsavedModal() {
-    _initModal('Save Changes?');
+    _setupHead('Save Changes?');
     _setupBody();
     _setupFooter();
 

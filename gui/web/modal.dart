@@ -27,7 +27,7 @@ abstract class UpDroidModal {
 
   Modal _modal;
 
-  void _initModal(String heading) {
+  void _setupHead(String heading) {
     _buttonListeners = [];
 
     _modalBase = querySelector('.modal-base');

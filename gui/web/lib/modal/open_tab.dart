@@ -8,7 +8,7 @@ class UpDroidOpenTabModal extends UpDroidModal {
     _side = side;
     _cs = cs;
 
-    _initModal('Select Tab: ');
+    _setupHead('Select Tab: ');
     _setupBody();
     _setupFooter();
 

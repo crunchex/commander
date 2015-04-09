@@ -8,7 +8,7 @@ class UpDroidRunNodeModal extends UpDroidModal {
     _nodeList = nodeList;
     _ws = ws;
 
-    _initModal('Available Nodes');
+    _setupHead('Available Nodes');
     _setupBody();
     _setupFooter();
 

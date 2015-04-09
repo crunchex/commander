@@ -2,7 +2,7 @@ part of updroid_modal;
 
 class UpDroidBuildResultsModal extends UpDroidModal {
   UpDroidBuildResultsModal(String results) {
-    _initModal('Build Results');
+    _setupHead('Build Results');
     _setupBody(results);
     _setupFooter();
 

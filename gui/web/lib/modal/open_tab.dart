@@ -11,7 +11,7 @@ class UpDroidOpenTabModal extends UpDroidModal {
     _createModal();
     _setupModal();
 
-    _modal = new Modal(querySelector('.modal-base'));
+    _modal = new Modal(_modalBase);
     _modal.show();
   }
 

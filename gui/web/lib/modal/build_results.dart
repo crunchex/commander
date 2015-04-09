@@ -5,7 +5,7 @@ class UpDroidBuildResultsModal extends UpDroidModal {
     _createModal();
     _setupModal(results);
 
-    _modal = new Modal(querySelector('.modal-base'));
+    _modal = new Modal(_modalBase);
     _modal.show();
   }
 

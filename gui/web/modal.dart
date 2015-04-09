@@ -59,21 +59,35 @@ abstract class UpDroidModal {
   }
 
   /// Returns ButtonElement for an 'X' close button at the modal corner.
-  ButtonElement _createClose() {
+  /// Optionally, a [method] can be passed in for additional logic besides
+  /// modal destruction.
+  ButtonElement _createClose({dynamic method}) {
     ButtonElement button = new ButtonElement()
      ..attributes['type'] = 'button'
      ..attributes['data-dismiss'] = 'modal'
      ..classes.add('close')
      ..append(new DocumentFragment.html('&times'));
+
+    _buttonListeners.add(button.onClick.listen((e) {
+      method();
+      _destroyModal();
+    }));
+
     return button;
   }
 
-  /// Returns ButtonElement for a button of [type] with [text].
-  ButtonElement _createButton(String type, String text) {
+  /// Returns ButtonElement for a button of [type] with [text]. Optionally,
+  /// a [method] can be passed in for additional logic besides modal destruction.
+  ButtonElement _createButton(String type, String text, {dynamic method}) {
     ButtonElement button = new ButtonElement()
       ..classes.addAll(['btn', 'btn-$type'])
       ..text = text
       ..attributes['data-dismiss'] = 'modal';
+
+    _buttonListeners.add(button.onClick.listen((e) {
+      if (method != null) method();
+      _destroyModal();
+    }));
     return button;
   }
 }

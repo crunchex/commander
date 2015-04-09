@@ -29,59 +29,23 @@ class UpDroidOpenTabModal extends UpDroidModal {
     DivElement selectorWrap = new DivElement()..id = "selector-wrapper";
 
     _modalBody.children.add(selectorWrap);
-    ButtonElement sEditor = new ButtonElement()
-      ..text = 'Editor'
-      ..id = 'select-editor'
-      ..attributes['type'] = 'button'
-      ..classes.addAll(['btn', 'btn-default']);
 
-    ButtonElement sConsole = new ButtonElement()
-      ..text = 'Console'
-      ..id = 'select-console'
-      ..attributes['type'] = 'button'
-      ..classes.addAll(['btn', 'btn-default']);
+    ButtonElement sEditor = _createButton('default', 'Editor', method: () {
+      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_side}_UpDroidEditor'));
+    });
 
-    ButtonElement sVideo = new ButtonElement()
-      ..text = 'Video'
-      ..id = 'select-video'
-      ..attributes['type'] = 'button'
-      ..classes.addAll(['btn', 'btn-default']);
+    ButtonElement sConsole = _createButton('default', 'Console', method: () {
+      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_side}_UpDroidConsole'));
+    });
 
-    selectorWrap.children.addAll([sEditor, sConsole, sVideo]);
+    ButtonElement sCamera = _createButton('default', 'Camera', method: () {
+      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_side}_UpDroidCamera'));
+    });
+
+    selectorWrap.children.addAll([sEditor, sConsole, sCamera]);
 
     // Footer
     ButtonElement discard = _createButton('warning', 'Discard');
     _modalFooter.children.add(discard);
-
-    _setUpListeners(closer, sEditor, sConsole, sVideo, discard);
-  }
-
-  _setUpListeners(ButtonElement closer, ButtonElement sEditor,
-      ButtonElement sConsole, ButtonElement sVideo, ButtonElement discard) {
-    _buttonListeners.add(closer.onClick.listen((e) {
-      _destroyModal();
-    }));
-
-    _buttonListeners.add(sEditor.onClick.listen((e) {
-      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB',
-          body: '${_side}_UpDroidEditor'));
-      _destroyModal();
-    }));
-
-    _buttonListeners.add(sConsole.onClick.listen((e) {
-      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB',
-          body: '${_side}_UpDroidConsole'));
-      _destroyModal();
-    }));
-
-    _buttonListeners.add(sVideo.onClick.listen((e) {
-      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB',
-          body: '${_side}_UpDroidCamera'));
-      _destroyModal();
-    }));
-
-    _buttonListeners.add(discard.onClick.listen((e) {
-      _destroyModal();
-    }));
   }
 }

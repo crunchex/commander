@@ -13,9 +13,6 @@ class UpDroidGitPassModal extends UpDroidModal {
     _modalBase.id = "git-pass";
 
     var closer = _createClose();
-    _buttonListeners.add(closer.onClick.listen((e) {
-      _destroyModal();
-    }));
     var h3 = new Element.tag('h3');
     h3.text = ('Git Push to Remote');
     _modalHead.children.insert(0, closer);
@@ -34,11 +31,9 @@ class UpDroidGitPassModal extends UpDroidModal {
     _modalBody.children.add(passInput);
 
     // Footer
-    var submit = _createButton('primary', 'Submit');
-    _buttonListeners.add(submit.onClick.listen((e) {
+    var submit = _createButton('primary', 'Submit', method: () {
       cs.add(new CommanderMessage('CLIENT', 'GIT_PASSWORD', body: input.value));
-      _destroyModal();
-    }));
+    });
     _modalFooter.children.insert(0, submit);
   }
 }

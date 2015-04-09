@@ -31,33 +31,14 @@ class UpDroidRunNodeModal extends UpDroidModal {
     _modalBody.children.add(selectorWrap);
 
     _nodeList.forEach((Map packageNode) {
-      ButtonElement nodeButton = new ButtonElement()
-        ..text = packageNode['node']
-        ..attributes['type'] = 'button'
-        ..classes.addAll(['btn', 'btn-default']);
-
-      _buttonListeners.add(nodeButton.onClick.listen((e) {
+      ButtonElement nodeButton = _createButton('default', packageNode['node'], method: () {
         _ws.send('[[CATKIN_RUN]]' + '${packageNode['package']}++${packageNode['node']}');
-        _destroyModal();
-      }));
-
+      });
       selectorWrap.children.add(nodeButton);
     });
 
     // Footer
     ButtonElement discard = _createButton('warning', 'Discard');
     _modalFooter.children.add(discard);
-
-    _setUpListeners(closer, discard);
-  }
-
-  _setUpListeners(ButtonElement closer, ButtonElement discard) {
-    _buttonListeners.add(closer.onClick.listen((e) {
-      _destroyModal();
-    }));
-
-    _buttonListeners.add(discard.onClick.listen((e) {
-      _destroyModal();
-    }));
   }
 }

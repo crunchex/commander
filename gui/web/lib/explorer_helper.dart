@@ -43,4 +43,3 @@ import 'dart:html';
     }
     return valid;
   }
-

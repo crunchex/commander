@@ -36,6 +36,7 @@ class UpDroidExplorer {
   Map editors = {};
   Map editorListeners = {};
   Map fileInfo = {};
+  Map ulInfo = {};
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
@@ -251,14 +252,20 @@ class UpDroidExplorer {
   }
 
 
+  String getName(LIElement li) {
+    return fileInfo[li][0];
+  }
+
+  String getPath(LIElement li) {
+    return fileInfo[li][1];
+  }
+
   /// Returns a generated [LIElement] with inner HTML based on
   /// the [SimpleFile]'s contents.
   LIElement generateLiHtml(file, [expanded]) {
     LIElement li = new LIElement();
     li
-        ..dataset['name'] = removeSpaces(file.name)
         ..dataset['trueName'] = (file.name)
-        ..dataset['path'] = file.path
         ..dataset['isDir'] = file.isDirectory.toString()
         ..draggable = true
         ..classes.add('explorer-li');
@@ -289,10 +296,10 @@ class UpDroidExplorer {
       li.dataset['expanded'] = 'false';
       UListElement ul = new UListElement();
       ul
-          ..dataset['name'] = 'explorer-ul-${removeSpaces(file.name)}'
-          ..dataset['path'] = removeSpaces(file.path)
           ..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
+
+      ulInfo.putIfAbsent(file.path, () => ul);
 
       ul.classes.add("hidden");
       glyphicon.replaceWith(glyph);
@@ -635,7 +642,7 @@ class UpDroidExplorer {
     completer.complete(true);
 
     LIElement li = generateLiHtml(file, expanded);
-    String truePath = pathLib.dirname(li.dataset['path']);
+    String truePath = pathLib.dirname(getPath(li));
 
     // Register double-click event handler for file renaming.
     li.children[0].children[1].onDoubleClick.listen((e) {
@@ -655,7 +662,10 @@ class UpDroidExplorer {
     } else if (!file.path.contains('/.') && !file.path.contains('CMakeLists.txt')) {
       var validPath = removeSpaces(truePath);
       var validParent = removeSpaces(file.parentDir);
-      dirElement = querySelector("[data-name=explorer-ul-${validParent}][data-path='$validPath']");
+      print(ulInfo);
+      print(pathLib.dirname(file.path));
+      dirElement = ulInfo[pathLib.dirname(file.path)];
+      print(dirElement);
       dirElement.append(li);
     }
 

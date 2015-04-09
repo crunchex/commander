@@ -35,6 +35,7 @@ class UpDroidExplorer {
   StreamSubscription outsideClickListener;
   Map editors = {};
   Map editorListeners = {};
+  Map fileInfo = {};
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
@@ -262,6 +263,7 @@ class UpDroidExplorer {
         ..draggable = true
         ..classes.add('explorer-li');
 
+    fileInfo.putIfAbsent(li, () => [file.name, file.path]);
     // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
     SpanElement glyph = new SpanElement();

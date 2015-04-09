@@ -9,16 +9,15 @@ class UpDroidOpenTabModal extends UpDroidModal {
     _cs = cs;
 
     _initModal('Select Tab: ');
-    _setupModal();
+    _setupBody();
+    _setupFooter();
+
     _showModal();
   }
 
-  void _setupModal() {
-    _modalBase.id = "tab-selector";
-
-    // Body
-    DivElement selectorWrap = new DivElement()..id = "selector-wrapper";
-
+  void _setupBody() {
+    DivElement selectorWrap = new DivElement()
+      ..id = "selector-wrapper";
     _modalBody.children.add(selectorWrap);
 
     ButtonElement sEditor = _createButton('default', 'Editor', method: () {
@@ -34,8 +33,9 @@ class UpDroidOpenTabModal extends UpDroidModal {
     });
 
     selectorWrap.children.addAll([sEditor, sConsole, sCamera]);
+  }
 
-    // Footer
+  void _setupFooter() {
     ButtonElement discard = _createButton('warning', 'Discard');
     _modalFooter.children.add(discard);
   }

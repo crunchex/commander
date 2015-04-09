@@ -1,15 +1,15 @@
 part of updroid_modal;
 
 class UpDroidSavedModal extends UpDroidModal {
-  UpDroidSavedModal () {
+  UpDroidSavedModal() {
     _initModal('Save Changes?');
-    _setupModal();
+    _setupBody();
+    _setupFooter();
+
     _showModal();
   }
 
-  void _setupModal() {
-    _modalBase.id = "save-as";
-
+  void _setupBody() {
     DivElement saveInput = new DivElement();
     saveInput.id = 'save-input';
 
@@ -34,9 +34,9 @@ class UpDroidSavedModal extends UpDroidModal {
 
     _modalBody.children.add(saveInput);
     _modalBody.children.add(warning);
+  }
 
-    // Footer
-
+  void _setupFooter() {
     var discard = _createButton('warning', 'Discard');
     var save = _createButton('primary', 'Save');
     _modalFooter.children.insertAll(0, [save, discard]);

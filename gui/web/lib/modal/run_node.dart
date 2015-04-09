@@ -9,16 +9,15 @@ class UpDroidRunNodeModal extends UpDroidModal {
     _ws = ws;
 
     _initModal('Available Nodes');
-    _setupModal();
+    _setupBody();
+    _setupFooter();
+
     _showModal();
   }
 
-  void _setupModal() {
-    _modalBase.id = "tab-selector";
-
-    // Body
-    DivElement selectorWrap = new DivElement()..id = "selector-wrapper";
-
+  void _setupBody() {
+    DivElement selectorWrap = new DivElement()
+      ..id = "selector-wrapper";
     _modalBody.children.add(selectorWrap);
 
     _nodeList.forEach((Map packageNode) {
@@ -27,8 +26,9 @@ class UpDroidRunNodeModal extends UpDroidModal {
       });
       selectorWrap.children.add(nodeButton);
     });
+  }
 
-    // Footer
+  void _setupFooter() {
     ButtonElement discard = _createButton('warning', 'Discard');
     _modalFooter.children.add(discard);
   }

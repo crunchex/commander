@@ -1,19 +1,21 @@
 part of updroid_modal;
 
 class UpDroidUnsavedModal extends UpDroidModal {
-  UpDroidUnsavedModal () {
+  UpDroidUnsavedModal() {
     _initModal('Save Changes?');
-    _setupModal();
+    _setupBody();
+    _setupFooter();
+
     _showModal();
   }
 
-  void _setupModal() {
-    _modalBase.id = "unsaved";
-
-    var p = new Element.p();
-    p.text = "Unsaved changes detected.  Save these changes?";
+  void _setupBody() {
+    ParagraphElement p = new ParagraphElement()
+      ..text = "Unsaved changes detected.  Save these changes?";
     _modalBody.children.add(p);
+  }
 
+  void _setupFooter() {
     var discard = _createButton('warning', 'Discard');
     var save = _createButton('primary', 'Save');
     _modalFooter.children.insertAll(0, [save, discard]);

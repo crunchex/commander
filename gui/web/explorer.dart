@@ -223,13 +223,15 @@ class UpDroidExplorer {
     dzRecycle.onDragLeave.listen((e) => recycle.classes.remove('recycle-entered'));
 
     dzRecycle.onDrop.listen((e) {
-      var path = e.draggableElement.dataset['path'];
+      var path = getPath(e.draggableElement);
 
       // Draggable is an empty folder
       if (e.draggableElement.dataset['isDir'] == 'true') {
-        LIElement selectedFolder = querySelector('[data-path="${e.draggableElement.dataset['path']}"');
+        LIElement selectedFolder = pathToFile[path];
         selectedFolder.remove();
       }
+
+      removeFileData(e.draggableElement, path);
 
       ws.send('[[EXPLORER_DELETE]]' + path);
     });
@@ -252,6 +254,16 @@ class UpDroidExplorer {
     return files;
   }
 
+  /// Functions for updating tracked file info
+
+  void removeFileData([LIElement li, String path]) {
+    if(li != null) {
+      fileInfo.remove(li);
+      }
+    if(path != null) {
+      pathToFile.remove(path);
+    }
+  }
 
   String getName(LIElement li) {
     return fileInfo[li][0];
@@ -636,8 +648,7 @@ class UpDroidExplorer {
       UListElement ul = li.parent;
       ul.children.remove(li);
     }
-    fileInfo.remove(li);
-    print(path);
+    removeFileData(li, path);
   }
 
 
@@ -647,7 +658,6 @@ class UpDroidExplorer {
     completer.complete(true);
 
     LIElement li = generateLiHtml(file, expanded);
-    String truePath = pathLib.dirname(getPath(li));
 
     // Register double-click event handler for file renaming.
     li.children[0].children[1].onDoubleClick.listen((e) {

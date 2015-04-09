@@ -2,11 +2,9 @@ part of updroid_modal;
 
 class UpDroidUnsavedModal extends UpDroidModal {
   UpDroidUnsavedModal () {
-    _createModal();
+    _initModal();
     _setupModal();
-
-    _modal = new Modal(_modalBase);
-    _modal.show();
+    _showModal();
   }
 
   void _setupModal() {

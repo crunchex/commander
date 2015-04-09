@@ -8,11 +8,9 @@ class UpDroidRunNodeModal extends UpDroidModal {
     _nodeList = nodeList;
     _ws = ws;
 
-    _createModal();
+    _initModal();
     _setupModal();
-
-    _modal = new Modal(_modalBase);
-    _modal.show();
+    _showModal();
   }
 
   void _setupModal() {

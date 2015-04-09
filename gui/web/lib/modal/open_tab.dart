@@ -8,11 +8,9 @@ class UpDroidOpenTabModal extends UpDroidModal {
     _side = side;
     _cs = cs;
 
-    _createModal();
+    _initModal();
     _setupModal();
-
-    _modal = new Modal(_modalBase);
-    _modal.show();
+    _showModal();
   }
 
   void _setupModal() {

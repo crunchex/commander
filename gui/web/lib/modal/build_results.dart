@@ -2,11 +2,9 @@ part of updroid_modal;
 
 class UpDroidBuildResultsModal extends UpDroidModal {
   UpDroidBuildResultsModal (String results) {
-    _createModal();
+    _initModal();
     _setupModal(results);
-
-    _modal = new Modal(_modalBase);
-    _modal.show();
+    _showModal();
   }
 
   void _setupModal(String results) {

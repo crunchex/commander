@@ -27,7 +27,7 @@ abstract class UpDroidModal {
 
   Modal _modal;
 
-  void _createModal() {
+  void _initModal() {
     _buttonListeners = [];
 
     _modalBase = querySelector('.modal-base');
@@ -44,6 +44,11 @@ abstract class UpDroidModal {
     _modalWrapper.children.insert(0, _modalHead);
     _modalWrapper.children.insert(1, _modalBody);
     _modalWrapper.children.insert(2, _modalFooter);
+  }
+
+  void _showModal() {
+    _modal = new Modal(_modalBase);
+    _modal.show();
   }
 
   void _destroyModal() {

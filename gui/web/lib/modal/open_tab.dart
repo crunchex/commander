@@ -7,7 +7,6 @@ class UpDroidOpenTabModal extends UpDroidModal {
   UpDroidOpenTabModal(int side, StreamController<CommanderMessage> cs) {
     _side = side;
     _cs = cs;
-    _buttonListeners = [];
 
     _createModal();
     _setupModal();

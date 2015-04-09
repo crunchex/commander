@@ -7,7 +7,6 @@ class UpDroidRunNodeModal extends UpDroidModal {
   UpDroidRunNodeModal(List<Map> nodeList, WebSocket ws) {
     _nodeList = nodeList;
     _ws = ws;
-    _buttonListeners = [];
 
     _createModal();
     _setupModal();

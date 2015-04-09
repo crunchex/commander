@@ -2,8 +2,6 @@ part of updroid_modal;
 
 class UpDroidUnsavedModal extends UpDroidModal {
   UpDroidUnsavedModal () {
-    _buttonListeners = [];
-
     _createModal();
     _setupModal();
 

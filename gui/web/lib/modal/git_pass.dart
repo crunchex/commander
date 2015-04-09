@@ -2,8 +2,6 @@ part of updroid_modal;
 
 class UpDroidGitPassModal extends UpDroidModal {
   UpDroidGitPassModal(StreamController<CommanderMessage> cs) {
-    _buttonListeners = [];
-
     _createModal();
     _setupModal(cs);
 

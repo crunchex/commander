@@ -28,6 +28,8 @@ abstract class UpDroidModal {
   Modal _modal;
 
   void _createModal() {
+    _buttonListeners = [];
+
     _modalBase = querySelector('.modal-base');
 
     _modalWrapper = querySelector('.modal-content');

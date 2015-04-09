@@ -2,8 +2,6 @@ part of updroid_modal;
 
 class UpDroidBuildResultsModal extends UpDroidModal {
   UpDroidBuildResultsModal (String results) {
-    _buttonListeners = [];
-
     _createModal();
     _setupModal(results);
 

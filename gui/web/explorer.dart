@@ -415,8 +415,8 @@ class UpDroidExplorer {
       }
       div.classes.add('highlighted');
       currentSelected = div;
-      div.parent.dataset['isDir'] == 'true' ? currentSelectedPath = div.parent.dataset['path'] :
-        currentSelectedPath = pathLib.dirname(div.parent.dataset['path']);
+      div.parent.dataset['isDir'] == 'true' ? currentSelectedPath = getPath(div.parent) :
+        currentSelectedPath = pathLib.dirname(getPath(div.parent));
     });
   }
 

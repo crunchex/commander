@@ -2,19 +2,13 @@ part of updroid_modal;
 
 class UpDroidGitPassModal extends UpDroidModal {
   UpDroidGitPassModal(StreamController<CommanderMessage> cs) {
-    _initModal();
+    _initModal('Git Push to Remote');
     _setupModal(cs);
     _showModal();
   }
 
   void _setupModal(StreamController<CommanderMessage> cs) {
     _modalBase.id = "git-pass";
-
-    var closer = _createClose();
-    var h3 = new Element.tag('h3');
-    h3.text = ('Git Push to Remote');
-    _modalHead.children.insert(0, closer);
-    _modalHead.children.insert(1, h3);
 
     DivElement passInput = new DivElement();
     passInput.id = 'git-pass-input';

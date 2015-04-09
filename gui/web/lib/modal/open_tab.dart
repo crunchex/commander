@@ -8,20 +8,13 @@ class UpDroidOpenTabModal extends UpDroidModal {
     _side = side;
     _cs = cs;
 
-    _initModal();
+    _initModal('Select Tab: ');
     _setupModal();
     _showModal();
   }
 
   void _setupModal() {
     _modalBase.id = "tab-selector";
-
-    // Head
-    Element closer = _createClose();
-
-    Element h3 = new Element.tag('h3')..text = ('Select Tab: ');
-    _modalHead.children.insert(0, closer);
-    _modalHead.children.insert(1, h3);
 
     // Body
     DivElement selectorWrap = new DivElement()..id = "selector-wrapper";

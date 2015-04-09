@@ -8,20 +8,13 @@ class UpDroidRunNodeModal extends UpDroidModal {
     _nodeList = nodeList;
     _ws = ws;
 
-    _initModal();
+    _initModal('Available Nodes');
     _setupModal();
     _showModal();
   }
 
   void _setupModal() {
     _modalBase.id = "tab-selector";
-
-    // Head
-    Element closer = _createClose();
-
-    Element h3 = new Element.tag('h3')..text = ('Available Nodes');
-    _modalHead.children.insert(0, closer);
-    _modalHead.children.insert(1, h3);
 
     // Body
     DivElement selectorWrap = new DivElement()..id = "selector-wrapper";

@@ -27,22 +27,30 @@ abstract class UpDroidModal {
 
   Modal _modal;
 
-  void _initModal() {
+  void _initModal(String heading) {
     _buttonListeners = [];
 
     _modalBase = querySelector('.modal-base');
-
     _modalWrapper = querySelector('.modal-content');
 
     _modalHead = new DivElement()
       ..classes.add('modal-header');
-    _modalBody = new DivElement()
-      ..classes.add('modal-body');
-    _modalFooter = new DivElement()
-      ..classes.add('modal-footer');
+
+    ButtonElement closer = _createClose();
+    _modalHead.children.insert(0, closer);
+
+    HeadingElement h3 = new HeadingElement.h3()
+      ..text = heading;
+    _modalHead.children.insert(1, h3);
 
     _modalWrapper.children.insert(0, _modalHead);
+
+    _modalBody = new DivElement()
+      ..classes.add('modal-body');
     _modalWrapper.children.insert(1, _modalBody);
+
+    _modalFooter = new DivElement()
+      ..classes.add('modal-footer');
     _modalWrapper.children.insert(2, _modalFooter);
   }
 

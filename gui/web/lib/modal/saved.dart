@@ -2,19 +2,13 @@ part of updroid_modal;
 
 class UpDroidSavedModal extends UpDroidModal {
   UpDroidSavedModal () {
-    _initModal();
+    _initModal('Save Changes?');
     _setupModal();
     _showModal();
   }
 
   void _setupModal() {
     _modalBase.id = "save-as";
-
-    var closer = _createClose();
-    var h3 = new Element.tag('h3');
-    h3.text = ('Save Changes?');
-    _modalHead.children.insert(0, closer);
-    _modalHead.children.insert(1, h3);
 
     DivElement saveInput = new DivElement();
     saveInput.id = 'save-input';

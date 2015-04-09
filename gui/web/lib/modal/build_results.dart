@@ -2,19 +2,13 @@ part of updroid_modal;
 
 class UpDroidBuildResultsModal extends UpDroidModal {
   UpDroidBuildResultsModal (String results) {
-    _initModal();
+    _initModal('Build Results');
     _setupModal(results);
     _showModal();
   }
 
   void _setupModal(String results) {
     _modalBase.id = "build-results";
-
-    var closer = _createClose();
-    var h3 = new Element.tag('h3');
-    h3.text = ('Build Results');
-    _modalHead.children.insert(0, closer);
-    _modalHead.children.insert(1, h3);
 
     var p = new Element.p();
     if (results == '') {

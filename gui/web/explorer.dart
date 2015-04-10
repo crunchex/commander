@@ -631,7 +631,7 @@ class UpDroidExplorer {
     var split = parentPath.replaceFirst(pathLib.normalize(workspacePath), '').split('/');
     for (int i = 1; i < split.length; i++) {
       curPath += split[i];
-      LIElement curLi = querySelector('[data-path="${pathLib.join(workspacePath, curPath)}"]');
+      LIElement curLi = pathToFile['${pathLib.join(workspacePath, curPath)}'];
       if (curLi == null && pathLib.join(workspacePath, curPath) != workspacePath) {
         newElementFromFile(new SimpleFile.fromPath(pathLib.join(workspacePath, curPath), workspacePath, true)).then((result) {
         });

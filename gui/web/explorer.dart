@@ -187,7 +187,9 @@ class UpDroidExplorer {
           if (currentPath != newPath && alert == false) {
             if (item.lastChild.hasChildNodes() == false) {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
-              newElementFromFile(new SimpleFile.fromPath(workspacePath + '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
+              var name = getName(e.draggableElement);
+              removeFileData(item, currentPath);
+              newElementFromFile(new SimpleFile.fromPath(workspacePath + '/' + name, workspacePath, true));
               item.remove();
             } // TODO: Preserve structure
             else if (checkContents(item) == true) {
@@ -289,7 +291,9 @@ class UpDroidExplorer {
         ..draggable = true
         ..classes.add('explorer-li');
 
+
     fileInfo.putIfAbsent(li, () => [file.name, file.path]);
+    print(fileInfo[li]);
     pathToFile.putIfAbsent(file.path, () => li);
     // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
@@ -375,16 +379,18 @@ class UpDroidExplorer {
           if (e.draggableElement.dataset['isDir'] == 'true') {
 
             bool send = true;
-            if (span.parent.parent.dataset['path'].contains(e.draggableElement.dataset['path'])) {
-              send = checkNested(span.parent.parent.dataset['path'], e.draggableElement.dataset['path']);
+            if (getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
+              send = checkNested(getPath(span.parent.parent), getPath(e.draggableElement));
             }
             // Avoid an exception thrown when the new name already exists or dragging to same folder.
 
             if (currentPath != newPath && duplicate == false && send == true) {
               if (item.lastChild.hasChildNodes() == false) {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                var name = getName(e.draggableElement);
+                removeFileData(e.draggableElement, currentPath);
+                newElementFromFile(new SimpleFile.fromPath(getPath(span.parent.parent) + '/' + name, workspacePath, true));
                 item.remove();
-                newElementFromFile(new SimpleFile.fromPath(span.parent.parent.dataset['path'] + '/' + e.draggableElement.dataset['trueName'], workspacePath, true));
               } else if (checkContents(item) == true) {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
@@ -642,6 +648,7 @@ class UpDroidExplorer {
     }
     newElementFromFile(sFile);
     print('add update fired');
+    print("number of file info contents: " + fileInfo.length.toString());
   }
 
   /// Handles an Explorer remove update for a single file.
@@ -734,7 +741,7 @@ class UpDroidExplorer {
     for (SimpleFile file in files) {
       //only check for folders
       if (file.isDirectory == true) {
-        LIElement curFolder = querySelector('[data-path="${file.path}"]');
+        LIElement curFolder = pathToFile[file.path];
         if (curFolder == null) {
           newElementFromFile(file);
         }

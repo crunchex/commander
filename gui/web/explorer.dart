@@ -165,7 +165,7 @@ class UpDroidExplorer {
 
         var currentPath = getPath(e.draggableElement);
         LIElement item = pathToFile[currentPath];
-        var newPath = '$workspacePath/${e.draggableElement.dataset['trueName']}';
+        var newPath = '$workspacePath/${getName(e.draggableElement)}';
         bool duplicate = false;
 
         // Check for duplicate file name
@@ -177,7 +177,7 @@ class UpDroidExplorer {
 
         if (duplicate == true) {
           alert = true;
-          window.alert("Cannot move here, filename already exists");
+          window.alert("Cannot move here, filename already exists: " + newPath);
         }
 
         if (e.draggableElement.dataset['isDir'] == 'true') {
@@ -196,7 +196,7 @@ class UpDroidExplorer {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
               ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
               item.remove();
-            } // TODO: Preserve structure
+            }
             else {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
               item.remove();
@@ -407,13 +407,13 @@ class UpDroidExplorer {
           }
 
           if (alert == true && item != duplicate) {
-            window.alert("Cannot move here, file name already exists.");
+            window.alert("Cannot move here, file name already exists: " + newPath );
           }
 
         } else if (e.draggableElement.id == 'file') {
-          ws.send('[[EXPLORER_NEW_FILE]]' + span.parent.parent.dataset['path']);
+          ws.send('[[EXPLORER_NEW_FILE]]' + getPath(span.parent.parent));
         } else {
-          ws.send('[[EXPLORER_NEW_FOLDER]]' + span.parent.parent.dataset['path'] + '/untitled');
+          ws.send('[[EXPLORER_NEW_FOLDER]]' + getPath(span.parent.parent) + '/untitled');
         }
       });
     }
@@ -664,7 +664,7 @@ class UpDroidExplorer {
       ul.children.remove(li);
     }
     removeFileData(li, path);
-    print("remove fired");
+    print("remove fired " + li.toString() + " " + path);
   }
 
 
@@ -717,7 +717,7 @@ class UpDroidExplorer {
     var folderStateList = {};
     for (var file in files) {
       if (file.isDirectory == true) {
-        LIElement folder = querySelector('[data-path="${file.path}"]');
+        LIElement folder = pathToFile[file.path];
         if (folder != null) {
           folder.dataset['expanded'] == "true" ? folderStateList[file] = true : folderStateList[file] = false;
         }

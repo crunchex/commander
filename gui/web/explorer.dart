@@ -185,6 +185,7 @@ class UpDroidExplorer {
           // Avoid an exception thrown when the new name already exists or dragging to same folder.
 
           if (currentPath != newPath && alert == false) {
+            removeFileData(item, currentPath);
             if (item.lastChild.hasChildNodes() == false) {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
               var name = getName(e.draggableElement);
@@ -269,6 +270,7 @@ class UpDroidExplorer {
       }
     if(path != null) {
       pathToFile.remove(path);
+      ulInfo.remove(path);
     }
   }
 
@@ -358,7 +360,6 @@ class UpDroidExplorer {
       d.onDragLeave.listen((e) => span.classes.remove('span-entered'));
 
       d.onDrop.listen((e) {
-        print("before: " + fileInfo.toString());
         if (e.draggableElement.className.contains('explorer-li')) {
           // The draggable is an existing file/folder.
           var currentPath = getPath(e.draggableElement);
@@ -384,6 +385,8 @@ class UpDroidExplorer {
             // Avoid an exception thrown when the new name already exists or dragging to same folder.
 
             if (currentPath != newPath && duplicate == false && send == true) {
+              removeFileData(item, currentPath);
+              print(currentPath);
               if (item.lastChild.hasChildNodes() == false) {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 var name = getName(e.draggableElement);
@@ -414,7 +417,6 @@ class UpDroidExplorer {
         } else {
           ws.send('[[EXPLORER_NEW_FOLDER]]' + getPath(span.parent.parent) + '/untitled');
         }
-        print("after: " + fileInfo.toString());
       });
     }
   }

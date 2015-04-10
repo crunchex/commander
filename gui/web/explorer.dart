@@ -118,7 +118,7 @@ class UpDroidExplorer {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
         var num = editors[dzEditor];
-        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: [num, e.draggableElement.dataset['path']]));
+        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: [num, getPath(e.draggableElement)]));
       }
     });
     return [enter, leave, drop];
@@ -163,15 +163,19 @@ class UpDroidExplorer {
 
         // The draggable is an existing file/folder.
 
-        var currentPath = e.draggableElement.dataset['path'];
-        LIElement item = querySelector('[data-path="$currentPath"]');
+        var currentPath = getPath(e.draggableElement);
+        LIElement item = pathToFile[currentPath];
         var newPath = '$workspacePath/${e.draggableElement.dataset['trueName']}';
+        bool duplicate = false;
 
         // Check for duplicate file name
-        LIElement duplicate = querySelector('[data-path="$workspacePath/${e.draggableElement.dataset['trueName']}"]');
+        if(pathToFile.containsKey(newPath)) {
+          duplicate = true;
+        }
+
         bool alert = false;
 
-        if (duplicate != null && duplicate != item) {
+        if (duplicate == true) {
           alert = true;
           window.alert("Cannot move here, filename already exists");
         }
@@ -204,7 +208,9 @@ class UpDroidExplorer {
 
       } else if (e.draggableElement.id == 'file') {
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
-      } else {
+      }
+      // TODO: need to manually update fileInfo and pathToFile since folders dont fire updates
+      else {
         ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
       }
     });
@@ -352,14 +358,15 @@ class UpDroidExplorer {
       d.onDrop.listen((e) {
         if (e.draggableElement.className.contains('explorer-li')) {
           // The draggable is an existing file/folder.
-          var currentPath = e.draggableElement.dataset['path'];
-          var newPath = '${span.parent.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}';
-          LIElement item = querySelector('[data-path="$currentPath"]');
+          var currentPath = getPath(e.draggableElement);
+          var newPath = '${getPath(span.parent.parent)}/${getName(e.draggableElement)}';
+          bool duplicate;
+          LIElement item = pathToFile[currentPath];
 
           // Check for duplicate file name
-          LIElement duplicate = querySelector('[data-path="${span.parent.parent.dataset['path']}/${e.draggableElement.dataset['trueName']}"]');
+          pathToFile.containsKey(newPath) ? duplicate = true : duplicate = false;
           bool alert = false;
-          if (duplicate != null) {
+          if (duplicate == true) {
             alert = true;
           }
 
@@ -373,7 +380,7 @@ class UpDroidExplorer {
             }
             // Avoid an exception thrown when the new name already exists or dragging to same folder.
 
-            if (currentPath != newPath && duplicate == null && send == true) {
+            if (currentPath != newPath && duplicate == false && send == true) {
               if (item.lastChild.hasChildNodes() == false) {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 item.remove();
@@ -388,7 +395,7 @@ class UpDroidExplorer {
               }
             }
           } else {
-            if (currentPath != newPath && duplicate == null && !span.parent.parent.dataset['path'].contains(e.draggableElement.dataset['path'])) {
+            if (currentPath != newPath && duplicate == null && !getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
             }
           }
@@ -634,6 +641,7 @@ class UpDroidExplorer {
       }
     }
     newElementFromFile(sFile);
+    print('add update fired');
   }
 
   /// Handles an Explorer remove update for a single file.
@@ -649,6 +657,7 @@ class UpDroidExplorer {
       ul.children.remove(li);
     }
     removeFileData(li, path);
+    print("remove fired");
   }
 
 

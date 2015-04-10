@@ -18,6 +18,7 @@ class UpDroidConsole extends UpDroidTab {
   int num;
   int _col;
   WebSocket _ws;
+  WebSocket _wsMain;
   Terminal _term;
 
   DivElement _console;
@@ -48,10 +49,13 @@ class UpDroidConsole extends UpDroidTab {
       _blink = true;
       _lightTheme = false;
 
-      // window.location.host returns whatever is in the URL bar (including port).
-      // Since the port here needs to be dynamic, the default needs to be replaced.
       String url = window.location.host;
       url = url.split(':')[0];
+      // Create the server <-> client [WebSocket].
+      // Port 12060 is the default port that UpDroid uses.
+      _wsMain = new WebSocket('ws://' + url + ':12060/pty/$num');
+      // window.location.host returns whatever is in the URL bar (including port).
+      // Since the port here needs to be dynamic, the default needs to be replaced.
       _initWebSocket('ws://' + url + ':1206$num/pty');
 
       _registerConsoleEventHandlers();
@@ -99,6 +103,11 @@ class UpDroidConsole extends UpDroidTab {
     tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
       _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidConsole'));
+    });
+
+    window.onResize.listen((e) {
+      _wsMain.send('[[RESIZE]]' + '${(_console.contentEdge.width) ~/ 7 - 1}x${(_console.contentEdge.height) ~/ 13 - 1}');
+      // TODO: _term.resize();
     });
   }
 

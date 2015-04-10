@@ -88,11 +88,11 @@ class Terminal {
   }
 
   // TODO: fix this dynamic size detection. _charWidth = 7, _charWidth = 13.
-  //int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
-  //int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
+  int get _cols => (div.contentEdge.width) ~/ 7 - 1;
+  int get _rows => (div.contentEdge.height) ~/ 13 - 1;
   // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
-  int get _cols => 58;
-  int get _rows => 31;
+  //int get _cols => 58;
+  //int get _rows => 31;
 
   void _registerEventHandlers() {
     stdout.stream.listen((List<int> out) => _processStdOut(new List.from(out)));

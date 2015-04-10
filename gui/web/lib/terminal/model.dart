@@ -28,8 +28,6 @@ class Model {
   Model (this.numRows, this.numCols) {
     cursor = new Cursor();
 
-    print('$numRows, $numCols');
-
     _reverseBuffer = [];
     _forwardBuffer = [];
     _frame = [];

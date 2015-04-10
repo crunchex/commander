@@ -318,10 +318,6 @@ li div input {
   height: 452px;
 }
 
-#row-main {
-  height: 100%;
-}
-
 .console {
   width: 100%;
   min-height: 100px;
@@ -335,39 +331,6 @@ li div input {
 
 .termrow {
   height: 14px;
-}
-
-.pre-output {
-  padding: 0px;
-  margin: 0px;
-  border: none;
-  background-color: transparent;
-  font-size: 12px;
-  font-family: "Lucida Console", Monaco, monospace;
-  color: #93a1a1;
-}
-
-.prompt {
-  color: #859900;
-  display: inline;
-}
-
-.prompt-hidden {
-  color: #859900;
-  display: none;
-}
-
-.user-command {
-  color: #268bd2;
-}
-
-#input {
-  width: 388px;
-  padding: 0px;
-  background-color: transparent;
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
 }
 
 .nav-tabs>li>a.new-tab-button {

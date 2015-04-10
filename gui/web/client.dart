@@ -227,8 +227,6 @@ class UpDroidClient {
   }
 
   void _openTab(int column, int id, String className) {
-    ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-
     if (_tabs[column].isNotEmpty) {
       for (var tab in _tabs[column]) {
         tab.makeTabInactive();
@@ -237,10 +235,14 @@ class UpDroidClient {
 
     if (className == UpDroidEditor.className) {
       _tabs[column].add(new UpDroidEditor(id, column, cs, active: true));
+      ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
     } else if (className == UpDroidCamera.className) {
       _tabs[column].add(new UpDroidCamera(id, column, cs, active: true));
+      ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
     } else if (className == UpDroidConsole.className) {
-      _tabs[column].add(new UpDroidConsole(id, column, cs, active: true));
+      UpDroidConsole console = new UpDroidConsole(id, column, cs, active: true);
+      _tabs[column].add(console);
+      ws.send('[[OPEN_TAB]]' + '$column-$id-$className-57-30');
     }
   }
 

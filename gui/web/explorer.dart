@@ -395,7 +395,7 @@ class UpDroidExplorer {
               }
             }
           } else {
-            if (currentPath != newPath && duplicate == null && !getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
+            if (currentPath != newPath && duplicate == false && !getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
             }
           }

@@ -84,7 +84,6 @@ abstract class UpDroidTab {
     _tabContainer.children.add(_tabContent);
 
     DivElement content = new DivElement()
-        ..id = id
         ..classes.add(id);
     _tabContent.children.add(content);
     configRefs['content'] = content;

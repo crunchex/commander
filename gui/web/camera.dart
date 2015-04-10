@@ -31,7 +31,7 @@ class UpDroidCamera extends UpDroidTab {
 
       DivElement content = configRefs['content'];
       CanvasElement canvas = new CanvasElement()
-          ..id = '#video-canvas'
+          ..classes.add('video-canvas')
           ..width = 447
           ..height = 450;
       content.children.add(canvas);

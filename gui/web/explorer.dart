@@ -177,7 +177,7 @@ class UpDroidExplorer {
 
         if (duplicate == true) {
           alert = true;
-          window.alert("Cannot move here, filename already exists: " + newPath);
+          window.alert("Cannot move here, filename already exists");
         }
 
         if (e.draggableElement.dataset['isDir'] == 'true') {
@@ -293,7 +293,6 @@ class UpDroidExplorer {
 
 
     fileInfo.putIfAbsent(li, () => [file.name, file.path]);
-    print(fileInfo[li]);
     pathToFile.putIfAbsent(file.path, () => li);
     // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
@@ -407,7 +406,7 @@ class UpDroidExplorer {
           }
 
           if (alert == true && item != duplicate) {
-            window.alert("Cannot move here, file name already exists: " + newPath );
+            window.alert("Cannot move here, file name already exists");
           }
 
         } else if (e.draggableElement.id == 'file') {
@@ -723,6 +722,10 @@ class UpDroidExplorer {
         }
       }
     }
+
+    ulInfo.clear();
+    fileInfo.clear();
+    pathToFile.clear();
 
     // Set the explorer list to empty for a full refresh.
     UListElement explorer = querySelector('#explorer-body');

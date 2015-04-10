@@ -242,7 +242,8 @@ class UpDroidClient {
     } else if (className == UpDroidConsole.className) {
       UpDroidConsole console = new UpDroidConsole(id, column, cs, active: true);
       _tabs[column].add(console);
-      ws.send('[[OPEN_TAB]]' + '$column-$id-$className-57-30');
+      // TODO: initial size should not be hardcoded.
+      ws.send('[[OPEN_TAB]]' + '$column-$id-$className-80-25');
     }
   }
 

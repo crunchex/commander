@@ -237,9 +237,8 @@ class UpDroidExplorer {
       if (e.draggableElement.dataset['isDir'] == 'true') {
         LIElement selectedFolder = pathToFile[path];
         selectedFolder.remove();
+        removeFileData(selectedFolder, path);
       }
-
-      removeFileData(e.draggableElement, path);
 
       ws.send('[[EXPLORER_DELETE]]' + path);
     });
@@ -359,6 +358,7 @@ class UpDroidExplorer {
       d.onDragLeave.listen((e) => span.classes.remove('span-entered'));
 
       d.onDrop.listen((e) {
+        print("before: " + fileInfo.toString());
         if (e.draggableElement.className.contains('explorer-li')) {
           // The draggable is an existing file/folder.
           var currentPath = getPath(e.draggableElement);
@@ -414,6 +414,7 @@ class UpDroidExplorer {
         } else {
           ws.send('[[EXPLORER_NEW_FOLDER]]' + getPath(span.parent.parent) + '/untitled');
         }
+        print("after: " + fileInfo.toString());
       });
     }
   }

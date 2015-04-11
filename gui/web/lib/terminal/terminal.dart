@@ -14,6 +14,9 @@ part 'escape_handler.dart';
 /// [stdout] needs to receive individual UTF8 integers and will handle
 /// them appropriately.
 class Terminal {
+  static double charWidth = 6.778;
+  static int charHeight = 13;
+
   /// The [DivElement] within which all [Terminal] graphical elements
   /// are rendered.
   DivElement div;
@@ -51,9 +54,6 @@ class Terminal {
     _refreshDisplay();
   }
 
-  double charWidth;
-  int charHeight;
-
   // Private
   Model _model;
   DisplayAttributes _currAttributes;
@@ -68,12 +68,11 @@ class Terminal {
     stdout = new StreamController<List<int>>();
     stdin = new StreamController<List<int>>();
 
-    _model = new Model(rows, cols);
     _currAttributes = new DisplayAttributes();
     _theme = new Theme.SolarizedDark();
     _blinkOn = false;
-    charWidth = 6.778;
-    charHeight = 13;
+
+    _model = new Model(rows, cols);
 
     setUpBlink();
 
@@ -101,27 +100,9 @@ class Terminal {
     if (_blinkTimer != null) _blinkTimer.cancel();
   }
 
-  // TODO: fix this dynamic size detection. _charWidth = 7, _charWidth = 13.
-//  int get cols {
-//    if (div == null) return 80;
-//    int numCols;
-//    while (div.borderEdge.width < 0) {
-//      numCols = (div.borderEdge.width - 10) ~/ _charWidth;
-//    }
-//    return numCols;
-//  }
-//
-//  int get rows {
-//    if (div == null) return 25;
-//    int numRows;
-//    while (div.borderEdge.height < 0) {
-//      numRows = (div.borderEdge.height - 10) ~/ _charHeight;
-//    }
-//    return numRows;
-//  }
   // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
-  int get cols => 58;
-  int get rows => 31;
+  int get cols => (div.borderEdge.width - 10) ~/ charWidth;
+  int get rows => (div.borderEdge.height - 10) ~/ charHeight;
 
   void _registerEventHandlers() {
     stdout.stream.listen((List<int> out) => _processStdOut(new List.from(out)));

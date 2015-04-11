@@ -75,6 +75,7 @@ class Terminal {
 
     _calculateSize();
     _model = new Model(_rows, _cols);
+    _refreshDisplay();
 
     setUpBlink();
 

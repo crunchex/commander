@@ -60,6 +60,7 @@ class Terminal {
   Theme _theme;
   Timer _blinkTimer, _blinkTimeout;
   bool _blinkOn;
+  int _rows, _cols;
   bool _cursorBlink = true;
 
   static const int ESC = 27;
@@ -72,7 +73,8 @@ class Terminal {
     _theme = new Theme.SolarizedDark();
     _blinkOn = false;
 
-    _model = new Model(rows, cols);
+    _calculateSize();
+    _model = new Model(_rows, _cols);
 
     setUpBlink();
 
@@ -100,9 +102,11 @@ class Terminal {
     if (_blinkTimer != null) _blinkTimer.cancel();
   }
 
+  void _calculateSize() {
   // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
-  int get cols => (div.borderEdge.width - 10) ~/ charWidth;
-  int get rows => (div.borderEdge.height - 10) ~/ charHeight;
+    _cols = (div.borderEdge.width - 10) ~/ charWidth;
+    _rows = (div.borderEdge.height - 10) ~/ charHeight;
+  }
 
   void _registerEventHandlers() {
     stdout.stream.listen((List<int> out) => _processStdOut(new List.from(out)));
@@ -272,10 +276,10 @@ class Terminal {
     DivElement row = new DivElement();
     String str = '';
     prev = _model.getGlyphAt(r, 0);
-    for (int c = 0; c < cols; c++) {
+    for (int c = 0; c < _cols; c++) {
       curr = _model.getGlyphAt(r, c);
 
-      if (!curr.hasSameAttributes(prev) || c == cols - 1) {
+      if (!curr.hasSameAttributes(prev) || c == _cols - 1) {
         if (prev.hasDefaults()) {
           row.append(new DocumentFragment.html(str));
         } else {
@@ -308,7 +312,7 @@ class Terminal {
     div.innerHtml = '';
 
     DivElement row;
-    for (int r = 0; r < rows; r++) {
+    for (int r = 0; r < _rows; r++) {
       row = _generateRow(r);
       row.classes.add('termrow');
 

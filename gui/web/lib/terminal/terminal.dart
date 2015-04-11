@@ -47,7 +47,8 @@ class Terminal {
     _refreshDisplay();
   }
 
-  int charWidth, charHeight;
+  double charWidth;
+  int charHeight;
 
   // Private
   Model _model;
@@ -67,7 +68,7 @@ class Terminal {
     _currAttributes = new DisplayAttributes();
     _theme = new Theme.SolarizedDark();
     _blinkOn = false;
-    charWidth = 7;
+    charWidth = 6.778;
     charHeight = 13;
 
     setUpBlink();

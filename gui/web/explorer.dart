@@ -287,7 +287,8 @@ class UpDroidExplorer {
   LIElement generateLiHtml(file, [expanded]) {
     LIElement li = new LIElement();
     li
-        ..dataset['trueName'] = (file.name)
+        ..dataset['name'] = file.name
+        ..dataset['path'] = file.path
         ..dataset['isDir'] = file.isDirectory.toString()
         ..draggable = true
         ..classes.add('explorer-li');
@@ -448,7 +449,7 @@ class UpDroidExplorer {
       li.classes.add('editing');
 
       InputElement input = new InputElement();
-      input.value = '${li.dataset['trueName']}';
+      input.value = '${li.dataset['name']}';
 
       Element outside = querySelector('.container-fluid');
 

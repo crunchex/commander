@@ -28,6 +28,8 @@ class Terminal {
   /// wheel event. Default: 3
   int scrollSpeed = 3;
 
+  bool get cursorBlink => _cursorBlink;
+
   /// Enable cursor blink. Default: true
   void set cursorBlink(bool b) {
     _cursorBlink = b;
@@ -36,6 +38,8 @@ class Terminal {
     setUpBlink();
     _refreshDisplay();
   }
+
+  Theme get theme => _theme;
 
   /// A [String] that sets the colored theme of the entire [Terminal].
   /// Supported themes: solarized-dark, solarized-light.

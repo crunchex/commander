@@ -25,8 +25,6 @@ class UpDroidConsole extends UpDroidTab {
   AnchorElement _closeTabButton;
   AnchorElement _themeButton;
   AnchorElement _blinkButton;
-  bool _blink;
-  bool _lightTheme;
 
   UpDroidConsole(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
     _col = col;
@@ -40,15 +38,10 @@ class UpDroidConsole extends UpDroidTab {
       _themeButton = configRefs['theme'];
       _blinkButton = configRefs['cursor-blink'];
 
-      _blink = true;
-
-      _term = new Terminal(_console);
-      _term
-          ..scrollSpeed = 3
-          ..cursorBlink = _blink
-          ..theme = new Theme.SolarizedDark();
-
-      _lightTheme = false;
+      _term = new Terminal(_console)
+        ..scrollSpeed = 3
+        ..cursorBlink = true
+        ..theme = new Theme.SolarizedDark();
 
       String url = window.location.host;
       url = url.split(':')[0];
@@ -65,14 +58,12 @@ class UpDroidConsole extends UpDroidTab {
 
   /// Toggles between a Solarized dark and light theme.
   void _toggleTheme() {
-    _term.theme = _lightTheme ? new Theme.SolarizedDark() : new Theme.SolarizedLight();
-    _lightTheme = !_lightTheme;
+    _term.theme = _term.theme.name == 'solarized-light' ? new Theme.SolarizedDark() : new Theme.SolarizedLight();
   }
 
   /// Toggles cursor blink on/off.
   void _toggleBlink() {
-    _term.cursorBlink = _blink ? false : true;
-    _blink = !_blink;
+    _term.cursorBlink = _term.cursorBlink ? false : true;
   }
 
   /// Sets up the event handlers for the console.

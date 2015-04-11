@@ -195,6 +195,7 @@ class UpDroidExplorer {
             } // TODO: Preserve structure
             else if (checkContents(item) == true) {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              removeSubFolders(item);
               ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
               item.remove();
             }
@@ -273,6 +274,26 @@ class UpDroidExplorer {
       ulInfo.remove(path);
     }
   }
+
+  void removeSubFolders(LIElement li) {
+    List subFolders = [];
+        var children;
+        if(li.hasChildNodes()){
+          var ul = li.childNodes;
+          children = ul[ul.length-1].childNodes;
+        }
+        if(children != null){
+          for(var item in children){
+                if(item.dataset['isDir'] == 'true'){
+                  subFolders.add(item);
+                  removeSubFolders(item);
+                }
+              }
+        }
+        for(var folder in subFolders) {
+          removeFileData(folder, folder.dataset['path']);
+        }
+    }
 
   String getName(LIElement li) {
     return fileInfo[li][0];
@@ -396,6 +417,7 @@ class UpDroidExplorer {
                 item.remove();
               } else if (checkContents(item) == true) {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                removeSubFolders(item);
                 ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
                 item.remove();
               } else {

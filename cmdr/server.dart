@@ -95,6 +95,12 @@ class CmdrServer {
           .then((WebSocket ws) => _cameras[objectID].handleWebSocket(ws, request));
         break;
 
+      case 'pty':
+        WebSocketTransformer
+          .upgrade(request)
+          .then((WebSocket ws) => _ptys[objectID].handleWebSocket(ws));
+        break;
+
       default:
         WebSocketTransformer
           .upgrade(request)

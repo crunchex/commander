@@ -47,6 +47,8 @@ class Terminal {
     _refreshDisplay();
   }
 
+  int charWidth, charHeight;
+
   // Private
   Model _model;
   DisplayAttributes _currAttributes;
@@ -61,14 +63,21 @@ class Terminal {
     stdout = new StreamController<List<int>>();
     stdin = new StreamController<List<int>>();
 
-    _model = new Model(_rows, _cols);
+    _model = new Model(rows, cols);
     _currAttributes = new DisplayAttributes();
     _theme = new Theme.SolarizedDark();
     _blinkOn = false;
+    charWidth = 7;
+    charHeight = 13;
 
     setUpBlink();
 
     _registerEventHandlers();
+  }
+
+  void resize(int newCols, int newRows) {
+    _model.resize(newCols, newRows);
+    _refreshDisplay();
   }
 
   void setUpBlink() {
@@ -88,11 +97,26 @@ class Terminal {
   }
 
   // TODO: fix this dynamic size detection. _charWidth = 7, _charWidth = 13.
-  //int get _cols => (div.borderEdge.width - 10) ~/ _charWidth - 1;
-  //int get _rows => (div.borderEdge.height - 10) ~/ _charHeight - 1;
+//  int get cols {
+//    if (div == null) return 80;
+//    int numCols;
+//    while (div.borderEdge.width < 0) {
+//      numCols = (div.borderEdge.width - 10) ~/ _charWidth;
+//    }
+//    return numCols;
+//  }
+//
+//  int get rows {
+//    if (div == null) return 25;
+//    int numRows;
+//    while (div.borderEdge.height < 0) {
+//      numRows = (div.borderEdge.height - 10) ~/ _charHeight;
+//    }
+//    return numRows;
+//  }
   // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
-  int get _cols => 58;
-  int get _rows => 31;
+  int get cols => 58;
+  int get rows => 31;
 
   void _registerEventHandlers() {
     stdout.stream.listen((List<int> out) => _processStdOut(new List.from(out)));
@@ -262,10 +286,10 @@ class Terminal {
     DivElement row = new DivElement();
     String str = '';
     prev = _model.getGlyphAt(r, 0);
-    for (int c = 0; c < _cols; c++) {
+    for (int c = 0; c < cols; c++) {
       curr = _model.getGlyphAt(r, c);
 
-      if (!curr.hasSameAttributes(prev) || c == _cols - 1) {
+      if (!curr.hasSameAttributes(prev) || c == cols - 1) {
         if (prev.hasDefaults()) {
           row.append(new DocumentFragment.html(str));
         } else {
@@ -298,7 +322,7 @@ class Terminal {
     div.innerHtml = '';
 
     DivElement row;
-    for (int r = 0; r < _rows; r++) {
+    for (int r = 0; r < rows; r++) {
       row = _generateRow(r);
       row.classes.add('termrow');
 

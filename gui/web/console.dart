@@ -106,8 +106,12 @@ class UpDroidConsole extends UpDroidTab {
     });
 
     window.onResize.listen((e) {
-      _wsMain.send('[[RESIZE]]' + '${(_console.contentEdge.width) ~/ 7 - 1}x${(_console.contentEdge.height) ~/ 13 - 1}');
-      // TODO: _term.resize();
+      if (_console.parent.classes.contains('active')) {
+        int newCols = (_console.borderEdge.width - 10) ~/ _term.charWidth;
+        int newRows = ((_console.borderEdge.height - 10) ~/ _term.charHeight) - 1;
+        _wsMain.send('[[RESIZE]]' + '${newCols}x${newRows}');
+        _term.resize(newCols, newRows);
+      }
     });
   }
 

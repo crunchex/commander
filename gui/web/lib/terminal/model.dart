@@ -40,6 +40,8 @@ class Model {
 
   /// Sets a [Glyph] at location row, col.
   void setGlyphAt(Glyph g, int row, int col) {
+    // TODO: add guards for setting Glyphs that are out of bounds
+    // after a resize.
     if (_forwardBuffer.isEmpty) {
       _frame[row][col] = g;
       return;
@@ -134,6 +136,11 @@ class Model {
       _reverseBuffer.add(_frame[0]);
       _frame.removeAt(0);
     }
+  }
+
+  void resize(int newCols, int newRows) {
+    numCols = newCols;
+    numRows = newRows;
   }
 
   /// Initializes the internal model with a List of Lists.

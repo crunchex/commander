@@ -40,13 +40,14 @@ class UpDroidConsole extends UpDroidTab {
       _themeButton = configRefs['theme'];
       _blinkButton = configRefs['cursor-blink'];
 
+      _blink = true;
+
       _term = new Terminal(_console);
       _term
           ..scrollSpeed = 3
-          ..cursorBlink = true
+          ..cursorBlink = _blink
           ..theme = new Theme.SolarizedDark();
 
-      _blink = true;
       _lightTheme = false;
 
       String url = window.location.host;

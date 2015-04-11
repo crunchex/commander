@@ -49,10 +49,14 @@ class CmdrCamera {
   }
 
   void _runFFMpeg() {
-    List<String> options = ['-s', '640x480', '-f', 'video4linux2', '-i', '/dev/video${cameraNum - 1}', '-f', 'mpeg1video', '-b', '800k', '-r', '20', 'http://127.0.0.1:12060/video/$cameraNum/640/480'];
-    Process.run('ffmpeg', options).catchError((error) {
+    // Only one camera per USB controller (check lsusb -> bus00x), or bump size down to 320x240 to avoid bus saturation.
+    List<String> options = ['-s', '640x480', '-f', 'video4linux2', '-input_format', 'mjpeg', '-i', '/dev/video${cameraNum - 1}', '-f', 'mpeg1video', '-b', '800k', '-r', '20', 'http://127.0.0.1:12060/video/$cameraNum/640/480'];
+    Process.start('ffmpeg', options, runInShell:true).then((shell) {
+      //shell.stdout.listen((data) => help.debug('camera [$cameraNum] stdout: ${UTF8.decode(data)}', 0));
+      //shell.stderr.listen((data) => help.debug('camera [$cameraNum] stderr: ${UTF8.decode(data)}', 0));
+    }).catchError((error) {
       if (error is! ProcessException) throw error;
-      help.debug('ffmpeg [cameraNum]: run failed. Probably not installed', 1);
+      help.debug('ffmpeg [$cameraNum]: run failed. Probably not installed', 1);
       return;
     });
   }

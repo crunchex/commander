@@ -111,7 +111,6 @@ class CmdrExplorer {
 
   void _fsNewFolder(String path) {
     String fullPath = path;
-    print(fullPath);
     Directory newFolder = new Directory(fullPath);
 
     int untitledNum = 0;

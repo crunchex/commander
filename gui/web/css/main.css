@@ -266,7 +266,7 @@ li div input {
   background-color: transparent;
 }
 
-#video-canvas {
+.video-canvas {
   /* Always stretch the canvas to 640x480, regardless of its
   internal size. */
   width: 100%;

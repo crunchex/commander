@@ -5,7 +5,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:quiver/core.dart';
 
-part 'model.dart';
+part 'model/model.dart';
+part 'model/glyph.dart';
+part 'model/display_attributes.dart';
 part 'input_keys.dart';
 part 'theme.dart';
 part 'escape_handler.dart';

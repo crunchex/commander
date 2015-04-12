@@ -700,8 +700,7 @@ class UpDroidExplorer {
     if (li == null) {
     }
     else {
-      UListElement ul = li.parent;
-      ul.children.remove(li);
+      li.remove();
     }
     removeFileData(li, path);
     print("remove fired " + li.toString() + " " + path);

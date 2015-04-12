@@ -17,7 +17,7 @@ part 'escape_handler.dart';
 /// them appropriately.
 class Terminal {
   static double charWidth = 6.778;
-  static int charHeight = 13;
+  static int charHeight = 14;
 
   /// The [DivElement] within which all [Terminal] graphical elements
   /// are rendered.

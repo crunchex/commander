@@ -325,7 +325,7 @@ li div input {
   padding: 5px;
   border: 1px solid #dddddd;
   font-size: 11px;
-  font-family: "DejaVu Sans Mono", Liberation Mono, monospace;
+  font-family: "DejaVu Sans Mono", "Liberation Mono", "Andale Mono", monospace;
   overflow-y: none;
 }
 

@@ -266,14 +266,6 @@ li div input {
   background-color: transparent;
 }
 
-.video-canvas {
-  /* Always stretch the canvas to 640x480, regardless of its
-  internal size. */
-  width: 100%;
-  height: 450px;
-  border: 1px solid #dddddd;
-}
-
 .editor {
   width: 100%;
   min-height: 100px;
@@ -310,6 +302,25 @@ li div input {
 .tab-content {
   border: 1px solid #dddddd;
   height: 100%;
+}
+
+#col-1-tab-content, #col-2-tab-content {
+  height: 100%;
+  border: none;
+}
+
+.camera {
+  border: none;
+  height: 100%;
+  width: 100%;
+  background-color: #D1CFD5;
+}
+
+.video-canvas {
+  /* Always stretch the canvas to 640x480, regardless of its
+  internal size. */
+  width: 100%;
+  border: 5px solid #D1CFD5;
 }
 
 /* workaround for strange height bug */

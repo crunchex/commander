@@ -2,7 +2,7 @@ part of terminal;
 
 // A map of Dart keyCodes (whatever they really are)
 // to UTF8 integers of their Shift equivalents.
-const NOSHIFT_KEYS = const {
+const Map<int, int> NOSHIFT_KEYS = const {
   65: 97,   // A => a
   66: 98,   // B => b
   67: 99,   // C => c
@@ -66,7 +66,7 @@ const SHIFT_KEYS = const {
   222: 34   // "
 };
 
-const NON_MODIFIABLE_KEYS = const {
+const Map<int, String> NON_MODIFIABLE_KEYS = const {
   8: 'BACKSPACE',
   9: 'TAB',
   13: 'ENTER',

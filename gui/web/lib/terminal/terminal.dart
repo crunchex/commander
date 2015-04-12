@@ -116,12 +116,7 @@ class Terminal {
 
     div.onKeyUp.listen((e) => _handleInput(e));
 
-    // Disable browser navigation keys.
     div.onKeyDown.listen((e) {
-      //if (e.keyCode == 8 ||
-      //    e.keyCode == 9 ||
-      //    e.keyCode == 32 ||
-      //    e.keyCode == 9) e.preventDefault();
       e.preventDefault();
     });
 
@@ -158,15 +153,7 @@ class Terminal {
       // Eat ctrl-v (paste).
       if (key == 86) return;
 
-      if (key == 67) {
-        key = 3;
-      }
-
-    }
-
-    if (key == 38) {
-      stdin.add([27, 91, 65]);
-      return;
+      if (key == 67) key = 3;
     }
 
     // keyCode behaves very oddly.
@@ -183,6 +170,9 @@ class Terminal {
     // Carriage Return (13) => New Line (10).
     if (key == 13) {
       key = 10;
+    } else if (key == 38) {
+      stdin.add([27, 91, 65]);
+      return;
     }
 
     // Don't let solo modifier keys through (Shift=16, Ctrl=17, Meta=91, Alt=18).
@@ -232,34 +222,29 @@ class Terminal {
     for (var code in codes) {
       String char = new String.fromCharCode(code);
 
-      if (code == 13) {
-        _model.cursorCarriageReturn();
-        continue;
-      }
-
-      if (code == 10) {
-        _model.cursorNewLine();
-        continue;
-      }
-
-      if (code == 32) {
-        char = Glyph.SPACE;
-      }
-
-      if (code == 60) {
-        char = Glyph.LT;
-      }
-
-      if (code == 62) {
-        char = Glyph.GT;
-      }
-
-      if (code == 38) {
-        char = Glyph.AMP;
-      }
-
-      if (code == 8 || code == 7) {
-        continue;
+      switch (code) {
+        case 32:
+          char = Glyph.SPACE;
+          break;
+        case 60:
+          char = Glyph.LT;
+          break;
+        case 62:
+          char = Glyph.GT;
+          break;
+        case 38:
+          char = Glyph.AMP;
+          break;
+        case 10:
+          _model.cursorNewLine();
+          continue;
+        case 13:
+          _model.cursorCarriageReturn();
+          continue;
+        case 7:
+          continue;
+        case 8:
+          continue;
       }
 
       Glyph g = new Glyph(char, _currAttributes);

@@ -84,9 +84,11 @@ class Terminal {
     _registerEventHandlers();
   }
 
-  void resize(int newCols, int newRows) {
-    _model.resize(newCols, newRows);
+  List<int> resize() {
+    _calculateSize();
+    _model.resize(_cols, _rows);
     _refreshDisplay();
+    return [_cols, _rows];
   }
 
   void setUpBlink() {

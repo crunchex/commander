@@ -244,8 +244,6 @@ class UpDroidExplorer {
         if(checkContents(selectedFolder) == true) {
             removeSubFolders(selectedFolder);
         }
-        print(fileInfo);
-        print(pathToFile);
       }
 
       ws.send('[[EXPLORER_DELETE]]' + path);
@@ -413,7 +411,6 @@ class UpDroidExplorer {
             // Avoid an exception thrown when the new name already exists or dragging to same folder.
 
             if (currentPath != newPath && duplicate == false && send == true) {
-              print(currentPath);
               if (item.lastChild.hasChildNodes() == false) {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 var name = getName(e.draggableElement);
@@ -687,8 +684,6 @@ class UpDroidExplorer {
       }
     }
     newElementFromFile(sFile);
-    print('add update fired');
-    print("number of file info contents: " + fileInfo.length.toString());
   }
 
   /// Handles an Explorer remove update for a single file.
@@ -703,7 +698,6 @@ class UpDroidExplorer {
       li.remove();
     }
     removeFileData(li, path);
-    print("remove fired " + li.toString() + " " + path);
   }
 
 

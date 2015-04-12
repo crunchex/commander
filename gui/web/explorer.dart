@@ -195,11 +195,13 @@ class UpDroidExplorer {
             else if (checkContents(item) == true) {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
               removeSubFolders(item);
+              removeFileData(e.draggableElement, currentPath);
               ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
               item.remove();
             }
             else {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              removeFileData(e.draggableElement, currentPath);
               item.remove();
             }
           }
@@ -421,11 +423,13 @@ class UpDroidExplorer {
               } else if (checkContents(item) == true) {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 removeSubFolders(item);
+                removeFileData(e.draggableElement, currentPath);
                 ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
                 item.remove();
               } else {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 item.remove();
+                removeFileData(e.draggableElement, currentPath);
               }
             }
           } else {
@@ -465,9 +469,13 @@ class UpDroidExplorer {
   void renameEventHandler(LIElement li, SimpleFile file) {
     bool refresh = false;
     bool renameFinish = false;
+    bool folder = false;
 
-    if (li.dataset['isDir'] == 'true' && checkContents(li) == true) {
-      refresh = true;
+    if (li.dataset['isDir'] == 'true') {
+      folder = true;
+      if (checkContents(li) == true) {
+        refresh = true;
+      }
     }
 
     if (!li.className.contains('editing')) {
@@ -491,14 +499,17 @@ class UpDroidExplorer {
           renameFinish = true;
           var newPath = pathLib.join(pathLib.dirname(file.path), input.value);
 
-          LIElement duplicate = querySelector("[data-path='$newPath']");
-          if (duplicate == null) {
+          bool duplicate = pathToFile.containsKey(newPath);
+          if (duplicate == false) {
             ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
+            if (folder == true) {
+                removeFileData(li, file.path);
+            }
           }
 
           // TODO: Create a overwrite option in case of existing file name
 
-          if (duplicate != null) {
+          if (duplicate == true) {
             if (duplicate == li) {
               ws.send('[[EXPLORER_DIRECTORY_LIST]]');
             } else {
@@ -523,6 +534,7 @@ class UpDroidExplorer {
           }
 
           if (refresh == true) {
+            removeSubFolders(li);
             ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
           }
 

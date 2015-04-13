@@ -63,6 +63,7 @@ class Terminal {
   Timer _blinkTimer, _blinkTimeout;
   bool _blinkOn;
   int _rows, _cols;
+  bool _resizing = false;
   bool _cursorBlink = true;
 
   static const int ESC = 27;
@@ -87,6 +88,11 @@ class Terminal {
   List<int> resize() {
     _calculateSize();
     _model = new Model.fromOldModel(_rows, _cols, _model);
+
+    // User expects the prompt to appear after a resize.
+    // Sending a \n results in a blank line above the first
+    // prompt, so we handle this special case with a flag.
+    _resizing = true;
     stdin.add([10]);
 
     return [_cols, _rows];
@@ -238,6 +244,10 @@ class Terminal {
           char = Glyph.AMP;
           break;
         case 10:
+          if (_resizing) {
+            _resizing = false;
+            continue;
+          }
           _model.cursorNewLine();
           continue;
         case 13:

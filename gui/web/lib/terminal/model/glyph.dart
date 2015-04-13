@@ -6,6 +6,7 @@ class Glyph {
   static const AMP = '&amp';
   static const LT = '&lt';
   static const GT = '&gt';
+  static const CURSOR = '|';
 
   bool bright, dim, underscore, blink, reverse, hidden;
   String value, fgColor, bgColor;

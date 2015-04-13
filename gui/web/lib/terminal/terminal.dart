@@ -285,7 +285,7 @@ class Terminal {
 
       // Draw the cursor.
       if (_model.cursor.row == r && _model.cursor.col == c && _blinkOn) {
-        str += '|';
+        str += Glyph.CURSOR;
       } else {
         str += curr.value;
       }

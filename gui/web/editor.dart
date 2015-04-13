@@ -281,7 +281,7 @@ class UpDroidEditor extends UpDroidTab {
         // Determining the save path
         if (_openFilePath == null) {
           if(_currentParPath == null) {
-            saveAsPath = pathLib.normalize(_absolutePathPrefix + "/${input.value}");
+            saveAsPath = pathLib.normalize(pathLib.normalize(_absolutePathPrefix+ '/src') + "/${input.value}");
           }
           else{
             saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");

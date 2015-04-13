@@ -306,7 +306,7 @@ li div input {
 
 #col-1-tab-content, #col-2-tab-content {
   height: 100%;
-  border: none;
+  border-bottom: none;
 }
 
 .camera {

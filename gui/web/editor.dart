@@ -253,8 +253,14 @@ class UpDroidEditor extends UpDroidTab {
     _saveAsButton.onClick.listen((e) {
       _cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
       _ws.send("[[EDITOR_REQUEST_LIST]]");
+
       var input = querySelector('#save-as-input');
       String saveAsPath = '';
+      // Make sure defaults are clear on modal creation
+      input.value = '';
+      if(!_warning.classes.contains('hidden')) {
+        _warning.classes.add('hidden');
+      }
       _presentModal("#save-as");
 
       void completeSave() {
@@ -297,8 +303,6 @@ class UpDroidEditor extends UpDroidTab {
             window.alert("That filename already exists as a directory");
             input.value = "";
           }
-
-          // TODO: warning doesn't clear if user doesn't commit overwrite
 
           else if (_pathMap[saveAsPath] == 'file') {
             _warning.classes.remove('hidden');

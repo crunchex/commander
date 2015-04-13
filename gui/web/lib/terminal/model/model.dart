@@ -35,8 +35,29 @@ class Model {
     _initModel();
   }
 
+  Model.fromOldModel(this.numRows, this.numCols, Model oldModel) {
+    cursor = new Cursor();
+
+    // Puts all old content into the reverse buffer and starts clean.
+    _reverseBuffer = oldModel._reverseBuffer;
+    _reverseBuffer.addAll(oldModel._frame);
+    _reverseBuffer.addAll(oldModel._forwardBuffer);
+    if (_reverseBuffer.length > _MAXBUFFER) {
+      _reverseBuffer = _reverseBuffer.sublist(_reverseBuffer.length - _MAXBUFFER);
+    }
+    _forwardBuffer = [];
+    _frame = [];
+
+    _initModel();
+  }
+
   /// Returns the [Glyph] at row, col.
-  Glyph getGlyphAt(int row, int col) => _frame[row][col];
+  Glyph getGlyphAt(int row, int col) {
+    if (col >= numCols) {
+      return new Glyph(Glyph.SPACE, new DisplayAttributes());
+    }
+    return _frame[row][col];
+  }
 
   /// Sets a [Glyph] at location row, col.
   void setGlyphAt(Glyph g, int row, int col) {
@@ -136,11 +157,6 @@ class Model {
       _reverseBuffer.add(_frame[0]);
       _frame.removeAt(0);
     }
-  }
-
-  void resize(int newCols, int newRows) {
-    numCols = newCols;
-    numRows = newRows;
   }
 
   /// Initializes the internal model with a List of Lists.

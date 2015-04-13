@@ -86,7 +86,7 @@ class Terminal {
 
   List<int> resize() {
     _calculateSize();
-    _model = new Model(_rows, _cols);
+    _model = new Model.fromOldModel(_rows, _cols, _model);
     _refreshDisplay();
 
     return [_cols, _rows];

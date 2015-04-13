@@ -180,7 +180,7 @@ class CmdrServer {
   Future _initBackendClasses(Directory dir) {
     var completer = new Completer();
 
-    Directory srcDir = new Directory('${dir.path}/src');
+    Directory srcDir = new Directory('${pathLib.normalize(dir.path + "/src")}');
     _explorers.add(new CmdrExplorer(srcDir));
 
     completer.complete();

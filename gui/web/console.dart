@@ -100,7 +100,8 @@ class UpDroidConsole extends UpDroidTab {
     window.onResize.listen((e) {
       if (_console.parent.classes.contains('active')) {
         List<int> newSize = _term.resize();
-        _wsMain.send('[[RESIZE]]' + '${newSize[0]}x${newSize[1]}');
+        // _cols must be $COLUMNS - 1 or we see some glitchy stuff.
+        _wsMain.send('[[RESIZE]]' + '${newSize[0] - 1}x${newSize[1]}');
       }
     });
   }

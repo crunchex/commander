@@ -109,7 +109,6 @@ class Terminal {
   }
 
   void _calculateSize() {
-  // _cols must be $COLUMNS + 1 or we see some glitchy stuff.
     _cols = (div.borderEdge.width - 10) ~/ charWidth;
     _rows = (div.borderEdge.height - 10) ~/ charHeight;
   }

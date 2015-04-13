@@ -38,20 +38,20 @@ class Model {
   Model.fromOldModel(this.numRows, this.numCols, Model oldModel) {
     cursor = new Cursor();
 
+    oldModel.scrollToBottom();
     // Puts all old content into the reverse buffer and starts clean.
     _reverseBuffer = oldModel._reverseBuffer;
     // Don't add blank lines.
     for (List<Glyph> row in oldModel._frame) {
       bool blank = true;
       for (Glyph g in row) {
-        if (g.value != Glyph.SPACE) {
+        if (g.value != Glyph.SPACE && g.value != Glyph.CURSOR) {
           blank = false;
           break;
         }
       }
       if (!blank) _reverseBuffer.add(row);
     }
-    _reverseBuffer.addAll(oldModel._forwardBuffer);
 
     // Trim off oldest content to keep buffer below max.
     if (_reverseBuffer.length > _MAXBUFFER) {

@@ -21,6 +21,7 @@ html, body {
   min-width: 1100px;
   width: auto !important;
   height: 85%;
+  min-height: 500px;
 }
 
 #row-main {
@@ -435,8 +436,8 @@ li div input {
 }
 
 .footer {
-  position: absolute;
-  bottom: -200px;
+  position: relative;
+  bottom: -100px;
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 30px;

@@ -21,6 +21,7 @@ html, body {
   min-width: 1100px;
   width: auto !important;
   height: 85%;
+  min-height: 500px;
 }
 
 #row-main {
@@ -301,12 +302,13 @@ li div input {
 
 .tab-content {
   border: 1px solid #dddddd;
+  min-height: 447px;
   height: 100%;
 }
 
 #col-1-tab-content, #col-2-tab-content {
   height: 100%;
-  border: none;
+  border-bottom: none;
 }
 
 .camera {
@@ -321,12 +323,6 @@ li div input {
   internal size. */
   width: 100%;
   border: 5px solid #D1CFD5;
-}
-
-/* workaround for strange height bug */
-/* remove this override to reproduce the problem */
-.tab-content2 {
-  height: 452px;
 }
 
 .console {
@@ -440,12 +436,11 @@ li div input {
 }
 
 .footer {
-  margin-top: 100px;
   position: relative;
-  bottom: 0;
+  bottom: -100px;
   width: 100%;
   /* Set the fixed height of the footer here */
-  height: 60px;
+  height: 30px;
   background-color: #fff;
 }
 

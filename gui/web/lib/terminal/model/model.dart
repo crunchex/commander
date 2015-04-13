@@ -40,8 +40,20 @@ class Model {
 
     // Puts all old content into the reverse buffer and starts clean.
     _reverseBuffer = oldModel._reverseBuffer;
-    _reverseBuffer.addAll(oldModel._frame);
+    // Don't add blank lines.
+    for (List<Glyph> row in oldModel._frame) {
+      bool blank = true;
+      for (Glyph g in row) {
+        if (g.value != Glyph.SPACE) {
+          blank = false;
+          break;
+        }
+      }
+      if (!blank) _reverseBuffer.add(row);
+    }
     _reverseBuffer.addAll(oldModel._forwardBuffer);
+
+    // Trim off oldest content to keep buffer below max.
     if (_reverseBuffer.length > _MAXBUFFER) {
       _reverseBuffer = _reverseBuffer.sublist(_reverseBuffer.length - _MAXBUFFER);
     }

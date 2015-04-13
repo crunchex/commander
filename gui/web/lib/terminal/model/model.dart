@@ -65,8 +65,8 @@ class Model {
 
   /// Returns the [Glyph] at row, col.
   Glyph getGlyphAt(int row, int col) {
-    if (col >= numCols) {
-      return new Glyph(Glyph.SPACE, new DisplayAttributes());
+    if (col >= _frame[row].length) {
+      _frame[row].add(new Glyph(Glyph.SPACE, new DisplayAttributes()));
     }
     return _frame[row][col];
   }

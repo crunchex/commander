@@ -33,28 +33,15 @@ class Terminal {
   /// wheel event. Default: 3
   int scrollSpeed = 3;
 
+  /// Returns true if cursor blink is enabled.
   bool get cursorBlink => _cursorBlink;
+  /// Enable/disable cursor blink. Default: true
+  void set cursorBlink(bool b) => _setCursorBlink(b);
 
-  /// Enable cursor blink. Default: true
-  void set cursorBlink(bool b) {
-    _cursorBlink = b;
-
-    cancelBlink();
-    setUpBlink();
-    _refreshDisplay();
-  }
-
+  /// Returns current [Theme].
   Theme get theme => _theme;
-
-  /// A [String] that sets the colored theme of the entire [Terminal].
-  /// Supported themes: solarized-dark, solarized-light.
-  /// Default: solarized-dark.
-  void set theme(Theme thm) {
-    _theme = thm;
-    div.style.backgroundColor = _theme.backgroundColor;
-    div.style.color = _theme.colors['white'];
-    _refreshDisplay();
-  }
+  /// Sets a [Terminal]'s [Theme]. Default: Solarized-Dark.
+  void set theme(Theme thm) => _setTheme(thm);
 
   // Private
   Model _model;
@@ -82,7 +69,7 @@ class Terminal {
     _model = new Model(_rows, _cols);
     _refreshDisplay();
 
-    setUpBlink();
+    _setUpBlink();
 
     _registerEventHandlers();
   }
@@ -105,7 +92,22 @@ class Terminal {
     return [cols, rows];
   }
 
-  void setUpBlink() {
+  void _setTheme(Theme thm) {
+    _theme = thm;
+    div.style.backgroundColor = _theme.backgroundColor;
+    div.style.color = _theme.colors['white'];
+    _refreshDisplay();
+  }
+
+  void _setCursorBlink(bool b) {
+    _cursorBlink = b;
+
+    _cancelBlink();
+    _setUpBlink();
+    _refreshDisplay();
+  }
+
+  void _setUpBlink() {
     if (!_cursorBlink) return;
 
     _blinkTimeout = new Timer(new Duration(milliseconds: 1000), () {
@@ -116,7 +118,7 @@ class Terminal {
     });
   }
 
-  void cancelBlink() {
+  void _cancelBlink() {
     if (_blinkTimeout != null) _blinkTimeout.cancel();
     if (_blinkTimer != null) _blinkTimer.cancel();
   }
@@ -152,10 +154,10 @@ class Terminal {
   void _handleInput(KeyboardEvent e) {
     // Deactivate blinking while the user is typing.
     // Reactivate after an idle period.
-    cancelBlink();
+    _cancelBlink();
     _blinkOn = true;
     _model.scrollToBottom();
-    setUpBlink();
+    _setUpBlink();
 
     int key = e.keyCode;
 

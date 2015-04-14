@@ -57,7 +57,7 @@ class UpDroidConsole extends UpDroidTab {
   }
 
   /// Process messages according to the type.
-  void processMessage(CommanderMessage m) {
+  void _processMessage(CommanderMessage m) {
     switch (m.type) {
       case 'RESIZE':
         List newSize = m.body.split('x');
@@ -85,7 +85,7 @@ class UpDroidConsole extends UpDroidTab {
 
   /// Sets up the event handlers for the console.
   void _registerConsoleEventHandlers() {
-    _cs.stream.where((m) => m.dest == 'CONSOLE' || m.dest == 'ALL').listen((m) => processMessage(m));
+    _cs.stream.where((m) => m.dest == 'CONSOLE' || m.dest == 'ALL').listen((m) => _processMessage(m));
 
     _ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;

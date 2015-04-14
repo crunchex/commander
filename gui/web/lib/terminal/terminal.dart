@@ -76,9 +76,14 @@ class Terminal {
     _theme = new Theme.SolarizedDark();
     _blinkOn = false;
 
-    List<int> size = calculateSize();
-    _cols = size[0];
-    _rows = size[1];
+    if (!div.parent.parent.classes.contains('active')) {
+      _cols = 80;
+      _rows = 25;
+    } else {
+      List<int> size = calculateSize();
+      _cols = size[0];
+      _rows = size[1];
+    }
     _model = new Model(_rows, _cols);
     _refreshDisplay();
 
@@ -311,6 +316,11 @@ class Terminal {
   /// Refreshes the entire console [DivElement] by setting its
   /// contents to null and regenerating each row [DivElement].
   void _refreshDisplay() {
+    // Don't try to draw the display if the enclosing tab is
+    // inactive (where the content div is dimensionless).
+    //print(div.parent.parent.classes.toString());
+    if (!div.parent.parent.classes.contains('active')) return;
+
     div.innerHtml = '';
 
     DivElement row;

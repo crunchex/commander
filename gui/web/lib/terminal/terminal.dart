@@ -94,6 +94,10 @@ class Terminal {
     return [cols, rows];
   }
 
+  List<int> currentSize() {
+    return [_model.numCols, _model.numRows];
+  }
+
   void _setTheme(Theme thm) {
     _theme = thm;
     div.style.backgroundColor = _theme.backgroundColor;

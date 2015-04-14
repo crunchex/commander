@@ -4,6 +4,7 @@ dependencies:
   ace: any
   bootjack: any
   browser: any
+  collection: any
   dnd: any
   dquery: any
   path: any

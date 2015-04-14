@@ -4,6 +4,8 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:collection/equality.dart';
+
 import 'lib/updroid_message.dart';
 import 'lib/terminal/terminal.dart';
 import 'tab.dart';
@@ -114,6 +116,15 @@ class UpDroidConsole extends UpDroidTab {
     tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
       _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidConsole'));
+    });
+
+    _console.onClick.listen((e) {
+      List<int> oldSize = _term.currentSize();
+      List<int> newSize = _term.calculateSize();
+
+      if (const ListEquality().equals(oldSize, newSize)) return;
+
+      _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
     });
 
     window.onResize.listen((e) {

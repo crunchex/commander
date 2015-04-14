@@ -3,6 +3,7 @@ library updroid_camera;
 import 'dart:html';
 import 'dart:async';
 import 'dart:js' as js;
+import 'dart:math' as math;
 
 import 'lib/updroid_message.dart';
 import 'tab.dart';
@@ -47,6 +48,48 @@ class UpDroidCamera extends UpDroidTab {
       _registerEventHandlers(canvas);
     });
   }
+
+  // Beginning resize
+
+  void resizeCanvas(CanvasElement canvas){
+      var con = document.getElementById("#camera"),
+          aspect = canvas.height/canvas.width,
+          width = con.width,
+          height = con.height;
+
+      canvas.width = width;
+      canvas.height = math.round(width * aspect);
+  }
+
+  Window.resizeEvent.listen((e){
+
+  });
+
+  var dR = 1, r = 10;
+
+  void drawSomething(){
+      var canvas = document.getElementById("canvas"),
+          ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0,0,canvas.width, canvas.height);
+
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(canvas.width/2, canvas.height/2, r, 0, Math.PI * 2, false);
+      ctx.fill();
+
+      r += dR;
+
+      if (r > 99 || r < 10) dR = -dR;
+
+
+      webkitRequestAnimationFrame(drawSomething);
+  }
+
+  webkitRequestAnimationFrame(drawSomething);
+
+  // End function
 
   void _registerEventHandlers(CanvasElement canvas) {
     _ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'CAMERA_READY').listen((um) {

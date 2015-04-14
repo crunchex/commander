@@ -239,7 +239,7 @@ class UpDroidClient {
       UpDroidConsole console = new UpDroidConsole(id, column, cs, active: true);
       _tabs[column].add(console);
       // TODO: initial size should not be hardcoded.
-      ws.send('[[OPEN_TAB]]' + '$column-$id-$className-80-25');
+      ws.send('[[OPEN_TAB]]' + '$column-$id-$className-25-80');
     }
   }
 

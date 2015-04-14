@@ -63,11 +63,11 @@ class UpDroidConsole extends UpDroidTab {
     switch (m.type) {
       case 'RESIZE':
         List newSize = m.body.split('x');
-        int newCol = int.parse(newSize[0]);
-        int newRow = int.parse(newSize[1]);
-        _term.resize(newCol, newRow);
+        int newRow = int.parse(newSize[0]);
+        int newCol = int.parse(newSize[1]);
+        _term.resize(newRow, newCol);
         // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
-        _wsMain.send('[[RESIZE]]' + '${newCol - 1}x${newRow - 1}');
+        _wsMain.send('[[RESIZE]]' + '${newRow - 1}x${newCol - 1}');
         break;
 
       default:

@@ -202,9 +202,9 @@ class CmdrServer {
         break;
 
       case 'UpDroidConsole':
-        String numCols = idList[3];
-        String numRows = idList[4];
-        _ptys.add(new CmdrPty(num, dir.path, numCols, numRows));
+        String numRows = idList[3];
+        String numCols = idList[4];
+        _ptys.add(new CmdrPty(num, dir.path, numRows, numCols));
         break;
     }
   }

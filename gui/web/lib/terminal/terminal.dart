@@ -71,7 +71,7 @@ class Terminal {
     _registerEventHandlers();
   }
 
-  void resize(int newCols, int newRows) {
+  void resize(int newRows, int newCols) {
     _model = new Model.fromOldModel(newRows, newCols, _model);
 
     // User expects the prompt to appear after a resize.
@@ -82,20 +82,20 @@ class Terminal {
   }
 
   List<int> calculateSize() {
-    int cols = (div.borderEdge.width - 10) ~/ charWidth;
     int rows = (div.borderEdge.height - 10) ~/ charHeight;
+    int cols = (div.borderEdge.width - 10) ~/ charWidth;
 
     // Set a default if the calculated size is unusable.
-    if (cols < 10 || rows < 10) {
-      cols = 80;
+    if (rows < 10 || cols < 10) {
       rows = 25;
+      cols = 80;
     }
 
-    return [cols, rows];
+    return [rows, cols];
   }
 
   List<int> currentSize() {
-    return [_model.numCols, _model.numRows];
+    return [_model.numRows, _model.numCols];
   }
 
   void _setTheme(Theme thm) {

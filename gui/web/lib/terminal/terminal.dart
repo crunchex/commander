@@ -76,7 +76,9 @@ class Terminal {
     _theme = new Theme.SolarizedDark();
     _blinkOn = false;
 
-    _calculateSize();
+    List<int> size = calculateSize();
+    _cols = size[0];
+    _rows = size[1];
     _model = new Model(_rows, _cols);
     _refreshDisplay();
 
@@ -85,8 +87,9 @@ class Terminal {
     _registerEventHandlers();
   }
 
-  List<int> resize() {
-    _calculateSize();
+  void resize(int newCols, int newRows) {
+    _rows = newRows;
+    _cols = newCols;
     _model = new Model.fromOldModel(_rows, _cols, _model);
 
     // User expects the prompt to appear after a resize.
@@ -94,8 +97,12 @@ class Terminal {
     // prompt, so we handle this special case with a flag.
     _resizing = true;
     stdin.add([10]);
+  }
 
-    return [_cols, _rows];
+  List<int> calculateSize() {
+    int cols = (div.borderEdge.width - 10) ~/ charWidth;
+    int rows = (div.borderEdge.height - 10) ~/ charHeight;
+    return [cols, rows];
   }
 
   void setUpBlink() {
@@ -112,11 +119,6 @@ class Terminal {
   void cancelBlink() {
     if (_blinkTimeout != null) _blinkTimeout.cancel();
     if (_blinkTimer != null) _blinkTimer.cancel();
-  }
-
-  void _calculateSize() {
-    _cols = (div.borderEdge.width - 10) ~/ charWidth;
-    _rows = (div.borderEdge.height - 10) ~/ charHeight;
   }
 
   void _registerEventHandlers() {

@@ -56,6 +56,23 @@ class UpDroidConsole extends UpDroidTab {
     });
   }
 
+  /// Process messages according to the type.
+  void processMessage(CommanderMessage m) {
+    switch (m.type) {
+      case 'RESIZE':
+        List newSize = m.body.split('x');
+        int newCol = int.parse(newSize[0]);
+        int newRow = int.parse(newSize[1]);
+        _term.resize(newCol, newRow);
+        // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
+        _wsMain.send('[[RESIZE]]' + '${newCol - 1}x${newRow - 1}');
+        break;
+
+      default:
+        print('Console error: unrecognized message type: ' + m.type);
+    }
+  }
+
   /// Toggles between a Solarized dark and light theme.
   void _toggleTheme() {
     _term.theme = _term.theme.name == 'solarized-light' ? new Theme.SolarizedDark() : new Theme.SolarizedLight();
@@ -68,6 +85,8 @@ class UpDroidConsole extends UpDroidTab {
 
   /// Sets up the event handlers for the console.
   void _registerConsoleEventHandlers() {
+    _cs.stream.where((m) => m.dest == 'CONSOLE' || m.dest == 'ALL').listen((m) => processMessage(m));
+
     _ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;
       _term.stdout.add(buf.asUint8List());
@@ -99,9 +118,8 @@ class UpDroidConsole extends UpDroidTab {
 
     window.onResize.listen((e) {
       if (_console.parent.classes.contains('active')) {
-        List<int> newSize = _term.resize();
-        // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
-        _wsMain.send('[[RESIZE]]' + '${newSize[0] - 1}x${newSize[1] - 1}');
+        List<int> newSize = _term.calculateSize();
+        _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
       }
     });
   }

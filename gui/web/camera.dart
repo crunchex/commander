@@ -33,9 +33,11 @@ class UpDroidCamera extends UpDroidTab {
       DivElement content = configRefs['content'];
       CanvasElement canvas = new CanvasElement();
       canvas
-          ..width = 447
-          ..height = 450
+          ..width = setDimensions(canvas)[0]
+          ..height = setDimensions(canvas)[1]
           ..classes.add('video-canvas');
+      print(canvas.width);
+      print(canvas.height);
       content.children.add(canvas);
 
       _drawLoading(canvas);
@@ -51,19 +53,29 @@ class UpDroidCamera extends UpDroidTab {
   }
 
   List setDimensions (CanvasElement canvas) {
-    var con = dQuery.$('.camera');
-    var width = con.width;
-    var height = con.height;
+    var con = querySelector('.tab-pane .active'),
+          width = con.borderEdge.width - 10,
+          height = con.borderEdge.height - 10;
     return [width, height];
   }
 
   void resizeCanvas(CanvasElement canvas){
-      var con = dQuery.$('.camera');
-      var width = con.width;
-      var height = con.height;
+      var con = querySelector('.tab-pane .active'),
+          width = (con.borderEdge.width - 10),
+          height = (con.borderEdge.height - 10);
 
-      canvas.width = width;
-      canvas.height = width;
+      if(width < height) {
+        print('width set');
+        canvas.width = width;
+        print('width: ' + width.toString());
+        canvas.height = width;
+      }
+      else {
+        print('else firing');
+        canvas.width = height;
+        print("height: " + height.toString());
+        canvas.height = height;
+      }
   }
 
   void _registerEventHandlers(CanvasElement canvas) {

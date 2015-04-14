@@ -3,6 +3,7 @@ library updroid_camera;
 import 'dart:html';
 import 'dart:async';
 import 'dart:js' as js;
+import 'package:dquery/dquery.dart' as dQuery;
 
 import 'lib/updroid_message.dart';
 import 'tab.dart';
@@ -30,10 +31,9 @@ class UpDroidCamera extends UpDroidTab {
       _closeTabButton = configRefs['close-tab'];
 
       DivElement content = configRefs['content'];
-      CanvasElement canvas = new CanvasElement()
-          ..classes.add('video-canvas')
-          ..width = 447
-          ..height = 450;
+      CanvasElement canvas = new CanvasElement();
+      canvas.classes.add('video-canvas');
+      setDimensions(canvas);
       content.children.add(canvas);
 
       _drawLoading(canvas);
@@ -48,7 +48,31 @@ class UpDroidCamera extends UpDroidTab {
     });
   }
 
+  void setDimensions (CanvasElement canvas) {
+    var con = querySelector('#col-$num-tab-content');
+    var width = (con.borderEdge.width - 13);
+    var height = (con.borderEdge.height - 13);
+
+    width <= 640 ? canvas.width = width : canvas.width = 640;
+    height <= 480 ? canvas.height = height : canvas.height = 482;
+  }
+
+  void resizeCanvas(CanvasElement canvas){
+      var con = querySelector('#col-$num-tab-content'),
+          width = (con.borderEdge.width - 13),
+          height = (con.borderEdge.height - 13);
+
+      width <= 640 ? canvas.width = width : canvas.width = 640;
+      height <= 480 ? canvas.height = height : canvas.height = 482;
+
+  }
+
   void _registerEventHandlers(CanvasElement canvas) {
+
+    window.onResize.listen((e){
+      resizeCanvas(canvas);
+    });
+
     _ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'CAMERA_READY').listen((um) {
       _startPlayer(canvas);
     });
@@ -62,6 +86,7 @@ class UpDroidCamera extends UpDroidTab {
       destroyTab();
       _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
     });
+
   }
 
   void _drawLoading(CanvasElement canvas) {

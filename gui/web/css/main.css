@@ -312,18 +312,20 @@ li div input {
 }
 
 .camera {
-  border: none;
+  margin: none;
   height: 100%;
-  width: 100%;
+  border: none;
   background-color: #D1CFD5;
 }
 
 .video-canvas {
-  /* Always stretch the canvas to 640x480, regardless of its
-  internal size. */
-  width: 100%;
-  border: 5px solid #D1CFD5;
-  background-color: #D1CFD5;
+  display: table;
+  margin: 0 auto;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  padding: 5px;
 }
 
 .console {

@@ -49,7 +49,6 @@ class Terminal {
   Theme _theme;
   Timer _blinkTimer, _blinkTimeout;
   bool _blinkOn;
-  int _rows, _cols;
   bool _resizing = false;
   bool _cursorBlink = true;
 
@@ -63,15 +62,8 @@ class Terminal {
     _theme = new Theme.SolarizedDark();
     _blinkOn = false;
 
-    if (!div.parent.parent.classes.contains('active')) {
-      _cols = 80;
-      _rows = 25;
-    } else {
-      List<int> size = calculateSize();
-      _cols = size[0];
-      _rows = size[1];
-    }
-    _model = new Model(_rows, _cols);
+    List<int> size = calculateSize();
+    _model = new Model(size[0], size[1]);
     _refreshDisplay();
 
     _setUpBlink();
@@ -80,9 +72,7 @@ class Terminal {
   }
 
   void resize(int newCols, int newRows) {
-    _rows = newRows;
-    _cols = newCols;
-    _model = new Model.fromOldModel(_rows, _cols, _model);
+    _model = new Model.fromOldModel(newRows, newCols, _model);
 
     // User expects the prompt to appear after a resize.
     // Sending a \n results in a blank line above the first
@@ -94,6 +84,13 @@ class Terminal {
   List<int> calculateSize() {
     int cols = (div.borderEdge.width - 10) ~/ charWidth;
     int rows = (div.borderEdge.height - 10) ~/ charHeight;
+
+    // Set a default if the calculated size is unusable.
+    if (cols < 10 || rows < 10) {
+      cols = 80;
+      rows = 25;
+    }
+
     return [cols, rows];
   }
 
@@ -285,10 +282,10 @@ class Terminal {
     DivElement row = new DivElement();
     String str = '';
     prev = _model.getGlyphAt(r, 0);
-    for (int c = 0; c < _cols; c++) {
+    for (int c = 0; c < _model.numCols; c++) {
       curr = _model.getGlyphAt(r, c);
 
-      if (!curr.hasSameAttributes(prev) || c == _cols - 1) {
+      if (!curr.hasSameAttributes(prev) || c == _model.numCols - 1) {
         if (prev.hasDefaults()) {
           row.append(new DocumentFragment.html(str));
         } else {
@@ -326,7 +323,7 @@ class Terminal {
     div.innerHtml = '';
 
     DivElement row;
-    for (int r = 0; r < _rows; r++) {
+    for (int r = 0; r < _model.numRows; r++) {
       row = _generateRow(r);
       row.classes.add('termrow');
 

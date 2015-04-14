@@ -24,6 +24,7 @@ class UpDroidCamera extends UpDroidTab {
   UpDroidCamera(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
     _col = col;
     _cs = cs;
+    print(num);
 
     setUpTabHandle(num, _col, 'Camera', active);
     setUpTabContainer(num, _col, 'Camera', _getMenuConfig(), active).then((Map configRefs) {
@@ -32,10 +33,8 @@ class UpDroidCamera extends UpDroidTab {
 
       DivElement content = configRefs['content'];
       CanvasElement canvas = new CanvasElement();
-      canvas
-          ..width = setDimensions(canvas)[0]
-          ..height = setDimensions(canvas)[1]
-          ..classes.add('video-canvas');
+      canvas.classes.add('video-canvas');
+      setDimensions(canvas);
       print(canvas.width);
       print(canvas.height);
       content.children.add(canvas);
@@ -52,17 +51,16 @@ class UpDroidCamera extends UpDroidTab {
     });
   }
 
-  List setDimensions (CanvasElement canvas) {
-    var con = querySelector('.tab-pane .active'),
-          width = con.borderEdge.width - 10,
-          height = con.borderEdge.height - 10;
-    return [width, height];
+  void setDimensions (CanvasElement canvas) {
+    var con = querySelector('#col-$num-tab-content');
+          canvas.width = con.borderEdge.width - 13;
+          canvas.height = con.borderEdge.height - 13;
   }
 
   void resizeCanvas(CanvasElement canvas){
-      var con = querySelector('.tab-pane .active'),
-          width = (con.borderEdge.width - 10),
-          height = (con.borderEdge.height - 10);
+      var con = querySelector('#col-$num-tab-content'),
+          width = (con.borderEdge.width - 13),
+          height = (con.borderEdge.height - 13);
 
       if(width < height) {
         print('width set');
@@ -70,10 +68,14 @@ class UpDroidCamera extends UpDroidTab {
         print('width: ' + width.toString());
         canvas.height = width;
       }
-      else {
+      else if ( height > width) {
         print('else firing');
         canvas.width = height;
         print("height: " + height.toString());
+        canvas.height = height;
+      }
+      else {
+        canvas.width = width;
         canvas.height = height;
       }
   }

@@ -76,10 +76,10 @@ class EscapeHandler {
     if (constantEscapes.containsKey(encodedEscape)) {
       switch (constantEscapes[encodedEscape]) {
         case 'Erase End of Line':
-          eraseEndOfLine(model, currAttributes);
+          _eraseEndOfLine(model, currAttributes);
           break;
         case 'Erase Down':
-          eraseDown(model);
+          _eraseDown(model);
           break;
         default:
           print('Constant escape : ${constantEscapes[encodedEscape]} (${escape.toString()}) not yet supported');
@@ -91,22 +91,22 @@ class EscapeHandler {
       switch (EscapeHandler
               .variableEscapeTerminators[escape.last]) {
         case 'Set Attribute Mode':
-          setAttributeMode(escape, currAttributes);
+          _setAttributeMode(escape, currAttributes);
           break;
         case 'Cursor Home':
-          cursorHome(escape, model);
+          _cursorHome(escape, model);
           break;
         case 'Cursor Forward':
-          cursorForward(model);
+          _cursorForward(model);
           break;
         case 'Set Mode':
-          setMode(escape);
+          _setMode(escape);
           break;
         case 'Reset Mode':
-          resetMode(escape);
+          _resetMode(escape);
           break;
         case 'Scroll Screen':
-          scrollScreen(escape);
+          _scrollScreen(escape);
           break;
         default:
           print('Variable escape : ${variableEscapeTerminators[escape.last]} (${escape.toString()}) not yet supported');
@@ -117,23 +117,23 @@ class EscapeHandler {
     return false;
   }
 
-  static void eraseDown(Model model) {
+  static void _eraseDown(Model model) {
     model.eraseDown();
   }
 
-  static void setMode(List<int> escape) {
+  static void _setMode(List<int> escape) {
     if (JSON.encode(escape) == '[27, 91, 63, 49, 104]') {
       print('setMode: not yet supported');
     }
   }
 
-  static void resetMode(List<int> escape) {
+  static void _resetMode(List<int> escape) {
     if (JSON.encode(escape) == '[27, 91, 63, 49, 108]') {
       print('resetMode: not yet supported');
     }
   }
 
-  static void scrollScreen(List<int> escape) {
+  static void _scrollScreen(List<int> escape) {
     int indexOfSemi = escape.indexOf(59);
     int start = int.parse(UTF8.decode(escape.sublist(2, indexOfSemi)));
     int end = int.parse(UTF8.decode(escape.sublist(indexOfSemi + 1, escape.length - 1)));
@@ -142,7 +142,7 @@ class EscapeHandler {
   /// Sets the cursor position where subsequent text will begin.
   /// If no row/column parameters are provided (ie. <ESC>[H),
   /// the cursor will move to the home position, at the upper left of the screen.
-  static void cursorHome(List<int> escape, Model model) {
+  static void _cursorHome(List<int> escape, Model model) {
     int row, col;
 
     if (escape.length == 3) {
@@ -159,12 +159,12 @@ class EscapeHandler {
   }
 
   /// Moves the cursor forward by COUNT columns; the default count is 1.
-  static void cursorForward(Model model) {
+  static void _cursorForward(Model model) {
     model.cursorForward();
   }
 
   /// Erases from the current cursor position to the end of the current line.
-  static void eraseEndOfLine(Model model, DisplayAttributes attr) {
+  static void _eraseEndOfLine(Model model, DisplayAttributes attr) {
     model.cursorBackward();
     // TODO: need to be able to use the same display attributes from the previous Glyph,
     // but right now it's too cumbersome.
@@ -174,7 +174,7 @@ class EscapeHandler {
 
   /// Sets multiple display attribute settings.
   /// Sets local [DisplayAttributes], given [escape].
-  static void setAttributeMode(List<int> escape, DisplayAttributes attr) {
+  static void _setAttributeMode(List<int> escape, DisplayAttributes attr) {
     String decodedEsc = UTF8.decode(escape);
 
     if (decodedEsc.contains('0m')) {

@@ -314,7 +314,6 @@ li div input {
 .camera {
   border: none;
   height: 100%;
-  width: 100%;
   background-color: #D1CFD5;
 }
 
@@ -322,8 +321,7 @@ li div input {
   /* Always stretch the canvas to 640x480, regardless of its
   internal size. */
   width: 100%;
-  border: 5px solid #D1CFD5;
-  background-color: #D1CFD5;
+  padding: 5px;
 }
 
 .console {

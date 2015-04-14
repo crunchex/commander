@@ -24,7 +24,6 @@ class UpDroidCamera extends UpDroidTab {
   UpDroidCamera(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
     _col = col;
     _cs = cs;
-    print(num);
 
     setUpTabHandle(num, _col, 'Camera', active);
     setUpTabContainer(num, _col, 'Camera', _getMenuConfig(), active).then((Map configRefs) {
@@ -35,8 +34,6 @@ class UpDroidCamera extends UpDroidTab {
       CanvasElement canvas = new CanvasElement();
       canvas.classes.add('video-canvas');
       setDimensions(canvas);
-      print(canvas.width);
-      print(canvas.height);
       content.children.add(canvas);
 
       _drawLoading(canvas);
@@ -53,8 +50,11 @@ class UpDroidCamera extends UpDroidTab {
 
   void setDimensions (CanvasElement canvas) {
     var con = querySelector('#col-$num-tab-content');
-          canvas.width = con.borderEdge.width - 13;
-          canvas.height = con.borderEdge.height - 13;
+    var width = (con.borderEdge.width - 13);
+    var height = (con.borderEdge.height - 13);
+
+    width <= 640 ? canvas.width = width : canvas.width = 640;
+    height <= 480 ? canvas.height = height : canvas.height = 482;
   }
 
   void resizeCanvas(CanvasElement canvas){
@@ -62,29 +62,15 @@ class UpDroidCamera extends UpDroidTab {
           width = (con.borderEdge.width - 13),
           height = (con.borderEdge.height - 13);
 
-      if(width < height) {
-        print('width set');
-        canvas.width = width;
-        print('width: ' + width.toString());
-        canvas.height = width;
-      }
-      else if ( height > width) {
-        print('else firing');
-        canvas.width = height;
-        print("height: " + height.toString());
-        canvas.height = height;
-      }
-      else {
-        canvas.width = width;
-        canvas.height = height;
-      }
+      width <= 640 ? canvas.width = width : canvas.width = 640;
+      height <= 480 ? canvas.height = height : canvas.height = 482;
+
   }
 
   void _registerEventHandlers(CanvasElement canvas) {
 
     window.onResize.listen((e){
       resizeCanvas(canvas);
-      print("resizing");
     });
 
     _ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'CAMERA_READY').listen((um) {

@@ -319,10 +319,11 @@ li div input {
 }
 
 .video-canvas {
-  /*These code values will vertically center div.
+  display: table;
+  margin: 0 auto;
   position: relative;
   top: 50%;
-  transform: translateY(-50%); */
+  transform: translateY(-50%);
   text-align: center;
   padding: 5px;
 }

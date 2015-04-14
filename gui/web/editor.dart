@@ -11,6 +11,7 @@ import "package:path/path.dart" as pathLib;
 
 import 'lib/updroid_message.dart';
 import 'tab.dart';
+import  'modal.dart';
 
 part 'lib/editor/templates.dart';
 
@@ -42,7 +43,7 @@ class UpDroidEditor extends UpDroidTab {
   ButtonElement _modalDiscardButton;
   Element _warning;
   Element _overwriteCommit;
-  Modal _curModal;
+  var _curModal;
   Dropzone linkedDropzone;
 
   int _fontSize = 14;
@@ -93,11 +94,6 @@ class UpDroidEditor extends UpDroidTab {
     _themeButton = configRefs['theme'];
     _fontSizeInput = configRefs['font-size'];
 
-    _saveCommit = querySelector('#save-as-commit');
-    _modalSaveButton = querySelector('.modal-save');
-    _modalDiscardButton = querySelector('.modal-discard');
-    _overwriteCommit = querySelector('#warning button');
-    _warning = querySelector('#warning');
   }
 
   /// Sets up the editor and styles.
@@ -224,9 +220,12 @@ class UpDroidEditor extends UpDroidTab {
         _fileName.text = "untitled";
       }
       else{
-        _presentModal("#unsaved");
+        e.preventDefault();
+        new UpDroidUnsavedModal();
 
         // TODO: refine this case
+        _modalSaveButton = querySelector('.modal-save');
+        _modalDiscardButton = querySelector('.modal-discard');
 
         _unsavedSave = _modalSaveButton.onClick.listen((e) {
           _saveText();
@@ -254,21 +253,19 @@ class UpDroidEditor extends UpDroidTab {
       _cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
       _ws.send("[[EDITOR_REQUEST_LIST]]");
 
-      var input = querySelector('#save-as-input');
       String saveAsPath = '';
-      // Make sure defaults are clear on modal creation
-      input.value = '';
-      if(!_warning.classes.contains('hidden')) {
-        _warning.classes.add('hidden');
-      }
-      _presentModal("#save-as");
+      _curModal = new UpDroidSavedModal();
+      var input = querySelector('#save-as-input');
+      _saveCommit = querySelector('#save-as-commit');
+      _overwriteCommit = querySelector('#warning button');
+      _warning = querySelector('#warning');
 
       void completeSave() {
           _ws.send('[[EDITOR_SAVE]]' + _aceEditor.value + '[[PATH]]' + saveAsPath);
           _fileName.text = input.value;
           input.value = '';
           _resetSavePoint();
-          _curModal.hide();
+          _curModal.destroyModal();
           _saveAsClickEnd.cancel();
           _saveAsEnterEnd.cancel();
           _openFilePath = saveAsPath;
@@ -346,7 +343,10 @@ class UpDroidEditor extends UpDroidTab {
     if (_noUnsavedChanges()) {
       _setEditorText(newPath, newText);
     } else {
-      _presentModal("#unsaved");
+      new UpDroidUnsavedModal();
+      _modalSaveButton = querySelector('.modal-save');
+      _modalDiscardButton = querySelector('.modal-discard');
+
       _unsavedSave = _modalSaveButton.onClick.listen((e) {
         _saveText();
         _setEditorText(newPath, newText);
@@ -367,13 +367,6 @@ class UpDroidEditor extends UpDroidTab {
 
     // Set focus to the interactive area so the user can typing immediately.
     _aceEditor.focus();
-  }
-
-  /// Shows the modal for unsaved changes.
-  void _presentModal(String selector) {
-    DivElement modal = querySelector(selector);
-    _curModal = new Modal(modal);
-    _curModal.show();
   }
 
   /// Sends the file path and contents to the server to be saved to disk.

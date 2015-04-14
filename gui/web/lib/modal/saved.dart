@@ -33,11 +33,23 @@ class UpDroidSavedModal extends UpDroidModal {
       ..attributes['type'] = 'button';
     warning.children.addAll([h4, overwrite]);
     _modalBody.children.add(warning);
+
+    _buttonListeners.add(input.onKeyUp.listen((e) {
+      var keyEvent = new KeyEvent.wrap(e);
+      if (keyEvent.keyCode == KeyCode.ENTER) {
+          _destroyModal();
+        }
+    }));
   }
 
   void _setupFooter() {
     ButtonElement discard = _createButton('warning', 'Discard');
+    discard
+      ..classes.add('modal-discard')
+      ..id = 'save-as-commit';
     ButtonElement save = _createButton('primary', 'Save');
-    _modalFooter.children.insertAll(0, [save, discard]);
+    save.classes.add('modal-save');
+    _modalFooter.children.addAll([save, discard]);
   }
+
 }

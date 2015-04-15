@@ -4,6 +4,8 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:collection/equality.dart';
+
 import 'lib/updroid_message.dart';
 import 'lib/terminal/terminal.dart';
 import 'tab.dart';
@@ -61,11 +63,11 @@ class UpDroidConsole extends UpDroidTab {
     switch (m.type) {
       case 'RESIZE':
         List newSize = m.body.split('x');
-        int newCol = int.parse(newSize[0]);
-        int newRow = int.parse(newSize[1]);
-        _term.resize(newCol, newRow);
+        int newRow = int.parse(newSize[0]);
+        int newCol = int.parse(newSize[1]);
+        _term.resize(newRow, newCol);
         // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
-        _wsMain.send('[[RESIZE]]' + '${newCol - 1}x${newRow - 1}');
+        _wsMain.send('[[RESIZE]]' + '${newRow - 1}x${newCol - 1}');
         break;
 
       default:
@@ -114,6 +116,15 @@ class UpDroidConsole extends UpDroidTab {
     tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
       _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidConsole'));
+    });
+
+    _console.onClick.listen((e) {
+      List<int> oldSize = _term.currentSize();
+      List<int> newSize = _term.calculateSize();
+
+      if (const ListEquality().equals(oldSize, newSize)) return;
+
+      _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
     });
 
     window.onResize.listen((e) {

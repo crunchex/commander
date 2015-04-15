@@ -252,6 +252,7 @@ class UpDroidEditor extends UpDroidTab {
     _saveAsButton.onClick.listen((e) {
       _cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
       _ws.send("[[EDITOR_REQUEST_LIST]]");
+      if(_curModal != null) _curModal.hide();
 
       String saveAsPath = '';
       _curModal = new UpDroidSavedModal();
@@ -263,9 +264,9 @@ class UpDroidEditor extends UpDroidTab {
       void completeSave() {
           _ws.send('[[EDITOR_SAVE]]' + _aceEditor.value + '[[PATH]]' + saveAsPath);
           _fileName.text = input.value;
+          _curModal.hide();
           input.value = '';
           _resetSavePoint();
-          _curModal.destroyModal();
           _saveAsClickEnd.cancel();
           _saveAsEnterEnd.cancel();
           _openFilePath = saveAsPath;

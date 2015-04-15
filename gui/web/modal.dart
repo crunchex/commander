@@ -91,16 +91,19 @@ abstract class UpDroidModal {
 
   /// Returns ButtonElement for a button of [type] with [text]. Optionally,
   /// a [method] can be passed in for additional logic besides modal destruction.
-  ButtonElement _createButton(String type, String text, {dynamic method}) {
+  ButtonElement _createButton(String type, String text, {dynamic method, String special}) {
     ButtonElement button = new ButtonElement()
       ..classes.addAll(['btn', 'btn-$type'])
-      ..text = text
-      ..attributes['data-dismiss'] = 'modal';
+      ..text = text;
+    if (text == 'discard') button.attributes['data-dismiss'] = 'modal';
 
-    _buttonListeners.add(button.onClick.listen((e) {
-      if (method != null) method();
-      _destroyModal();
-    }));
+    if (special == null) {
+      _buttonListeners.add(button.onClick.listen((e) {
+        if (method != null) method();
+        _destroyModal();
+      }));
+    }
+
     return button;
   }
 }

@@ -144,9 +144,14 @@ html, body {
   list-style-type: none;;
 }
 
+#title-wrapper {
+  text-align: center;
+  padding: 0;
+}
+
 #file-explorer-title {
+  padding: 5px 5px;
   display: inline-block;
-  margin-right: 5px;
   text-align: center;
   vertical-align: middle;
   font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
@@ -453,6 +458,20 @@ li div input {
   bottom: 0px;
   right: 10px;
   font-size: 10px;
+}
+
+#side-menu-wrapper {
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+#side-menu {
+  float: right;
+}
+
+#side-menu button {
+  padding: 3px 7px;
+  font-size: 13px;
 }
 
 #explorer-container{

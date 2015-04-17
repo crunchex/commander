@@ -213,7 +213,7 @@ class UpDroidClient {
   void _initializeTabs(String strConfig) {
     List config = JSON.decode(strConfig);
 
-    _tabs[0].add(new UpDroidExplorer(cs));
+    _tabs[0].add(new UpDroidExplorer(cs, 1));
 
     for (int i = 0; i < config.length; i++) {
       for (Map tab in config[i]) {

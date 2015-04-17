@@ -6,16 +6,18 @@ import 'dart:async';
 import 'package:dnd/dnd.dart';
 import "package:path/path.dart" as pathLib;
 
+import 'tab.dart';
 import 'lib/updroid_message.dart';
 import 'lib/explorer_helper.dart';
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests
 /// to the server side.
-class UpDroidExplorer {
+class UpDroidExplorer extends UpDroidTab{
   static const String className = 'UpDroidExplorer';
 
   // Make dynamic
+  int expNum;
   DivElement exp = querySelector("#exp-1");
 
   String workspacePath;
@@ -49,20 +51,22 @@ class UpDroidExplorer {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 
-  UpDroidExplorer(StreamController<CommanderMessage> cs) {
+  UpDroidExplorer(StreamController<CommanderMessage> cs, num) {
+    expNum = num;
     this.cs = cs;
+    createExplorer(1);
 
-    newFile = querySelector('#file');
+    newFile = querySelector('#file-$expNum');
     newFileDragSetup();
 
-    newFolder = querySelector('#folder');
+    newFolder = querySelector('#folder-$expNum');
     newFolderDragSetup();
 
-    title = querySelector('#file-explorer-title');
+    title = querySelector('#file-explorer-title-');
     controlToggle = querySelector('#control-toggle');
     controlPanel = querySelector('#control');
-    newFileDrop = querySelector('#new-file-drop');
-    rootlineContainer = querySelector('#file-explorer-hr-container');
+    newFileDrop = querySelector('#new-file-drop-$expNum');
+    rootlineContainer = querySelector('#file-explorer-hr-container-$expNum');
     dzRootLineContainer = new Dropzone(rootlineContainer);
     recycle = querySelector('#recycle');
     dzRecycle = new Dropzone(recycle);
@@ -800,7 +804,7 @@ class UpDroidExplorer {
 
     UListElement dirElement;
     if (file.parentDir == '' && !file.path.contains('/.')) {
-      dirElement = querySelector('#explorer-body');
+      dirElement = querySelector('#explorer-body-$expNum');
       dirElement.append(li);
     } else if (!file.path.contains('/.') &&
         !file.path.contains('CMakeLists.txt')) {
@@ -816,7 +820,7 @@ class UpDroidExplorer {
   void initialDirectoryList(String raw) {
     var files = fileList(raw);
 
-    UListElement explorer = querySelector('#explorer-body');
+    UListElement explorer = querySelector('#explorer-body-$expNum');
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {
@@ -844,7 +848,7 @@ class UpDroidExplorer {
     pathToFile.clear();
 
     // Set the explorer list to empty for a full refresh.
-    UListElement explorer = querySelector('#explorer-body');
+    UListElement explorer = querySelector('#explorer-body-$expNum');
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {

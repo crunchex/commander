@@ -36,6 +36,7 @@ abstract class UpDroidTab {
     _explorersDiv.append(container);
     DivElement explorerHead = new DivElement()
       ..classes.add('explorer-head');
+    container.append(explorerHead);
     LIElement newDnd = new LIElement()
         ..classes.add('new')
         ..text = "New";

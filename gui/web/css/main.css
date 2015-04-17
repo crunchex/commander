@@ -131,19 +131,12 @@ html, body {
   font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
 }
 
-#file-explorer-title #folder {
-  margin-left: 4px;
-}
-
-#file-explorer-hr-container {
-}
-
-#new-file-drop {
+.new-file-drop {
   margin-left: 10px;
   margin-right: 10px;
 }
 
-#new-file-drop p {
+.new-file-drop p {
   margin-top: 5px;
   margin-bottom: 5px;
   padding-top: 7px;
@@ -174,7 +167,7 @@ html, body {
   margin-bottom: 5px;
 }
 
-#explorer-body > .explorer-li {
+.explorer-body > .explorer-li {
     margin-left: -38px;
 }
 
@@ -186,17 +179,17 @@ html, body {
   list-style-type: none;
 }
 
-#explorer-body .btn {
+.explorer-body .btn {
   background-color: transparent;
 }
 
-#explorer-body {
+.explorer-body {
   display: inline-block;
   float: left;
   clear: both;
 }
 
-#explorer-body .btn:hover {
+.explorer-body .btn:hover {
   color: #268bd2;
 }
 
@@ -486,7 +479,7 @@ li div input {
   font-size: 13px;
 }
 
-#explorer-container{
+.explorer-container{
   border: 0 1px 1px 1px;
   min-height: 300px;
   max-height: 400px;
@@ -503,10 +496,10 @@ li div input {
   display: none;
 }
 
-#folder{
+.folder{
   cursor: pointer;
 }
 
-#file{
+.file{
   cursor: pointer;
 }

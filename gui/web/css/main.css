@@ -132,7 +132,7 @@ html, body {
   color: #268bd2;
 }
 
-#title-container{
+#explorer-head{
   padding-top: 10px;
   background-color: #f5f5f5;
   border: 1px solid #e3e3e3;
@@ -140,7 +140,7 @@ html, body {
   text-align: center;
 }
 
-#title-container li{
+#explorer-head li{
   list-style-type: none;;
 }
 
@@ -231,8 +231,7 @@ li div input {
 }
 
 #upload {
-  width: 99%;
-  background-color: #e2695e;
+  background-color: #859900;
   color: white;
 }
 

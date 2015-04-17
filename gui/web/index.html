@@ -60,36 +60,50 @@
             <span class="sr-only">Toggle Dropdown</span>
           </button>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
+            <li><a href="#">Explorer-1</a></li>
             <li class="divider"></li>
             <li><a href="#">Add Explorer</a></li>
           </ul>
         </div>
       </div>
 
-          <div id="title-container">
+      <!-- Explorer Specific Content -->
+        <div>
+          <div id="explorer-head">
             <li id="new">New
               <span id="folder" class="glyphicon glyphicon-folder-close"></span>
               <span id="file" class="glyphicon glyphicon-file"></span>
             </li>
-          <div id="file-explorer-hr-container">
-            <div id=new-file-drop>
-              <p>Top Level</p>
+            <div id="file-explorer-hr-container">
+              <div id=new-file-drop>
+                <p>Top Level</p>
+              </div>
             </div>
-          </div>
           </div>
         <div id='explorer-container' class="well well-sm">
           <ul class="explorer" id="explorer-body" ></ul>
         </div>
         <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span></p>
-        <div id="control-buttons" class="btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
-          <button id="build-button" type="button" class="btn btn-default">Build <span class="glyphicon glyphicon-ok"></span></button>
-          <button id="run-button" type="button" class="btn btn-default">Run <span class="glyphicon glyphicon-play"></span></button>
+          <div id="control-buttons" class="btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
+            <button id="build-button" type="button" class="btn btn-default">Build <span class="glyphicon glyphicon-ok"></span></button>
+            <button id="upload" type="button" class="btn btn-sm">Upload <span class="glyphicon glyphicon-share"></span></button>
+          </div>
         </div>
-        <button id="upload" type="button" class="btn btn-sm">Upload <span class="glyphicon glyphicon-share"></span></button>
+
+
+      <!-- Control Div -->
+
+      <div id="control" class="hidden">
+        <div>
+          <h3>Nodes</h3>
+        </div>
+                  <button id="run-button" type="button" class="btn btn-default">Run <span class="glyphicon glyphicon-play"></span></button>
       </div>
+
+      </div>
+
+
+
 
       <!-- Editor -->
 

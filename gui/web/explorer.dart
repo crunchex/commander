@@ -22,6 +22,7 @@ class UpDroidExplorer {
   DivElement currentSelected;
   String currentSelectedPath;
 
+  LIElement title;
   DivElement editorDiv;
   ButtonElement controlToggle;
   DivElement controlPanel;
@@ -38,6 +39,7 @@ class UpDroidExplorer {
   Dropzone dzRootLineContainer;
   Dropzone dzRecycle;
   StreamSubscription outsideClickListener;
+  StreamSubscription controlLeave;
   Map editors = {};
   Map editorListeners = {};
   Map fileInfo = {};
@@ -56,6 +58,7 @@ class UpDroidExplorer {
     newFolder = querySelector('#folder');
     newFolderDragSetup();
 
+    title = querySelector('#file-explorer-title');
     controlToggle = querySelector('#control-toggle');
     controlPanel = querySelector('#control');
     newFileDrop = querySelector('#new-file-drop');
@@ -307,6 +310,15 @@ class UpDroidExplorer {
   void showControl () {
     exp.classes.add('hidden');
     controlPanel.classes.remove('hidden');
+    controlLeave = title.onClick.listen((e){
+      hideControl();
+      controlLeave.cancel();
+    });
+  }
+
+  void hideControl () {
+    controlPanel.classes.add('hidden');
+    exp.classes.remove('hidden');
   }
 
   /// Functions for updating tracked file info

@@ -30,27 +30,42 @@ abstract class UpDroidTab {
     _tabContainer.remove();
   }
 
-//  void createExplorer(int num) {
-//    DivElement container = new DivElement()
-//      ..id = "exp-$num";
-//    _explorersDiv.append(container);
-//    DivElement explorerHead = new DivElement()
-//      ..classes.add('explorer-head');
-//    LIElement newDnd = new LIElement()
-//        ..classes.add('new');
-//    explorerHead.append(newDnd);
-//    SpanElement file = new SpanElement()
-//      ..id = "file-$num"
-//      ..classes.add("glyphicon glyphicon-folder-close");
-//    SpanElement folder = new SpanElement()
-//      ..id = "folder-$num"
-//      ..classes.add("glyphicon glyphicon-file");
-//    newDnd.append(file);
-//    newDnd.append(folder);
-//    DivElement hrContainer = new DivElement()
-//      ..id = "file-explorer-hr-container-$num";
-//
-//  }
+  void createExplorer(int num) {
+    DivElement container = new DivElement()
+      ..id = "exp-$num";
+    _explorersDiv.append(container);
+    DivElement explorerHead = new DivElement()
+      ..classes.add('explorer-head');
+    LIElement newDnd = new LIElement()
+        ..classes.add('new')
+        ..text = "New";
+    explorerHead.append(newDnd);
+    SpanElement file = new SpanElement()
+      ..id = "file-$num"
+      ..classes.add("glyphicon glyphicon-folder-close");
+    SpanElement folder = new SpanElement()
+      ..id = "folder-$num"
+      ..classes.add("glyphicon glyphicon-file");
+    newDnd.append(file);
+    newDnd.append(folder);
+    DivElement hrContainer = new DivElement()
+      ..id = "file-explorer-hr-container-$num";
+    explorerHead.append(hrContainer);
+    DivElement drop = new DivElement()
+      ..id = "new-file-drop-$num";
+    hrContainer.append(drop);
+    ParagraphElement p = new ParagraphElement();
+    p.text = "Top Level";
+    drop.append(p);
+    DivElement body = new DivElement()
+      ..classes.addAll(['well', 'well-sm'])
+      ..id = "explorer-$num";
+    container.append(body);
+    UListElement guts = new UListElement()
+      ..classes.add("explorer")
+      ..id = "explorer-body-$num";
+    body.append(guts);
+  }
 
   void closeExplorer(int num) {
 

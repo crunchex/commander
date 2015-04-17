@@ -15,11 +15,16 @@ import 'lib/explorer_helper.dart';
 class UpDroidExplorer {
   static const String className = 'UpDroidExplorer';
 
+  // Make dynamic
+  DivElement exp = querySelector("#exp-1");
+
   String workspacePath;
   DivElement currentSelected;
   String currentSelectedPath;
 
   DivElement editorDiv;
+  ButtonElement controlToggle;
+  DivElement controlPanel;
   SpanElement newFile;
   SpanElement newFolder;
   DivElement newFileDrop;
@@ -51,6 +56,8 @@ class UpDroidExplorer {
     newFolder = querySelector('#folder');
     newFolderDragSetup();
 
+    controlToggle = querySelector('#control-toggle');
+    controlPanel = querySelector('#control');
     newFileDrop = querySelector('#new-file-drop');
     rootlineContainer = querySelector('#file-explorer-hr-container');
     dzRootLineContainer = new Dropzone(rootlineContainer);
@@ -170,6 +177,8 @@ class UpDroidExplorer {
         .transform(updroidTransformer)
         .where((um) => um.header == 'EXPLORER_REMOVE')
         .listen((um) => removeUpdate(um.body));
+
+    controlToggle.onClick.listen((e) => showControl());
 
     newFileDrop.onClick.listen((e) {
       if (currentSelected != null) {
@@ -294,8 +303,13 @@ class UpDroidExplorer {
     return files;
   }
 
-  /// Functions for updating tracked file info
+  /// Shows control panel
+  void showControl () {
+    exp.classes.add('hidden');
+    controlPanel.classes.remove('hidden');
+  }
 
+  /// Functions for updating tracked file info
   void removeFileData([LIElement li, String path]) {
     if (li != null) {
       fileInfo.remove(li);

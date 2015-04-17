@@ -9,6 +9,7 @@ abstract class UpDroidTab {
   LIElement _tabHandle;
   DivElement _tabContainer;
   DivElement _tabContent;
+  DivElement _explorersDiv = querySelector("#exp-container");
 
   AnchorElement tabHandleButton;
 
@@ -27,6 +28,32 @@ abstract class UpDroidTab {
   void destroyTab() {
     _tabHandle.remove();
     _tabContainer.remove();
+  }
+
+//  void createExplorer(int num) {
+//    DivElement container = new DivElement()
+//      ..id = "exp-$num";
+//    _explorersDiv.append(container);
+//    DivElement explorerHead = new DivElement()
+//      ..classes.add('explorer-head');
+//    LIElement newDnd = new LIElement()
+//        ..classes.add('new');
+//    explorerHead.append(newDnd);
+//    SpanElement file = new SpanElement()
+//      ..id = "file-$num"
+//      ..classes.add("glyphicon glyphicon-folder-close");
+//    SpanElement folder = new SpanElement()
+//      ..id = "folder-$num"
+//      ..classes.add("glyphicon glyphicon-file");
+//    newDnd.append(file);
+//    newDnd.append(folder);
+//    DivElement hrContainer = new DivElement()
+//      ..id = "file-explorer-hr-container-$num";
+//
+//  }
+
+  void closeExplorer(int num) {
+
   }
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.

@@ -497,9 +497,11 @@ li div input {
 }
 
 .folder{
+  margin-left: 5px;
   cursor: pointer;
 }
 
 .file{
+  margin-left: 3px;
   cursor: pointer;
 }

@@ -41,14 +41,14 @@ abstract class UpDroidTab {
         ..classes.add('new')
         ..text = "New";
     explorerHead.append(newDnd);
-    SpanElement file = new SpanElement()
-      ..id = "file-$num"
-      ..classes.addAll(["glyphicon glyphicon-folder-close", 'file']);
     SpanElement folder = new SpanElement()
       ..id = "folder-$num"
-      ..classes.addAll(["glyphicon glyphicon-file", 'folder']);
-    newDnd.append(file);
+      ..classes.addAll(["glyphicon glyphicon-folder-close", 'folder']);
+    SpanElement file = new SpanElement()
+      ..id = "file-$num"
+      ..classes.addAll(["glyphicon glyphicon-file", 'file']);
     newDnd.append(folder);
+    newDnd.append(file);
     DivElement hrContainer = new DivElement()
       ..id = "file-explorer-hr-container-$num";
     explorerHead.append(hrContainer);

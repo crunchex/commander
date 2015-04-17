@@ -9,6 +9,7 @@ bin/
 *.deb
 deploy/
 src-min-noconflict/
+cmdr.css
 
 
 # Or the files created by dart2js.

@@ -87,7 +87,7 @@ class UpDroidConsole extends UpDroidTab {
 
   /// Sets up the event handlers for the console.
   void _registerConsoleEventHandlers() {
-    _cs.stream.where((m) => m.dest == 'CONSOLE' || m.dest == 'ALL').listen((m) => _processMessage(m));
+    _cs.stream.where((m) => m.dest == 'CONSOLE').listen((m) => _processMessage(m));
 
     _ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;

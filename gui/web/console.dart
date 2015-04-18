@@ -119,19 +119,19 @@ class UpDroidConsole extends UpDroidTab {
     });
 
     _console.onClick.listen((e) {
-      List<int> oldSize = _term.currentSize();
-      List<int> newSize = _term.calculateSize();
-
-      if (const ListEquality().equals(oldSize, newSize)) return;
-
-      _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
+//      List<int> oldSize = _term.currentSize();
+//      List<int> newSize = _term.calculateSize();
+//
+//      if (const ListEquality().equals(oldSize, newSize)) return;
+//
+//      _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
     });
 
     window.onResize.listen((e) {
-      if (_console.parent.classes.contains('active')) {
-        List<int> newSize = _term.calculateSize();
-        _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
-      }
+//      if (_console.parent.classes.contains('active')) {
+//        List<int> newSize = _term.calculateSize();
+//        _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
+//      }
     });
   }
 

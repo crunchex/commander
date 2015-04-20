@@ -3,15 +3,13 @@ part of updroid_server;
 class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';
 
-  int editorNum = 1;
-
   Directory _dir;
   DirectoryWatcher _watcher;
 
   CmdrExplorer(Directory dir) {
     _dir = dir;
 
-    _watcher = new DirectoryWatcher(dir.path);
+    _watcher = new DirectoryWatcher(dir.path + '/src');
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests

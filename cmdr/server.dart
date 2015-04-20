@@ -151,6 +151,7 @@ class CmdrServer {
           Ros.runNode(package, node);
           break;
 
+        //TODO: Need to change to grab all directories
         case 'CATKIN_NODE_LIST':
           Ros.nodeList(dir, socket);
           break;
@@ -177,11 +178,15 @@ class CmdrServer {
     }).onDone(() => _cleanUpBackend());
   }
 
+  //TODO: explorers need to be added here
   Future _initBackendClasses(Directory dir) {
     var completer = new Completer();
+    print(dir.listSync());
 
-    Directory srcDir = new Directory('${pathLib.normalize(dir.path + "/src")}');
-    _explorers.add(new CmdrExplorer(srcDir));
+    Directory srcDir = new Directory('${pathLib.normalize(dir.path)}');
+    for (var item in srcDir.listSync()) {
+      _explorers.add(new CmdrExplorer(item));
+    }
 
     completer.complete();
     return completer.future;

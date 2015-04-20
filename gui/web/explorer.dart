@@ -51,10 +51,11 @@ class UpDroidExplorer extends UpDroidTab{
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 
-  UpDroidExplorer(StreamController<CommanderMessage> cs, num) {
+  UpDroidExplorer(StreamController<CommanderMessage> cs, num, path) {
     expNum = num;
+    print(num);
     this.cs = cs;
-    createExplorer(1);
+    createExplorer(num);
 
     newFile = querySelector('#file-$expNum');
     newFileDragSetup();

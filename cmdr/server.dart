@@ -134,7 +134,7 @@ class CmdrServer {
       switch (um.header) {
         case 'CLIENT_CONFIG':
           _initBackendClasses(dir).then((value) {
-            socket.add('[[CLIENT_SERVER_READY]]');
+            socket.add('[[CLIENT_SERVER_READY]]' + value);
           });
           break;
 
@@ -178,17 +178,19 @@ class CmdrServer {
     }).onDone(() => _cleanUpBackend());
   }
 
-  //TODO: explorers need to be added here
+  //TODO: need to filter out files
   Future _initBackendClasses(Directory dir) {
     var completer = new Completer();
-    print(dir.listSync());
 
     Directory srcDir = new Directory('${pathLib.normalize(dir.path)}');
-    for (var item in srcDir.listSync()) {
-      _explorers.add(new CmdrExplorer(item));
-    }
+    srcDir.list().toList().then((folderList) {
+      for(var folder in folderList) {
+          _explorers.add(new CmdrExplorer(folder));
+      }
+      folderList = folderList.toString().replaceAll('Directory: ', "");
+      completer.complete(folderList);
+    });
 
-    completer.complete();
     return completer.future;
   }
 

@@ -8,7 +8,9 @@ class CmdrExplorer {
   int expNum;
 
   CmdrExplorer(Directory dir, num) {
-    _dir = dir;
+    for(var item in dir.listSync()) {
+      if(pathLib.basename(item.path) == 'src') _dir = item;
+    }
     expNum = num;
 
     _watcher = new DirectoryWatcher(dir.path + '/src');

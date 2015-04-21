@@ -181,22 +181,29 @@ class CmdrServer {
   }
 
   //TODO: need to filter out files
+  // This can be simplified.  Paths grabbed but path passing not necessary.
   Future _initBackendClasses(Directory dir) {
     var completer = new Completer();
 
     Directory srcDir = new Directory('${pathLib.normalize(dir.path)}');
     srcDir.list().toList().then((folderList) {
+      var result = [];
+      var paths = [];
+      for(var item in folderList) {
+        if(!item.toString().startsWith('File: ')){
+          paths.add(item.toString().replaceAll('Directory: ', ""));
+          result.add(item);
+        }
+      }
+      folderList = result;
+
       int num = 1;
       for(var folder in folderList) {
           _explorers.add(new CmdrExplorer(folder, num));
           num += 1;
       }
-      var result = [];
-      for(var item in folderList) {
-        result.add(item.toString().replaceAll('Directory: ', ""));
-      }
-      folderList = result;
-      completer.complete(folderList);
+
+      completer.complete(paths);
     });
 
     return completer.future;

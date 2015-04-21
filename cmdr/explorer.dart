@@ -7,6 +7,7 @@ class CmdrExplorer {
   DirectoryWatcher _watcher;
   int expNum;
 
+  //TODO: make asynchroneous
   CmdrExplorer(Directory dir, num) {
     for(var item in dir.listSync()) {
       if(pathLib.basename(item.path) == 'src') _dir = item;

@@ -76,8 +76,8 @@ abstract class UpDroidTab {
     _explorer.classes.add('hidden');
   }
 
-  void closeExplorer(int num) {
-
+  void showExlorer() {
+    _explorer.classes.remove('hidden');
   }
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.

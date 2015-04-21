@@ -5,9 +5,10 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:collection/equality.dart';
+import 'package:terminal/terminal.dart';
+import 'package:terminal/theme.dart';
 
 import 'lib/updroid_message.dart';
-import 'lib/terminal/terminal.dart';
 import 'tab.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]

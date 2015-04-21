@@ -10,6 +10,8 @@ abstract class UpDroidTab {
   DivElement _tabContainer;
   DivElement _tabContent;
   DivElement _explorersDiv = querySelector("#exp-container");
+  UListElement _expList = querySelector("#side-menu ul");
+  Element separator = querySelector('#side-menu-separator');
   DivElement _explorer;
 
   AnchorElement tabHandleButton;
@@ -34,6 +36,7 @@ abstract class UpDroidTab {
   // Explorer related functions
 
   void createExplorer(int num) {
+    makeExpButton(num);
     _explorer = new DivElement()
       ..id = "exp-$num";
     _explorersDiv.append(_explorer);
@@ -72,6 +75,17 @@ abstract class UpDroidTab {
     body.append(guts);
   }
 
+  makeExpButton (int num) {
+    LIElement item = new LIElement();
+    AnchorElement link = new AnchorElement()
+      ..id = "exp-$num-button"
+      ..href = "#"
+      ..text = "Workspace $num"
+      ..attributes['role'] = 'button';
+    item.append(link);
+    _expList.insertBefore(item, separator);
+  }
+
   void hideExplorer() {
     _explorer.classes.add('hidden');
   }
@@ -79,6 +93,8 @@ abstract class UpDroidTab {
   void showExlorer() {
     _explorer.classes.remove('hidden');
   }
+
+  // End of explorer functions
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
   void setUpTabHandle(int num, int col, String title, bool active) {

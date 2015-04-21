@@ -124,7 +124,7 @@ class UpDroidClient {
 
     ws.onMessage.transform(updroidTransformer)
       .where((um) => um.header == 'CLIENT_SERVER_READY')
-      .listen((um) => _initializeTabs(config, um.body));
+      .listen((um) => _initializeTabs(config, JSON.decode(um.body)));
 
     ws.onMessage.transform(updroidTransformer)
       .where((um) => um.header == 'BUILD_RESULT')
@@ -210,9 +210,8 @@ class UpDroidClient {
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: create an abstract class [UpDroidTab] that all others implement.
   /// TODO: call a generic UpDroidTab constructor instead of ifs or switches.
-  void _initializeTabs(String strConfig, String explorerPathsRaw) {
+  void _initializeTabs(String strConfig, List explorerPaths) {
     List config = JSON.decode(strConfig);
-    var explorerPaths = explorerPathsRaw.split(" ");
     int i = 1;
     for(var path in explorerPaths) {
       _tabs[0].add(new UpDroidExplorer(cs, i));

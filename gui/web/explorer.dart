@@ -159,7 +159,6 @@ class UpDroidExplorer extends UpDroidTab{
         .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
         .listen((um) {
       workspacePath = um.body;
-      print(workspacePath);
       ws.send('[[INITIAL_DIRECTORY_LIST]]');
     });
 

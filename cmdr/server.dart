@@ -88,7 +88,6 @@ class CmdrServer {
           .upgrade(request)
           .then((WebSocket ws) {
             _explorers[objectID].handleWebSocket(ws);
-            print(objectID);
         });
         break;
 
@@ -137,7 +136,7 @@ class CmdrServer {
       switch (um.header) {
         case 'CLIENT_CONFIG':
           _initBackendClasses(dir).then((value) {
-            socket.add('[[CLIENT_SERVER_READY]]' + value);
+            socket.add('[[CLIENT_SERVER_READY]]' + JSON.encode(value));
           });
           break;
 
@@ -192,7 +191,11 @@ class CmdrServer {
           _explorers.add(new CmdrExplorer(folder, num));
           num += 1;
       }
-      folderList = folderList.toString().replaceAll('Directory: ', "");
+      var result = [];
+      for(var item in folderList) {
+        result.add(item.toString().replaceAll('Directory: ', ""));
+      }
+      folderList = result;
       completer.complete(folderList);
     });
 

@@ -9,7 +9,6 @@ class CmdrExplorer {
 
   CmdrExplorer(Directory dir, num) {
     _dir = dir;
-    print(dir.path);
     expNum = num;
 
     _watcher = new DirectoryWatcher(dir.path + '/src');

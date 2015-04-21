@@ -9,3 +9,5 @@ dependencies:
   dquery: any
   path: any
   quiver: any
+  terminal:
+    path: /home/dong/git/terminal

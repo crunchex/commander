@@ -215,7 +215,7 @@ class UpDroidClient {
     var explorerPaths = explorerPathsRaw.split(" ");
     int i = 1;
     for(var path in explorerPaths) {
-      _tabs[0].add(new UpDroidExplorer(cs, i, path));
+      _tabs[0].add(new UpDroidExplorer(cs, i));
       i += 1;
     }
 

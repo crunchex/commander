@@ -5,9 +5,12 @@ class CmdrExplorer {
 
   Directory _dir;
   DirectoryWatcher _watcher;
+  int expNum;
 
-  CmdrExplorer(Directory dir) {
+  CmdrExplorer(Directory dir, num) {
     _dir = dir;
+    print(dir.path);
+    expNum = num;
 
     _watcher = new DirectoryWatcher(dir.path + '/src');
   }
@@ -27,7 +30,8 @@ class CmdrExplorer {
           break;
 
         case 'EXPLORER_DIRECTORY_PATH':
-          _sendPath(ws);
+          int num = int.parse(um.body);
+          if(expNum == num) _sendPath(ws);
           break;
 
         case 'EXPLORER_DIRECTORY_LIST':

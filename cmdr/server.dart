@@ -184,8 +184,10 @@ class CmdrServer {
 
     Directory srcDir = new Directory('${pathLib.normalize(dir.path)}');
     srcDir.list().toList().then((folderList) {
+      int num = 1;
       for(var folder in folderList) {
-          _explorers.add(new CmdrExplorer(folder));
+          _explorers.add(new CmdrExplorer(folder, num));
+          num += 1;
       }
       folderList = folderList.toString().replaceAll('Directory: ', "");
       completer.complete(folderList);

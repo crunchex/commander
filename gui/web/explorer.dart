@@ -2,6 +2,7 @@ library updroid_explorer;
 
 import 'dart:html';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dnd/dnd.dart';
 import "package:path/path.dart" as pathLib;
@@ -51,7 +52,7 @@ class UpDroidExplorer extends UpDroidTab{
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 
-  UpDroidExplorer(StreamController<CommanderMessage> cs, num, path) {
+  UpDroidExplorer(StreamController<CommanderMessage> cs, num) {
     expNum = num;
     print(num);
     this.cs = cs;
@@ -76,7 +77,7 @@ class UpDroidExplorer extends UpDroidTab{
     // Port 12060 is the default port that UpDroid uses.
     String url = window.location.host;
     url = url.split(':')[0];
-    ws = new WebSocket('ws://' + url + ':12060/explorer/1');
+    ws = new WebSocket('ws://' + url + ':12060/explorer/${expNum.toString()}');
 
     registerExplorerEventHandlers();
   }
@@ -151,13 +152,14 @@ class UpDroidExplorer extends UpDroidTab{
         .where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL')
         .listen((m) => processMessage(m));
 
-    ws.onOpen.listen((e) => ws.send('[[EXPLORER_DIRECTORY_PATH]]'));
+    ws.onOpen.listen((e) => ws.send('[[EXPLORER_DIRECTORY_PATH]]' + expNum.toString()));
 
     ws.onMessage
         .transform(updroidTransformer)
         .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
         .listen((um) {
       workspacePath = um.body;
+      print(workspacePath);
       ws.send('[[INITIAL_DIRECTORY_LIST]]');
     });
 

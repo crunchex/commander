@@ -202,6 +202,10 @@ class CmdrServer {
     return completer.future;
   }
 
+  void _openExplorer(String id, Directory dir) {
+
+  }
+
   void _openTab(String id, Directory dir) {
     List idList = id.split('-');
     int col = int.parse(idList[0]);

@@ -10,6 +10,7 @@ abstract class UpDroidTab {
   DivElement _tabContainer;
   DivElement _tabContent;
   DivElement _explorersDiv = querySelector("#exp-container");
+  DivElement _explorer;
 
   AnchorElement tabHandleButton;
 
@@ -30,13 +31,15 @@ abstract class UpDroidTab {
     _tabContainer.remove();
   }
 
+  // Explorer related functions
+
   void createExplorer(int num) {
-    DivElement container = new DivElement()
+    _explorer = new DivElement()
       ..id = "exp-$num";
-    _explorersDiv.append(container);
+    _explorersDiv.append(_explorer);
     DivElement explorerHead = new DivElement()
       ..classes.add('explorer-head');
-    container.append(explorerHead);
+    _explorer.append(explorerHead);
     LIElement newDnd = new LIElement()
         ..classes.add('new')
         ..text = "New";
@@ -62,11 +65,15 @@ abstract class UpDroidTab {
     DivElement body = new DivElement()
       ..classes.addAll(['well', 'well-sm', 'explorer-container'])
       ..id = "explorer-$num";
-    container.append(body);
+    _explorer.append(body);
     UListElement guts = new UListElement()
       ..classes.add("explorer-body")
       ..id = "explorer-body-$num";
     body.append(guts);
+  }
+
+  void hideExplorer() {
+    _explorer.classes.add('hidden');
   }
 
   void closeExplorer(int num) {

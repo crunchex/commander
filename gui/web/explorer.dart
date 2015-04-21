@@ -258,7 +258,7 @@ class UpDroidExplorer extends UpDroidTab{
             ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
           }
         }
-      } else if (e.draggableElement.id == 'file') {
+      } else if (e.draggableElement.classes.contains('file')) {
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
       }
       // TODO: need to manually update fileInfo and pathToFile since folders dont fire updates
@@ -510,7 +510,7 @@ class UpDroidExplorer extends UpDroidTab{
           if (alert == true && item != duplicate) {
             window.alert("Cannot move here, file name already exists");
           }
-        } else if (e.draggableElement.id == 'file') {
+        } else if (e.draggableElement.classes.contains('file')) {
           ws.send('[[EXPLORER_NEW_FILE]]' + getPath(span.parent.parent));
         } else {
           ws.send('[[EXPLORER_NEW_FOLDER]]' +

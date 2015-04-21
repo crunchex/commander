@@ -86,7 +86,10 @@ class CmdrServer {
       case 'explorer':
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
+          .then((WebSocket ws) {
+            _explorers[objectID].handleWebSocket(ws);
+            print(objectID);
+        });
         break;
 
       case 'camera':

@@ -18,6 +18,11 @@
   src: url(../assets/AvenirNextLTPro-MediumCn.otf);
 }
 
+@font-face {
+  font-family: Monosten A;
+  src: url(../assets/Monosten-A-webfont.ttf);
+}
+
 html {
   position: relative;
   height: 100%;
@@ -324,6 +329,11 @@ li div input {
   border-width: 0px 0px 1px 0px;
   border-color: #dddddd;
   background-color: transparent;
+}
+
+.ace_editor.ace-solarized-dark.updroid_editor,
+.ace_editor.ace-solarized-light.updroid_editor {
+  font-family: "Monosten A", "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;
 }
 
 .editor {

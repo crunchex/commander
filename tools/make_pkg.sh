@@ -52,14 +52,18 @@ if [ -e "$TOPDIR/deploy/cmdr"* ]; then
 	rm deploy/cmdr*
 fi
 
-fpm -s dir -t deb -n cmdr -v 0.2 -p $TOPDIR/deploy/ \
+fpm -s dir -t deb -n cmdr -v 0.4 -p $TOPDIR/deploy/ \
+    --vendor "UpDroid, Inc." \
+    --provides cmdr \
+    --description "A browser-based IDE and omni-tool for robots." \
+    --maintainer "Mike Lewis <mike@updroid.com>" \
+    --url http://www.updroid.com \
     -d dart -d ros-indigo-ros-base \
     --before-install=$TOPDIR/tools/packaging/before-install.sh \
     --after-install=$TOPDIR/tools/packaging/after-install.sh \
     ./gui/build/web=/opt/updroid/cmdr \
     ./cmdr/bin/cmdr=/usr/local/bin/cmdr \
-    ./cmdr/bin/cmdr-pty=/usr/local/bin/cmdr-pty \
-    > /dev/null
+    ./cmdr/bin/cmdr-pty=/usr/local/bin/cmdr-pty
 
 echo "OK"
 

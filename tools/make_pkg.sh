@@ -53,6 +53,7 @@ if [ -e "$TOPDIR/deploy/cmdr"* ]; then
 fi
 
 fpm -s dir -t deb -n cmdr -v 0.2 -p $TOPDIR/deploy/ \
+    -d dart -d ros-indigo-ros-base \
     --before-install=$TOPDIR/tools/packaging/before-install.sh \
     --after-install=$TOPDIR/tools/packaging/after-install.sh \
     ./gui/build/web=/opt/updroid/cmdr \

@@ -68,9 +68,16 @@ body>.navbar.navbar-inverse {
   border: none;
 }
 
-.navbar-inverse .navbar-nav>li>a {
+.navbar-inverse .navbar-nav>li>a,
+.navbar-inverse .navbar-nav>li>a:focus {
   color: #0c0c0c;
+  background-color: transparent;
   font-family: "Avenir Next LT Pro Bold";
+  -webkit-transition: all 0.7s ease;
+  -moz-transition: all 0.7s ease;
+  -ms-transition: all 0.7s ease;
+  -o-transition: all 0.7s ease;
+  transition: all 0.7s ease;
 }
 
 .navbar-inverse .navbar-nav>li>a:hover {

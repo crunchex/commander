@@ -19,7 +19,7 @@ class UpDroidExplorer extends UpDroidTab{
 
   // Make dynamic
   int expNum;
-  DivElement exp = querySelector("#exp-1");
+  DivElement exp;
 
   String workspacePath;
   DivElement currentSelected;
@@ -54,6 +54,7 @@ class UpDroidExplorer extends UpDroidTab{
 
   UpDroidExplorer(StreamController<CommanderMessage> cs, num) {
     expNum = num;
+    exp = querySelector("#exp-$expNum");
     print(num);
     this.cs = cs;
     createExplorer(num);

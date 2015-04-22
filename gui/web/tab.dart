@@ -31,7 +31,8 @@ abstract class UpDroidTab {
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
   void setUpTabHandle(int num, int col, String title, bool active) {
-    _tabHandle = new LIElement();
+    _tabHandle = new LIElement()
+      ..classes.add('tab-handle');
     if (active) _tabHandle.classes.add('active');
 
     String id = title.toLowerCase().replaceAll(' ', '-');
@@ -41,6 +42,7 @@ abstract class UpDroidTab {
         ..href = '#tab-$id-$num-container'
         ..dataset['toggle'] = 'tab'
         ..text = '$title-$num';
+    tabHandleButton.onClick.listen((e) => _renameEventHandler());
     _tabHandle.children.add(tabHandleButton);
 
     DivElement column = querySelector('#column-$col');
@@ -166,5 +168,35 @@ abstract class UpDroidTab {
     configRefs[id] = button;
 
     return buttonList;
+  }
+
+  /// Handles tab renaming with a single-click event.
+  void _renameEventHandler() {
+    if (!_tabHandle.className.contains('editing')) {
+      _tabHandle.classes.add('editing');
+
+      String originalText = tabHandleButton.text;
+
+      AnchorElement a = new AnchorElement();
+      InputElement input = new InputElement();
+      a.children.add(input);
+      input.value = originalText;
+
+      input.onKeyUp.listen((e) {
+        if (e.keyCode == KeyCode.ENTER || e.keyCode == KeyCode.ESC) {
+          if (e.keyCode == KeyCode.ENTER) {
+            tabHandleButton.text = input.value;
+          } else if (e.keyCode == KeyCode.ESC){
+            tabHandleButton.text = originalText;
+          }
+          _tabHandle.children[0] = tabHandleButton;
+          _tabHandle.classes.remove('editing');
+        }
+      });
+
+      _tabHandle.children[0] = a;
+      input.focus();
+      input.select();
+    }
   }
 }

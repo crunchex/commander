@@ -109,6 +109,20 @@ body>.navbar.navbar-inverse {
   border-bottom: 1px;
 }
 
+.nav-tabs>.tab-handle {
+  width: auto;
+  /*font-family: "Avenir Next LT Pro Medium Condensed";*/
+}
+
+.nav-tabs>.tab-handle.editing>a {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.nav-tabs>.tab-handle.editing>a>input {
+  width: 100%;
+}
+
 .dropdown-menu>li>a {
   font-family: "Avenir Next LT Pro Medium Condensed";
   border-bottom: 1px;

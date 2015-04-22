@@ -58,7 +58,7 @@ fpm -s dir -t deb -n cmdr -v 0.4 -p $TOPDIR/deploy/ \
     --description "A browser-based IDE and omni-tool for robots." \
     --maintainer "Mike Lewis <mike@updroid.com>" \
     --url http://www.updroid.com \
-    -d dart -d ros-indigo-ros-base \
+    -d 'dart >= 1.9.3' -d ros-indigo-ros-base \
     --before-install=$TOPDIR/tools/packaging/before-install.sh \
     --after-install=$TOPDIR/tools/packaging/after-install.sh \
     ./gui/build/web=/opt/updroid/cmdr \

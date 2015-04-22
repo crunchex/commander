@@ -64,7 +64,7 @@ fpm -s dir -t deb -n cmdr -v 0.4 -p $TOPDIR/deploy/ \
     --after-install=$TOPDIR/tools/packaging/after-install.sh \
     ./gui/build/web=/opt/updroid/cmdr \
     ./cmdr/bin/cmdr=/usr/local/bin/cmdr \
-    ./cmdr/bin/cmdr-pty=/usr/local/bin/cmdr-pty
+    ./cmdr/bin/cmdr-pty=/usr/local/bin/cmdr-pty > /dev/null
 
 echo "OK"
 

@@ -509,16 +509,22 @@ li div input {
 
 .modal-header h3 {
   margin-left: 20px;
-  font: 26px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+  font-family: "Avenir Next LT Pro Bold";
+  font-size: 26px;
 
 }
 
 .modal-body {
-  padding: 10px;
+  font-family: "Avenir Next LT Pro Regular";
+  padding: 30px;
 }
 
-.modal-body p {
+/*.modal-body p {
   padding-left: 20px;
+}*/
+
+code, kbd, pre, samp {
+  font-family: "Monosten A";
 }
 
 #warning{
@@ -544,11 +550,16 @@ li div input {
 #selector-wrapper button{
   margin-left: 20px;
   width: 150px;
-  background-color: #E7F4FE;
+  color: #0c0c0c;
+  border-color: #7e7e7e;
+  font-family: "Avenir Next LT Pro Demi";
+  background-color: #ffffff;
 }
 
 #selector-wrapper button:hover {
-  background-color: #003366;
+  background-color: #ff2919;
+  border-color: #ff2919;
+  color: #ffffff;
 }
 
 .popover {

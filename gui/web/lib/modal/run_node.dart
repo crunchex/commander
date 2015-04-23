@@ -29,7 +29,7 @@ class UpDroidRunNodeModal extends UpDroidModal {
   }
 
   void _setupFooter() {
-    ButtonElement discard = _createButton('warning', 'Discard');
+    ButtonElement discard = _createButton('warning', 'Cancel');
     _modalFooter.children.add(discard);
   }
 }

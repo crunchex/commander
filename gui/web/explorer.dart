@@ -249,11 +249,17 @@ class UpDroidExplorer {
     });
 
     newFolder.onDoubleClick.listen((e) {
-      ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
+      if(currentSelectedPath == null) ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
+      else{
+        ws.send('[[EXPLORER_NEW_FOLDER]]' + currentSelectedPath + '/untitled');
+        }
     });
 
     newFile.onDoubleClick.listen((e) {
-      ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
+      if(currentSelectedPath == null) ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
+      else{
+        ws.send('[[EXPLORER_NEW_FILE]]' + currentSelectedPath);
+      }
     });
 
     dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));

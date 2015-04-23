@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta http-equiv="X-UA-Compatible" content=="IE=edge"/>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content=="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UpDroid Commander</title>
-  <link rel="stylesheet" href="css/cmdr.css"></link>
+  <link rel="stylesheet" href="packages/bootjack/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/cosmos-bootstrap.min.css"></link>
+  <link rel="stylesheet" href="css/main.css"></link>
+
+  <script type="text/javascript" src="src-min-noconflict/ace.js"></script>
+  <script type="text/javascript" src="./jsmpg.js"></script>
+  <script async type="application/dart" src="main.dart"></script>
+  <script async data-pub-inline src="./packages/browser/dart.js"></script>
 </head>
 
 <body>
@@ -15,9 +23,8 @@
   <div class="modal fade modal-base" tabindex="-1" role="dialog">
     <div class="modal-dialog">
 
-
       <div class="modal-content">
-       <!-- insert content here -->
+        <!-- insert content here -->
       </div>
 
     </div>
@@ -30,8 +37,10 @@
       <img id="updroid" src="assets/commander_logo_black.png" alt="UpDroid Commander">
     </a>
     <ul class="nav navbar-nav navbar-right">
-      <li><a id="feedback-button" href="javascript: void(0)">Send Us Feedback!</a></li>
-      <li><a href="http://www.updroid.com" target="_blank">UpDroid.com</a></li>
+      <li><a id="feedback-button" href="javascript: void(0)">Send Us Feedback!</a>
+      </li>
+      <li><a href="http://www.updroid.com" target="_blank">UpDroid.com</a>
+      </li>
       <!--li><a href="javascript: void(0)">Tutorials</a></li>
       <li><a href="javascript: void(0)">Forums</a></li-->
     </ul>
@@ -42,48 +51,54 @@
   <div class="container-fluid">
     <div id="row-main" class="row">
 
-    <!-- Explorer -->
+      <!-- Col 0 -->
 
       <div id="column-0" class="col-xs-2">
-          <div id="title-container">
-              <li id="file-explorer-title">UP-Root
-              </li>
-            <li id="new">New
-              <span id="folder" class="glyphicon glyphicon-folder-close"></span>
-              <span id="file" class="glyphicon glyphicon-file"></span>
-            </li>
+        <div id="title-container">
+          <li id="file-explorer-title">UP-Root
+          </li>
+          <li id="new">New
+            <span id="folder" class="glyphicon glyphicon-folder-close"></span>
+            <span id="file" class="glyphicon glyphicon-file"></span>
+          </li>
           <div id="file-explorer-hr-container">
             <div id=new-file-drop>
               <p>Top Level</p>
             </div>
           </div>
-          </div>
+        </div>
         <div id='explorer-container' class="well well-sm">
-          <ul class="explorer" id="explorer-body" ></ul>
+          <ul class="explorer" id="explorer-body"></ul>
         </div>
-        <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span></p>
+        <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span>
+        </p>
         <div id="control-buttons" class="btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
-          <button id="build-button" type="button" class="btn btn-default">Build <span class="glyphicon glyphicon-ok"></span></button>
-          <button id="run-button" type="button" class="btn btn-default">Run <span class="glyphicon glyphicon-play"></span></button>
+          <button id="build-button" type="button" class="btn btn-default">Build <span class="glyphicon glyphicon-ok"></span>
+          </button>
+          <button id="run-button" type="button" class="btn btn-default">Run <span class="glyphicon glyphicon-play"></span>
+          </button>
         </div>
-        <button id="upload" type="button" class="btn btn-sm">Upload <span class="glyphicon glyphicon-share"></span></button>
+        <button id="upload" type="button" class="btn btn-sm">Upload <span class="glyphicon glyphicon-share"></span>
+        </button>
       </div>
 
-      <!-- Editor -->
+      <!-- Col 1 -->
 
       <div id="column-1" class="col-xs-5 column-content">
         <ul class="nav nav-tabs" role="tablist">
-          <li><a id="column-1-new" class="new-tab-button" data-toggle="tab"><span class="glyphicon glyphicon-plus"></span></a></li>
+          <li><a id="column-1-new" class="new-tab-button" data-toggle="tab"><span class="glyphicon glyphicon-plus"></span></a>
+          </li>
         </ul>
 
         <div id="col-1-tab-content" class="tab-content"></div>
       </div>
 
-      <!-- Console -->
+      <!-- Col 2 -->
 
       <div id="column-2" class="col-xs-5 column-content">
         <ul class="nav nav-tabs" role="tablist">
-          <li><a id="column-2-new" class="new-tab-button" data-toggle="tab"><span class="glyphicon glyphicon-plus"></span></a></li>
+          <li><a id="column-2-new" class="new-tab-button" data-toggle="tab"><span class="glyphicon glyphicon-plus"></span></a>
+          </li>
         </ul>
 
         <div id="col-2-tab-content" class="tab-content"></div>
@@ -92,14 +107,10 @@
     </div>
   </div>
 
-      <div class="footer">
-        <p class="text-muted">Copyright 2014 UpDroid, Inc. All rights reserved.</p>
-      </div>
-
-  <script type="text/javascript" src="src-min-noconflict/ace.js"></script>
-  <script type="text/javascript" src="./jsmpg.js"></script>
-  <script type="application/dart" src="main.dart"></script>
-  <script src="./packages/browser/dart.js"></script>
+  <div class="footer">
+    <p class="text-muted">Copyright 2014 UpDroid, Inc. All rights reserved.</p>
+  </div>
 
 </body>
+
 </html>

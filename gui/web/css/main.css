@@ -130,12 +130,21 @@ body>.navbar.navbar-inverse {
   padding-bottom: 7px;
 }
 
-.nav-tabs>.tab-handle.editing>a>input {
+.nav-tabs>.tab-handle.editinsg>a>input {
   width: 100%;
 }
 
-.dropdown-menu>li>a {
+.dropdown-menu>li {
+  text-align: left;
+}
+
+.dropdown-menu>li>a,
+.dropdown-menu>li>div {
+  text-align: left;
+  padding-left: 20px;
   font-family: "Avenir Next LT Pro Demi";
+  font-size: 14px;
+  color: #7e7e7e;
   border-bottom: 1px;
 }
 
@@ -298,7 +307,7 @@ body>.navbar.navbar-inverse {
 }
 
 li div input {
-  margin-left: 6px;
+  margin-left: 10px;
   width: 50px;
 }
 
@@ -367,13 +376,13 @@ li div input {
 .inner-tabs .dropdown-toggle:hover {
   border-color: #dddddd;
   background-color: #ffffff;
-  color: #dddddd;
+  color: #eaecec;
 }
 
 .inner-tabs .dropdown-toggle:focus {
   border-color: #dddddd;
   background-color: #ffffff;
-  color: #2780e3;
+  color: #ff2919;
 }
 
 .nav .open>a,

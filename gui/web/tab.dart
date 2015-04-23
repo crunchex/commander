@@ -133,7 +133,7 @@ abstract class UpDroidTab {
   /// Generates an input item (label and input field) and returns
   /// the new [LIElement].
   LIElement _createInputItem(String title, Map configRefs) {
-    LIElement li = new LIElement()..style.textAlign = 'center';
+    LIElement li = new LIElement();
 
     DivElement d = new DivElement()..style.display = 'inline-block';
     li.children.add(d);

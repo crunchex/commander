@@ -189,8 +189,8 @@ li div input {
 }
 
 .filename {
-  margin-left: 6px;
-  font-family: Avenir Next LT Pro Demi;
+  margin-left: 5px;
+  font-family: "Avenir Next LT Pro Demi";
   font-size: 12px;
 }
 
@@ -215,10 +215,10 @@ li div input {
   display: inline-block;
   padding: 2px 4px 2px 4px;
   text-align: center;
-  color: #333333;
+  color: #0c0c0c;
   border: 1px solid #dddddd;
-  font-family: "Source Sans Pro", Calibri, Candara, Arial, sans-serif;
-  font-size: 15px;
+  font-family: "Avenir Next LT Pro Demi";
+  font-size: 14px;
 }
 
 #explorer-container {
@@ -268,10 +268,17 @@ li div input {
 
 #title-container {
   padding-top: 10px;
+  color: #0c0c0c;
   margin-bottom: 5px;
   background-color: #eaecec;
   border: 1px solid #e3e3e3;
+  font-family: Avenir Next LT Pro Bold;
+  font-size: 16px;
   text-align: center;
+}
+
+#title-container>div>div>p {
+  font-size: 14px;
 }
 
 #title-container li {
@@ -283,17 +290,14 @@ li div input {
   margin-right: 5px;
   text-align: center;
   vertical-align: middle;
-  font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
 }
 
 #file-explorer-title #folder {
   margin-left: 4px;
 }
 
-#file-explorer-hr-container {
-}
-
 .file-container {
+  color: #0c0c0c;
   padding-left: 4px;
 }
 
@@ -322,9 +326,12 @@ li div input {
 
 #recycle {
   margin-top: 5px;
-  padding: 2px;
+  padding: 4px;
   text-align: center;
-  color: #7e7e7e;
+  vertical-align: middle;
+  color: #0c0c0c;
+  font-family: Avenir Next LT Pro Bold;
+  font-size: 14px;
   background-color: #eaecec;
   border: 1px solid #e3e3e3;
 }
@@ -418,7 +425,7 @@ li div input {
   width: 200%;
 }
 
-.highlighted {
+.file-container.highlighted {
   color: #ffffff;
   background-color: #ff2919;
 }

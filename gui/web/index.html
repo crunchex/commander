@@ -5,7 +5,14 @@
   <meta http-equiv="X-UA-Compatible" content=="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UpDroid Commander</title>
-  <link rel="stylesheet" href="css/cmdr.css"></link>
+  <link rel="stylesheet" href="packages/bootjack/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/cosmos-bootstrap.min.css"></link>
+  <link rel="stylesheet" href="css/main.css"></link>
+
+  <script type="text/javascript" src="src-min-noconflict/ace.js"></script>
+  <script type="text/javascript" src="./jsmpg.js"></script>
+  <script async type="application/dart" src="main.dart"></script>
+  <script async data-pub-inline src="./packages/browser/dart.js"></script>
 </head>
 
 <body>
@@ -26,13 +33,14 @@
   <!-- Top Nav -->
 
   <nav id="navbar" class="navbar navbar-inverse" role="navigation">
-    <a class="nav navbar-nav navbar-left" href="#">
-      <img id="updroid" src="assets/commander_logo.png" alt="UpDroid Commander">
+    <a class="nav navbar-nav navbar-left" href="javascript: void(0)">
+      <img id="updroid" src="assets/commander_logo_black.png" alt="UpDroid Commander">
     </a>
     <ul class="nav navbar-nav navbar-right">
+      <li><a id="feedback-button" href="javascript: void(0)">Send Us Feedback!</a></li>
       <li><a href="http://www.updroid.com" target="_blank">UpDroid.com</a></li>
-      <li><a href="#">Tutorials</a></li>
-      <li><a href="#">Forums</a></li>
+      <!--li><a href="javascript: void(0)">Tutorials</a></li>
+      <li><a href="javascript: void(0)">Forums</a></li-->
     </ul>
   </nav>
 
@@ -94,11 +102,6 @@
       <div class="footer">
         <p class="text-muted">Copyright 2014 UpDroid, Inc. All rights reserved.</p>
       </div>
-
-  <script type="text/javascript" src="src-min-noconflict/ace.js"></script>
-  <script type="text/javascript" src="./jsmpg.js"></script>
-  <script type="application/dart" src="main.dart"></script>
-  <script src="./packages/browser/dart.js"></script>
 
 </body>
 </html>

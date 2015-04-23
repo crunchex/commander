@@ -46,7 +46,7 @@ class UpDroidEditor extends UpDroidTab {
   var _curModal;
   Dropzone linkedDropzone;
 
-  int _fontSize = 14;
+  int _fontSize = 12;
 
   // Stream Subscriptions.
   StreamSubscription _saveAsClickEnd;
@@ -105,6 +105,9 @@ class UpDroidEditor extends UpDroidTab {
       ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
       ..fontSize = _fontSize
       ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK);
+
+    // Necessary to allow our styling (in main.css) to override Ace's.
+    _content.classes.add('updroid_editor');
 
     _resetSavePoint();
   }

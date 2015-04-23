@@ -70,6 +70,8 @@ BUILD=$TOPDIR/gui/build/web
 mkdir $BUILD/fonts
 cp $WEB/packages/bootjack/fonts/glyphicons-halflings-regular.* $BUILD/fonts/
 rm $BUILD/css/cosmos-bootstrap.min.css $BUILD/css/main.css
+sed -i '/bootstrap.min.css/d' $BUILD/index.html
+sed -i 's/main.css/cmdr.css/g' $BUILD/index.html
 sed -i 's/main.dart/main.dart.js/g' $BUILD/index.html
 echo "OK"
 

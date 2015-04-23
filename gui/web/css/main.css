@@ -191,6 +191,19 @@ body>.navbar.navbar-inverse {
   font-size: 15px;
 }
 
+#explorer-container {
+  background-color: #eaecec;
+  border-width: 1px;
+  border-color: solid #e3e3e3;
+  min-height: 300px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  /*max-height: 400px;*/
+  overflow: auto;
+  padding: none;
+  box-shadow: none;
+}
+
 #explorer-body > .explorer-li {
     margin-left: -38px;
 }
@@ -211,22 +224,28 @@ body>.navbar.navbar-inverse {
   display: inline-block;
   float: left;
   clear: both;
+  margin-bottom: 0px;
 }
 
 #explorer-body .btn:hover {
   color: #268bd2;
 }
 
-#title-container{
+.explorer-li{
+  min-width: 200px;
+  cursor: pointer;
+}
+
+#title-container {
   padding-top: 10px;
-  background-color: #f5f5f5;
+  margin-bottom: 5px;
+  background-color: #eaecec;
   border: 1px solid #e3e3e3;
-  border-bottom: none;
   text-align: center;
 }
 
-#title-container li{
-  list-style-type: none;;
+#title-container li {
+  list-style-type: none;
 }
 
 #file-explorer-title {
@@ -273,10 +292,11 @@ li div input {
 }
 
 #recycle {
-  margin-top: 20px;
+  margin-top: 5px;
   padding: 2px;
   text-align: center;
   color: #333333;
+  background-color: #eaecec;
   border: 1px solid #dddddd;
 }
 
@@ -543,19 +563,6 @@ li div input {
   bottom: 0px;
   right: 10px;
   font-size: 10px;
-}
-
-#explorer-container{
-  border: 0 1px 1px 1px;
-  min-height: 300px;
-  max-height: 400px;
-  overflow: auto;
-  padding: none;
-}
-
-.explorer-li{
-  min-width: 200px;
-  cursor: pointer;
 }
 
 .hidden {

@@ -19,6 +19,16 @@
 }
 
 @font-face {
+  font-family: Avenir Next LT Pro Regular;
+  src: url(../assets/AvenirNextLTPro-Regular.otf);
+}
+
+@font-face {
+  font-family: Avenir Next LT Pro Demi;
+  src: url(../assets/AvenirNextLTPro-Demi.otf);
+}
+
+@font-face {
   font-family: Monosten A;
   src: url(../assets/Monosten-A-webfont.ttf);
 }
@@ -156,6 +166,8 @@ body>.navbar.navbar-inverse {
 
 .filename {
   margin-left: 6px;
+  font-family: Avenir Next LT Pro Demi;
+  font-size: 12px;
 }
 
 .span-ondrag {
@@ -199,7 +211,7 @@ body>.navbar.navbar-inverse {
 }
 
 #explorer-body > .explorer-li {
-    margin-left: -38px;
+    margin-left: -40px;
 }
 
 .explorer-ul > .explorer-li {
@@ -225,7 +237,7 @@ body>.navbar.navbar-inverse {
   color: #268bd2;
 }
 
-.explorer-li{
+.explorer-li {
   min-width: 200px;
   cursor: pointer;
 }
@@ -255,6 +267,10 @@ body>.navbar.navbar-inverse {
 }
 
 #file-explorer-hr-container {
+}
+
+.file-container {
+  padding-left: 4px;
 }
 
 #new-file-drop {
@@ -392,7 +408,8 @@ li div input {
 }
 
 .highlighted {
-  background-color: #ecc4a3;
+  color: #ffffff;
+  background-color: #ff2919;
 }
 
 .editor-file-name {
@@ -514,7 +531,7 @@ li div input {
   background-color: #E7F4FE;
 }
 
-#selector-wrapper button:hover{
+#selector-wrapper button:hover {
   background-color: #003366;
 }
 
@@ -543,10 +560,10 @@ li div input {
   display: none;
 }
 
-#folder{
+#folder {
   cursor: pointer;
 }
 
-#file{
+#file {
   cursor: pointer;
 }

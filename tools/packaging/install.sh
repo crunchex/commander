@@ -72,8 +72,8 @@ if [ "x$(id -u)" != x0 ] && [ 0 -eq "${do_quick_check-0}" ]; then
 fi
 
 echo -n "Setting up apt for HTTPS........"
-sudo apt-get -qqy update
-sudo apt-get install -qqy apt-transport-https
+sudo apt-get -qqy update >/dev/null 2>&1
+sudo apt-get install -qqy apt-transport-https >/dev/null 2>&1
 echo "DONE"
 
 echo -n "Setting up Dart repo............"
@@ -91,10 +91,10 @@ echo "DONE"
 echo -n "Setting up UpDroid repo........."
 # Get the UpDroid package signing key and set up the dev repository.
 sudo sh -c 'curl -silent http://packages.updroid.com/packages.updroid.com-keyring.key | apt-key add -' >/dev/null 2>&1
-sudo sh -c 'echo "deb http://packages.updroid.com/ubuntu trusty main" > /etc/apt/sources.list.d/updroid.list' >/dev/null 2>&1
+sudo sh -c 'echo "deb http://packages.updroid.com/ubuntu/ trusty main" > /etc/apt/sources.list.d/updroid.list' >/dev/null 2>&1
 echo "DONE"
 
 echo -n "Installing cmdr and deps........"
-sudo apt-get -qqy update
-sudo apt-get -qqy install cmdr
+sudo apt-get -qqy update >/dev/null 2>&1
+sudo apt-get -qqy install cmdr >/dev/null 2>&1
 echo "DONE"

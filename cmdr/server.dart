@@ -109,16 +109,18 @@ class CmdrServer {
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
-    if (request.uri.pathSegments[0] == 'video') {
+    help.debug("${request.method} request for: ${request.uri.path}", 0);
+
+    if (request.uri.pathSegments.length != 0 && request.uri.pathSegments[0] == 'video') {
       int objectID = int.parse(request.uri.pathSegments[1]) - 1;
       _cameras[objectID].handleVideoFeed(request);
       return;
     }
 
-    help.debug("${request.method} request for: ${request.uri.path}", 0);
-
     if (virDir != null) {
       virDir.serveRequest(request);
+    } else {
+      help.debug('ERROR: no Virtual Directory to serve', 1);
     }
   }
 

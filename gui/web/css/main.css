@@ -155,14 +155,14 @@ body>.navbar.navbar-inverse {
 
 .dropdown.open>.dropdown-menu {
   border-width: 1px;
-  border-color: #eaecec;
+  border-color: #e3e3e3;
 }
 
 li div input {
   margin-left: 10px;
   border-style: solid;
   border-width: 1px;
-  border-color: #eaecec;
+  border-color: #e3e3e3;
   padding-left: 5px;
   width: 50px;
 }
@@ -195,7 +195,7 @@ li div input {
 }
 
 .span-ondrag {
-  color: #268bd2;
+  color: #ff2919;
 }
 
 .span-entered {
@@ -258,7 +258,7 @@ li div input {
 }
 
 #explorer-body .btn:hover {
-  color: #268bd2;
+  color: #ff2919;
 }
 
 .explorer-li {
@@ -312,31 +312,31 @@ li div input {
 
 .file-drop-ondrag {
   border-top-width: 2px;
-  background-color: #268bd2;
+  background-color: #ff2919;
 }
 
 .file-drop-entered {
   border-top-width: 2px;
-  background-color: #c6e9bb;
+  background-color: #ffffff;
 }
 
 #recycle {
   margin-top: 5px;
   padding: 2px;
   text-align: center;
-  color: #333333;
+  color: #7e7e7e;
   background-color: #eaecec;
-  border: 1px solid #dddddd;
+  border: 1px solid #e3e3e3;
 }
 
 #recycle.recycle-ondrag {
-  color: #268bd2;
-  border-color: #268bd2;
+  color: #ff2919;
+  border-color: #ff2919;
 }
 
 #recycle.recycle-entered {
-  color: #811819;
-  border-color: #811819;
+  color: #ffffff;
+  border-color: #ffffff;
 }
 
 .col-xs-2>.btn.btn-sm,
@@ -346,7 +346,7 @@ li div input {
   background-color: #ffffff;
   color: #0c0c0c;
   border-width: 1px;
-  border-color: #eaecec;
+  border-color: #e3e3e3;
   text-align: left;
   font-family: "Avenir Next LT Pro Bold";
   margin-top: 5px;
@@ -376,13 +376,13 @@ li div input {
 }
 
 .inner-tabs .dropdown-toggle:hover {
-  border-color: #dddddd;
+  border-color: #e3e3e3;
   background-color: #ffffff;
   color: #eaecec;
 }
 
 .inner-tabs .dropdown-toggle:focus {
-  border-color: #dddddd;
+  border-color: #e3e3e3;
   background-color: #ffffff;
   color: #ff2919;
 }
@@ -391,7 +391,7 @@ li div input {
 .nav .open>a:hover,
 .nav .open>a:focus {
   border-width: 0px 0px 1px 0px;
-  border-color: #dddddd;
+  border-color: #e3e3e3;
   background-color: transparent;
 }
 
@@ -407,7 +407,7 @@ li div input {
 }
 
 .editor.editor-ondrag {
-  border: 10px solid #268bd2;
+  border: 10px solid #ff2919;
 }
 
 .editor.editor-entered {
@@ -434,7 +434,7 @@ li div input {
 }
 
 .tab-content {
-  border: 1px solid #eaecec;
+  border: 1px solid #e3e3e3;
   min-height: 447px;
   height: 100%;
 }

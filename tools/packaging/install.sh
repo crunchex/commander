@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# install.sh --version 0.1.0
+# install.sh --version 0.1.1
 # Copyright 2015 -- UpDroid, Inc.
 
 usage() {
@@ -11,6 +11,7 @@ usage() {
   echo "--quick-check: quickly try to determine if dependencies are installed"
   echo "               (this avoids interactive prompts and sudo commands,"
   echo "               so might not be 100% accurate)"
+  echo "--uninstall: uninstall cmdr and remove everything this script installs"
   echo "--unsupported: attempt installation even on unsupported systems"
   echo "Script will prompt interactively if options not given."
   exit 1
@@ -29,6 +30,7 @@ do
                             do_quietly="-qq --assume-yes"
     ;;
   --quick-check)            do_quick_check=1;;
+  --uninstall)              do_uninstall=1;;
   --unsupported)            do_unsupported=1;;
   *) usage;;
   esac
@@ -66,35 +68,51 @@ if [ 0 -eq "${do_unsupported-0}" ] && [ 0 -eq "${do_quick_check-0}" ] ; then
 fi
 
 if [ "x$(id -u)" != x0 ] && [ 0 -eq "${do_quick_check-0}" ]; then
-  echo "Running as non-root user."
-  echo "You might have to enter your password one or more times for 'sudo'."
-  echo
+  echo "Please re-run this script with 'sudo'."
+  exit 1
+fi
+
+if [ 1 -eq "${do_uninstall-0}" ] ; then
+  echo -n "Uninstalling cmdr............."
+  sudo apt-get -qq remove cmdr >/dev/null
+  echo "DONE"
+  echo -n "Uninstalling dependencies....."
+  sudo apt-get -qq autoremove >/dev/null
+  echo "DONE"
+  echo -n "Removing sources.............."
+  #sudo rm /etc/apt/sources.list.d/ros-latest.list >/dev/null
+  sudo rm /etc/apt/sources.list.d/updroid.list >/dev/null
+  sudo rm /etc/apt/sources.list.d/dart_stable.list >/dev/null
+  sudo apt-get -qq update >/dev/null
+  echo "DONE"
+
+  exit 0
 fi
 
 echo -n "Setting up apt for HTTPS........"
-sudo apt-get -qqy update >/dev/null 2>&1
-sudo apt-get install -qqy apt-transport-https >/dev/null 2>&1
+sudo apt-get -qq update >/dev/null
+sudo apt-get install -qq apt-transport-https >/dev/null
 echo "DONE"
 
 echo -n "Setting up Dart repo............"
 # Get the Google Linux package signing key and set up the stable repository.
-sudo sh -c 'curl –silent https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -' >/dev/null 2>&1
-sudo sh -c 'curl –silent https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list' >/dev/null 2>&1
+sudo sh -c 'curl --silent https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -' >/dev/null
+sudo sh -c 'curl --silent https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list' >/dev/null
 echo "DONE"
 
 echo -n "Setting up ROS repo............."
 # Get the ROS package signing key and set up the stable repository.
-sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xB01FA116 >/dev/null 2>&1
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list' >/dev/null 2>&1
+sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xB01FA116 >/dev/null
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list' >/dev/null
 echo "DONE"
 
 echo -n "Setting up UpDroid repo........."
 # Get the UpDroid package signing key and set up the dev repository.
-sudo sh -c 'curl -silent http://packages.updroid.com/packages.updroid.com-keyring.key | apt-key add -' >/dev/null 2>&1
-sudo sh -c 'echo "deb http://packages.updroid.com/ubuntu/ trusty main" > /etc/apt/sources.list.d/updroid.list' >/dev/null 2>&1
+sudo sh -c 'curl --silent http://packages.updroid.com/packages.updroid.com-keyring.key | apt-key add -' >/dev/null
+sudo sh -c 'echo "deb http://packages.updroid.com/ubuntu/ trusty main" > /etc/apt/sources.list.d/updroid.list' >/dev/null
 echo "DONE"
 
 echo -n "Installing cmdr and deps........"
-sudo apt-get -qqy update >/dev/null 2>&1
-sudo apt-get -qqy install cmdr >/dev/null 2>&1
+sudo apt-get -qq update >/dev/null
+sudo apt-get -qq install cmdr >/dev/null
 echo "DONE"

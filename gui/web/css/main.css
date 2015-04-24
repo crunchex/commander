@@ -423,7 +423,8 @@ li div input {
   width: 200%;
 }
 
-.file-container.highlighted {
+.file-container.highlighted,
+.file-container.highlighted>div>.glyphicon {
   color: #ffffff;
   background-color: #ff2919;
 }

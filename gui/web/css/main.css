@@ -1,14 +1,4 @@
 @font-face {
-  font-family: RobotoCondensed-Light;
-  src: url(../assets/RobotoCondensed-Light.ttf);
-}
-
-@font-face {
-  font-family: RobotoCondensed-Regular;
-  src: url(../assets/RobotoCondensed-Regular.ttf);
-}
-
-@font-face {
   font-family: Avenir Next LT Pro Bold;
   src: url(../assets/AvenirNextLTPro-Bold.otf);
 }

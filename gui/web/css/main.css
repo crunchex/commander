@@ -361,7 +361,7 @@ li div input {
   background-color: #ffffff;
   color: #0c0c0c;
   border-width: 1px;
-  border-color: #eaecec;
+  border-color: #e3e3e3;
   text-align: center;
   font-family: "Avenir Next LT Pro Bold";
   margin-top: 5px;
@@ -559,7 +559,7 @@ code, kbd, pre, samp {
   margin-left: 20px;
   width: 150px;
   color: #0c0c0c;
-  border-color: #eaecec;
+  border-color: #e3e3e3;
   font-family: "Avenir Next LT Pro Demi";
   background-color: #ffffff;
 }

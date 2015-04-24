@@ -59,12 +59,11 @@ if [ 0 -eq "${do_unsupported-0}" ] && [ 0 -eq "${do_quick_check-0}" ] ; then
         "currently supported" >&2
     exit 1
   fi
+fi
 
-  #if ! uname -m | egrep -q "i686|x86_64"; then
-  if ! uname -m | egrep -q "x86_64"; then
-    echo "Only x86_64 architectures are currently supported" >&2
-    exit
-  fi
+if ! uname -m | egrep -q "i686|x86_64|armv7l" ; then
+  echo "Only x86_64, i686, and armv7l architectures are currently supported" >&2
+  exit 1
 fi
 
 if [ "x$(id -u)" != x0 ] && [ 0 -eq "${do_quick_check-0}" ]; then

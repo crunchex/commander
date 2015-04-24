@@ -685,6 +685,7 @@ class UpDroidExplorer {
 
     // Dragging through nested dropzones appears to be glitchy.
     d.onDragStart.listen((event) {
+      d.avatarHandler.avatar.children.first.classes.remove('highlighted');
       newFileDrop.classes.add('file-drop-ondrag');
       recycle.classes.add('recycle-ondrag');
       ElementList<SpanElement> spanList =

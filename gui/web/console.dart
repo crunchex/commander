@@ -38,7 +38,7 @@ class UpDroidConsole extends UpDroidTab {
       _console = configRefs['content'];
       _console.tabIndex = 0;
       _closeTabButton = configRefs['close-tab'];
-      _themeButton = configRefs['theme'];
+      _themeButton = configRefs['invert'];
       _blinkButton = configRefs['cursor-blink'];
 
       _term = new Terminal(_console)
@@ -164,7 +164,7 @@ class UpDroidConsole extends UpDroidTab {
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'Close Tab'}]},
       {'title': 'Settings', 'items': [
-        {'type': 'toggle', 'title': 'Theme'},
+        {'type': 'toggle', 'title': 'Invert'},
         {'type': 'toggle', 'title': 'Cursor Blink'}]}
     ];
     return menu;

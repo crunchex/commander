@@ -91,7 +91,7 @@ class UpDroidEditor extends UpDroidTab {
     _saveButton = configRefs['save'];
     _saveAsButton = configRefs['save-as'];
     _closeTabButton = configRefs['close-tab'];
-    _themeButton = configRefs['theme'];
+    _themeButton = configRefs['invert'];
     _fontSizeInput = configRefs['font-size'];
 
   }
@@ -409,7 +409,7 @@ class UpDroidEditor extends UpDroidTab {
         {'type': 'toggle', 'title': 'Save As'},
         {'type': 'toggle', 'title': 'Close Tab'}]},
       {'title': 'Settings', 'items': [
-        {'type': 'toggle', 'title': 'Theme'},
+        {'type': 'toggle', 'title': 'Invert'},
         {'type': 'input', 'title': 'Font Size'}]}
     ];
     return menu;

@@ -23,7 +23,7 @@ part 'explorer.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
-  static const String defaultWorkspacePath = '/home/user/uproot';
+  static String defaultWorkspacePath = '/home/${Platform.environment['USER']}/uproot';
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 

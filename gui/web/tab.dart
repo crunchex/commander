@@ -172,7 +172,7 @@ abstract class UpDroidTab {
 
   /// Handles tab renaming with a single-click event.
   void _renameEventHandler() {
-    if (!_tabHandle.className.contains('editing')) {
+    if (!_tabHandle.className.contains('editing') && _tabHandle.className.contains('active')) {
       _tabHandle.classes.add('editing');
 
       String originalText = tabHandleButton.text;

@@ -34,8 +34,15 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-
+    //_setUpWorkspace(dir);
     _initServer(dir, _getVirDir(results));
+  }
+
+  /// Ensure that the workspace exists and is in good order.
+  void _setUpWorkspace(Directory dir) {
+    // TODO: fix sourcing ROS setup not applying to current process.
+    Process.runSync('.', ['/opt/ros/indigo/setup.sh'], runInShell: true);
+    Process.runSync('catkin_init_workspace', [], workingDirectory: '${dir.path}/src');
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].

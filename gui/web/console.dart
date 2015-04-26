@@ -90,6 +90,11 @@ class UpDroidConsole extends UpDroidTab {
   void _registerConsoleEventHandlers() {
     _cs.stream.where((m) => m.dest == 'CONSOLE').listen((m) => _processMessage(m));
 
+    _wsMain.onOpen.listen((e) {
+      List<int> size = _term.currentSize();
+      _wsMain.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
+    });
+
     _ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;
       _term.stdout.add(buf.asUint8List());
@@ -117,15 +122,6 @@ class UpDroidConsole extends UpDroidTab {
     tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
       _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidConsole'));
-    });
-
-    _console.onClick.listen((e) {
-//      List<int> oldSize = _term.currentSize();
-//      List<int> newSize = _term.calculateSize();
-//
-//      if (const ListEquality().equals(oldSize, newSize)) return;
-//
-//      _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
     });
 
     window.onResize.listen((e) {

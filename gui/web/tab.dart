@@ -182,7 +182,8 @@ abstract class UpDroidTab {
       a.children.add(input);
       input.value = originalText;
 
-      input.onKeyUp.listen((e) {
+      StreamSubscription inputKeyUp;
+      inputKeyUp = input.onKeyUp.listen((e) {
         if (e.keyCode == KeyCode.ENTER || e.keyCode == KeyCode.ESC) {
           if (e.keyCode == KeyCode.ENTER) {
             tabHandleButton.text = input.value;
@@ -191,6 +192,7 @@ abstract class UpDroidTab {
           }
           _tabHandle.children[0] = tabHandleButton;
           _tabHandle.classes.remove('editing');
+          inputKeyUp.cancel();
         }
       });
 

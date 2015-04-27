@@ -42,7 +42,11 @@ abstract class UpDroidTab {
         ..href = '#tab-$id-$num-container'
         ..dataset['toggle'] = 'tab'
         ..text = '$title-$num';
-    tabHandleButton.onClick.listen((e) => _renameEventHandler());
+    tabHandleButton.onClick.listen((e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      _renameEventHandler();
+    });
     _tabHandle.children.add(tabHandleButton);
 
     DivElement column = querySelector('#column-$col');
@@ -173,6 +177,8 @@ abstract class UpDroidTab {
   /// Handles tab renaming with a single-click event.
   void _renameEventHandler() {
     if (!_tabHandle.className.contains('editing') && _tabHandle.className.contains('active')) {
+      bool editing = false;
+
       _tabHandle.classes.add('editing');
 
       String originalText = tabHandleButton.text;
@@ -182,8 +188,15 @@ abstract class UpDroidTab {
       a.children.add(input);
       input.value = originalText;
 
-      StreamSubscription inputKeyUp;
-      inputKeyUp = input.onKeyUp.listen((e) {
+      _tabHandle.children[0] = a;
+      input.focus();
+      input.select();
+
+      editing = true;
+
+      List<StreamSubscription> subs = [];
+
+      subs.add(input.onKeyUp.listen((e) {
         if (e.keyCode == KeyCode.ENTER || e.keyCode == KeyCode.ESC) {
           if (e.keyCode == KeyCode.ENTER) {
             tabHandleButton.text = input.value;
@@ -192,13 +205,18 @@ abstract class UpDroidTab {
           }
           _tabHandle.children[0] = tabHandleButton;
           _tabHandle.classes.remove('editing');
-          inputKeyUp.cancel();
+          subs.forEach((sub) => sub.cancel());
         }
-      });
+      }));
 
-      _tabHandle.children[0] = a;
-      input.focus();
-      input.select();
+      subs.add(document.onClick.listen((e) {
+        if (editing == true) {
+          tabHandleButton.text = originalText;
+          _tabHandle.children[0] = tabHandleButton;
+          _tabHandle.classes.remove('editing');
+          subs.forEach((sub) => sub.cancel());
+        }
+      }));
     }
   }
 }

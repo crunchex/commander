@@ -16,6 +16,13 @@ command -v pub >/dev/null 2>&1 || {
 	exit 1;
 }
 echo "OK"
+echo -n "Checking system for cleancss...."
+command -v cleancss >/dev/null 2>&1 || {
+	echo "FAIL";
+	echo "Please install cleancss (npm -g install clean-css) and restart this script. Aborting."
+	exit 1;
+}
+echo "OK"
 
 ### cmdr ###
 cd $TOPDIR/cmdr
@@ -53,7 +60,19 @@ echo "OK"
 cd $TOPDIR/gui
 
 echo -n "Building (minifying) gui........"
+WEB=$TOPDIR/gui/web
+cat $WEB/packages/bootjack/css/bootstrap.css $WEB/css/cosmos-bootstrap.min.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
 pub build > /dev/null
+echo "OK"
+
+echo -n "Cleaning up gui................."
+BUILD=$TOPDIR/gui/build/web
+mkdir $BUILD/fonts
+cp $WEB/packages/bootjack/fonts/glyphicons-halflings-regular.* $BUILD/fonts/
+rm $BUILD/css/cosmos-bootstrap.min.css $BUILD/css/main.css
+sed -i '/bootstrap.min.css/d' $BUILD/index.html
+sed -i 's/main.css/cmdr.css/g' $BUILD/index.html
+sed -i 's/main.dart/main.dart.js/g' $BUILD/index.html
 echo "OK"
 
 ### done ###

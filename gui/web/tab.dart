@@ -98,7 +98,8 @@ abstract class UpDroidTab {
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
   void setUpTabHandle(int num, int col, String title, bool active) {
-    _tabHandle = new LIElement();
+    _tabHandle = new LIElement()
+      ..classes.add('tab-handle');
     if (active) _tabHandle.classes.add('active');
 
     String id = title.toLowerCase().replaceAll(' ', '-');
@@ -108,6 +109,11 @@ abstract class UpDroidTab {
         ..href = '#tab-$id-$num-container'
         ..dataset['toggle'] = 'tab'
         ..text = '$title-$num';
+    tabHandleButton.onClick.listen((e) {
+      //e.preventDefault();
+      //e.stopImmediatePropagation();
+      _renameEventHandler();
+    });
     _tabHandle.children.add(tabHandleButton);
 
     DivElement column = querySelector('#column-$col');
@@ -198,7 +204,7 @@ abstract class UpDroidTab {
   /// Generates an input item (label and input field) and returns
   /// the new [LIElement].
   LIElement _createInputItem(String title, Map configRefs) {
-    LIElement li = new LIElement()..style.textAlign = 'center';
+    LIElement li = new LIElement();
 
     DivElement d = new DivElement()..style.display = 'inline-block';
     li.children.add(d);
@@ -233,5 +239,51 @@ abstract class UpDroidTab {
     configRefs[id] = button;
 
     return buttonList;
+  }
+
+  /// Handles tab renaming with a single-click event.
+  void _renameEventHandler() {
+    if (!_tabHandle.className.contains('editing') && _tabHandle.className.contains('active')) {
+      bool editing = false;
+
+      _tabHandle.classes.add('editing');
+
+      String originalText = tabHandleButton.text;
+
+      AnchorElement a = new AnchorElement();
+      InputElement input = new InputElement();
+      a.children.add(input);
+      input.value = originalText;
+
+      _tabHandle.children[0] = a;
+      input.focus();
+      input.select();
+
+      editing = true;
+
+      List<StreamSubscription> subs = [];
+
+      subs.add(input.onKeyUp.listen((e) {
+        if (e.keyCode == KeyCode.ENTER || e.keyCode == KeyCode.ESC) {
+          if (e.keyCode == KeyCode.ENTER) {
+            tabHandleButton.text = input.value;
+          } else if (e.keyCode == KeyCode.ESC){
+            tabHandleButton.text = originalText;
+          }
+          _tabHandle.children[0] = tabHandleButton;
+          _tabHandle.classes.remove('editing');
+          subs.forEach((sub) => sub.cancel());
+        }
+      }));
+
+      subs.add(document.onClick.listen((e) {
+        if (editing == true) {
+          tabHandleButton.text = originalText;
+          _tabHandle.children[0] = tabHandleButton;
+          _tabHandle.classes.remove('editing');
+          subs.forEach((sub) => sub.cancel());
+        }
+      }));
+    }
   }
 }

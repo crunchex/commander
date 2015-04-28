@@ -31,6 +31,9 @@ echo "OK"
 
 echo -n "Building cmdr-pty..............."
 cd $GO_CMDRPTY_PATH
+go get github.com/gorilla/websocket
+go get github.com/creack/goterm/win
+go get github.com/kr/pty
 go build
 mkdir -p $TOPDIR/cmdr/bin
 mv cmdr-pty $TOPDIR/cmdr/bin/

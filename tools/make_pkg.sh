@@ -51,8 +51,21 @@ mkdir -p $TOPDIR/deploy
 if [ -e "$TOPDIR/deploy/cmdr"* ]; then
 	rm deploy/cmdr*
 fi
-fpm -s dir -t deb -n cmdr -v 0.2 -p $TOPDIR/deploy/ ./gui/build/web=/opt/updroid/cmdr \
-./cmdr/bin/cmdr=/usr/local/bin/cmdr ./cmdr/bin/cmdr-pty=/usr/local/bin/cmdr-pty  > /dev/null
+
+fpm -s dir -t deb -n cmdr -v 0.4.0 -p $TOPDIR/deploy/ \
+    --vendor "UpDroid, Inc." \
+    --provides cmdr \
+    --description "A browser-based IDE and omni-tool for robots." \
+    --maintainer "Mike Lewis <mike@updroid.com>" \
+    --iteration 1 \
+    --url http://www.updroid.com \
+    -d 'dart >= 1.9.3' -d 'ffmpeg >= 2.6.2' \
+    --before-install=$TOPDIR/tools/packaging/before-install.sh \
+    --after-install=$TOPDIR/tools/packaging/after-install.sh \
+    ./gui/build/web=/opt/updroid/cmdr \
+    ./cmdr/bin/cmdr=/usr/local/bin/cmdr \
+    ./cmdr/bin/cmdr-pty=/usr/local/bin/cmdr-pty > /dev/null
+
 echo "OK"
 
 ### done ###

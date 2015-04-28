@@ -1,11 +1,26 @@
 @font-face {
-  font-family: RobotoCondensed-Light;
-  src: url(../assets/RobotoCondensed-Light.ttf);
+  font-family: Avenir Next LT Pro Bold;
+  src: url(../assets/AvenirNextLTPro-Bold.otf);
 }
 
 @font-face {
-  font-family: RobotoCondensed-Regular;
-  src: url(../assets/RobotoCondensed-Regular.ttf);
+  font-family: Avenir Next LT Pro Medium Condensed;
+  src: url(../assets/AvenirNextLTPro-MediumCn.otf);
+}
+
+@font-face {
+  font-family: Avenir Next LT Pro Regular;
+  src: url(../assets/AvenirNextLTPro-Regular.otf);
+}
+
+@font-face {
+  font-family: Avenir Next LT Pro Demi;
+  src: url(../assets/AvenirNextLTPro-Demi.otf);
+}
+
+@font-face {
+  font-family: Monosten A;
+  src: url(../assets/Monosten-A-webfont.ttf);
 }
 
 html {
@@ -48,6 +63,108 @@ html, body {
   float: left !important;
 }
 
+body>.navbar.navbar-inverse {
+  background-color: #eaecec;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom-width: 1px;
+  border-bottom-color: #e3e3e3;
+}
+
+.navbar-inverse .navbar-nav>li>a,
+.navbar-inverse .navbar-nav>li>a:focus {
+  color: #0c0c0c;
+  background-color: #eaecec;
+  font-family: "Avenir Next LT Pro Bold";
+  border-color: #0c0c0c;
+  border-width: 1px;
+  -webkit-transition: all 0.7s ease;
+  -moz-transition: all 0.7s ease;
+  -ms-transition: all 0.7s ease;
+  -o-transition: all 0.7s ease;
+  transition: all 0.7s ease;
+}
+
+.navbar-inverse .navbar-nav>li>a:hover {
+  color: #ffffff;
+  background-color: #ff2919;
+  font-family: "Avenir Next LT Pro Bold";
+  border-color: #0c0c0c;
+  border-width: 1px;
+}
+
+.nav-tabs>li>a {
+  color: #7e7e7e;
+  background-color: #ffffff;
+  font-family: "Avenir Next LT Pro Demi";
+  font-size: 14px;
+  border-bottom: 1px;
+}
+
+.nav-tabs>li.active>a,
+.nav-tabs>li.active>a:hover {
+  color: #0c0c0c;
+  background-color: #ffffff;
+  font-family: "Avenir Next LT Pro Bold";
+}
+
+.nav-tabs>li>a:hover {
+  color: #ffffff;
+  background-color: #ff2919;
+  font-family: "Avenir Next LT Pro Demi";
+}
+
+.nav-tabs>li>a.inner-tabs {
+  border-bottom: 0px;
+}
+
+.nav-tabs>.tab-handle {
+  width: auto;
+}
+
+.nav-tabs>.tab-handle.editing>a {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.nav-tabs>.tab-handle.editing>a>input {
+  width: 100%;
+}
+
+.dropdown-menu>li {
+  text-align: left;
+}
+
+.dropdown-menu>li>a,
+.dropdown-menu>li>div {
+  text-align: left;
+  padding-left: 20px;
+  font-family: "Avenir Next LT Pro Demi";
+  font-size: 14px;
+  color: #7e7e7e;
+  border-bottom: 1px;
+}
+
+.dropdown-menu>li>a:hover {
+  background-color: #ff2919;
+  font-family: "Avenir Next LT Pro Demi";
+}
+
+.dropdown.open>.dropdown-menu {
+  border-width: 1px;
+  border-color: #e3e3e3;
+}
+
+li div input {
+  margin-left: 10px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #e3e3e3;
+  padding-left: 5px;
+  width: 50px;
+}
+
 .navbar-left {
   margin-top: 5px !important;
   margin-bottom: 5px !important;
@@ -76,11 +193,13 @@ html, body {
 }
 
 .filename {
-  margin-left: 6px;
+  margin-left: 5px;
+  font-family: "Avenir Next LT Pro Demi";
+  font-size: 12px;
 }
 
 .span-ondrag {
-  color: #268bd2;
+  color: #ff2919;
 }
 
 .span-entered {
@@ -96,79 +215,31 @@ html, body {
   padding-right: 10px;
 }
 
-.new {
+#new {
   display: inline-block;
   padding: 2px 4px 2px 4px;
   text-align: center;
-  color: #333333;
+  color: #0c0c0c;
   border: 1px solid #dddddd;
-  font-family: "Source Sans Pro", Calibri, Candara, Arial, sans-serif;
-  font-size: 15px;
+  font-family: "Avenir Next LT Pro Demi";
+  font-size: 14px;
 }
 
-.explorer-head{
-  padding-top: 10px;
-  background-color: #f5f5f5;
-  border: 1px solid #e3e3e3;
-  border-bottom: none;
-  text-align: center;
-}
-
-.explorer-head li{
-  list-style-type: none;;
-}
-
-#title-wrapper {
-  text-align: center;
-  padding: 0;
-}
-
-#file-explorer-title {
-  padding: 5px 5px;
-  display: inline-block;
-  text-align: center;
-  vertical-align: middle;
-  font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
-}
-
-.new-file-drop {
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-.new-file-drop p {
+#explorer-container {
+  background-color: #eaecec;
+  border-width: 1px;
+  border-color: solid #e3e3e3;
+  min-height: 300px;
   margin-top: 5px;
   margin-bottom: 5px;
-  padding-top: 7px;
-  padding-bottom: 7px;
-  text-align: center;
+  /*max-height: 400px;*/
+  overflow: auto;
+  padding: none;
+  box-shadow: none;
 }
 
-.file-drop-ondrag {
-  border-top-width: 2px;
-  background-color: #268bd2;
-}
-
-.file-drop-entered {
-  border-top-width: 2px;
-  background-color: #c6e9bb;
-}
-
-#control div h3 {
-  text-align: center;
-}
-
-#nodes {
-  min-height: 300px;
-  border-top: 3px solid #314159;
-  border-left: 1px solid #314159;
-  border-right: 1px solid #314159;
-  border-bottom: 1px solid #314159;
-  margin-bottom: 5px;
-}
-
-.explorer-body > .explorer-li {
-    margin-left: -38px;
+#explorer-body > .explorer-li {
+    margin-left: -40px;
 }
 
 .explorer-ul > .explorer-li {
@@ -179,66 +250,134 @@ html, body {
   list-style-type: none;
 }
 
-.explorer-body .btn {
+#explorer-body .btn {
   background-color: transparent;
 }
 
-.explorer-body {
+#explorer-body {
   display: inline-block;
   float: left;
   clear: both;
+  margin-bottom: 0px;
 }
 
-.explorer-body .btn:hover {
-  color: #268bd2;
+#explorer-body .btn:hover {
+  color: #ff2919;
 }
 
-li div input {
-  margin-left: 6px;
-  width: 50px;
+.explorer-li {
+  min-width: 200px;
+  cursor: pointer;
+}
+
+#title-container {
+  padding-top: 10px;
+  color: #0c0c0c;
+  margin-bottom: 5px;
+  background-color: #eaecec;
+  border: 1px solid #e3e3e3;
+  font-family: Avenir Next LT Pro Demi;
+  font-size: 16px;
+  text-align: center;
+}
+
+#title-container>div>div>p {
+  font-size: 14px;
+}
+
+#title-container li {
+  list-style-type: none;
+}
+
+#file-explorer-title {
+  display: inline-block;
+  margin-right: 5px;
+  text-align: center;
+  vertical-align: middle;
+  font: 18px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+}
+
+#file-explorer-title #folder {
+  margin-left: 4px;
+}
+
+.file-container {
+  color: #0c0c0c;
+  padding-left: 4px;
+}
+
+#new-file-drop {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+#new-file-drop p {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  text-align: center;
+}
+
+.file-drop-ondrag {
+  color: #ffffff;
+  border-top-width: 2px;
+  background-color: #ff2919;
+}
+
+.file-drop-entered {
+  color: #ff2919;
+  border-top-width: 2px;
+  background-color: #ffffff;
 }
 
 #recycle {
-  margin-top: 20px;
-  padding: 2px;
+  margin-top: 5px;
+  padding: 4px;
   text-align: center;
-  color: #333333;
-  border: 1px solid #dddddd;
+  vertical-align: middle;
+  color: #0c0c0c;
+  font-family: Avenir Next LT Pro Demi;
+  font-size: 14px;
+  background-color: #eaecec;
+  border: 1px solid #e3e3e3;
 }
 
 #recycle.recycle-ondrag {
-  color: #268bd2;
-  border-color: #268bd2;
+  color: #ff2919;
+  border-color: #ff2919;
 }
 
 #recycle.recycle-entered {
-  color: #811819;
-  border-color: #811819;
-}
-
-#control-buttons {
-  border: 0 1px 1px 1px;
-  padding: none;
-  width: 100%
-}
-
-#build-button {
-  width: 49%;
   color: #ffffff;
-  background-color: #268bd2;
-  margin-right:1px;
+  border-color: #ffffff;
 }
 
-#run-button {
+.col-xs-2>.btn.btn-sm,
+.btn-primary,
+.btn-warning {
   width: 100%;
-  color: #ffffff;
-  background-color: #859900;
-  margin-left: 1px;
+  background-color: #ffffff;
+  color: #0c0c0c;
+  border-width: 1px;
+  border-color: #e3e3e3;
+  text-align: center;
+  font-family: "Avenir Next LT Pro Bold";
+  margin-top: 5px;
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
 }
 
-#upload {
-  background-color: #859900;
-  color: white;
+.col-xs-2>.btn.btn-sm:hover,
+.btn-primary:hover,
+.btn-warning:hover {
+  background-color: #ff2919;
+  color: #ffffff;
+  border-width: 1px;
+  border-color: #ff2919;
 }
 
 .column-content .nav-tabs {
@@ -255,26 +394,29 @@ li div input {
   padding: 5px 10px 5px 10px;
 }
 
-
-
 .inner-tabs .dropdown-toggle:hover {
-  border-color: #dddddd;
+  border-color: #e3e3e3;
   background-color: #ffffff;
-  color: #dddddd;
+  color: #eaecec;
 }
 
 .inner-tabs .dropdown-toggle:focus {
-  border-color: #dddddd;
+  border-color: #e3e3e3;
   background-color: #ffffff;
-  color: #2780e3;
+  color: #ff2919;
 }
 
 .nav .open>a,
 .nav .open>a:hover,
 .nav .open>a:focus {
   border-width: 0px 0px 1px 0px;
-  border-color: #dddddd;
+  border-color: #e3e3e3;
   background-color: transparent;
+}
+
+.ace_editor.ace-solarized-dark.updroid_editor,
+.ace_editor.ace-solarized-light.updroid_editor {
+  font-family: "Monosten A", "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;
 }
 
 .editor {
@@ -285,7 +427,7 @@ li div input {
 }
 
 .editor.editor-ondrag {
-  border: 10px solid #268bd2;
+  border: 10px solid #ff2919;
 }
 
 .editor.editor-entered {
@@ -296,8 +438,10 @@ li div input {
   width: 200%;
 }
 
-.highlighted {
-  background-color: #ecc4a3;
+.file-container.highlighted,
+.file-container.highlighted>div>.glyphicon {
+  color: #ffffff;
+  background-color: #ff2919;
 }
 
 .editor-file-name {
@@ -311,7 +455,7 @@ li div input {
 }
 
 .tab-content {
-  border: 1px solid #dddddd;
+  border: 1px solid #e3e3e3;
   min-height: 447px;
   height: 100%;
 }
@@ -381,16 +525,22 @@ li div input {
 
 .modal-header h3 {
   margin-left: 20px;
-  font: 26px RobotoCondensed-Regular, Helvetica, Arial, sans-serif;
+  font-family: "Avenir Next LT Pro Bold";
+  font-size: 26px;
 
 }
 
 .modal-body {
-  padding: 10px;
+  font-family: "Avenir Next LT Pro Regular";
+  padding: 30px;
 }
 
-.modal-body p {
+/*.modal-body p {
   padding-left: 20px;
+}*/
+
+code, kbd, pre, samp {
+  font-family: "Monosten A";
 }
 
 #warning{
@@ -416,32 +566,16 @@ li div input {
 #selector-wrapper button{
   margin-left: 20px;
   width: 150px;
-  background-color: #E7F4FE;
-}
-
-#selector-wrapper button:hover{
-  background-color: #003366;
-}
-
-.btn-warning {
-  padding: 5px 9px 5px 9px;
-  background-color: rgb(245, 245, 245);
+  color: #0c0c0c;
   border-color: #e3e3e3;
-  color: rgb(51, 51, 51);
-  outline: none !important;
-  box-shadow: none !important;
+  font-family: "Avenir Next LT Pro Demi";
+  background-color: #ffffff;
 }
 
-.btn-warning:hover {
-  background-color: #e3e3e3;
-  border-color: #e3e3e3;
-  color: rgb(51, 51, 51);
-}
-
-.btn-primary {
-  padding: 5px 9px 5px 9px;
-  outline: none !important;
-  box-shadow: none !important;
+#selector-wrapper button:hover {
+  background-color: #ff2919;
+  border-color: #ff2919;
+  color: #ffffff;
 }
 
 .popover {
@@ -454,7 +588,7 @@ li div input {
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 30px;
-  background-color: #fff;
+  background-color: #ffffff;
 }
 
 .text-muted {
@@ -465,21 +599,7 @@ li div input {
   font-size: 10px;
 }
 
-#side-menu-wrapper {
-  padding: 0;
-  margin-bottom: 10px;
-}
-
-#side-menu {
-  float: right;
-}
-
-#side-menu button {
-  padding: 3px 7px;
-  font-size: 13px;
-}
-
-.explorer-container{
+#explorer-container{
   border: 0 1px 1px 1px;
   min-height: 300px;
   max-height: 400px;
@@ -496,12 +616,10 @@ li div input {
   display: none;
 }
 
-.folder{
-  margin-left: 5px;
+#folder {
   cursor: pointer;
 }
 
-.file{
-  margin-left: 3px;
+#file {
   cursor: pointer;
 }

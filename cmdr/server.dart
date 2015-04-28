@@ -23,7 +23,7 @@ part 'explorer.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
-  static const String defaultWorkspacePath = '/home/user/uproot';
+  static String defaultWorkspacePath = '/home/${Platform.environment['USER']}/uproot';
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
@@ -34,8 +34,17 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-
+    _setUpWorkspace(dir);
     _initServer(dir, _getVirDir(results));
+  }
+
+  /// Ensure that the workspace exists and is in good order.
+  void _setUpWorkspace(Directory dir) {
+    Directory uprootSrc = new Directory('${dir.path}/src');
+    uprootSrc.create(recursive: true);
+    // TODO: fix sourcing ROS setup not applying to current process.
+//    Process.runSync('.', ['/opt/ros/indigo/setup.sh'], runInShell: true);
+//    Process.runSync('catkin_init_workspace', [], workingDirectory: '${dir.path}/src');
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -111,16 +120,18 @@ class CmdrServer {
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
-    if (request.uri.pathSegments[0] == 'video') {
+    help.debug("${request.method} request for: ${request.uri.path}", 0);
+
+    if (request.uri.pathSegments.length != 0 && request.uri.pathSegments[0] == 'video') {
       int objectID = int.parse(request.uri.pathSegments[1]) - 1;
       _cameras[objectID].handleVideoFeed(request);
       return;
     }
 
-    help.debug("${request.method} request for: ${request.uri.path}", 0);
-
     if (virDir != null) {
       virDir.serveRequest(request);
+    } else {
+      help.debug('ERROR: no Virtual Directory to serve', 1);
     }
   }
 

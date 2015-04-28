@@ -5,9 +5,10 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:collection/equality.dart';
+import 'package:terminal/terminal.dart';
+import 'package:terminal/theme.dart';
 
 import 'lib/updroid_message.dart';
-import 'lib/terminal/terminal.dart';
 import 'tab.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
@@ -36,8 +37,9 @@ class UpDroidConsole extends UpDroidTab {
     setUpTabContainer(num, _col, 'Console', _getMenuConfig(), active).then((Map configRefs) {
       _console = configRefs['content'];
       _console.tabIndex = 0;
+      _console.contentEditable = "true";
       _closeTabButton = configRefs['close-tab'];
-      _themeButton = configRefs['theme'];
+      _themeButton = configRefs['invert'];
       _blinkButton = configRefs['cursor-blink'];
 
       _term = new Terminal(_console)
@@ -87,7 +89,12 @@ class UpDroidConsole extends UpDroidTab {
 
   /// Sets up the event handlers for the console.
   void _registerConsoleEventHandlers() {
-    _cs.stream.where((m) => m.dest == 'CONSOLE' || m.dest == 'ALL').listen((m) => _processMessage(m));
+    _cs.stream.where((m) => m.dest == 'CONSOLE').listen((m) => _processMessage(m));
+
+    _wsMain.onOpen.listen((e) {
+      List<int> size = _term.currentSize();
+      _wsMain.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
+    });
 
     _ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;
@@ -116,15 +123,6 @@ class UpDroidConsole extends UpDroidTab {
     tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
       _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidConsole'));
-    });
-
-    _console.onClick.listen((e) {
-      List<int> oldSize = _term.currentSize();
-      List<int> newSize = _term.calculateSize();
-
-      if (const ListEquality().equals(oldSize, newSize)) return;
-
-      _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
     });
 
     window.onResize.listen((e) {
@@ -163,7 +161,7 @@ class UpDroidConsole extends UpDroidTab {
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'Close Tab'}]},
       {'title': 'Settings', 'items': [
-        {'type': 'toggle', 'title': 'Theme'},
+        {'type': 'toggle', 'title': 'Invert'},
         {'type': 'toggle', 'title': 'Cursor Blink'}]}
     ];
     return menu;

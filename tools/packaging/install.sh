@@ -107,7 +107,8 @@ echo "DONE"
 
 echo -n "Setting up UpDroid repo........."
 # Get the UpDroid package signing key and set up the dev repository.
-sudo sh -c 'curl --silent http://packages.updroid.com/packages.updroid.com-keyring.key | apt-key add -' >/dev/null
+#wget -qO - http://packages.updroid.com/Release.key | sudo apt-key add -
+sudo sh -c 'curl --silent http://packages.updroid.com/Release.key | apt-key add -' >/dev/null
 sudo sh -c 'echo "deb http://packages.updroid.com/ubuntu/ trusty main" > /etc/apt/sources.list.d/updroid.list' >/dev/null
 echo "DONE"
 

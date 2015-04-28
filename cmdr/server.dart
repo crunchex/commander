@@ -215,6 +215,7 @@ class CmdrServer {
       }
 
       completer.complete(paths);
+      print(paths);
     });
 
     return completer.future;

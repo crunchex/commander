@@ -11,6 +11,6 @@ dependencies:
   quiver: any
   script_inliner: any
   terminal:
-    path: /home/crunchex/work/terminal
+    path: /home/dong/git/terminal
 transformers:
-  - script_inliner
+- script_inliner

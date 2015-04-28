@@ -40,7 +40,7 @@ class CmdrServer {
 
   /// Ensure that the workspace exists and is in good order.
   void _setUpWorkspace(Directory dir) {
-    Directory uprootSrc = new Directory('${dir.path}/src');
+    Directory uprootSrc = new Directory('${dir.path}');
     uprootSrc.create(recursive: true);
     // TODO: fix sourcing ROS setup not applying to current process.
 //    Process.runSync('.', ['/opt/ros/indigo/setup.sh'], runInShell: true);

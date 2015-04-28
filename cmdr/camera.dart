@@ -1,8 +1,9 @@
 part of updroid_server;
 
 class CmdrCamera {
+  static const String guiName = 'UpDroidCamera';
+
   int cameraNum = 1;
-  WebSocket _ws;
   StreamController<List<int>> _transStream;
 
   Uint16List _streamHeader;
@@ -14,65 +15,48 @@ class CmdrCamera {
     help.debug('Spawning UpDroidCamera ($cameraNum)', 0);
 
     _streamHeader = [];
+    _streamHeader.addAll(UTF8.encode('jsmp'));
+    // TODO: replace hardcoding with actual UInt16BE conversion.
+    //_streamHeader.add(width.g);
+    //_streamHeader.add(height);
+    //streamHeader.writeUInt16BE(width, 4);
+    //streamHeader.writeUInt16BE(height, 6);
+    _streamHeader.addAll([2, 128, 1, 224]);
+
     _transStream = new StreamController<List<int>>.broadcast();
 
-    _setUpStreamReceiver();
     _runFFMpeg();
-    _setUpWebSocket();
   }
 
-  void _setUpWebSocket() {
-    HttpServer.bind(InternetAddress.ANY_IP_V4, 12070 + cameraNum).then((HttpServer server) {
-      help.debug("WebSocket listening on port:${server.port}...", 0);
-      server.listen((HttpRequest request) {
-        if (WebSocketTransformer.isUpgradeRequest(request)) {
-          WebSocketTransformer.upgrade(request).then((WebSocket ws) {
-            _ws = ws;
-            _ws.add(_streamHeader);
-            _transStream.stream.listen((data) {
-              _ws.add(data);
-            });
-          });
-        }
+  /// Route websocket connections to messages (cmdr) and video data (input).
+  void handleWebSocket(WebSocket ws, HttpRequest request) {
+    String type = request.uri.pathSegments[2];
+    if (type == 'cmdr') {
+      ws.add('[[CAMERA_READY]]');
+    } else {
+      ws.add(_streamHeader);
+      _transStream.stream.listen((data) {
+        ws.add(data);
       });
-    });
+    }
   }
 
-  void _setUpStreamReceiver() {
-    HttpServer.bind(InternetAddress.ANY_IP_V4, 12080 + cameraNum).then((HttpServer server) {
-      help.debug("StreamReceiver listening on port:${server.port}...", 0);
-      server.listen((HttpRequest request) {
-        List<String> params = request.uri.path.split('/').sublist(1);
-        if (params[0] == 'cheesecake') {
-          int width = int.parse(params[1]);
-          int height = int.parse(params[2]);
-
-          _streamHeader.addAll(UTF8.encode('jsmp'));
-          // TODO: replace hardcoding with actual UInt16BE conversion.
-          //_streamHeader.add(width.g);
-          //_streamHeader.add(height);
-          //streamHeader.writeUInt16BE(width, 4);
-          //streamHeader.writeUInt16BE(height, 6);
-          _streamHeader.add(2);
-          _streamHeader.add(128);
-          _streamHeader.add(1);
-          _streamHeader.add(224);
-
-          request.listen((data) {
-            _transStream.add(data);
-          });
-        } else {
-          help.debug('Failed Stream Connection', 1);
-        }
-      });
+  /// Set up a listener for incoming video data from ffmpeg.
+  void handleVideoFeed(HttpRequest request) {
+    request.listen((data) {
+      _transStream.add(data);
     });
   }
 
   void _runFFMpeg() {
-    List<String> options = ['-s', '640x480', '-f', 'video4linux2', '-i', '/dev/video0', '-f', 'mpeg1video', '-b', '800k', '-r', '20', 'http://127.0.0.1:1208$cameraNum/cheesecake/640/480'];
-    Process.run('ffmpeg', options).catchError((error) {
+    // Only one camera per USB controller (check lsusb -> bus00x), or bump size down to 320x240 to avoid bus saturation.
+    List<String> options = ['-s', '640x480', '-f', 'video4linux2', '-input_format', 'mjpeg', '-i', '/dev/video${cameraNum - 1}', '-f', 'mpeg1video', '-b', '800k', '-r', '20', 'http://127.0.0.1:12060/video/$cameraNum/640/480'];
+    Process.start('ffmpeg', options, runInShell:true).then((shell) {
+      //shell.stdout.listen((data) => help.debug('camera [$cameraNum] stdout: ${UTF8.decode(data)}', 0));
+      //shell.stderr.listen((data) => help.debug('camera [$cameraNum] stderr: ${UTF8.decode(data)}', 0));
+    }).catchError((error) {
       if (error is! ProcessException) throw error;
-      help.debug('ffmpeg [cameraNum]: run failed. Probably not installed', 1);
+      help.debug('ffmpeg [$cameraNum]: run failed. Probably not installed', 1);
       return;
     });
   }

@@ -1,14 +1,92 @@
-part of updroid_client;
+library updroid_camera;
+
+import 'dart:html';
+import 'dart:async';
+import 'dart:js' as js;
+import 'package:dquery/dquery.dart' as dQuery;
+
+import 'lib/updroid_message.dart';
+import 'tab.dart';
 
 /// [UpDroidCamera] is a client-side class that uses the jsmpeg library
 /// to render a video stream from a websocket onto a canvas element.
-class UpDroidCamera {
-  int cameraNum;
+class UpDroidCamera extends UpDroidTab {
+  static const String className = 'UpDroidCamera';
+  String type = 'UpDroidCamera';
 
-  UpDroidCamera(this.cameraNum) {
-    CanvasElement canvas = querySelector('#video-canvas');
-    _drawLoading(canvas);
-    _startPlayer(canvas);
+  int num;
+  int _col;
+  WebSocket _ws;
+  StreamController<CommanderMessage> _cs;
+
+  AnchorElement _closeTabButton;
+
+  UpDroidCamera(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
+    _col = col;
+    _cs = cs;
+
+    setUpTabHandle(num, _col, 'Camera', active);
+    setUpTabContainer(num, _col, 'Camera', _getMenuConfig(), active).then((Map configRefs) {
+
+      _closeTabButton = configRefs['close-tab'];
+
+      DivElement content = configRefs['content'];
+      CanvasElement canvas = new CanvasElement();
+      canvas.classes.add('video-canvas');
+      setDimensions(canvas);
+      content.children.add(canvas);
+
+      _drawLoading(canvas);
+
+      // Create the server <-> client [WebSocket].
+      // Port 12060 is the default port that UpDroid uses.
+      String url = window.location.host;
+      url = url.split(':')[0];
+      _ws = new WebSocket('ws://' + url + ':12060/camera/$num/cmdr');
+
+      _registerEventHandlers(canvas);
+    });
+  }
+
+  void setDimensions (CanvasElement canvas) {
+    var con = querySelector('#col-$num-tab-content');
+    var width = (con.borderEdge.width - 13);
+    var height = (con.borderEdge.height - 13);
+
+    width <= 640 ? canvas.width = width : canvas.width = 640;
+    height <= 480 ? canvas.height = height : canvas.height = 482;
+  }
+
+  void resizeCanvas(CanvasElement canvas){
+      var con = querySelector('#col-$num-tab-content'),
+          width = (con.borderEdge.width - 13),
+          height = (con.borderEdge.height - 13);
+
+      width <= 640 ? canvas.width = width : canvas.width = 640;
+      height <= 480 ? canvas.height = height : canvas.height = 482;
+
+  }
+
+  void _registerEventHandlers(CanvasElement canvas) {
+
+    window.onResize.listen((e){
+      resizeCanvas(canvas);
+    });
+
+    _ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'CAMERA_READY').listen((um) {
+      _startPlayer(canvas);
+    });
+
+    tabHandleButton.onDoubleClick.listen((e) {
+      e.preventDefault();
+      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidCamera'));
+    });
+
+    _closeTabButton.onClick.listen((e) {
+      destroyTab();
+      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
+    });
+
   }
 
   void _drawLoading(CanvasElement canvas) {
@@ -20,11 +98,24 @@ class UpDroidCamera {
   void _startPlayer(CanvasElement canvas) {
     String url = window.location.host;
     url = url.split(':')[0];
-    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':1207$cameraNum/']);
+    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/camera/$num/input']);
 
     var options = new js.JsObject.jsify({'canvas': canvas});
 
-    js.JsObject player = new js.JsObject(js.context['jsmpeg'], [client, options]);
+    new js.JsObject(js.context['jsmpeg'], [client, options]);
 
+  }
+
+  List _getMenuConfig() {
+    List menu = [
+      {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'Close Tab'}]},
+      {'title': 'Settings', 'items': [
+        {'type': 'toggle', 'title': 'Quality'},
+        {'type': 'toggle', 'title': 'Aspect Ratio'},
+        {'type': 'toggle', 'title': 'Resolution'},
+        {'type': 'toggle', 'title': 'CV Overlay'}]}
+    ];
+    return menu;
   }
 }

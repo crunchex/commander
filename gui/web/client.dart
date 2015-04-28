@@ -3,37 +3,50 @@ library updroid_client;
 import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
-import 'dart:js' as js;
-import 'package:ace/ace.dart' as ace;
-import 'package:bootjack/bootjack.dart';
-import 'package:ace/proxy.dart';
-import 'package:dnd/dnd.dart';
-import 'lib/updroid_message.dart';
-import 'lib/explorer_helper.dart';
-import 'lib/terminal/terminal.dart';
-import "package:path/path.dart" as pathLib;
 
-part 'explorer.dart';
-part 'editor.dart';
-part 'console.dart';
-part 'camera.dart';
+import 'tab.dart';
+import 'editor.dart';
+import 'console.dart';
+import 'explorer.dart';
+import 'camera.dart';
+import 'modal.dart';
+import 'lib/updroid_message.dart';
 
 class UpDroidClient {
-  UpDroidEditor editor;
-  UpDroidExplorer explorer;
-  UpDroidConsole console;
-  UpDroidCamera camera;
+  // TODO: find syntax to make this not such a long line.
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 
+  List<List> _tabs;
+
+  AnchorElement _newButtonLeft;
+  AnchorElement _newButtonRight;
+  ButtonElement _buildButton;
+  ButtonElement _runButton;
+  ButtonElement _uploadButton;
+
   String status;
   bool encounteredError;
+  String currentPath;
+
+  ElementStream chooseEditor;
+  ElementStream chooseConsole;
+  ElementStream chooseVideo;
 
   UpDroidClient() {
     this.status = 'DISCONNECTED';
     this.encounteredError = false;
+
+    _tabs = [[], [], []];
+
+    _newButtonLeft = querySelector('#column-1-new');
+    _newButtonRight = querySelector('#column-2-new');
+    _buildButton = querySelector('#build-button');
+    _runButton = querySelector('#run-button');
+    _uploadButton = querySelector('#upload');
+
+    String config = _getConfig();
 
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.
@@ -43,41 +56,34 @@ class UpDroidClient {
     // Port 12060 is the default port that UpDroid uses.
     String url = window.location.host;
     url = url.split(':')[0];
-    initWebSocket('ws://' + url + ':12060/pty');
+    initWebSocket('ws://' + url + ':12060/server/1');
 
-    registerEventHandlers(ws, cs);
-    initializeClasses(ws, cs);
-  }
-
-  /// Initializes the main Commander classes.
-  void initializeClasses(WebSocket ws, StreamController<CommanderMessage> cs) {
-    editor = new UpDroidEditor(ws, cs);
-    explorer = new UpDroidExplorer(ws, cs);
-    for (int i = 1; i <= 4; i++) {
-      console = new UpDroidConsole(i, cs);
-    }
-    camera = new UpDroidCamera(1);
+    registerEventHandlers(ws, cs, config);
   }
 
   /// Process messages according to the type.
   void processMessage(CommanderMessage m) {
-    // The classes still need to be informed of connection status individually
-    // because they are initialized after first 'CONNECTED' broadcast.
-    // Subsequent connection notifications can be grouped together.
     switch (m.type) {
-      case 'CONSOLE_READY':
-        //cs.add(new CommanderMessage('CONSOLE', status));
+      case 'CLOSE_TAB':
+        _closeTab(m.body);
         break;
 
-      case 'EXPLORER_READY':
-        //cs.add(new CommanderMessage('EXPLORER', status));
+      case 'OPEN_TAB':
+        List idList = m.body.split('_');
+        int column = int.parse(idList[0]);
+        String className = idList[1];
+
+        int id = _getAvailableId(className);
+        _openTab(column, id, className);
         break;
 
-      case 'EDITOR_READY':
+      case 'GIT_PASSWORD':
+        // TODO: need a more reliable handle to Explorer.
+        ws.send('[[GIT_PUSH]]' + '${_tabs[0].first.currentSelectedPath}++${m.body}');
         break;
 
       default:
-        print('Client error: unrecognized message type: ' + m.type);
+        print('Client warning: received unrecognized message type ${m.type}');
     }
   }
 
@@ -88,6 +94,7 @@ class UpDroidClient {
 
     ws.onOpen.listen((e) {
       status = 'CONNECTED';
+      ws.send('[[CLIENT_CONFIG]]');
       cs.add(new CommanderMessage('ALL', status));
     });
 
@@ -110,9 +117,147 @@ class UpDroidClient {
 
   /// Sets up external event handlers for the various Commander classes. These
   /// are mostly listening events for [WebSocket] messages.
-  void registerEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs) {
+  void registerEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs, String config) {
     cs.stream
         .where((m) => m.dest == 'CLIENT')
         .listen((m) => processMessage(m));
+
+    ws.onMessage.transform(updroidTransformer)
+      .where((um) => um.header == 'CLIENT_SERVER_READY')
+      .listen((um) => _initializeTabs(config));
+
+    ws.onMessage.transform(updroidTransformer)
+      .where((um) => um.header == 'BUILD_RESULT')
+      .listen((um) {
+        print(um.body.toString());
+        new UpDroidBuildResultsModal(um.body);
+      });
+
+    ws.onMessage.transform(updroidTransformer)
+      .where((um) => um.header == 'CATKIN_NODE_LIST')
+      .listen((um) {
+        new UpDroidRunNodeModal(JSON.decode(um.body), ws);
+      });
+
+    _newButtonLeft.onClick.listen((e) {
+      e.preventDefault();
+      if (_tabs[1].length >= 4) return;
+
+      new UpDroidOpenTabModal(1, cs);
+    });
+
+    _newButtonRight.onClick.listen((e) {
+      e.preventDefault();
+      if (_tabs[2].length >= 4) return;
+
+      new UpDroidOpenTabModal(2, cs);
+    });
+
+    _buildButton.onClick.listen((e) {
+      ws.send('[[WORKSPACE_BUILD]]');
+    });
+
+    _runButton.onClick.listen((e) {
+      ws.send('[[CATKIN_NODE_LIST]]');
+    });
+
+    _uploadButton.onClick.listen((e) {
+      new UpDroidGitPassModal(cs);
+    });
+  }
+
+  /// Returns a [Map] of all the tabs that [UpDroidClient] needs to spawn,
+  /// where key = side|left|right| and value = a list of IDs and UpDroidTab.className.
+  /// TODO: this function should retrieve information from some defaults or
+  /// a user account settings save.
+  String _getConfig([String strConfig = '']) {
+    // TODO: the default should eventually be JSON'd.
+    //if (strConfig == null) strConfig = UpDroidClient.defaultConfig;
+    if (strConfig != '') return strConfig;
+
+    List listConfig = [
+      [
+        {'id': 1, 'class': 'UpDroidEditor'}],
+      [
+        {'id': 1, 'class': 'UpDroidConsole'}]
+    ];
+
+    return JSON.encode(listConfig);
+  }
+
+  int _getAvailableId(String className) {
+    List ids = [];
+
+    // Add all used ids for [className] to ids.
+    for (int i = 1; i <= 2; i++) {
+      _tabs[i].forEach((tab) {
+        if (tab.type == className) ids.add(tab.num);
+      });
+    }
+
+    // Find the lowest unused ID possible.
+    int id = 0;
+    bool found = false;
+    while (!found) {
+      id++;
+      if (!ids.contains(id))
+        break;
+    }
+
+    return id;
+  }
+
+  /// Initializes all classes based on the loaded configuration in [_config].
+  /// TODO: create an abstract class [UpDroidTab] that all others implement.
+  /// TODO: call a generic UpDroidTab constructor instead of ifs or switches.
+  void _initializeTabs(String strConfig) {
+    List config = JSON.decode(strConfig);
+
+    _tabs[0].add(new UpDroidExplorer(cs));
+
+    for (int i = 0; i < config.length; i++) {
+      for (Map tab in config[i]) {
+        _openTab(i + 1, tab['id'], tab['class']);
+      }
+    }
+  }
+
+  void _openTab(int column, int id, String className) {
+    if (_tabs[column].isNotEmpty) {
+      for (var tab in _tabs[column]) {
+        tab.makeTabInactive();
+      }
+    }
+
+    if (className == UpDroidEditor.className) {
+      _tabs[column].add(new UpDroidEditor(id, column, cs, active: true));
+      ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
+    } else if (className == UpDroidCamera.className) {
+      _tabs[column].add(new UpDroidCamera(id, column, cs, active: true));
+      ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
+    } else if (className == UpDroidConsole.className) {
+      UpDroidConsole console = new UpDroidConsole(id, column, cs, active: true);
+      _tabs[column].add(console);
+      // TODO: initial size should not be hardcoded.
+      ws.send('[[OPEN_TAB]]' + '$column-$id-$className-25-80');
+    }
+  }
+
+  void _closeTab(String id) {
+    List idList = id.split('_');
+    String type = idList[0];
+    int num = int.parse(idList[1]);
+
+    // Add all used ids for [className] to ids.
+    for (int i = 1; i <= 2; i++) {
+      for (int j = 0; j < _tabs[i].length; j++) {
+        if (_tabs[i][j].type == type && _tabs[i][j].num == num) {
+          _tabs[i].removeAt(j);
+          _tabs[i].last.makeTabActive();
+        }
+      }
+    }
+
+    ws.send('[[CLOSE_TAB]]' + id);
   }
 }

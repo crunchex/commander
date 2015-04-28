@@ -9,32 +9,42 @@ import 'package:args/args.dart';
 import 'package:watcher/watcher.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
+import 'package:path/path.dart' as pathLib;
 
-import 'lib/client_responses.dart';
+import 'lib/ros.dart';
+import 'lib/git.dart';
 import 'lib/server_helper.dart' as help;
 
 part 'pty.dart';
 part 'camera.dart';
 part 'commands.dart';
+part 'editor.dart';
+part 'explorer.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
-  static const String defaultWorkspacePath = '/home/user/uproot';
+  static String defaultWorkspacePath = '/home/${Platform.environment['USER']}/uproot';
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
+  List<CmdrExplorer> _explorers = [];
+  List<CmdrEditor> _editors = [];
+  List<CmdrPty> _ptys = [];
+  List<CmdrCamera> _cameras = [];
+
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-    DirectoryWatcher watcher = new DirectoryWatcher(dir.path);
+    _setUpWorkspace(dir);
+    _initServer(dir, _getVirDir(results));
+  }
 
-    VirtualDirectory virDir;
-    if (!results['serveronly']) {
-      virDir = _getVirDir(results);
-    }
-
-    _initServer(dir, virDir, watcher);
-    _initPty(dir);
-    _initCamera();
+  /// Ensure that the workspace exists and is in good order.
+  void _setUpWorkspace(Directory dir) {
+    Directory uprootSrc = new Directory('${dir.path}/src');
+    uprootSrc.create(recursive: true);
+    // TODO: fix sourcing ROS setup not applying to current process.
+//    Process.runSync('.', ['/opt/ros/indigo/setup.sh'], runInShell: true);
+//    Process.runSync('catkin_init_workspace', [], workingDirectory: '${dir.path}/src');
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -54,115 +64,186 @@ class CmdrServer {
   }
 
   /// Initializes and HTTP server to serve the gui and handle [WebSocket] requests.
-  void _initServer(Directory dir, VirtualDirectory virDir, DirectoryWatcher watcher) {
+  void _initServer(Directory dir, VirtualDirectory virDir) {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
       help.debug("HttpServer listening on port:${server.port}...", 0);
-      server.listen((HttpRequest request) {
-        // WebSocket requests are considered "upgraded" HTTP requests.
-        if (WebSocketTransformer.isUpgradeRequest(request)) {
-          WebSocketTransformer
-            .upgrade(request)
-            .then((WebSocket ws) => _handleWebSocket(ws, dir, watcher));
-          return;
-        }
-
-        _handleRequest(request, virDir);
-      });
+      server.asBroadcastStream()
+          .listen((HttpRequest request) => _routeRequest(request, dir, virDir))
+          .asFuture()  // Automatically cancels on error.
+          .catchError((_) => help.debug("caught error", 1));
     });
   }
 
-  void _handleRequest(HttpRequest request, VirtualDirectory virDir) {
+  void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir) {
+    // WebSocket requests are considered "upgraded" HTTP requests.
+    if (!WebSocketTransformer.isUpgradeRequest(request)) {
+      _handleStandardRequest(request, virDir);
+      return;
+    }
+
+    // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
+    int objectID = int.parse(request.uri.pathSegments[1]) - 1;
+    switch (request.uri.pathSegments[0]) {
+      case 'editor':
+        WebSocketTransformer
+          .upgrade(request)
+          .then((WebSocket ws) => _editors[objectID].handleWebSocket(ws));
+        break;
+
+      case 'explorer':
+        WebSocketTransformer
+          .upgrade(request)
+          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
+        break;
+
+      case 'camera':
+        WebSocketTransformer
+          .upgrade(request)
+          .then((WebSocket ws) => _cameras[objectID].handleWebSocket(ws, request));
+        break;
+
+      case 'pty':
+        WebSocketTransformer
+          .upgrade(request)
+          .then((WebSocket ws) => _ptys[objectID].handleWebSocket(ws));
+        break;
+
+      default:
+        WebSocketTransformer
+          .upgrade(request)
+          .then((WebSocket ws) => _handleWebSocket(ws, dir));
+    }
+  }
+
+  void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
     help.debug("${request.method} request for: ${request.uri.path}", 0);
+
+    if (request.uri.pathSegments.length != 0 && request.uri.pathSegments[0] == 'video') {
+      int objectID = int.parse(request.uri.pathSegments[1]) - 1;
+      _cameras[objectID].handleVideoFeed(request);
+      return;
+    }
 
     if (virDir != null) {
       virDir.serveRequest(request);
+    } else {
+      help.debug('ERROR: no Virtual Directory to serve', 1);
     }
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
-  void _handleWebSocket(WebSocket socket, Directory dir, DirectoryWatcher watcher) {
-    help.debug('Client connected!', 0);
-    StreamController<String> processInput = new StreamController<String>.broadcast();
+  void _handleWebSocket(WebSocket socket, Directory dir) {
+    help.debug('Commander client connected.', 0);
 
     socket.listen((String s) {
       help.UpDroidMessage um = new help.UpDroidMessage(s);
-      help.debug('Incoming message: ' + s, 0);
+      help.debug('Server incoming: ' + s, 0);
 
       switch (um.header) {
-
-        case "INITIAL_DIRECTORY_LIST":
-          sendInitial(socket, dir);
+        case 'CLIENT_CONFIG':
+          _initBackendClasses(dir).then((value) {
+            socket.add('[[CLIENT_SERVER_READY]]');
+          });
           break;
 
-        case 'EXPLORER_DIRECTORY_PATH':
-          sendPath(socket, dir);
+        case 'WORKSPACE_BUILD':
+          Ros.buildWorkspace(dir.path).then((result) {
+            socket.add('[[BUILD_RESULT]]' + result);
+          });
           break;
 
-        case 'EXPLORER_DIRECTORY_LIST':
-          sendDirectory(socket, dir);
+        case 'CATKIN_RUN':
+          List runArgs = um.body.split('++');
+          String package = runArgs[0];
+          String node = runArgs[1];
+          Ros.runNode(package, node);
           break;
 
-        case 'EXPLORER_DIRECTORY_REFRESH':
-          refreshDirectory(socket, dir);
+        case 'CATKIN_NODE_LIST':
+          Ros.nodeList(dir, socket);
           break;
 
-        case 'EXPLORER_NEW_FILE':
-          fsNewFile(um.body);
+        case 'GIT_PUSH':
+          List runArgs = um.body.split('++');
+          String dirPath = runArgs[0];
+          String password = runArgs[1];
+          //help.debug('dirPath: $dirPath, password: $password', 0);
+          Git.push(dirPath, password);
           break;
 
-        case 'EXPLORER_NEW_FOLDER':
-          fsNewFolder(um.body);
-          // Empty folders don't trigger an incremental update, so we need to
-          // refresh the entire workspace.
-          sendDirectory(socket, dir);
+        case 'CLOSE_TAB':
+          _closeTab(um.body);
           break;
 
-        case 'EXPLORER_RENAME':
-          fsRename(um.body);
-          break;
-
-        case 'EXPLORER_MOVE':
-          // Currently implemented in the same way as RENAME as there is no
-          // direct API for MOVE.
-          fsRename(um.body);
-          break;
-
-        case 'EXPLORER_DELETE':
-          fsDelete(um.body, socket);
-          break;
-
-        case 'EDITOR_REQUEST_LIST':
-          sendEditorList(socket, dir);
-          break;
-
-        case 'EDITOR_OPEN':
-          sendFileContents(socket, um.body);
-          break;
-
-        case 'EDITOR_SAVE':
-          saveFile(um.body);
+        case 'OPEN_TAB':
+          _openTab(um.body, dir);
           break;
 
         default:
           help.debug('Message received without updroid header.', 1);
       }
-    });
-
-    watcher.events.listen((e) => help.formattedFsUpdate(socket, e));
+    }).onDone(() => _cleanUpBackend());
   }
 
-  void _initPty(Directory dir) {
-    // TODO: an [UpDroidPty] object should be created dynamically, given
-    // some command from the Commander side (like a new Console tab being created).
-    for (int i = 1; i <= 4; i++) {
-      CmdrPty pty = new CmdrPty(i, dir.path);
+  Future _initBackendClasses(Directory dir) {
+    var completer = new Completer();
+
+    Directory srcDir = new Directory('${pathLib.normalize(dir.path + "/src")}');
+    _explorers.add(new CmdrExplorer(srcDir));
+
+    completer.complete();
+    return completer.future;
+  }
+
+  void _openTab(String id, Directory dir) {
+    List idList = id.split('-');
+    int col = int.parse(idList[0]);
+    int num = int.parse(idList[1]);
+    String type = idList[2];
+
+    switch (type) {
+      case 'UpDroidEditor':
+        _editors.add(new CmdrEditor(dir));
+        break;
+      case 'UpDroidCamera':
+        _cameras.add(new CmdrCamera(num));
+        break;
+
+      case 'UpDroidConsole':
+        String numRows = idList[3];
+        String numCols = idList[4];
+        _ptys.add(new CmdrPty(num, dir.path, numRows, numCols));
+        break;
     }
   }
 
-  void _initCamera() {
-    CmdrCamera camera = new CmdrCamera(1);
+  void _closeTab(String id) {
+    List idList = id.split('_');
+    String type = idList[0];
+    int num = int.parse(idList[1]);
+
+    switch (type) {
+      case 'UpDroidEditor':
+        _editors.removeAt(num - 1);
+        break;
+
+      case 'UpDroidCamera':
+        _cameras.removeAt(num - 1);
+        break;
+
+      case 'UpDroidConsole':
+        _ptys.removeAt(num - 1);
+        break;
+    }
+  }
+
+  void _cleanUpBackend() {
+    _explorers = [];
+    _editors = [];
+    _ptys = [];
+    _cameras = [];
   }
 }

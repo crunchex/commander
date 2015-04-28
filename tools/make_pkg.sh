@@ -52,7 +52,7 @@ if [ -e "$TOPDIR/deploy/cmdr"* ]; then
 	rm deploy/cmdr*
 fi
 
-fpm -s dir -t deb -n cmdr -v 0.3.6 -p $TOPDIR/deploy/ \
+fpm -s dir -t deb -n cmdr -v 0.4.0 -p $TOPDIR/deploy/ \
     --vendor "UpDroid, Inc." \
     --provides cmdr \
     --description "A browser-based IDE and omni-tool for robots." \

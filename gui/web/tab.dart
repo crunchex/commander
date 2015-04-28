@@ -43,8 +43,8 @@ abstract class UpDroidTab {
         ..dataset['toggle'] = 'tab'
         ..text = '$title-$num';
     tabHandleButton.onClick.listen((e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
+      //e.preventDefault();
+      //e.stopImmediatePropagation();
       _renameEventHandler();
     });
     _tabHandle.children.add(tabHandleButton);

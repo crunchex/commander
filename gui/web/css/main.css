@@ -575,6 +575,10 @@ code, kbd, pre, samp {
   color: #ffffff;
 }
 
+#selector-wrapper>.tooltip {
+  font-size: 10px;
+}
+
 .node-wrapper>input {
   height: 42px;
   padding: 10px;

@@ -48,6 +48,11 @@ class UpDroidRunNodeModal extends UpDroidModal {
           _ws.send('[[CATKIN_RUN]]' + JSON.encode([packageNode['package'], packageNode['node'], nodeArgs.value]));
         }
       });
+      nodeButton
+        ..dataset['toggle'] = 'tooltip'
+        ..dataset['placement'] = 'bottom'
+        ..title = nodeName;
+      new Tooltip(nodeButton, showDelay: 700, container: selectorWrap);
       nodeWrap.children.add(nodeButton);
       nodeWrap.children.add(nodeArgs);
     });

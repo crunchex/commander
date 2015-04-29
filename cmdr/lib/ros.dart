@@ -39,6 +39,7 @@ abstract class Ros {
   }
 
   static void nodeList(Directory workspace, WebSocket ws) {
+    List launchList = [];
     List nodeList = [];
 
     Directory src = new Directory('${workspace.path}/src');
@@ -74,7 +75,7 @@ abstract class Ros {
               }
             });
 
-            nodeList.add({
+            launchList.add({
               'package': f.parent.path.split('/').last,
               'node': filename,
               'args': args
@@ -127,7 +128,8 @@ abstract class Ros {
         }
       });
 
-      ws.add('[[CATKIN_NODE_LIST]]' + JSON.encode(nodeList));
+      launchList.addAll(nodeList);
+      ws.add('[[CATKIN_NODE_LIST]]' + JSON.encode(launchList));
     });
   }
 

@@ -41,10 +41,9 @@ class CmdrServer {
   /// Ensure that the workspace exists and is in good order.
   void _setUpWorkspace(Directory dir) {
     Directory uprootSrc = new Directory('${dir.path}/src');
-    uprootSrc.create(recursive: true);
-    // TODO: fix sourcing ROS setup not applying to current process.
-//    Process.runSync('.', ['/opt/ros/indigo/setup.sh'], runInShell: true);
-//    Process.runSync('catkin_init_workspace', [], workingDirectory: '${dir.path}/src');
+    uprootSrc.create(recursive: true).then((value) {
+      Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: '${dir.path}/src', runInShell: true);
+    });
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].

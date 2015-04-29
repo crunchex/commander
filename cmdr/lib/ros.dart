@@ -25,13 +25,27 @@ abstract class Ros {
   static Future<String> buildWorkspace(String dirPath) {
     Completer completer = new Completer();
 
+    ProcessResult result;
     String resultString = '';
 
-    ProcessResult result = Process.runSync('catkin_make', [],
+    result = Process.runSync('catkin_make', [],
         workingDirectory: dirPath, runInShell: true);
     if (result.exitCode != 0) {
       //resultString += 'catkin_make: run failed - probably not sourced.';
       resultString += result.stderr;
+
+      completer.complete(resultString);
+      return completer.future;
+    }
+
+    result = Process.runSync('catkin_make_install', [],
+        workingDirectory: dirPath, runInShell: true);
+    if (result.exitCode != 0) {
+      //resultString += 'catkin_make_install: run failed - probably not sourced.';
+      resultString += result.stderr;
+
+      completer.complete(resultString);
+      return completer.future;
     }
 
     completer.complete(resultString);

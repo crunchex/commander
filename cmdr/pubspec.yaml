@@ -6,3 +6,4 @@ dependencies:
   logging_handlers: any
   tokenizr: any
   watcher: any
+  xml: any

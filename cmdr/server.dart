@@ -156,10 +156,7 @@ class CmdrServer {
           break;
 
         case 'CATKIN_RUN':
-          List runArgs = um.body.split('++');
-          String package = runArgs[0];
-          String node = runArgs[1];
-          Ros.runNode(package, node);
+          Ros.runNode(um.body);
           break;
 
         case 'CATKIN_NODE_LIST':

@@ -2,6 +2,7 @@ library updroid_modal;
 
 import 'dart:html';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:bootjack/bootjack.dart';
 

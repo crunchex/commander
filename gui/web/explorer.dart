@@ -152,7 +152,7 @@ class UpDroidExplorer extends UpDroidTab{
         .where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL')
         .listen((m) => processMessage(m));
 
-    ws.onOpen.listen((e) => ws.send('[[EXPLORER_DIRECTORY_PATH]]' + expNum.toString()));
+    ws.onOpen.listen((e) => ws.send('[[EXPLORER_DIRECTORY_PATH]]'));
 
     ws.onMessage
         .transform(updroidTransformer)

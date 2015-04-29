@@ -33,8 +33,7 @@ class CmdrExplorer {
           break;
 
         case 'EXPLORER_DIRECTORY_PATH':
-          int num = int.parse(um.body);
-          if(expNum == num) _sendPath(ws);
+          _sendPath(ws);
           break;
 
         case 'EXPLORER_DIRECTORY_LIST':

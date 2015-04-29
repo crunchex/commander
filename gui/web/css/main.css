@@ -517,6 +517,8 @@ li div input {
 
 .modal-body {
   font-family: "Avenir Next LT Pro Regular";
+  max-height: 450px;
+  overflow-y: auto;
   padding: 30px;
 }
 

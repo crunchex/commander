@@ -357,10 +357,10 @@ class UpDroidExplorer {
     SpanElement glyphicon = new SpanElement();
     SpanElement glyph = new SpanElement();
     glyph.classes
-        .addAll(['glyphicon', 'glyphicon-folder-close', "list-folder"]);
+        .addAll(['glyphicons', 'glyphicons-folder-closed', "list-folder"]);
     var glyphType =
-        (file.isDirectory) ? 'glyphicon-folder-open' : 'glyphicon-file';
-    glyphicon.classes.addAll(['glyphicon', glyphType]);
+        (file.isDirectory) ? 'glyphicons-folder-open' : 'glyphicons-file';
+    glyphicon.classes.addAll(['glyphicons', glyphType]);
     dropSetup(glyphicon, file);
     dropSetup(glyph, file);
     DivElement fileContainer = new DivElement();
@@ -616,7 +616,7 @@ class UpDroidExplorer {
       cs.add(
           new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
       ElementList<SpanElement> spanList =
-          querySelectorAll('.glyphicon-folder-open');
+          querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.add('span-ondrag');

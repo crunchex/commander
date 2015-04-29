@@ -1,26 +1,26 @@
 @font-face {
   font-family: Avenir Next LT Pro Bold;
-  src: url(../assets/AvenirNextLTPro-Bold.otf);
+  src: url(../fonts/AvenirNextLTPro-Bold.otf);
 }
 
 @font-face {
   font-family: Avenir Next LT Pro Medium Condensed;
-  src: url(../assets/AvenirNextLTPro-MediumCn.otf);
+  src: url(../fonts/AvenirNextLTPro-MediumCn.otf);
 }
 
 @font-face {
   font-family: Avenir Next LT Pro Regular;
-  src: url(../assets/AvenirNextLTPro-Regular.otf);
+  src: url(../fonts/AvenirNextLTPro-Regular.otf);
 }
 
 @font-face {
   font-family: Avenir Next LT Pro Demi;
-  src: url(../assets/AvenirNextLTPro-Demi.otf);
+  src: url(../fonts/AvenirNextLTPro-Demi.otf);
 }
 
 @font-face {
   font-family: Monosten A;
-  src: url(../assets/Monosten-A-webfont.ttf);
+  src: url(../fonts/Monosten-A-webfont.ttf);
 }
 
 html {

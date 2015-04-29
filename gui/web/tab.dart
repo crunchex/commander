@@ -35,9 +35,9 @@ abstract class UpDroidTab {
 
   // Explorer related functions
 
-  void createExplorer(int num) {
+  void createExplorer(int num, String name) {
     ParagraphElement recycle = querySelector("#recycle");
-    makeExpButton(num);
+    makeExpButton(num, name);
     _explorer = new DivElement()
       ..id = "exp-$num"
       ..dataset['num'] = num.toString();
@@ -77,12 +77,12 @@ abstract class UpDroidTab {
     body.append(guts);
   }
 
-  makeExpButton (int num) {
+  makeExpButton (int num, name) {
     LIElement item = new LIElement();
     AnchorElement link = new AnchorElement()
       ..id = "exp-button-$num"
       ..href = "#"
-      ..text = "Workspace $num"
+      ..text = name
       ..attributes['role'] = 'button';
     item.append(link);
     _expList.insertBefore(item, separator);

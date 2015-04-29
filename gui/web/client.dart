@@ -213,8 +213,8 @@ class UpDroidClient {
   void _initializeTabs(String strConfig, List explorerPaths) {
     List config = JSON.decode(strConfig);
     int i = 1;
-    for(var path in explorerPaths) {
-     _openExplorer(i);
+    for(var name in explorerPaths) {
+     _openExplorer(i, name);
       i += 1;
     }
 
@@ -225,14 +225,13 @@ class UpDroidClient {
     }
   }
 
-  void _openExplorer(int id) {
-    print(id);
+  void _openExplorer(int id, name) {
     if(_tabs[0].isNotEmpty) {
       for(var explorer in _tabs[0]) {
         explorer.hideExplorer();
       }
     }
-    _tabs[0].add(new UpDroidExplorer(cs, id));
+    _tabs[0].add(new UpDroidExplorer(cs, id, name));
   }
 
   void _openTab(int column, int id, String className) {

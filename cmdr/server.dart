@@ -199,10 +199,9 @@ class CmdrServer {
     Directory srcDir = new Directory('${pathLib.normalize(dir.path)}');
     srcDir.list().toList().then((folderList) {
       var result = [];
-      var paths = [];
-      for(var item in folderList) {
-        if(!item.toString().startsWith('File: ')){
-          paths.add(item.toString().replaceAll('Directory: ', ""));
+      var names = [];
+      for(FileSystemEntity item in folderList) {
+        if(item.runtimeType.toString() == "_Directory"){
           result.add(item);
         }
       }
@@ -210,11 +209,12 @@ class CmdrServer {
 
       int num = 1;
       for(var folder in folderList) {
-          _explorers.add(new CmdrExplorer(folder, num));
-          num += 1;
+        names.add(pathLib.basename(folder.path));
+        _explorers.add(new CmdrExplorer(folder, num));
+        num += 1;
       }
 
-      completer.complete(paths);
+      completer.complete(names);
     });
 
     return completer.future;

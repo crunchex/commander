@@ -305,6 +305,10 @@ li div input {
   padding-left: 4px;
 }
 
+.file-container > input {
+  width: 40%;
+}
+
 .new-file-drop {
   margin-left: 5px;
   margin-right: 5px;

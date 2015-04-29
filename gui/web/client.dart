@@ -22,6 +22,7 @@ class UpDroidClient {
 
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
+  ButtonElement _cleanButton;
   ButtonElement _buildButton;
   ButtonElement _runButton;
   ButtonElement _uploadButton;
@@ -42,6 +43,7 @@ class UpDroidClient {
 
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
+    _cleanButton = querySelector('#clean-button');
     _buildButton = querySelector('#build-button');
     _runButton = querySelector('#run-button');
     _uploadButton = querySelector('#upload');
@@ -151,6 +153,10 @@ class UpDroidClient {
       if (_tabs[2].length >= 4) return;
 
       new UpDroidOpenTabModal(2, cs);
+    });
+
+    _cleanButton.onClick.listen((e) {
+      ws.send('[[WORKSPACE_CLEAN]]');
     });
 
     _buildButton.onClick.listen((e) {

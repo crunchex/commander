@@ -149,6 +149,12 @@ class CmdrServer {
           });
           break;
 
+        case 'WORKSPACE_CLEAN':
+          Ros.cleanWorkspace(dir.path).then((result) {
+            //socket.add('[[WORKSPACE_CLEAN_DONE]]' + result);
+          });
+          break;
+
         case 'WORKSPACE_BUILD':
           Ros.buildWorkspace(dir.path).then((result) {
             socket.add('[[BUILD_RESULT]]' + result);

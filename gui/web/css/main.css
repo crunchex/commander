@@ -226,21 +226,18 @@ li div input {
   min-height: 300px;
   margin-top: 5px;
   margin-bottom: 5px;
-  /*max-height: 400px;*/
+  max-height: 350px;
   overflow: auto;
   padding: none;
   box-shadow: none;
 }
 
-#explorer-body > .explorer-li {
-    margin-left: -40px;
-}
-
-.explorer-ul > .explorer-li {
-    margin-left: -20px;
+.explorer-ul>.explorer-li {
+  margin-left: 10px;
 }
 
 .explorer {
+  padding-left: 0px;
   list-style-type: none;
 }
 
@@ -296,7 +293,18 @@ li div input {
 
 .file-container {
   color: #0c0c0c;
-  padding-left: 4px;
+  height: 24px;
+  line-height: 24px;
+}
+
+.file-container>span.glyphicons-folder-open,
+.file-container>span.glyphicons-folder-closed {
+  padding: 3px;
+}
+
+.file-container>span.glyphicons-file {
+  color: #363636;
+  padding: 3px;
 }
 
 #new-file-drop {

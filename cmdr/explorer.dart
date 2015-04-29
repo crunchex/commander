@@ -19,7 +19,7 @@ class CmdrExplorer {
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
-  void handleWebSocket(WebSocket ws) {
+  void handleWebSocket(WebSocket ws, HttpRequest request) {
     help.debug('Explorer client connected.', 0);
 
     ws.listen((String s) {

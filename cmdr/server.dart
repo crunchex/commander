@@ -92,11 +92,12 @@ class CmdrServer {
           .then((WebSocket ws) => _editors[objectID].handleWebSocket(ws));
         break;
 
+        //TODO: Route request here
       case 'explorer':
         WebSocketTransformer
           .upgrade(request)
           .then((WebSocket ws) {
-            _explorers[objectID].handleWebSocket(ws);
+            _explorers[objectID].handleWebSocket(ws, request);
         });
         break;
 

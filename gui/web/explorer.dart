@@ -56,7 +56,6 @@ class UpDroidExplorer extends UpDroidTab{
     expNum = num;
     this.cs = cs;
     createExplorer(num);
-    print(recycle);
     exp = querySelector("#exp-container");
 
     newFile = querySelector('#file-$expNum');
@@ -380,6 +379,7 @@ class UpDroidExplorer extends UpDroidTab{
     li
       ..dataset['name'] = file.name
       ..dataset['path'] = file.path
+      ..dataset['exp'] = expNum.toString()
       ..dataset['isDir'] = file.isDirectory.toString()
       ..draggable = true
       ..classes.add('explorer-li');

@@ -6,6 +6,7 @@ class CmdrExplorer {
   Directory _dir;
   DirectoryWatcher _watcher;
   int expNum;
+  var expPath;
 
   //TODO: make asynchroneous
   CmdrExplorer(Directory dir, num) {

@@ -39,7 +39,8 @@ abstract class UpDroidTab {
     ParagraphElement recycle = querySelector("#recycle");
     makeExpButton(num);
     _explorer = new DivElement()
-      ..id = "exp-$num";
+      ..id = "exp-$num"
+      ..dataset['num'] = num.toString();
     _explorersDiv.insertBefore(_explorer, recycle);
     DivElement explorerHead = new DivElement()
       ..classes.add('explorer-head');
@@ -79,12 +80,22 @@ abstract class UpDroidTab {
   makeExpButton (int num) {
     LIElement item = new LIElement();
     AnchorElement link = new AnchorElement()
-      ..id = "exp-$num-button"
+      ..id = "exp-button-$num"
       ..href = "#"
       ..text = "Workspace $num"
       ..attributes['role'] = 'button';
     item.append(link);
     _expList.insertBefore(item, separator);
+    item.onClick.listen((e){
+      for(var explorer in _explorersDiv.children) {
+        if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
+          explorer.classes.add('hidden');
+        }
+        if(int.parse(explorer.dataset['num']) == num) {
+          explorer.classes.remove('hidden');
+        }
+      }
+    });
   }
 
   void hideExplorer() {

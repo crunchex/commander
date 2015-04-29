@@ -226,6 +226,7 @@ class UpDroidClient {
   }
 
   void _openExplorer(int id) {
+    print(id);
     if(_tabs[0].isNotEmpty) {
       for(var explorer in _tabs[0]) {
         explorer.hideExplorer();

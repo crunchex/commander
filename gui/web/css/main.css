@@ -547,22 +547,37 @@ code, kbd, pre, samp {
 }
 
 #selector-wrapper {
+  padding-left: 50px;
+  padding-right: 50px;
   text-align: center;
 }
 
-#selector-wrapper button{
-  margin-left: 20px;
-  width: 150px;
+.node-wrapper {
+  margin-bottom: 10px;
+  height: 42px;
+  line-height: 42px;
+}
+
+.node-wrapper>button {
+  margin-right: 20px;
+  width: 200px;
+  height: 42px;
+  text-align: center;
   color: #0c0c0c;
   border-color: #e3e3e3;
   font-family: "Avenir Next LT Pro Demi";
   background-color: #ffffff;
 }
 
-#selector-wrapper button:hover {
+.node-wrapper>button:hover {
   background-color: #ff2919;
   border-color: #ff2919;
   color: #ffffff;
+}
+
+.node-wrapper>input {
+  height: 42px;
+  padding: 10px;
 }
 
 .popover {

@@ -21,6 +21,9 @@ class UpDroidRunNodeModal extends UpDroidModal {
     _modalBody.children.add(selectorWrap);
 
     _nodeList.forEach((Map packageNode) {
+      DivElement nodeWrap = new DivElement()
+        ..classes.add('node-wrapper');
+      selectorWrap.children.add(nodeWrap);
       InputElement nodeArgs = new InputElement()
         ..classes.add('node-args-input');
 
@@ -36,15 +39,17 @@ class UpDroidRunNodeModal extends UpDroidModal {
         nodeArgs.placeholder = arguments;
       }
 
-      ButtonElement nodeButton = _createButton('default', packageNode['node'], method: () {
+      String nodeName = packageNode['node'];
+      String buttonText = nodeName.length <= 15 ? nodeName : nodeName.substring(0, 15) + ' ...';
+      ButtonElement nodeButton = _createButton('default', buttonText, method: () {
         if (nodeArgs.value.isEmpty) {
           _ws.send('[[CATKIN_RUN]]' + JSON.encode([packageNode['package'], packageNode['node']]));
         } else {
           _ws.send('[[CATKIN_RUN]]' + JSON.encode([packageNode['package'], packageNode['node'], nodeArgs.value]));
         }
       });
-      selectorWrap.children.add(nodeButton);
-      selectorWrap.children.add(nodeArgs);
+      nodeWrap.children.add(nodeButton);
+      nodeWrap.children.add(nodeArgs);
     });
   }
 

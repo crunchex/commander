@@ -11,7 +11,7 @@ import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
-import 'lib/ros.dart';
+import 'lib/ros/ros.dart';
 import 'lib/git.dart';
 import 'lib/server_helper.dart' as help;
 
@@ -34,15 +34,14 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-    _setUpWorkspace(dir);
+    _setUpWorkspace(results['workspace']);
     _initServer(dir, _getVirDir(results));
   }
 
   /// Ensure that the workspace exists and is in good order.
-  void _setUpWorkspace(Directory dir) {
-    Directory uprootSrc = new Directory('${dir.path}/src');
-    uprootSrc.create(recursive: true).then((value) {
-      Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: '${dir.path}/src', runInShell: true);
+  void _setUpWorkspace(String path) {
+    new Workspace(path)..create(recursive: true).then((ws) {
+      ws.initSync();
     });
   }
 

@@ -6,7 +6,9 @@ import 'dart:convert';
 
 import 'package:xml/xml.dart';
 
-import 'server_helper.dart' as help;
+import '../server_helper.dart' as help;
+
+part 'workspace.dart';
 
 abstract class Ros {
   static Future<String> cleanWorkspace(String dirPath) {

@@ -54,10 +54,10 @@ class UpDroidExplorer extends UpDroidTab{
 
   UpDroidExplorer(StreamController<CommanderMessage> cs, num) {
     expNum = num;
-    exp = querySelector("#exp-$expNum");
-    print(num);
     this.cs = cs;
     createExplorer(num);
+    print(recycle);
+    exp = querySelector("#exp-container");
 
     newFile = querySelector('#file-$expNum');
     newFileDragSetup();
@@ -65,7 +65,7 @@ class UpDroidExplorer extends UpDroidTab{
     newFolder = querySelector('#folder-$expNum');
     newFolderDragSetup();
 
-    title = querySelector('#file-explorer-title-');
+    title = querySelector('#file-explorer-title');
     controlToggle = querySelector('#control-toggle');
     controlPanel = querySelector('#control');
     newFileDrop = querySelector('#new-file-drop-$expNum');
@@ -321,7 +321,7 @@ class UpDroidExplorer extends UpDroidTab{
 
   /// Shows control panel
   void showControl () {
-    exp.classes.add('hidden');
+    if(exp != null) exp.classes.add('hidden');
     controlPanel.classes.remove('hidden');
     controlLeave = title.onClick.listen((e){
       hideControl();

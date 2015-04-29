@@ -622,6 +622,16 @@ code, kbd, pre, samp {
   font-size: 10px;
 }
 
+/* Control panel */
+
+#control{
+
+}
+
+#control h3 {
+  text-align: center;
+}
+
 .explorer-container{
   border: 0 1px 1px 1px;
   min-height: 300px;

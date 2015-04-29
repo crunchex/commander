@@ -36,10 +36,11 @@ abstract class UpDroidTab {
   // Explorer related functions
 
   void createExplorer(int num) {
+    ParagraphElement recycle = querySelector("#recycle");
     makeExpButton(num);
     _explorer = new DivElement()
       ..id = "exp-$num";
-    _explorersDiv.append(_explorer);
+    _explorersDiv.insertBefore(_explorer, recycle);
     DivElement explorerHead = new DivElement()
       ..classes.add('explorer-head');
     _explorer.append(explorerHead);

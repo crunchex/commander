@@ -454,8 +454,9 @@ li div input {
 }
 
 .editor-file-name {
-  font-size: 16px;
-  padding: 5px 20px 0 0;
+  font-family: "Monosten A";
+  font-size: 13px;
+  padding: 7px 20px 0 0;
   float: right !important;
 }
 

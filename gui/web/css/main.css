@@ -79,11 +79,11 @@ body>.navbar.navbar-inverse {
   font-family: "Avenir Next LT Pro Bold";
   border-color: #0c0c0c;
   border-width: 1px;
-  -webkit-transition: all 0.7s ease;
-  -moz-transition: all 0.7s ease;
-  -ms-transition: all 0.7s ease;
-  -o-transition: all 0.7s ease;
-  transition: all 0.7s ease;
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
 }
 
 .navbar-inverse .navbar-nav>li>a:hover {
@@ -92,6 +92,25 @@ body>.navbar.navbar-inverse {
   font-family: "Avenir Next LT Pro Bold";
   border-color: #0c0c0c;
   border-width: 1px;
+}
+
+.navbar-inverse .navbar-nav>li>a.feedback-bold,
+.navbar-inverse .navbar-nav>li>a:focus.feedback-bold {
+  color: #ffffff;
+  background-color: #ffd000;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+#feedback-button {
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 .nav-tabs>li>a {

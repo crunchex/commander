@@ -64,6 +64,27 @@ class UpDroidClient {
     initWebSocket('ws://' + url + ':12060/server/1');
 
     registerEventHandlers(ws, cs, config);
+
+    AnchorElement feedbackButton = querySelector('#feedback-button');
+    pulseFeedback(feedbackButton);
+  }
+
+  void pulseFeedback(AnchorElement feedbackButton) {
+    // Initial pulse.
+    new Timer(new Duration(milliseconds: 1000), () {
+      feedbackButton.classes.add('feedback-bold');
+      new Timer(new Duration(milliseconds: 500), () {
+        feedbackButton.classes.remove('feedback-bold');
+      });
+    });
+
+    // Every 5 minutes after.
+    new Timer.periodic(new Duration(minutes: 5), (timer) {
+      feedbackButton.classes.add('feedback-bold');
+      new Timer(new Duration(milliseconds: 500), () {
+        feedbackButton.classes.remove('feedback-bold');
+      });
+    });
   }
 
   /// Process messages according to the type.

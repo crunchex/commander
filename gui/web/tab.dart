@@ -97,11 +97,13 @@ abstract class UpDroidTab {
         controlPanel.classes.add('hidden');
       }
       for(var explorer in _explorersDiv.children) {
-        if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
-          explorer.classes.add('hidden');
-        }
-        if(int.parse(explorer.dataset['num']) == num) {
-          explorer.classes.remove('hidden');
+        if(explorer.id != 'recycle' && explorer.id != 'control-buttons') {
+          if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
+            explorer.classes.add('hidden');
+          }
+          if(int.parse(explorer.dataset['num']) == num) {
+            explorer.classes.remove('hidden');
+          }
         }
       }
     });

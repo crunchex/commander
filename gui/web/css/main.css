@@ -343,6 +343,12 @@ li div input {
   padding: 3px;
 }
 
+.file-container input {
+  width: 35%;
+  font-family: "Avenir Next LT Pro Demi";
+  font-size: 14px;
+}
+
 .new-file-drop {
   margin-left: 5px;
   margin-right: 5px;

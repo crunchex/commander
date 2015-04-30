@@ -157,7 +157,7 @@ class CmdrServer {
           break;
 
         case 'WORKSPACE_BUILD':
-          Ros.buildWorkspace(dir.path).then((result) {
+          workspace.buildWorkspace().then((result) {
             socket.add('[[BUILD_RESULT]]' + result);
           });
           break;

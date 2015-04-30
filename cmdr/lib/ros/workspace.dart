@@ -31,6 +31,13 @@ class Workspace implements Directory {
   /// Cleans the workspace by removing build, devel, and install directories.
   Future<ProcessResult> cleanWorkspace() => Process.run('rm', ['-rf', 'build', 'devel', 'install'], workingDirectory: path, runInShell: true);
 
+  /// Builds the workspace.
+  ///
+  /// Equivalent to running 'catkin_make' and 'catkin_make install'.
+  Future<ProcessResult> buildWorkspace() {
+    return Process.run('bash', ['-c', '. catkin_make && catkin_make install'], workingDirectory: path, runInShell: true);
+  }
+
   /// Creates a [Workspace] with this name and a src directory within.
   ///
   /// If [recursive] is false, only the last directory in the path is

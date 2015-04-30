@@ -12,6 +12,7 @@ abstract class UpDroidTab {
   DivElement _explorersDiv = querySelector("#exp-container");
   UListElement _expList = querySelector("#side-menu ul");
   Element separator = querySelector('#side-menu-separator');
+  DivElement controlPanel = querySelector('#control');
   DivElement _explorer;
 
   AnchorElement tabHandleButton;
@@ -91,6 +92,10 @@ abstract class UpDroidTab {
     item.append(link);
     _expList.insertBefore(item, separator);
     item.onClick.listen((e){
+      if(_explorersDiv.classes.contains('hidden')) {
+        _explorersDiv.classes.remove('hidden');
+        controlPanel.classes.add('hidden');
+      }
       for(var explorer in _explorersDiv.children) {
         if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
           explorer.classes.add('hidden');

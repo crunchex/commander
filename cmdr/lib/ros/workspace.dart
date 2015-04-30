@@ -22,22 +22,6 @@ class Workspace implements Directory {
   /// Returns the [Directory] for the top-level src directory.
   Directory get src => new Directory('$path/src');
 
-  /// Sources the default ROS setup.bash file and initializes the workspace by
-  /// calling 'catkin_init_workspace'.
-  void initSync() {
-    Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: src.path, runInShell: true);
-  }
-
-  /// Cleans the workspace by removing build, devel, and install directories.
-  Future<ProcessResult> clean() => Process.run('rm', ['-rf', 'build', 'devel', 'install'], workingDirectory: path, runInShell: true);
-
-  /// Builds the workspace.
-  ///
-  /// Equivalent to running 'catkin_make' and 'catkin_make install'.
-  Future<ProcessResult> build() {
-    return Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_make && catkin_make install'], workingDirectory: path, runInShell: true);
-  }
-
   /// Creates a [Workspace] with this name and a src directory within.
   ///
   /// If [recursive] is false, only the last directory in the path is
@@ -52,6 +36,22 @@ class Workspace implements Directory {
     });
 
     return completer.future;
+  }
+
+  /// Sources the default ROS setup.bash file and initializes the workspace by
+  /// calling 'catkin_init_workspace'.
+  void initSync() {
+    Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: src.path, runInShell: true);
+  }
+
+  /// Cleans the workspace by removing build, devel, and install directories.
+  Future<ProcessResult> clean() => Process.run('rm', ['-rf', 'build', 'devel', 'install'], workingDirectory: path, runInShell: true);
+
+  /// Builds the workspace.
+  ///
+  /// Equivalent to running 'catkin_make' and 'catkin_make install'.
+  Future<ProcessResult> build() {
+    return Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_make && catkin_make install'], workingDirectory: path, runInShell: true);
   }
 
   /// Gets the path of this workspace.

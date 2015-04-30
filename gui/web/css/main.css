@@ -391,6 +391,9 @@ li div input {
   margin-left: 3px;
 }
 
+.col-xs-2>.btn.btn-sm:focus {
+  outline: none;
+}
 
 .column-content .nav-tabs {
   border-bottom-width: 0px;

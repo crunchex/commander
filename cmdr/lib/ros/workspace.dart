@@ -35,7 +35,7 @@ class Workspace implements Directory {
   ///
   /// Equivalent to running 'catkin_make' and 'catkin_make install'.
   Future<ProcessResult> buildWorkspace() {
-    return Process.run('bash', ['-c', '. catkin_make && catkin_make install'], workingDirectory: path, runInShell: true);
+    return Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_make && catkin_make install'], workingDirectory: path, runInShell: true);
   }
 
   /// Creates a [Workspace] with this name and a src directory within.

@@ -151,13 +151,13 @@ class CmdrServer {
           break;
 
         case 'WORKSPACE_CLEAN':
-          workspace.cleanWorkspace().then((result) {
+          workspace.clean().then((result) {
             socket.add('[[WORKSPACE_CLEAN_DONE]]');
           });
           break;
 
         case 'WORKSPACE_BUILD':
-          workspace.buildWorkspace().then((ProcessResult result) {
+          workspace.build().then((ProcessResult result) {
             String resultString = result.exitCode == 0 ? '' : result.stderr;
             socket.add('[[BUILD_RESULT]]' + resultString);
           });

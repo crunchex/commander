@@ -29,12 +29,12 @@ class Workspace implements Directory {
   }
 
   /// Cleans the workspace by removing build, devel, and install directories.
-  Future<ProcessResult> cleanWorkspace() => Process.run('rm', ['-rf', 'build', 'devel', 'install'], workingDirectory: path, runInShell: true);
+  Future<ProcessResult> clean() => Process.run('rm', ['-rf', 'build', 'devel', 'install'], workingDirectory: path, runInShell: true);
 
   /// Builds the workspace.
   ///
   /// Equivalent to running 'catkin_make' and 'catkin_make install'.
-  Future<ProcessResult> buildWorkspace() {
+  Future<ProcessResult> build() {
     return Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_make && catkin_make install'], workingDirectory: path, runInShell: true);
   }
 

@@ -150,8 +150,8 @@ class UpDroidClient {
           new UpDroidBuildResultsModal(um.body);
         }
 
-        _cleanButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
-        _cleanButton.children.first.classes.add('glyphicons-classic-hammer');
+        _buildButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
+        _buildButton.children.first.classes.add('glyphicons-classic-hammer');
       });
 
     ws.onMessage.transform(updroidTransformer)
@@ -185,8 +185,8 @@ class UpDroidClient {
     });
 
     _buildButton.onClick.listen((e) {
-      _cleanButton.children.first.classes.remove('glyphicons-classic-hammer');
-      _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
+      _buildButton.children.first.classes.remove('glyphicons-classic-hammer');
+      _buildButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
       ws.send('[[WORKSPACE_BUILD]]');
     });
 

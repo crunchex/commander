@@ -106,8 +106,10 @@ class UpDroidExplorer extends UpDroidTab{
         break;
 
       case 'REQUEST_PARENT_PATH':
-        cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH',
-            body: currentSelectedPath));
+        if(!explorer.classes.contains('hidden')) {
+          cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH',
+              body: currentSelectedPath));
+        }
         break;
 
       case 'REMOVE_EDITOR':

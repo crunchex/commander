@@ -164,11 +164,11 @@ class CmdrServer {
           break;
 
         case 'CATKIN_RUN':
-          Ros.runNode(um.body);
+          Ros.runNode(workspace, um.body);
           break;
 
         case 'CATKIN_NODE_LIST':
-          Ros.nodeList(dir, socket);
+          Ros.nodeList(workspace, socket);
           break;
 
         case 'GIT_PUSH':

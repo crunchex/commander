@@ -43,9 +43,9 @@ class UpDroidRunNodeModal extends UpDroidModal {
       String buttonText = nodeName.length <= 15 ? nodeName : nodeName.substring(0, 15) + ' ...';
       ButtonElement nodeButton = _createButton('default', buttonText, method: () {
         if (nodeArgs.value.isEmpty) {
-          _ws.send('[[CATKIN_RUN]]' + JSON.encode([packageNode['package'], packageNode['node']]));
+          _ws.send('[[CATKIN_RUN]]' + JSON.encode([packageNode['package'], packageNode['package-path'], packageNode['node']]));
         } else {
-          _ws.send('[[CATKIN_RUN]]' + JSON.encode([packageNode['package'], packageNode['node'], nodeArgs.value]));
+          _ws.send('[[CATKIN_RUN]]' + JSON.encode([packageNode['package'], packageNode['package-path'], packageNode['node'], nodeArgs.value]));
         }
       });
       nodeButton

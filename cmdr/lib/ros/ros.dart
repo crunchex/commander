@@ -48,56 +48,64 @@ abstract class Ros {
               }
             });
 
-            launchList.add({
-              'package': f.parent.path.split('/').last,
-              'node': filename,
-              'args': args
-            });
+            // Only pick up launch files that are within the 'launch' dir
+            // at the top level of the package root.
+            //print(f.parent.path.split('/').toString());
+            if (f.parent.path.split('/').last == 'launch') {
+              package = f.parent.parent;
+
+              launchList.add({
+                'package': package.path.split('/').last,
+                'package-path': package.path,
+                'node': filename,
+                'args': args
+              });
+            }
           }
-
-          if (filename == 'CMakeLists.txt') {
-            // Get the parent package name.
-            package = f.parent;
-
-            // Read CMakeLists.txt for C++ executables.
-            List<String> contents = f.readAsLinesSync();
-            contents.forEach((line) {
-              if (line.contains('add_executable') && !line.contains('#')) {
-                String execName =
-                    line.substring(line.indexOf('(') + 1, line.indexOf(' '));
-                nodeList.add({
-                  'package': package.path.split('/').last,
-                  'node': execName
-                });
-              }
-            });
-          }
-
-          // Scan for Python nodes with a main function.
-          if (filename.contains('.py')) {
-            List<String> contents = f.readAsLinesSync();
-            contents.forEach((line) {
-              if (line.contains('rospy.init_node') && !line.contains('#')) {
-                String execName = line.substring(line.indexOf('\'') + 1);
-                execName = execName.substring(0, execName.indexOf('\'')) + '.py';
-
-                // Get the parent package name.
-                Directory parent = f.parent;
-                while (true) {
-                  String parentName = parent.path.split('/').last;
-                  if (parentName != 'src' && parentName != 'scripts') {
-                    package = parent;
-                    break;
-                  }
-                  parent = parent.parent;
-                }
-                nodeList.add({
-                  'package': package.path.split('/').last,
-                  'node': execName
-                });
-              }
-            });
-          }
+//
+//          if (filename == 'CMakeLists.txt') {
+//            // Get the parent package name.
+//            package = f.parent;
+//
+//            // Read CMakeLists.txt for C++ executables.
+//            List<String> contents = f.readAsLinesSync();
+//            contents.forEach((line) {
+//              if (line.contains('add_executable') && !line.contains('#')) {
+//                String execName =
+//                    line.substring(line.indexOf('(') + 1, line.indexOf(' '));
+//                nodeList.add({
+//                  'package': package.path.split('/').last,
+//                  'node': execName
+//                });
+//              }
+//            });
+//          }
+//
+//          // Scan for Python nodes with a main function.
+//          if (filename.contains('.py')) {
+//            List<String> contents = f.readAsLinesSync();
+//            contents.forEach((line) {
+//              if (line.contains('rospy.init_node') && !line.contains('#')) {
+//                String execName = line.substring(line.indexOf('\'') + 1);
+//                execName = execName.substring(0, execName.indexOf('\'')) + '.py';
+//
+//                // Get the parent package name.
+//                Directory parent = f.parent;
+//                while (true) {
+//                  String parentName = parent.path.split('/').last;
+//                  if (parentName != 'src' && parentName != 'scripts') {
+//                    package = parent;
+//                    break;
+//                  }
+//                  parent = parent.parent;
+//                }
+//                nodeList.add({
+//                  'package': package.path.split('/').last,
+//                  'node': execName
+//                });
+//              }
+//            });
+//          }
         }
       });
 
@@ -106,13 +114,15 @@ abstract class Ros {
     });
   }
 
-  static void runNode(String nodeInfo) {
+  static void runNode(Workspace ws, String nodeInfo) {
     List nodeMap = JSON.decode(nodeInfo);
 
-    if (nodeMap[1].contains('.launch')) {
-      Process.run('roslaunch', nodeMap).then((result) {
-        help.debug(result.stdout, 0);
-        help.debug(result.stderr, 0);
+    if (nodeMap[2].contains('.launch')) {
+      String rosLaunch = '${nodeMap[0]} ${nodeMap[2]}';
+      if (nodeMap.length > 3) rosLaunch += ' ${nodeMap[3]}';
+      Process.start('bash', ['-c', '. ${ws.path}/devel/setup.bash && roscd ${nodeMap[0]} && roslaunch $rosLaunch'], runInShell: true).then((process) {
+        stdout.addStream(process.stdout);
+        stderr.addStream(process.stderr);
       });
     } else {
       Process.run('pgrep', ['roscore']).then((result) {

@@ -157,8 +157,8 @@ class CmdrServer {
           break;
 
         case 'WORKSPACE_BUILD':
-          workspace.buildWorkspace().then((result) {
-            socket.add('[[BUILD_RESULT]]' + result);
+          workspace.buildWorkspace().then((ProcessResult result) {
+            socket.add('[[BUILD_RESULT]]' + result.stderr);
           });
           break;
 

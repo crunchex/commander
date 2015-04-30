@@ -48,6 +48,7 @@ html, body {
 }
 
 #column-0, #column-1, #column-2 {
+  list-style: none;
   height: 100%;
 }
 
@@ -205,6 +206,12 @@ li div input {
   margin-left: 15px;
 }
 
+.btn-default {
+  color: #333;
+  background-color: #dddddd;
+  border-color: #ccc;
+}
+
 .filename {
   margin-left: 5px;
   font-family: "Avenir Next LT Pro Demi";
@@ -228,7 +235,13 @@ li div input {
   padding-right: 10px;
 }
 
-#new {
+.explorer-head {
+  padding-top: 10px;
+  clear: both;
+  text-align: center;
+}
+
+.new {
   display: inline-block;
   padding: 2px 4px 2px 4px;
   text-align: center;
@@ -238,44 +251,48 @@ li div input {
   font-size: 14px;
 }
 
-#explorer-container {
+.explorer-container {
   background-color: #eaecec;
   border-width: 1px;
   border-color: solid #e3e3e3;
   min-height: 300px;
   margin-top: 5px;
   margin-bottom: 5px;
-  max-height: 350px;
+  /*max-height: 400px;*/
   overflow: auto;
   padding: none;
   box-shadow: none;
 }
 
-.explorer-ul>.explorer-li {
-  margin-left: 10px;
+.explorer-body > .explorer-li {
+    margin-left: -40px;
+}
+
+.explorer-ul > .explorer-li {
+    margin-left: -20px;
 }
 
 .explorer {
-  padding-left: 0px;
   list-style-type: none;
 }
 
-#explorer-body .btn {
+.explorer-body .btn {
   background-color: transparent;
 }
 
-#explorer-body {
+.explorer-body {
   display: inline-block;
   float: left;
   clear: both;
   margin-bottom: 0px;
 }
 
-#explorer-body .btn:hover {
+.explorer-body .btn:hover {
   color: #ff2919;
 }
 
 .explorer-li {
+  list-style: none;
   min-width: 200px;
   cursor: pointer;
 }
@@ -326,12 +343,12 @@ li div input {
   padding: 3px;
 }
 
-#new-file-drop {
+.new-file-drop {
   margin-left: 5px;
   margin-right: 5px;
 }
 
-#new-file-drop p {
+.new-file-drop p {
   margin-top: 5px;
   margin-bottom: 5px;
   padding-top: 5px;
@@ -507,6 +524,7 @@ li div input {
 .camera {
   margin: none;
   height: 100%;
+  border: none;
   background-color: #D1CFD5;
 }
 
@@ -598,6 +616,26 @@ code, kbd, pre, samp {
   padding: 5px;
 }
 
+#column-0 > div {
+  background-color: #eaecec;
+}
+
+#title-wrapper {
+  width: 50%;
+  text-align: center;
+  display: inline-block;
+  padding: 5px 0 0 15px;
+}
+
+#side-menu button {
+  padding: 2px 5px;
+}
+
+#side-menu {
+  display: inline-block;
+  float: right;
+}
+
 #selector-wrapper {
   padding-left: 50px;
   padding-right: 50px;
@@ -657,14 +695,38 @@ code, kbd, pre, samp {
   font-size: 10px;
 }
 
+/* Control panel */
+
+#control{
+
+}
+
+#control h3 {
+  text-align: center;
+}
+
+.explorer-container{
+  border: 0 1px 1px 1px;
+  min-height: 300px;
+  max-height: 400px;
+  overflow: auto;
+  padding: none;
+}
+
+.explorer-li{
+  min-width: 200px;
+  cursor: pointer;
+}
+
 .hidden {
   display: none;
 }
 
-#folder {
+.folder {
+  margin: 0 4px;
   cursor: pointer;
 }
 
-#file {
+.file {
   cursor: pointer;
 }

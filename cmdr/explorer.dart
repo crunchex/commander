@@ -3,20 +3,24 @@ part of updroid_server;
 class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';
 
-  int editorNum = 1;
-
   Directory _dir;
   DirectoryWatcher _watcher;
+  int expNum;
+  var expPath;
 
-  CmdrExplorer(Directory dir) {
-    _dir = dir;
+  //TODO: make asynchroneous
+  CmdrExplorer(Directory dir, num) {
+    for(var item in dir.listSync()) {
+      if(pathLib.basename(item.path) == 'src') _dir = item;
+    }
+    expNum = num;
 
-    _watcher = new DirectoryWatcher(dir.path);
+    _watcher = new DirectoryWatcher(dir.path + '/src');
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
-  void handleWebSocket(WebSocket ws) {
+  void handleWebSocket(WebSocket ws, HttpRequest request) {
     help.debug('Explorer client connected.', 0);
 
     ws.listen((String s) {

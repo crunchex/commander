@@ -55,33 +55,50 @@
       <!-- Col 0 -->
 
       <div id="column-0" class="col-xs-2">
-        <div id="title-container">
-          <li id="file-explorer-title">UP-Root
-          </li>
-          <li id="new">New
-            <span id="folder" class="glyphicons glyphicons-folder-closed"></span>
-            <span id="file" class="glyphicons glyphicons-file"></span>
-          </li>
-          <div id="file-explorer-hr-container">
-            <div id=new-file-drop>
-              <p>Top Level</p>
-            </div>
+      <div>
+        <div id="title-wrapper">
+          <li id="file-explorer-title">UP-Root</li>
+        </div>
+
+        <!-- Side Menu -->
+
+          <div id="side-menu" class="btn-group">
+            <button id="control-toggle" type="button" class="btn">Control</button>
+            <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li id="side-menu-separator" class="divider"></li>
+              <li><a href="#">Close Workspace</a></li>
+              <li><a href="#">Add Workspace</a></li>
+            </ul>
           </div>
         </div>
-        <div id='explorer-container' class="well well-sm">
-          <ul class="explorer" id="explorer-body"></ul>
+
+      <!-- Explorers added here -->
+      <div id="exp-container">
+
+        <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span></p>
+        <div id="control-buttons" class="btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
+          <button id="build-button" type="button" class="btn btn-default">Build <span class="glyphicon glyphicon-ok"></span></button>
+          <button id="upload" type="button" class="btn btn-sm">Upload <span class="glyphicon glyphicon-share"></span></button>
         </div>
-        <p id="recycle">Recycle <span id="trash" class="glyphicons glyphicons-bin"></span>
-        </p>
-        <button id="clean-button" type="button" class="btn btn-sm">Clean <span class="glyphicons glyphicons-cleaning"></span>
-        </button>
-        <button id="build-button" type="button" class="btn btn-sm">Build <span class="glyphicons glyphicons-classic-hammer"></span>
-        </button>
-        <button id="run-button" type="button" class="btn btn-sm">Run <span class="glyphicons glyphicons-person-running"></span>
-        </button>
-        <button id="upload" type="button" class="btn btn-sm">Upload <span class="glyphicons glyphicons-share"></span>
-        </button>
       </div>
+
+      <!-- Control Div -->
+       <div id="control" class="hidden">
+        <div>
+          <h3>Nodes</h3>
+          <div id="nodes">
+
+          </div>
+          <div id="control-buttons" class="btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
+            <button id="run-button" type="button" class="btn btn-default">Run <span class="glyphicon glyphicon-play"></span></button>
+          </div>
+        </div>
+      </div>
+    </div>
 
       <!-- Col 1 -->
 

@@ -96,7 +96,9 @@ class CmdrServer {
       case 'explorer':
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
+          .then((WebSocket ws) {
+            _explorers[objectID].handleWebSocket(ws, request);
+        });
         break;
 
       case 'camera':
@@ -146,7 +148,7 @@ class CmdrServer {
       switch (um.header) {
         case 'CLIENT_CONFIG':
           _initBackendClasses(dir).then((value) {
-            socket.add('[[CLIENT_SERVER_READY]]');
+            socket.add('[[CLIENT_SERVER_READY]]' + JSON.encode(value));
           });
           break;
 
@@ -167,6 +169,7 @@ class CmdrServer {
           Ros.runNode(workspace, um.body);
           break;
 
+		//TODO: Need to change to grab all directories
         case 'CATKIN_NODE_LIST':
           Ros.nodeList(workspace, socket);
           break;
@@ -196,11 +199,32 @@ class CmdrServer {
   Future _initBackendClasses(Directory dir) {
     var completer = new Completer();
 
-    Directory srcDir = new Directory('${pathLib.normalize(dir.path + "/src")}');
-    _explorers.add(new CmdrExplorer(srcDir));
+    Directory srcDir = new Directory('${pathLib.normalize(dir.path)}');
+    srcDir.list().toList().then((folderList) {
+      var result = [];
+      var names = [];
+      for(FileSystemEntity item in folderList) {
+        if(item.runtimeType.toString() == "_Directory"){
+          result.add(item);
+        }
+      }
+      folderList = result;
 
-    completer.complete();
+      int num = 1;
+      for(var folder in folderList) {
+        names.add(pathLib.basename(folder.path));
+        _explorers.add(new CmdrExplorer(folder, num));
+        num += 1;
+      }
+
+      completer.complete(names);
+    });
+
     return completer.future;
+  }
+
+  void _openExplorer(String id, Directory dir) {
+
   }
 
   void _openTab(String id, Directory dir) {

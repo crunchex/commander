@@ -2,24 +2,34 @@ library updroid_explorer;
 
 import 'dart:html';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dnd/dnd.dart';
 import "package:path/path.dart" as pathLib;
 
+import 'tab.dart';
 import 'lib/updroid_message.dart';
 import 'lib/explorer_helper.dart';
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests
 /// to the server side.
-class UpDroidExplorer {
+class UpDroidExplorer extends UpDroidTab{
   static const String className = 'UpDroidExplorer';
+
+  // Make dynamic
+  int expNum;
+  DivElement expCon;
+  DivElement explorer;
 
   String workspacePath;
   DivElement currentSelected;
   String currentSelectedPath;
 
+  LIElement title;
   DivElement editorDiv;
+  ButtonElement controlToggle;
+  DivElement controlPanel;
   SpanElement newFile;
   SpanElement newFolder;
   DivElement newFileDrop;
@@ -33,6 +43,8 @@ class UpDroidExplorer {
   Dropzone dzRootLineContainer;
   Dropzone dzRecycle;
   StreamSubscription outsideClickListener;
+  StreamSubscription controlLeave;
+  Map expRefs;
   Map editors = {};
   Map editorListeners = {};
   Map fileInfo = {};
@@ -42,26 +54,33 @@ class UpDroidExplorer {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 
-  UpDroidExplorer(StreamController<CommanderMessage> cs) {
+  UpDroidExplorer(StreamController<CommanderMessage> cs, num, name) {
+    expNum = num;
     this.cs = cs;
+    expRefs = createExplorer(num, name);
+    expCon = expRefs['explorersDiv'];
+    explorer = expRefs['explorer'];
 
-    newFile = querySelector('#file');
+    newFile = expRefs['file'];
     newFileDragSetup();
 
-    newFolder = querySelector('#folder');
+    newFolder = expRefs['folder'];
     newFolderDragSetup();
 
-    newFileDrop = querySelector('#new-file-drop');
-    rootlineContainer = querySelector('#file-explorer-hr-container');
+    title = expRefs['title'];
+    controlToggle = expRefs['controlToggle'];
+    controlPanel = expRefs['control'];
+    newFileDrop = expRefs['drop'];
+    rootlineContainer = expRefs['hrContainer'];
     dzRootLineContainer = new Dropzone(rootlineContainer);
-    recycle = querySelector('#recycle');
+    recycle = expRefs['recycle'];
     dzRecycle = new Dropzone(recycle);
 
     // Create the server <-> client [WebSocket].
     // Port 12060 is the default port that UpDroid uses.
     String url = window.location.host;
     url = url.split(':')[0];
-    ws = new WebSocket('ws://' + url + ':12060/explorer/1');
+    ws = new WebSocket('ws://' + url + ':12060/explorer/${expNum.toString()}');
 
     registerExplorerEventHandlers();
   }
@@ -88,8 +107,10 @@ class UpDroidExplorer {
         break;
 
       case 'REQUEST_PARENT_PATH':
-        cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH',
-            body: currentSelectedPath));
+        if(!explorer.classes.contains('hidden')) {
+          cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH',
+              body: currentSelectedPath));
+        }
         break;
 
       case 'REMOVE_EDITOR':
@@ -107,6 +128,7 @@ class UpDroidExplorer {
 
   }
 
+  // TODO: cancel when inactive
   List<StreamSubscription> createEditorListeners(Dropzone dzEditor) {
     var enter = dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
@@ -120,11 +142,13 @@ class UpDroidExplorer {
         'EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
 
     var drop = dzEditor.onDrop.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        var num = editors[dzEditor];
-        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE',
-            body: [num, getPath(e.draggableElement)]));
+      if(!explorer.classes.contains('hidden')) {
+        var isDir = e.draggableElement.dataset['isDir'];
+        if (isDir == 'false') {
+          var num = editors[dzEditor];
+          cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE',
+              body: [num, getPath(e.draggableElement)]));
+      }
       }
     });
     return [enter, leave, drop];
@@ -170,6 +194,8 @@ class UpDroidExplorer {
         .transform(updroidTransformer)
         .where((um) => um.header == 'EXPLORER_REMOVE')
         .listen((um) => removeUpdate(um.body));
+
+    controlToggle.onClick.listen((e) => showControl());
 
     newFileDrop.onClick.listen((e) {
       if (currentSelected != null) {
@@ -239,10 +265,10 @@ class UpDroidExplorer {
             ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
           }
         }
-      } else if (e.draggableElement.id == 'file') {
+      } else if (e.draggableElement.classes.contains('file')) {
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
       }
-      // TODO: need to manually update fileInfo and pathToFile since folders dont fire updates
+
       else {
         ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
       }
@@ -262,24 +288,27 @@ class UpDroidExplorer {
       }
     });
 
+    // TODO: cancel when inactive
     dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));
     dzRecycle.onDragLeave
         .listen((e) => recycle.classes.remove('recycle-entered'));
 
     dzRecycle.onDrop.listen((e) {
-      var path = getPath(e.draggableElement);
+      if (!explorer.classes.contains('hidden')) {
+        var path = getPath(e.draggableElement);
 
-      // Draggable is an empty folder
-      if (e.draggableElement.dataset['isDir'] == 'true') {
-        LIElement selectedFolder = pathToFile[path];
-        selectedFolder.remove();
-        removeFileData(selectedFolder, path);
-        if (checkContents(selectedFolder) == true) {
-          removeSubFolders(selectedFolder);
+        // Draggable is an empty folder
+        if (e.draggableElement.dataset['isDir'] == 'true') {
+          LIElement selectedFolder = pathToFile[path];
+          selectedFolder.remove();
+          removeFileData(selectedFolder, path);
+          if (checkContents(selectedFolder) == true) {
+            removeSubFolders(selectedFolder);
+          }
         }
-      }
 
-      ws.send('[[EXPLORER_DELETE]]' + path);
+        ws.send('[[EXPLORER_DELETE]]' + path);
+      }
     });
   }
 
@@ -300,8 +329,22 @@ class UpDroidExplorer {
     return files;
   }
 
-  /// Functions for updating tracked file info
+  /// Shows control panel
+  void showControl () {
+    if(expCon != null) expCon.classes.add('hidden');
+    controlPanel.classes.remove('hidden');
+    controlLeave = title.onClick.listen((e){
+      hideControl();
+      controlLeave.cancel();
+    });
+  }
 
+  void hideControl () {
+    controlPanel.classes.add('hidden');
+    expCon.classes.remove('hidden');
+  }
+
+  /// Functions for updating tracked file info
   void removeFileData([LIElement li, String path]) {
     if (li != null) {
       fileInfo.remove(li);
@@ -347,6 +390,7 @@ class UpDroidExplorer {
     li
       ..dataset['name'] = file.name
       ..dataset['path'] = file.path
+      ..dataset['exp'] = expNum.toString()
       ..dataset['isDir'] = file.isDirectory.toString()
       ..draggable = true
       ..classes.add('explorer-li');
@@ -483,7 +527,7 @@ class UpDroidExplorer {
           if (alert == true && item != duplicate) {
             window.alert("Cannot move here, file name already exists");
           }
-        } else if (e.draggableElement.id == 'file') {
+        } else if (e.draggableElement.classes.contains('file')) {
           ws.send('[[EXPLORER_NEW_FILE]]' + getPath(span.parent.parent));
         } else {
           ws.send('[[EXPLORER_NEW_FOLDER]]' +
@@ -781,7 +825,7 @@ class UpDroidExplorer {
 
     UListElement dirElement;
     if (file.parentDir == '' && !file.path.contains('/.')) {
-      dirElement = querySelector('#explorer-body');
+      dirElement = querySelector('#explorer-body-$expNum');
       dirElement.append(li);
     } else if (!file.path.contains('/.') &&
         !file.path.contains('CMakeLists.txt')) {
@@ -797,7 +841,7 @@ class UpDroidExplorer {
   void initialDirectoryList(String raw) {
     var files = fileList(raw);
 
-    UListElement explorer = querySelector('#explorer-body');
+    UListElement explorer = querySelector('#explorer-body-$expNum');
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {
@@ -825,7 +869,7 @@ class UpDroidExplorer {
     pathToFile.clear();
 
     // Set the explorer list to empty for a full refresh.
-    UListElement explorer = querySelector('#explorer-body');
+    UListElement explorer = querySelector('#explorer-body-$expNum');
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {

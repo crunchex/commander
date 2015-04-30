@@ -158,7 +158,8 @@ class CmdrServer {
 
         case 'WORKSPACE_BUILD':
           workspace.buildWorkspace().then((ProcessResult result) {
-            socket.add('[[BUILD_RESULT]]' + result.stderr);
+            String resultString = result.exitCode == 0 ? '' : result.stderr;
+            socket.add('[[BUILD_RESULT]]' + resultString);
           });
           break;
 

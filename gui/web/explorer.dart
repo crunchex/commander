@@ -19,7 +19,8 @@ class UpDroidExplorer extends UpDroidTab{
 
   // Make dynamic
   int expNum;
-  DivElement exp;
+  DivElement expCon;
+  DivElement explorer;
 
   String workspacePath;
   DivElement currentSelected;
@@ -56,7 +57,8 @@ class UpDroidExplorer extends UpDroidTab{
     expNum = num;
     this.cs = cs;
     createExplorer(num, name);
-    exp = querySelector("#exp-container");
+    expCon = querySelector("#exp-container");
+    explorer = querySelector('#exp-$expNum');
 
     newFile = querySelector('#file-$expNum');
     newFileDragSetup();
@@ -123,6 +125,7 @@ class UpDroidExplorer extends UpDroidTab{
 
   }
 
+  // TODO: cancel when inactive
   List<StreamSubscription> createEditorListeners(Dropzone dzEditor) {
     var enter = dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
@@ -260,7 +263,7 @@ class UpDroidExplorer extends UpDroidTab{
       } else if (e.draggableElement.classes.contains('file')) {
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
       }
-      // TODO: need to manually update fileInfo and pathToFile since folders dont fire updates
+
       else {
         ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
       }
@@ -280,24 +283,27 @@ class UpDroidExplorer extends UpDroidTab{
       }
     });
 
+    // TODO: cancel when inactive
     dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));
     dzRecycle.onDragLeave
         .listen((e) => recycle.classes.remove('recycle-entered'));
 
     dzRecycle.onDrop.listen((e) {
-      var path = getPath(e.draggableElement);
+      if (!explorer.classes.contains('hidden')) {
+        var path = getPath(e.draggableElement);
 
-      // Draggable is an empty folder
-      if (e.draggableElement.dataset['isDir'] == 'true') {
-        LIElement selectedFolder = pathToFile[path];
-        selectedFolder.remove();
-        removeFileData(selectedFolder, path);
-        if (checkContents(selectedFolder) == true) {
-          removeSubFolders(selectedFolder);
+        // Draggable is an empty folder
+        if (e.draggableElement.dataset['isDir'] == 'true') {
+          LIElement selectedFolder = pathToFile[path];
+          selectedFolder.remove();
+          removeFileData(selectedFolder, path);
+          if (checkContents(selectedFolder) == true) {
+            removeSubFolders(selectedFolder);
+          }
         }
-      }
 
-      ws.send('[[EXPLORER_DELETE]]' + path);
+        ws.send('[[EXPLORER_DELETE]]' + path);
+      }
     });
   }
 
@@ -320,7 +326,7 @@ class UpDroidExplorer extends UpDroidTab{
 
   /// Shows control panel
   void showControl () {
-    if(exp != null) exp.classes.add('hidden');
+    if(expCon != null) expCon.classes.add('hidden');
     controlPanel.classes.remove('hidden');
     controlLeave = title.onClick.listen((e){
       hideControl();
@@ -330,7 +336,7 @@ class UpDroidExplorer extends UpDroidTab{
 
   void hideControl () {
     controlPanel.classes.add('hidden');
-    exp.classes.remove('hidden');
+    expCon.classes.remove('hidden');
   }
 
   /// Functions for updating tracked file info

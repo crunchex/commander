@@ -400,6 +400,10 @@ li div input {
   border-color: #ff2919;
 }
 
+.col-xs-2>.btn.btn-sm:focus {
+  outline: none;
+}
+
 .col-xs-2>.btn.btn-sm.control-button-disabled,
 .col-xs-2>.btn.btn-sm.control-button-disabled:hover {
   color: #e3e3e3;
@@ -410,9 +414,15 @@ li div input {
   margin-left: 3px;
 }
 
-.col-xs-2>.btn.btn-sm:focus {
-  outline: none;
+.col-xs-2>.btn.btn-sm>span.glyphicons-refresh.glyph-progress,
+.col-xs-2>.btn.btn-sm:hover>span.glyphicons-refresh.glyph-progress {
+  -webkit-animation:spin 1.5s linear infinite;
+  -moz-animation:spin 1.5s linear infinite;
+  animation:spin 1.5s linear infinite;
 }
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
 .column-content .nav-tabs {
   border-bottom-width: 0px;

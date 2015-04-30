@@ -9,10 +9,14 @@ abstract class UpDroidTab {
   LIElement _tabHandle;
   DivElement _tabContainer;
   DivElement _tabContent;
+  // Explorer Specific Refs
   DivElement _explorersDiv = querySelector("#exp-container");
   UListElement _expList = querySelector("#side-menu ul");
   Element separator = querySelector('#side-menu-separator');
-  DivElement controlPanel = querySelector('#control');
+  DivElement _controlPanel = querySelector('#control');
+  LIElement _title = querySelector('#file-explorer-title');
+  ButtonElement _controlToggle = querySelector('#control-toggle');
+  ParagraphElement _recycle = querySelector('#recycle');
   DivElement _explorer;
 
   AnchorElement tabHandleButton;
@@ -36,13 +40,16 @@ abstract class UpDroidTab {
 
   // Explorer related functions
 
-  void createExplorer(int num, String name) {
+  Map createExplorer(int num, String name) {
+    Map explorerRefs = {'explorersDiv' : _explorersDiv, 'control' : _controlPanel, 'title' : _title, 'controlToggle' : _controlToggle, 'recycle' : _recycle};
     ParagraphElement recycle = querySelector("#recycle");
     makeExpButton(num, name);
     _explorer = new DivElement()
       ..id = "exp-$num"
       ..dataset['num'] = num.toString();
     _explorersDiv.insertBefore(_explorer, recycle);
+    explorerRefs['explorer'] = _explorer;
+
     DivElement explorerHead = new DivElement()
       ..classes.add('explorer-head');
     _explorer.append(explorerHead);
@@ -60,15 +67,19 @@ abstract class UpDroidTab {
     SpanElement file = new SpanElement()
       ..id = "file-$num"
       ..classes.addAll(["glyphicon glyphicon-file", 'file']);
+    explorerRefs['file'] = file;
+    explorerRefs['folder'] = folder;
     newDnd.append(folder);
     newDnd.append(file);
     DivElement hrContainer = new DivElement()
       ..id = "file-explorer-hr-container-$num";
     explorerHead.append(hrContainer);
+    explorerRefs['hrContainer'] = hrContainer;
     DivElement drop = new DivElement()
       ..classes.add("new-file-drop")
       ..id = "new-file-drop-$num";
     hrContainer.append(drop);
+    explorerRefs['drop'] = drop;
     ParagraphElement p = new ParagraphElement();
     p.text = "Top Level";
     drop.append(p);
@@ -76,10 +87,13 @@ abstract class UpDroidTab {
       ..classes.addAll(['well', 'well-sm', 'explorer-container'])
       ..id = "explorer-$num";
     _explorer.append(body);
+    explorerRefs['expBody'] = body;
     UListElement guts = new UListElement()
       ..classes.add("explorer-body")
       ..id = "explorer-body-$num";
     body.append(guts);
+    explorerRefs['expList'] = guts;
+    return explorerRefs;
   }
 
   makeExpButton (int num, name) {
@@ -94,7 +108,7 @@ abstract class UpDroidTab {
     item.onClick.listen((e){
       if(_explorersDiv.classes.contains('hidden')) {
         _explorersDiv.classes.remove('hidden');
-        controlPanel.classes.add('hidden');
+        _controlPanel.classes.add('hidden');
       }
       for(var explorer in _explorersDiv.children) {
         if(explorer.id != 'recycle' && explorer.id != 'control-buttons') {

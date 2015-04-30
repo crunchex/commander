@@ -44,6 +44,7 @@ class UpDroidExplorer extends UpDroidTab{
   Dropzone dzRecycle;
   StreamSubscription outsideClickListener;
   StreamSubscription controlLeave;
+  Map expRefs;
   Map editors = {};
   Map editorListeners = {};
   Map fileInfo = {};
@@ -56,23 +57,23 @@ class UpDroidExplorer extends UpDroidTab{
   UpDroidExplorer(StreamController<CommanderMessage> cs, num, name) {
     expNum = num;
     this.cs = cs;
-    createExplorer(num, name);
-    expCon = querySelector("#exp-container");
-    explorer = querySelector('#exp-$expNum');
+    expRefs = createExplorer(num, name);
+    expCon = expRefs['explorersDiv'];
+    explorer = expRefs['explorer'];
 
-    newFile = querySelector('#file-$expNum');
+    newFile = expRefs['file'];
     newFileDragSetup();
 
-    newFolder = querySelector('#folder-$expNum');
+    newFolder = expRefs['folder'];
     newFolderDragSetup();
 
-    title = querySelector('#file-explorer-title');
-    controlToggle = querySelector('#control-toggle');
-    controlPanel = querySelector('#control');
-    newFileDrop = querySelector('#new-file-drop-$expNum');
-    rootlineContainer = querySelector('#file-explorer-hr-container-$expNum');
+    title = expRefs['title'];
+    controlToggle = expRefs['controlToggle'];
+    controlPanel = expRefs['control'];
+    newFileDrop = expRefs['drop'];
+    rootlineContainer = expRefs['hrContainer'];
     dzRootLineContainer = new Dropzone(rootlineContainer);
-    recycle = querySelector('#recycle');
+    recycle = expRefs['recycle'];
     dzRecycle = new Dropzone(recycle);
 
     // Create the server <-> client [WebSocket].

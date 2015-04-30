@@ -11,19 +11,6 @@ import '../server_helper.dart' as help;
 part 'workspace.dart';
 
 abstract class Ros {
-  static Future<String> cleanWorkspace(String dirPath) {
-    Completer completer = new Completer();
-
-    ProcessResult result = Process.runSync('rm', ['-rf', 'build', 'devel', 'install'],
-        workingDirectory: dirPath, runInShell: true);
-    if (result.exitCode != 0) {
-
-    }
-
-    completer.complete();
-    return completer.future;
-  }
-
   static Future<String> buildWorkspace(String dirPath) {
     Completer completer = new Completer();
 

@@ -30,6 +30,7 @@ class UpDroidClient {
   String status;
   bool encounteredError;
   String currentPath;
+  bool _runButtonEnabled;
 
   ElementStream chooseEditor;
   ElementStream chooseConsole;
@@ -47,6 +48,8 @@ class UpDroidClient {
     _buildButton = querySelector('#build-button');
     _runButton = querySelector('#run-button');
     _uploadButton = querySelector('#upload');
+
+    _runButtonEnabled = true;
 
     String config = _getConfig();
 
@@ -129,10 +132,23 @@ class UpDroidClient {
       .listen((um) => _initializeTabs(config));
 
     ws.onMessage.transform(updroidTransformer)
+      .where((um) => um.header == 'WORKSPACE_CLEAN_DONE')
+      .listen((um) {
+      print('clean done');
+        _cleanButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
+        _cleanButton.children.first.classes.add('glyphicons-cleaning');
+      });
+
+    ws.onMessage.transform(updroidTransformer)
       .where((um) => um.header == 'BUILD_RESULT')
       .listen((um) {
         print(um.body.toString());
         new UpDroidBuildResultsModal(um.body);
+        // Success.
+        if (um.body == '') {
+          _runButton.classes.remove('control-button-disabled');
+          _runButtonEnabled = true;
+        }
       });
 
     ws.onMessage.transform(updroidTransformer)
@@ -156,7 +172,13 @@ class UpDroidClient {
     });
 
     _cleanButton.onClick.listen((e) {
+      _cleanButton.children.first.classes.remove('glyphicons-cleaning');
+      _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
+
       ws.send('[[WORKSPACE_CLEAN]]');
+
+      _runButton.classes.add('control-button-disabled');
+      _runButtonEnabled = false;
     });
 
     _buildButton.onClick.listen((e) {
@@ -164,6 +186,7 @@ class UpDroidClient {
     });
 
     _runButton.onClick.listen((e) {
+      if (!_runButtonEnabled) return;
       ws.send('[[CATKIN_NODE_LIST]]');
     });
 

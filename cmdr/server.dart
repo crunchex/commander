@@ -34,15 +34,18 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-    _setUpWorkspace(results['workspace']);
-    _initServer(dir, _getVirDir(results));
+    Workspace ws = _setUpWorkspace(results['workspace']);
+    _initServer(ws, dir, _getVirDir(results));
   }
 
   /// Ensure that the workspace exists and is in good order.
-  void _setUpWorkspace(String path) {
-    new Workspace(path)..create(recursive: true).then((ws) {
+  Workspace _setUpWorkspace(String path) {
+    Workspace ws = new Workspace(path);
+    ws.create(recursive: true).then((ws) {
       ws.initSync();
     });
+
+    return ws;
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -62,19 +65,19 @@ class CmdrServer {
   }
 
   /// Initializes and HTTP server to serve the gui and handle [WebSocket] requests.
-  void _initServer(Directory dir, VirtualDirectory virDir) {
+  void _initServer(Workspace ws, Directory dir, VirtualDirectory virDir) {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
-          .listen((HttpRequest request) => _routeRequest(request, dir, virDir))
+          .listen((HttpRequest request) => _routeRequest(request, ws, dir, virDir))
           .asFuture()  // Automatically cancels on error.
           .catchError((_) => help.debug("caught error", 1));
     });
   }
 
-  void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir) {
+  void _routeRequest(HttpRequest request, Workspace workspace, Directory dir, VirtualDirectory virDir) {
     // WebSocket requests are considered "upgraded" HTTP requests.
     if (!WebSocketTransformer.isUpgradeRequest(request)) {
       _handleStandardRequest(request, virDir);
@@ -111,7 +114,7 @@ class CmdrServer {
       default:
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _handleWebSocket(ws, dir));
+          .then((WebSocket ws) => _handleWebSocket(ws, workspace, dir));
     }
   }
 
@@ -133,7 +136,7 @@ class CmdrServer {
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
-  void _handleWebSocket(WebSocket socket, Directory dir) {
+  void _handleWebSocket(WebSocket socket, Workspace workspace, Directory dir) {
     help.debug('Commander client connected.', 0);
 
     socket.listen((String s) {
@@ -148,8 +151,8 @@ class CmdrServer {
           break;
 
         case 'WORKSPACE_CLEAN':
-          Ros.cleanWorkspace(dir.path).then((result) {
-            //socket.add('[[WORKSPACE_CLEAN_DONE]]' + result);
+          workspace.cleanWorkspace().then((result) {
+            socket.add('[[WORKSPACE_CLEAN_DONE]]');
           });
           break;
 

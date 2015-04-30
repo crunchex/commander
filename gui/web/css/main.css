@@ -381,6 +381,11 @@ li div input {
   border-color: #ff2919;
 }
 
+.col-xs-2>.btn.btn-sm.control-button-disabled,
+.col-xs-2>.btn.btn-sm.control-button-disabled:hover {
+  color: #e3e3e3;
+}
+
 .column-content .nav-tabs {
   border-bottom-width: 0px;
 }

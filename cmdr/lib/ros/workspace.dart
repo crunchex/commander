@@ -28,6 +28,9 @@ class Workspace implements Directory {
     Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: src.path, runInShell: true);
   }
 
+  /// Cleans the workspace by removing build, devel, and install directories.
+  Future<ProcessResult> cleanWorkspace() => Process.run('rm', ['-rf', 'build', 'devel', 'install'], workingDirectory: path, runInShell: true);
+
   /// Creates a [Workspace] with this name and a src directory within.
   ///
   /// If [recursive] is false, only the last directory in the path is

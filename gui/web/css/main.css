@@ -386,6 +386,12 @@ li div input {
   color: #e3e3e3;
 }
 
+.col-xs-2>.btn.btn-sm>span,
+.col-xs-2>.btn.btn-sm:hover>span {
+  margin-left: 3px;
+}
+
+
 .column-content .nav-tabs {
   border-bottom-width: 0px;
 }

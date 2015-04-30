@@ -139,11 +139,13 @@ class UpDroidExplorer extends UpDroidTab{
         'EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
 
     var drop = dzEditor.onDrop.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        var num = editors[dzEditor];
-        cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE',
-            body: [num, getPath(e.draggableElement)]));
+      if(!explorer.classes.contains('hidden')) {
+        var isDir = e.draggableElement.dataset['isDir'];
+        if (isDir == 'false') {
+          var num = editors[dzEditor];
+          cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE',
+              body: [num, getPath(e.draggableElement)]));
+      }
       }
     });
     return [enter, leave, drop];

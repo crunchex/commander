@@ -134,7 +134,6 @@ class UpDroidClient {
     ws.onMessage.transform(updroidTransformer)
       .where((um) => um.header == 'WORKSPACE_CLEAN_DONE')
       .listen((um) {
-      print('clean done');
         _cleanButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
         _cleanButton.children.first.classes.add('glyphicons-cleaning');
       });

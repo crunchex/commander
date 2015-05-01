@@ -11,7 +11,7 @@ import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
-import 'lib/ros.dart';
+import 'lib/ros/ros.dart';
 import 'lib/git.dart';
 import 'lib/server_helper.dart' as help;
 
@@ -34,17 +34,18 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-    _setUpWorkspace(dir);
-    _initServer(dir, _getVirDir(results));
+    Workspace ws = _setUpWorkspace(results['workspace']);
+    _initServer(ws, dir, _getVirDir(results));
   }
 
   /// Ensure that the workspace exists and is in good order.
-  void _setUpWorkspace(Directory dir) {
-    Directory uprootSrc = new Directory('${dir.path}/src');
-    uprootSrc.create(recursive: true);
-    // TODO: fix sourcing ROS setup not applying to current process.
-//    Process.runSync('.', ['/opt/ros/indigo/setup.sh'], runInShell: true);
-//    Process.runSync('catkin_init_workspace', [], workingDirectory: '${dir.path}/src');
+  Workspace _setUpWorkspace(String path) {
+    Workspace ws = new Workspace(path);
+    ws.create(recursive: true).then((ws) {
+      ws.initSync();
+    });
+
+    return ws;
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -64,19 +65,19 @@ class CmdrServer {
   }
 
   /// Initializes and HTTP server to serve the gui and handle [WebSocket] requests.
-  void _initServer(Directory dir, VirtualDirectory virDir) {
+  void _initServer(Workspace ws, Directory dir, VirtualDirectory virDir) {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
-          .listen((HttpRequest request) => _routeRequest(request, dir, virDir))
+          .listen((HttpRequest request) => _routeRequest(request, ws, dir, virDir))
           .asFuture()  // Automatically cancels on error.
           .catchError((_) => help.debug("caught error", 1));
     });
   }
 
-  void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir) {
+  void _routeRequest(HttpRequest request, Workspace workspace, Directory dir, VirtualDirectory virDir) {
     // WebSocket requests are considered "upgraded" HTTP requests.
     if (!WebSocketTransformer.isUpgradeRequest(request)) {
       _handleStandardRequest(request, virDir);
@@ -113,7 +114,7 @@ class CmdrServer {
       default:
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _handleWebSocket(ws, dir));
+          .then((WebSocket ws) => _handleWebSocket(ws, workspace, dir));
     }
   }
 
@@ -135,7 +136,7 @@ class CmdrServer {
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
-  void _handleWebSocket(WebSocket socket, Directory dir) {
+  void _handleWebSocket(WebSocket socket, Workspace workspace, Directory dir) {
     help.debug('Commander client connected.', 0);
 
     socket.listen((String s) {
@@ -149,21 +150,25 @@ class CmdrServer {
           });
           break;
 
+        case 'WORKSPACE_CLEAN':
+          workspace.clean().then((result) {
+            socket.add('[[WORKSPACE_CLEAN_DONE]]');
+          });
+          break;
+
         case 'WORKSPACE_BUILD':
-          Ros.buildWorkspace(dir.path).then((result) {
-            socket.add('[[BUILD_RESULT]]' + result);
+          workspace.build().then((ProcessResult result) {
+            String resultString = result.exitCode == 0 ? '' : result.stderr;
+            socket.add('[[BUILD_RESULT]]' + resultString);
           });
           break;
 
         case 'CATKIN_RUN':
-          List runArgs = um.body.split('++');
-          String package = runArgs[0];
-          String node = runArgs[1];
-          Ros.runNode(package, node);
+          Ros.runNode(workspace, um.body);
           break;
 
         case 'CATKIN_NODE_LIST':
-          Ros.nodeList(dir, socket);
+          Ros.nodeList(workspace, socket);
           break;
 
         case 'GIT_PUSH':

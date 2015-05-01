@@ -7,8 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UpDroid Commander</title>
   <link rel="stylesheet" href="packages/bootjack/css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/cosmos-bootstrap.min.css"></link>
-  <link rel="stylesheet" href="css/main.css"></link>
+  <link rel="stylesheet" href="css/glyphicons.css">
+  <link rel="stylesheet" href="css/cosmos-bootstrap.min.css">
+  <link rel="stylesheet" href="css/main.css">
 
   <script type="text/javascript" src="src-min-noconflict/ace.js"></script>
   <script type="text/javascript" src="./jsmpg.js"></script>
@@ -58,8 +59,8 @@
           <li id="file-explorer-title">UP-Root
           </li>
           <li id="new">New
-            <span id="folder" class="glyphicon glyphicon-folder-close"></span>
-            <span id="file" class="glyphicon glyphicon-file"></span>
+            <span id="folder" class="glyphicons glyphicons-folder-closed"></span>
+            <span id="file" class="glyphicons glyphicons-file"></span>
           </li>
           <div id="file-explorer-hr-container">
             <div id=new-file-drop>
@@ -70,13 +71,15 @@
         <div id='explorer-container' class="well well-sm">
           <ul class="explorer" id="explorer-body"></ul>
         </div>
-        <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span>
+        <p id="recycle">Recycle <span id="trash" class="glyphicons glyphicons-bin"></span>
         </p>
-        <button id="build-button" type="button" class="btn btn-sm">Build <span class="glyphicon glyphicon-ok"></span>
+        <button id="clean-button" type="button" class="btn btn-sm">Clean <span class="glyphicons glyphicons-cleaning"></span>
         </button>
-        <button id="run-button" type="button" class="btn btn-sm">Run <span class="glyphicon glyphicon-play"></span>
+        <button id="build-button" type="button" class="btn btn-sm">Build <span class="glyphicons glyphicons-classic-hammer"></span>
         </button>
-        <button id="upload" type="button" class="btn btn-sm">Upload <span class="glyphicon glyphicon-share"></span>
+        <button id="run-button" type="button" class="btn btn-sm">Run <span class="glyphicons glyphicons-person-running"></span>
+        </button>
+        <button id="upload" type="button" class="btn btn-sm">Upload <span class="glyphicons glyphicons-share"></span>
         </button>
       </div>
 
@@ -84,7 +87,7 @@
 
       <div id="column-1" class="col-xs-5 column-content">
         <ul class="nav nav-tabs" role="tablist">
-          <li><a id="column-1-new" class="new-tab-button" data-toggle="tab"><span class="glyphicon glyphicon-plus"></span></a>
+          <li><a id="column-1-new" class="new-tab-button" data-toggle="tab"><span class="glyphicons glyphicons-plus"></span></a>
           </li>
         </ul>
 
@@ -95,7 +98,7 @@
 
       <div id="column-2" class="col-xs-5 column-content">
         <ul class="nav nav-tabs" role="tablist">
-          <li><a id="column-2-new" class="new-tab-button" data-toggle="tab"><span class="glyphicon glyphicon-plus"></span></a>
+          <li><a id="column-2-new" class="new-tab-button" data-toggle="tab"><span class="glyphicons glyphicons-plus"></span></a>
           </li>
         </ul>
 

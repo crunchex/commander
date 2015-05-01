@@ -37,6 +37,7 @@ class UpDroidConsole extends UpDroidTab {
     setUpTabContainer(num, _col, 'Console', _getMenuConfig(), active).then((Map configRefs) {
       _console = configRefs['content'];
       _console.tabIndex = 0;
+      _console.contentEditable = "true";
       _closeTabButton = configRefs['close-tab'];
       _themeButton = configRefs['invert'];
       _blinkButton = configRefs['cursor-blink'];

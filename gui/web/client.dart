@@ -22,6 +22,7 @@ class UpDroidClient {
 
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
+  ButtonElement _cleanButton;
   ButtonElement _buildButton;
   ButtonElement _runButton;
   ButtonElement _uploadButton;
@@ -29,6 +30,7 @@ class UpDroidClient {
   String status;
   bool encounteredError;
   String currentPath;
+  bool _runButtonEnabled;
 
   ElementStream chooseEditor;
   ElementStream chooseConsole;
@@ -42,9 +44,12 @@ class UpDroidClient {
 
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
+    _cleanButton = querySelector('#clean-button');
     _buildButton = querySelector('#build-button');
     _runButton = querySelector('#run-button');
     _uploadButton = querySelector('#upload');
+
+    _runButtonEnabled = true;
 
     String config = _getConfig();
 
@@ -59,6 +64,27 @@ class UpDroidClient {
     initWebSocket('ws://' + url + ':12060/server/1');
 
     registerEventHandlers(ws, cs, config);
+
+    AnchorElement feedbackButton = querySelector('#feedback-button');
+    pulseFeedback(feedbackButton);
+  }
+
+  void pulseFeedback(AnchorElement feedbackButton) {
+    // Initial pulse - 3 seconds in.
+    new Timer(new Duration(seconds: 3), () {
+      feedbackButton.classes.add('feedback-bold');
+      new Timer(new Duration(milliseconds: 500), () {
+        feedbackButton.classes.remove('feedback-bold');
+      });
+    });
+
+    // Every 5 minutes after.
+    new Timer.periodic(new Duration(minutes: 5), (timer) {
+      feedbackButton.classes.add('feedback-bold');
+      new Timer(new Duration(milliseconds: 500), () {
+        feedbackButton.classes.remove('feedback-bold');
+      });
+    });
   }
 
   /// Process messages according to the type.
@@ -127,10 +153,25 @@ class UpDroidClient {
       .listen((um) => _initializeTabs(config));
 
     ws.onMessage.transform(updroidTransformer)
+      .where((um) => um.header == 'WORKSPACE_CLEAN_DONE')
+      .listen((um) {
+        _cleanButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
+        _cleanButton.children.first.classes.add('glyphicons-cleaning');
+      });
+
+    ws.onMessage.transform(updroidTransformer)
       .where((um) => um.header == 'BUILD_RESULT')
       .listen((um) {
-        print(um.body.toString());
-        new UpDroidBuildResultsModal(um.body);
+        // Success.
+        if (um.body == '') {
+          _runButton.classes.remove('control-button-disabled');
+          _runButtonEnabled = true;
+        } else {
+          new UpDroidBuildResultsModal(um.body);
+        }
+
+        _buildButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
+        _buildButton.children.first.classes.add('glyphicons-classic-hammer');
       });
 
     ws.onMessage.transform(updroidTransformer)
@@ -153,11 +194,24 @@ class UpDroidClient {
       new UpDroidOpenTabModal(2, cs);
     });
 
+    _cleanButton.onClick.listen((e) {
+      _cleanButton.children.first.classes.remove('glyphicons-cleaning');
+      _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
+
+      ws.send('[[WORKSPACE_CLEAN]]');
+
+      _runButton.classes.add('control-button-disabled');
+      _runButtonEnabled = false;
+    });
+
     _buildButton.onClick.listen((e) {
+      _buildButton.children.first.classes.remove('glyphicons-classic-hammer');
+      _buildButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
       ws.send('[[WORKSPACE_BUILD]]');
     });
 
     _runButton.onClick.listen((e) {
+      if (!_runButtonEnabled) return;
       ws.send('[[CATKIN_NODE_LIST]]');
     });
 

@@ -61,15 +61,16 @@ cd $TOPDIR/gui
 
 echo -n "Building (minifying) gui........"
 WEB=$TOPDIR/gui/web
-cat $WEB/packages/bootjack/css/bootstrap.css $WEB/css/cosmos-bootstrap.min.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
+cat $WEB/css/glyphicons.css $WEB/css/cosmos-bootstrap.min.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
 pub build > /dev/null
 echo "OK"
 
 echo -n "Cleaning up gui................."
 BUILD=$TOPDIR/gui/build/web
-mkdir $BUILD/fonts
+mkdir -p $BUILD/fonts
 cp $WEB/packages/bootjack/fonts/glyphicons-halflings-regular.* $BUILD/fonts/
-rm $BUILD/css/cosmos-bootstrap.min.css $BUILD/css/main.css
+rm $BUILD/css/cosmos-bootstrap.min.css $BUILD/css/main.css $BUILD/css/glyphicons.css
+sed -i '/glyphicons.css/d' $BUILD/index.html
 sed -i '/bootstrap.min.css/d' $BUILD/index.html
 sed -i 's/main.css/cmdr.css/g' $BUILD/index.html
 sed -i 's/main.dart/main.dart.js/g' $BUILD/index.html

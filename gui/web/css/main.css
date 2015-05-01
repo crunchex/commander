@@ -1,26 +1,26 @@
 @font-face {
   font-family: Avenir Next LT Pro Bold;
-  src: url(../assets/AvenirNextLTPro-Bold.otf);
+  src: url(../fonts/AvenirNextLTPro-Bold.otf);
 }
 
 @font-face {
   font-family: Avenir Next LT Pro Medium Condensed;
-  src: url(../assets/AvenirNextLTPro-MediumCn.otf);
+  src: url(../fonts/AvenirNextLTPro-MediumCn.otf);
 }
 
 @font-face {
   font-family: Avenir Next LT Pro Regular;
-  src: url(../assets/AvenirNextLTPro-Regular.otf);
+  src: url(../fonts/AvenirNextLTPro-Regular.otf);
 }
 
 @font-face {
   font-family: Avenir Next LT Pro Demi;
-  src: url(../assets/AvenirNextLTPro-Demi.otf);
+  src: url(../fonts/AvenirNextLTPro-Demi.otf);
 }
 
 @font-face {
   font-family: Monosten A;
-  src: url(../assets/Monosten-A-webfont.ttf);
+  src: url(../fonts/Monosten-A-webfont.ttf);
 }
 
 html {
@@ -79,11 +79,11 @@ body>.navbar.navbar-inverse {
   font-family: "Avenir Next LT Pro Bold";
   border-color: #0c0c0c;
   border-width: 1px;
-  -webkit-transition: all 0.7s ease;
-  -moz-transition: all 0.7s ease;
-  -ms-transition: all 0.7s ease;
-  -o-transition: all 0.7s ease;
-  transition: all 0.7s ease;
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
 }
 
 .navbar-inverse .navbar-nav>li>a:hover {
@@ -92,6 +92,25 @@ body>.navbar.navbar-inverse {
   font-family: "Avenir Next LT Pro Bold";
   border-color: #0c0c0c;
   border-width: 1px;
+}
+
+.navbar-inverse .navbar-nav>li>a.feedback-bold,
+.navbar-inverse .navbar-nav>li>a:focus.feedback-bold {
+  color: #ffffff;
+  background-color: #ffd000;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+#feedback-button {
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 .nav-tabs>li>a {
@@ -226,21 +245,18 @@ li div input {
   min-height: 300px;
   margin-top: 5px;
   margin-bottom: 5px;
-  /*max-height: 400px;*/
+  max-height: 350px;
   overflow: auto;
   padding: none;
   box-shadow: none;
 }
 
-#explorer-body > .explorer-li {
-    margin-left: -40px;
-}
-
-.explorer-ul > .explorer-li {
-    margin-left: -20px;
+.explorer-ul>.explorer-li {
+  margin-left: 10px;
 }
 
 .explorer {
+  padding-left: 0px;
   list-style-type: none;
 }
 
@@ -296,7 +312,18 @@ li div input {
 
 .file-container {
   color: #0c0c0c;
-  padding-left: 4px;
+  height: 24px;
+  line-height: 24px;
+}
+
+.file-container>span.glyphicons-folder-open,
+.file-container>span.glyphicons-folder-closed {
+  padding: 3px;
+}
+
+.file-container>span.glyphicons-file {
+  color: #363636;
+  padding: 3px;
 }
 
 #new-file-drop {
@@ -373,6 +400,30 @@ li div input {
   border-color: #ff2919;
 }
 
+.col-xs-2>.btn.btn-sm:focus {
+  outline: none;
+}
+
+.col-xs-2>.btn.btn-sm.control-button-disabled,
+.col-xs-2>.btn.btn-sm.control-button-disabled:hover {
+  color: #e3e3e3;
+}
+
+.col-xs-2>.btn.btn-sm>span,
+.col-xs-2>.btn.btn-sm:hover>span {
+  margin-left: 3px;
+}
+
+.col-xs-2>.btn.btn-sm>span.glyphicons-refresh.glyph-progress,
+.col-xs-2>.btn.btn-sm:hover>span.glyphicons-refresh.glyph-progress {
+  -webkit-animation:spin 1.5s linear infinite;
+  -moz-animation:spin 1.5s linear infinite;
+  animation:spin 1.5s linear infinite;
+}
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
 .column-content .nav-tabs {
   border-bottom-width: 0px;
 }
@@ -432,8 +483,9 @@ li div input {
 }
 
 .editor-file-name {
-  font-size: 16px;
-  padding: 5px 20px 0 0;
+  font-family: "Monosten A";
+  font-size: 13px;
+  padding: 7px 20px 0 0;
   float: right !important;
 }
 
@@ -517,6 +569,8 @@ li div input {
 
 .modal-body {
   font-family: "Avenir Next LT Pro Regular";
+  max-height: 450px;
+  overflow-y: auto;
   padding: 30px;
 }
 
@@ -545,22 +599,41 @@ code, kbd, pre, samp {
 }
 
 #selector-wrapper {
+  padding-left: 50px;
+  padding-right: 50px;
   text-align: center;
 }
 
-#selector-wrapper button{
-  margin-left: 20px;
-  width: 150px;
+.node-wrapper {
+  margin-bottom: 10px;
+  height: 42px;
+  line-height: 42px;
+}
+
+.node-wrapper>button {
+  margin-right: 20px;
+  width: 200px;
+  height: 42px;
+  text-align: center;
   color: #0c0c0c;
   border-color: #e3e3e3;
   font-family: "Avenir Next LT Pro Demi";
   background-color: #ffffff;
 }
 
-#selector-wrapper button:hover {
+.node-wrapper>button:hover {
   background-color: #ff2919;
   border-color: #ff2919;
   color: #ffffff;
+}
+
+#selector-wrapper>.tooltip {
+  font-size: 10px;
+}
+
+.node-wrapper>input {
+  height: 42px;
+  padding: 10px;
 }
 
 .popover {

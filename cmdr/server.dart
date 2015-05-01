@@ -41,9 +41,9 @@ class CmdrServer {
   /// Ensure that the workspace exists and is in good order.
   Workspace _setUpWorkspace(String path) {
     Workspace ws = new Workspace(path);
-    ws.create(recursive: true).then((ws) {
-      ws.initSync();
-    });
+//    ws.create(recursive: true).then((ws) {
+//      ws.initSync();
+//    });
 
     return ws;
   }

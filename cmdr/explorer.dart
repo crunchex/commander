@@ -12,10 +12,10 @@ class CmdrExplorer {
   CmdrExplorer(Directory dir, num) {
     for(var item in dir.listSync()) {
       if(pathLib.basename(item.path) == 'src') _dir = item;
-    }
-    expNum = num;
+      expNum = num;
 
-    _watcher = new DirectoryWatcher(dir.path + '/src');
+      _watcher = new DirectoryWatcher(dir.path + '/src');
+    }
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests

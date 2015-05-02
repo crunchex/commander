@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'tab.dart';
 import 'tabs/editor/editor.dart';
 import 'tabs/console.dart';
-import 'tabs/explorer.dart';
+import 'tabs/explorer/explorer.dart';
 import 'tabs/camera/camera.dart';
 import 'modal/modal.dart';
 import 'updroid_message.dart';

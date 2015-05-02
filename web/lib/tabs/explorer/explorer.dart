@@ -7,14 +7,14 @@ import 'dart:convert';
 import 'package:dnd/dnd.dart';
 import "package:path/path.dart" as pathLib;
 
-import '../tab.dart';
-import '../updroid_message.dart';
-import '../explorer_helper.dart';
+import '../../tab.dart';
+import '../../updroid_message.dart';
+import 'explorer_helper.dart';
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests
 /// to the server side.
-class UpDroidExplorer extends UpDroidTab{
+class UpDroidExplorer extends UpDroidTab {
   static const String className = 'UpDroidExplorer';
 
   // Make dynamic
@@ -99,17 +99,14 @@ class UpDroidExplorer extends UpDroidTab{
         var dropDiv = m.body[1];
 
         var dzEditor = new Dropzone(dropDiv);
-        editorListeners.putIfAbsent(
-            dzEditor, () => createEditorListeners(dzEditor));
+        editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
         editors.putIfAbsent(dzEditor, () => num);
-        cs.add(new CommanderMessage('EDITOR', 'PASS_EDITOR_INFO',
-            body: [num, dzEditor]));
+        cs.add(new CommanderMessage('EDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
         break;
 
       case 'REQUEST_PARENT_PATH':
-        if(!explorer.classes.contains('hidden')) {
-          cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH',
-              body: currentSelectedPath));
+        if (!explorer.classes.contains('hidden')) {
+          cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH', body: currentSelectedPath));
         }
         break;
 
@@ -133,22 +130,20 @@ class UpDroidExplorer extends UpDroidTab{
     var enter = dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD',
-            body: 'editor-entered'));
+        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
       }
     });
 
-    var leave = dzEditor.onDragLeave.listen((e) => cs.add(new CommanderMessage(
-        'EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
+    var leave = dzEditor.onDragLeave
+        .listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
 
     var drop = dzEditor.onDrop.listen((e) {
-      if(!explorer.classes.contains('hidden')) {
+      if (!explorer.classes.contains('hidden')) {
         var isDir = e.draggableElement.dataset['isDir'];
         if (isDir == 'false') {
           var num = editors[dzEditor];
-          cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE',
-              body: [num, getPath(e.draggableElement)]));
-      }
+          cs.add(new CommanderMessage('EDITOR', 'OPEN_FILE', body: [num, getPath(e.draggableElement)]));
+        }
       }
     });
     return [enter, leave, drop];
@@ -156,16 +151,11 @@ class UpDroidExplorer extends UpDroidTab{
 
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
-    cs.stream
-        .where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL')
-        .listen((m) => processMessage(m));
+    cs.stream.where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL').listen((m) => processMessage(m));
 
     ws.onOpen.listen((e) => ws.send('[[EXPLORER_DIRECTORY_PATH]]'));
 
-    ws.onMessage
-        .transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_DIRECTORY_PATH')
-        .listen((um) {
+    ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_DIRECTORY_PATH').listen((um) {
       workspacePath = um.body;
       ws.send('[[INITIAL_DIRECTORY_LIST]]');
     });
@@ -205,10 +195,8 @@ class UpDroidExplorer extends UpDroidTab{
       currentSelectedPath = workspacePath;
     });
 
-    dzRootLineContainer.onDragEnter
-        .listen((e) => newFileDrop.classes.add('file-drop-entered'));
-    dzRootLineContainer.onDragLeave
-        .listen((e) => newFileDrop.classes.remove('file-drop-entered'));
+    dzRootLineContainer.onDragEnter.listen((e) => newFileDrop.classes.add('file-drop-entered'));
+    dzRootLineContainer.onDragLeave.listen((e) => newFileDrop.classes.remove('file-drop-entered'));
 
     dzRootLineContainer.onDrop.listen((e) {
       if (e.draggableElement.className.contains('explorer-li')) {
@@ -238,24 +226,20 @@ class UpDroidExplorer extends UpDroidTab{
 
           if (currentPath != newPath && alert == false) {
             if (item.lastChild.hasChildNodes() == false) {
-              ws.send(
-                  '[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
               var name = getName(e.draggableElement);
               removeFileData(item, currentPath);
-              newElementFromFile(new SimpleFile.fromPath(
-                  workspacePath + '/' + name, workspacePath, true));
+              newElementFromFile(new SimpleFile.fromPath(workspacePath + '/' + name, workspacePath, true));
               item.remove();
             } // TODO: Preserve structure
             else if (checkContents(item) == true) {
-              ws.send(
-                  '[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
               removeSubFolders(item);
               removeFileData(e.draggableElement, currentPath);
               ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
               item.remove();
             } else {
-              ws.send(
-                  '[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
               removeFileData(e.draggableElement, currentPath);
               item.remove();
             }
@@ -267,31 +251,28 @@ class UpDroidExplorer extends UpDroidTab{
         }
       } else if (e.draggableElement.classes.contains('file')) {
         ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
-      }
-
-      else {
+      } else {
         ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
       }
     });
 
     newFolder.onDoubleClick.listen((e) {
-      if(currentSelectedPath == null) ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
-      else{
+      if (currentSelectedPath == null) ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
+      else {
         ws.send('[[EXPLORER_NEW_FOLDER]]' + currentSelectedPath + '/untitled');
-        }
+      }
     });
 
     newFile.onDoubleClick.listen((e) {
-      if(currentSelectedPath == null) ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
-      else{
+      if (currentSelectedPath == null) ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
+      else {
         ws.send('[[EXPLORER_NEW_FILE]]' + currentSelectedPath);
       }
     });
 
     // TODO: cancel when inactive
     dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));
-    dzRecycle.onDragLeave
-        .listen((e) => recycle.classes.remove('recycle-entered'));
+    dzRecycle.onDragLeave.listen((e) => recycle.classes.remove('recycle-entered'));
 
     dzRecycle.onDrop.listen((e) {
       if (!explorer.classes.contains('hidden')) {
@@ -330,16 +311,16 @@ class UpDroidExplorer extends UpDroidTab{
   }
 
   /// Shows control panel
-  void showControl () {
-    if(expCon != null) expCon.classes.add('hidden');
+  void showControl() {
+    if (expCon != null) expCon.classes.add('hidden');
     controlPanel.classes.remove('hidden');
-    controlLeave = title.onClick.listen((e){
+    controlLeave = title.onClick.listen((e) {
       hideControl();
       controlLeave.cancel();
     });
   }
 
-  void hideControl () {
+  void hideControl() {
     controlPanel.classes.add('hidden');
     expCon.classes.remove('hidden');
   }
@@ -400,10 +381,8 @@ class UpDroidExplorer extends UpDroidTab{
     // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
     SpanElement glyph = new SpanElement();
-    glyph.classes
-        .addAll(['glyphicons', 'glyphicons-folder-closed', "list-folder"]);
-    var glyphType =
-        (file.isDirectory) ? 'glyphicons-folder-open' : 'glyphicons-file';
+    glyph.classes.addAll(['glyphicons', 'glyphicons-folder-closed', "list-folder"]);
+    var glyphType = (file.isDirectory) ? 'glyphicons-folder-open' : 'glyphicons-file';
     glyphicon.classes.addAll(['glyphicons', glyphType]);
     dropSetup(glyphicon, file);
     dropSetup(glyph, file);
@@ -466,14 +445,12 @@ class UpDroidExplorer extends UpDroidTab{
         if (e.draggableElement.className.contains('explorer-li')) {
           // The draggable is an existing file/folder.
           var currentPath = getPath(e.draggableElement);
-          var newPath =
-              '${getPath(span.parent.parent)}/${getName(e.draggableElement)}';
+          var newPath = '${getPath(span.parent.parent)}/${getName(e.draggableElement)}';
           bool duplicate;
           LIElement item = pathToFile[currentPath];
 
           // Check for duplicate file name
-          pathToFile
-              .containsKey(newPath) ? duplicate = true : duplicate = false;
+          pathToFile.containsKey(newPath) ? duplicate = true : duplicate = false;
           bool alert = false;
           if (duplicate == true) {
             alert = true;
@@ -483,33 +460,27 @@ class UpDroidExplorer extends UpDroidTab{
 
           if (e.draggableElement.dataset['isDir'] == 'true') {
             bool send = true;
-            if (getPath(span.parent.parent)
-                .contains(getPath(e.draggableElement))) {
-              send = checkNested(
-                  getPath(span.parent.parent), getPath(e.draggableElement));
+            if (getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
+              send = checkNested(getPath(span.parent.parent), getPath(e.draggableElement));
             }
             // Avoid an exception thrown when the new name already exists or dragging to same folder.
 
             if (currentPath != newPath && duplicate == false && send == true) {
               if (item.lastChild.hasChildNodes() == false) {
-                ws.send(
-                    '[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 var name = getName(e.draggableElement);
                 removeFileData(e.draggableElement, currentPath);
-                newElementFromFile(new SimpleFile.fromPath(
-                    getPath(span.parent.parent) + '/' + name, workspacePath,
-                    true));
+                newElementFromFile(
+                    new SimpleFile.fromPath(getPath(span.parent.parent) + '/' + name, workspacePath, true));
                 item.remove();
               } else if (checkContents(item) == true) {
-                ws.send(
-                    '[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 removeSubFolders(item);
                 removeFileData(e.draggableElement, currentPath);
                 ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
                 item.remove();
               } else {
-                ws.send(
-                    '[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 item.remove();
                 removeFileData(e.draggableElement, currentPath);
               }
@@ -517,10 +488,8 @@ class UpDroidExplorer extends UpDroidTab{
           } else {
             if (currentPath != newPath &&
                 duplicate == false &&
-                !getPath(span.parent.parent)
-                    .contains(getPath(e.draggableElement))) {
-              ws.send(
-                  '[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                !getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
+              ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
             }
           }
 
@@ -530,9 +499,7 @@ class UpDroidExplorer extends UpDroidTab{
         } else if (e.draggableElement.classes.contains('file')) {
           ws.send('[[EXPLORER_NEW_FILE]]' + getPath(span.parent.parent));
         } else {
-          ws.send('[[EXPLORER_NEW_FOLDER]]' +
-              getPath(span.parent.parent) +
-              '/untitled');
+          ws.send('[[EXPLORER_NEW_FOLDER]]' + getPath(span.parent.parent) + '/untitled');
         }
       });
     }
@@ -628,10 +595,8 @@ class UpDroidExplorer extends UpDroidTab{
 
           // Create a folder icon if the item renamed was an empty folder
 
-          if (file.isDirectory == true &&
-              li.lastChild.hasChildNodes() == false) {
-            newElementFromFile(
-                new SimpleFile.fromPath(newPath, workspacePath, true));
+          if (file.isDirectory == true && li.lastChild.hasChildNodes() == false) {
+            newElementFromFile(new SimpleFile.fromPath(newPath, workspacePath, true));
           }
         } else {
           // TODO: need to make field width scale to the user's input.
@@ -651,16 +616,13 @@ class UpDroidExplorer extends UpDroidTab{
   void newFileDragSetup() {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
-    Draggable d =
-        new Draggable(newFile, avatarHandler: new AvatarHandler.clone());
+    Draggable d = new Draggable(newFile, avatarHandler: new AvatarHandler.clone());
 
     // Highlight valid dropzones: rootline, editor, any workspace folder.
     d.onDragStart.listen((event) {
       newFileDrop.classes.add('file-drop-ondrag');
-      cs.add(
-          new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
-      ElementList<SpanElement> spanList =
-          querySelectorAll('.glyphicons-folder-open');
+      cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.add('span-ondrag');
@@ -672,10 +634,8 @@ class UpDroidExplorer extends UpDroidTab{
 
     d.onDragEnd.listen((event) {
       newFileDrop.classes.remove('file-drop-ondrag');
-      cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE',
-          body: 'editor-ondrag'));
-      ElementList<SpanElement> spanList =
-          querySelectorAll('.glyphicon-folder-open');
+      cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.remove('span-ondrag');
@@ -690,14 +650,12 @@ class UpDroidExplorer extends UpDroidTab{
   void newFolderDragSetup() {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
-    Draggable d =
-        new Draggable(newFolder, avatarHandler: new AvatarHandler.clone());
+    Draggable d = new Draggable(newFolder, avatarHandler: new AvatarHandler.clone());
 
     // Highlight valid dropzones: rootline, any workspace folder.
     d.onDragStart.listen((event) {
       newFileDrop.classes.add('file-drop-ondrag');
-      ElementList<SpanElement> spanList =
-          querySelectorAll('.glyphicon-folder-open');
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.add('span-ondrag');
@@ -709,8 +667,7 @@ class UpDroidExplorer extends UpDroidTab{
 
     d.onDragEnd.listen((event) {
       newFileDrop.classes.remove('file-drop-ondrag');
-      ElementList<SpanElement> spanList =
-          querySelectorAll('.glyphicon-folder-open');
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.remove('span-ondrag');
@@ -732,10 +689,9 @@ class UpDroidExplorer extends UpDroidTab{
       d.avatarHandler.avatar.children.first.classes.remove('highlighted');
       print(li.dataset['path']);
       print(workspacePath);
-      if(pathLib.dirname(li.dataset['path']) != workspacePath) newFileDrop.classes.add('file-drop-ondrag');
+      if (pathLib.dirname(li.dataset['path']) != workspacePath) newFileDrop.classes.add('file-drop-ondrag');
       recycle.classes.add('recycle-ondrag');
-      ElementList<SpanElement> spanList =
-          querySelectorAll('.glyphicon-folder-open');
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.add('span-ondrag');
@@ -744,16 +700,14 @@ class UpDroidExplorer extends UpDroidTab{
         span.classes.add('span-ondrag');
       }
       if (!file.isDirectory) {
-        cs.add(
-            new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
+        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
       }
     });
 
     d.onDragEnd.listen((event) {
       newFileDrop.classes.remove('file-drop-ondrag');
       recycle.classes.remove('recycle-ondrag');
-      ElementList<SpanElement> spanList =
-          querySelectorAll('.glyphicon-folder-open');
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.remove('span-ondrag');
@@ -762,8 +716,7 @@ class UpDroidExplorer extends UpDroidTab{
         span.classes.remove('span-ondrag');
       }
       if (!file.isDirectory) {
-        cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE',
-            body: 'editor-ondrag'));
+        cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
       }
     });
   }
@@ -777,16 +730,12 @@ class UpDroidExplorer extends UpDroidTab{
     String curPath = '';
 
     // Iterate through the path checking to see if the folder exists
-    var split = parentPath
-        .replaceFirst(pathLib.normalize(workspacePath), '')
-        .split('/');
+    var split = parentPath.replaceFirst(pathLib.normalize(workspacePath), '').split('/');
     for (int i = 1; i < split.length; i++) {
       curPath += split[i];
       LIElement curLi = pathToFile['${pathLib.join(workspacePath, curPath)}'];
-      if (curLi == null &&
-          pathLib.join(workspacePath, curPath) != workspacePath) {
-        newElementFromFile(new SimpleFile.fromPath(
-                pathLib.join(workspacePath, curPath), workspacePath, true))
+      if (curLi == null && pathLib.join(workspacePath, curPath) != workspacePath) {
+        newElementFromFile(new SimpleFile.fromPath(pathLib.join(workspacePath, curPath), workspacePath, true))
             .then((result) {});
       }
       if (i != split.length - 1) {
@@ -829,8 +778,7 @@ class UpDroidExplorer extends UpDroidTab{
     if (file.parentDir == '' && !file.path.contains('/.')) {
       dirElement = querySelector('#explorer-body-$expNum');
       dirElement.append(li);
-    } else if (!file.path.contains('/.') &&
-        !file.path.contains('CMakeLists.txt')) {
+    } else if (!file.path.contains('/.') && !file.path.contains('CMakeLists.txt')) {
       dirElement = ulInfo[pathLib.dirname(file.path)];
       dirElement.append(li);
     }
@@ -859,9 +807,7 @@ class UpDroidExplorer extends UpDroidTab{
       if (file.isDirectory == true) {
         LIElement folder = pathToFile[file.path];
         if (folder != null) {
-          folder.dataset['expanded'] == "true"
-              ? folderStateList[file] = true
-              : folderStateList[file] = false;
+          folder.dataset['expanded'] == "true" ? folderStateList[file] = true : folderStateList[file] = false;
         }
       }
     }
@@ -875,9 +821,7 @@ class UpDroidExplorer extends UpDroidTab{
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {
-      file.isDirectory == true
-          ? newElementFromFile(file, folderStateList[file])
-          : newElementFromFile(file);
+      file.isDirectory == true ? newElementFromFile(file, folderStateList[file]) : newElementFromFile(file);
     }
   }
 

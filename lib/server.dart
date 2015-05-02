@@ -11,15 +11,15 @@ import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
-import 'lib/ros/ros.dart';
-import 'lib/git.dart';
-import 'lib/server_helper.dart' as help;
+import 'ros/ros.dart';
+import 'git.dart';
+import 'server_helper.dart' as help;
 
-part 'pty.dart';
-part 'camera.dart';
 part 'commands.dart';
-part 'editor.dart';
-part 'explorer.dart';
+part 'tab/pty.dart';
+part 'tab/camera.dart';
+part 'tab/editor.dart';
+part 'tab/explorer.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {

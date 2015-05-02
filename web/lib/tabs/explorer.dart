@@ -7,9 +7,9 @@ import 'dart:convert';
 import 'package:dnd/dnd.dart';
 import "package:path/path.dart" as pathLib;
 
-import 'tab.dart';
-import 'lib/updroid_message.dart';
-import 'lib/explorer_helper.dart';
+import '../tab.dart';
+import '../updroid_message.dart';
+import '../explorer_helper.dart';
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests

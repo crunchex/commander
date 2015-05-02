@@ -5,12 +5,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'tab.dart';
-import 'editor.dart';
-import 'console.dart';
-import 'explorer.dart';
-import 'camera.dart';
-import 'modal.dart';
-import 'lib/updroid_message.dart';
+import 'tabs/editor/editor.dart';
+import 'tabs/console.dart';
+import 'tabs/explorer.dart';
+import 'tabs/camera/camera.dart';
+import 'modal/modal.dart';
+import 'updroid_message.dart';
 
 class UpDroidClient {
   // TODO: find syntax to make this not such a long line.

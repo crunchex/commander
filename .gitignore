@@ -27,3 +27,6 @@ pubspec.lock
 
 # Mac OS X
 *.DS_Store
+
+#WebStorm
+.idea/

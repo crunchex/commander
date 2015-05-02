@@ -1,6 +1,12 @@
-name: updroidclient
-description: A sample application
+name: updroidrobot
 dependencies:
+  args: any
+  http_server: '>=0.9.3 <0.10.0'
+  logging: any
+  logging_handlers: any
+  tokenizr: any
+  watcher: any
+  xml: any
   ace: any
   bootjack: any
   browser: any
@@ -11,6 +17,6 @@ dependencies:
   quiver: any
   script_inliner: any
   terminal:
-    path: /home/dong/git/terminal
+    path: /home/crunchex/work/terminal
 transformers:
 - script_inliner

@@ -24,28 +24,27 @@ command -v cleancss >/dev/null 2>&1 || {
 }
 echo "OK"
 
-### cmdr ###
-cd $TOPDIR/cmdr
+### global ###
+cd $TOPDIR
 
-echo -n "Getting dependencies for cmdr..."
+echo -n "Getting app dependencies........"
 pub get > /dev/null
 echo "OK"
 
+### cmdr ###
+cd $TOPDIR/bin
+
 echo -n "Building (minifying) cmdr......."
-mkdir -p bin
 dart2js --output-type=dart --categories=Server --minify -o cmdr cmdr.dart > /dev/null
 rm cmdr.deps
 sed -i '1i#!/usr/bin/env dart' cmdr
 chmod +x cmdr
-mv cmdr bin/
 echo "OK"
 
 ### gui ###
-cd $TOPDIR/gui
+cd $TOPDIR/web
 
-echo -n "Getting dependencies for gui...."
-pub get > /dev/null
-cd web
+echo -n "Getting more gui deps..........."
 if [ ! -d "src-min-noconflict" ]; then
 	git clone --quiet https://github.com/ajaxorg/ace-builds.git
 	cd ace-builds
@@ -53,20 +52,20 @@ if [ ! -d "src-min-noconflict" ]; then
 	git checkout --quiet beb9ff68e397b4dcaa1d40f79651a063fc917736
 	mv src-min-noconflict ../src-min-noconflict
 fi
-cd $TOPDIR/gui
-rm -rf $TOPDIR/gui/web/ace-builds
+cd $TOPDIR/web
+rm -rf ace-builds
 echo "OK"
 
-cd $TOPDIR/gui
+cd $TOPDIR/
 
 echo -n "Building (minifying) gui........"
-WEB=$TOPDIR/gui/web
+WEB=$TOPDIR/web
 cat $WEB/css/glyphicons.css $WEB/css/cosmos-bootstrap.min.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
 pub build > /dev/null
 echo "OK"
 
 echo -n "Cleaning up gui................."
-BUILD=$TOPDIR/gui/build/web
+BUILD=$TOPDIR/build/web
 mkdir -p $BUILD/fonts
 cp $WEB/packages/bootjack/fonts/glyphicons-halflings-regular.* $BUILD/fonts/
 rm $BUILD/css/cosmos-bootstrap.min.css $BUILD/css/main.css $BUILD/css/glyphicons.css

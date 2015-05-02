@@ -69,6 +69,8 @@ class CmdrServer {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
+      print('[UpDroid Commander serving on port 12060]');
+      print('You can now enter "localhost:12060" in your browser.\nCtrl-C to exit.');
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
           .listen((HttpRequest request) => _routeRequest(request, ws, dir, virDir))

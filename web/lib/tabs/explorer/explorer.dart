@@ -33,7 +33,6 @@ class UpDroidExplorer extends UpDroidTab {
   SpanElement newFile;
   SpanElement newFolder;
   DivElement newFileDrop;
-  DivElement rootlineContainer;
   ParagraphElement recycle;
   LIElement fileName;
 
@@ -71,8 +70,7 @@ class UpDroidExplorer extends UpDroidTab {
     controlToggle = expRefs['controlToggle'];
     controlPanel = expRefs['control'];
     newFileDrop = expRefs['drop'];
-    rootlineContainer = expRefs['hrContainer'];
-    dzTopLevel = new Dropzone(rootlineContainer);
+    dzTopLevel = new Dropzone(expRefs['hrContainer']);
     recycle = expRefs['recycle'];
     dzRecycle = new Dropzone(recycle);
 

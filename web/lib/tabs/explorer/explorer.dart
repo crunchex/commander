@@ -2,24 +2,24 @@ library updroid_explorer;
 
 import 'dart:html';
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:dnd/dnd.dart';
 import "package:path/path.dart" as pathLib;
 
-import '../../tab.dart';
 import '../../updroid_message.dart';
 import 'explorer_helper.dart';
+
+part 'explorer_view.dart';
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests
 /// to the server side.
-class UpDroidExplorer extends UpDroidTab {
+class UpDroidExplorer extends ExplorerView {
   static const String className = 'UpDroidExplorer';
 
   // Make dynamic
   int expNum;
-  DivElement expCon;
+  DivElement _explorersDiv;
   DivElement explorer;
 
   String workspacePath;
@@ -54,10 +54,11 @@ class UpDroidExplorer extends UpDroidTab {
   StreamController<CommanderMessage> cs;
 
   UpDroidExplorer(StreamController<CommanderMessage> cs, num, name) {
+
     expNum = num;
     this.cs = cs;
     expRefs = createExplorer(num, name);
-    expCon = expRefs['explorersDiv'];
+    _explorersDiv = expRefs['explorersDiv'];
     explorer = expRefs['explorer'];
 
     newFile = expRefs['file'];
@@ -300,7 +301,7 @@ class UpDroidExplorer extends UpDroidTab {
 
   /// Shows control panel
   void showControl() {
-    if (expCon != null) expCon.classes.add('hidden');
+    if (_explorersDiv != null) _explorersDiv.classes.add('hidden');
     controlPanel.classes.remove('hidden');
     controlLeave = title.onClick.listen((e) {
       hideControl();
@@ -310,7 +311,7 @@ class UpDroidExplorer extends UpDroidTab {
 
   void hideControl() {
     controlPanel.classes.add('hidden');
-    expCon.classes.remove('hidden');
+    _explorersDiv.classes.remove('hidden');
   }
 
   /// Functions for updating tracked file info

@@ -76,6 +76,10 @@ class CmdrExplorer {
           _workspaceClean(ws);
           break;
 
+        case 'EXPLORER_WORKSPACE_BUILD':
+          _workspaceBuild(ws);
+          break;
+
         default:
           help.debug('Explorer: message received without updroid header.', 1);
       }
@@ -164,6 +168,13 @@ class CmdrExplorer {
   void _workspaceClean(WebSocket s) {
     _workspace.clean().then((result) {
       s.add('[[WORKSPACE_CLEAN]]');
+    });
+  }
+
+  void _workspaceBuild(WebSocket s) {
+    _workspace.build().then((result) {
+      String resultString = result.exitCode == 0 ? '' : result.stderr;
+      s.add('[[WORKSPACE_BUILD]]' + resultString);
     });
   }
 }

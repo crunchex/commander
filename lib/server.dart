@@ -142,13 +142,6 @@ class CmdrServer {
           });
           break;
 
-        case 'WORKSPACE_BUILD':
-          workspace.build().then((ProcessResult result) {
-            String resultString = result.exitCode == 0 ? '' : result.stderr;
-            socket.add('[[BUILD_RESULT]]' + resultString);
-          });
-          break;
-
         case 'CATKIN_RUN':
           Ros.runNode(workspace, um.body);
           break;

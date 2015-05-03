@@ -96,6 +96,12 @@ class UpDroidExplorer extends ExplorerView {
         }
         break;
 
+      case 'WORKSPACE_BUILD':
+        if (isActive()) {
+          ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
+        }
+        break;
+
       case 'REMOVE_EDITOR':
         editors.remove(m.body);
         for (var stream in editorListeners[m.body]) {
@@ -175,6 +181,11 @@ class UpDroidExplorer extends ExplorerView {
         .transform(updroidTransformer)
         .where((um) => um.header == 'WORKSPACE_CLEAN')
         .listen((um) => cs.add(new CommanderMessage('CLIENT', 'WORKSPACE_CLEAN')));
+
+    ws.onMessage
+        .transform(updroidTransformer)
+        .where((um) => um.header == 'WORKSPACE_BUILD')
+        .listen((um) => cs.add(new CommanderMessage('CLIENT', 'WORKSPACE_BUILD', body: um.body)));
 
     _controlToggle.onClick.listen((e) => showControl());
 

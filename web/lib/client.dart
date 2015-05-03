@@ -113,6 +113,19 @@ class UpDroidClient {
         _cleanButton.children.first.classes.add('glyphicons-cleaning');
         break;
 
+      case 'WORKSPACE_BUILD':
+        // Success else failure.
+        if (m.body == '') {
+          _runButton.classes.remove('control-button-disabled');
+          _runButtonEnabled = true;
+        } else {
+          new UpDroidBuildResultsModal(m.body);
+        }
+
+        _buildButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
+        _buildButton.children.first.classes.add('glyphicons-classic-hammer');
+        break;
+
       default:
         print('Client warning: received unrecognized message type ${m.type}');
     }
@@ -158,22 +171,6 @@ class UpDroidClient {
 
     ws.onMessage
         .transform(updroidTransformer)
-        .where((um) => um.header == 'BUILD_RESULT')
-        .listen((um) {
-      // Success.
-      if (um.body == '') {
-        _runButton.classes.remove('control-button-disabled');
-        _runButtonEnabled = true;
-      } else {
-        new UpDroidBuildResultsModal(um.body);
-      }
-
-      _buildButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
-      _buildButton.children.first.classes.add('glyphicons-classic-hammer');
-    });
-
-    ws.onMessage
-        .transform(updroidTransformer)
         .where((um) => um.header == 'CATKIN_NODE_LIST')
         .listen((um) {
       new UpDroidRunNodeModal(JSON.decode(um.body), ws);
@@ -206,7 +203,8 @@ class UpDroidClient {
     _buildButton.onClick.listen((e) {
       _buildButton.children.first.classes.remove('glyphicons-classic-hammer');
       _buildButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
-      ws.send('[[WORKSPACE_BUILD]]');
+
+      cs.add(new CommanderMessage('EXPLORER', 'WORKSPACE_BUILD'));
     });
 
     _runButton.onClick.listen((e) {

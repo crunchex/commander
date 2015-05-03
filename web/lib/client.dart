@@ -108,6 +108,11 @@ class UpDroidClient {
         ws.send('[[GIT_PUSH]]' + '${_tabs[0].first.currentSelectedPath}++${m.body}');
         break;
 
+      case 'WORKSPACE_CLEAN':
+        _cleanButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
+        _cleanButton.children.first.classes.add('glyphicons-cleaning');
+        break;
+
       default:
         print('Client warning: received unrecognized message type ${m.type}');
     }
@@ -128,14 +133,14 @@ class UpDroidClient {
       status = 'DISCONNECTED';
       cs.add(new CommanderMessage('ALL', status));
       if (!encounteredError) {
-        new Timer(new Duration(seconds:retrySeconds), () => initWebSocket(url, retrySeconds * 2));
+        new Timer(new Duration(seconds: retrySeconds), () => initWebSocket(url, retrySeconds * 2));
       }
       encounteredError = true;
     });
 
     ws.onError.listen((e) {
       if (!encounteredError) {
-        new Timer(new Duration(seconds:retrySeconds), () => initWebSocket(url, retrySeconds * 2));
+        new Timer(new Duration(seconds: retrySeconds), () => initWebSocket(url, retrySeconds * 2));
       }
       encounteredError = true;
     });
@@ -144,41 +149,35 @@ class UpDroidClient {
   /// Sets up external event handlers for the various Commander classes. These
   /// are mostly listening events for [WebSocket] messages.
   void registerEventHandlers(WebSocket ws, StreamController<CommanderMessage> cs, String config) {
-    cs.stream
-        .where((m) => m.dest == 'CLIENT')
-        .listen((m) => processMessage(m));
+    cs.stream.where((m) => m.dest == 'CLIENT').listen((m) => processMessage(m));
 
-    ws.onMessage.transform(updroidTransformer)
-      .where((um) => um.header == 'CLIENT_SERVER_READY')
-      .listen((um) => _initializeTabs(config, JSON.decode(um.body)));
+    ws.onMessage
+        .transform(updroidTransformer)
+        .where((um) => um.header == 'CLIENT_SERVER_READY')
+        .listen((um) => _initializeTabs(config, JSON.decode(um.body)));
 
-    ws.onMessage.transform(updroidTransformer)
-      .where((um) => um.header == 'WORKSPACE_CLEAN_DONE')
-      .listen((um) {
-        _cleanButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
-        _cleanButton.children.first.classes.add('glyphicons-cleaning');
-      });
+    ws.onMessage
+        .transform(updroidTransformer)
+        .where((um) => um.header == 'BUILD_RESULT')
+        .listen((um) {
+      // Success.
+      if (um.body == '') {
+        _runButton.classes.remove('control-button-disabled');
+        _runButtonEnabled = true;
+      } else {
+        new UpDroidBuildResultsModal(um.body);
+      }
 
-    ws.onMessage.transform(updroidTransformer)
-      .where((um) => um.header == 'BUILD_RESULT')
-      .listen((um) {
-        // Success.
-        if (um.body == '') {
-          _runButton.classes.remove('control-button-disabled');
-          _runButtonEnabled = true;
-        } else {
-          new UpDroidBuildResultsModal(um.body);
-        }
+      _buildButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
+      _buildButton.children.first.classes.add('glyphicons-classic-hammer');
+    });
 
-        _buildButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
-        _buildButton.children.first.classes.add('glyphicons-classic-hammer');
-      });
-
-    ws.onMessage.transform(updroidTransformer)
-      .where((um) => um.header == 'CATKIN_NODE_LIST')
-      .listen((um) {
-        new UpDroidRunNodeModal(JSON.decode(um.body), ws);
-      });
+    ws.onMessage
+        .transform(updroidTransformer)
+        .where((um) => um.header == 'CATKIN_NODE_LIST')
+        .listen((um) {
+      new UpDroidRunNodeModal(JSON.decode(um.body), ws);
+    });
 
     _newButtonLeft.onClick.listen((e) {
       e.preventDefault();
@@ -199,7 +198,6 @@ class UpDroidClient {
       _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
 
       cs.add(new CommanderMessage('EXPLORER', 'WORKSPACE_CLEAN'));
-      //ws.send('[[WORKSPACE_CLEAN]]');
 
       _runButton.classes.add('control-button-disabled');
       _runButtonEnabled = false;
@@ -231,10 +229,8 @@ class UpDroidClient {
     if (strConfig != '') return strConfig;
 
     List listConfig = [
-      [
-        {'id': 1, 'class': 'UpDroidEditor'}],
-      [
-        {'id': 1, 'class': 'UpDroidConsole'}]
+      [{'id': 1, 'class': 'UpDroidEditor'}],
+      [{'id': 1, 'class': 'UpDroidConsole'}]
     ];
 
     return JSON.encode(listConfig);
@@ -255,8 +251,7 @@ class UpDroidClient {
     bool found = false;
     while (!found) {
       id++;
-      if (!ids.contains(id))
-        break;
+      if (!ids.contains(id)) break;
     }
 
     return id;
@@ -268,8 +263,8 @@ class UpDroidClient {
   void _initializeTabs(String strConfig, List explorerPaths) {
     List config = JSON.decode(strConfig);
     int i = 1;
-    for(var name in explorerPaths) {
-     _openExplorer(i, name);
+    for (var name in explorerPaths) {
+      _openExplorer(i, name);
       i += 1;
     }
 
@@ -281,8 +276,8 @@ class UpDroidClient {
   }
 
   void _openExplorer(int id, name) {
-    if(_tabs[0].isNotEmpty) {
-      for(var explorer in _tabs[0]) {
+    if (_tabs[0].isNotEmpty) {
+      for (var explorer in _tabs[0]) {
         explorer.hideExplorer();
       }
     }

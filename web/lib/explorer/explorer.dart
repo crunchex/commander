@@ -171,6 +171,11 @@ class UpDroidExplorer extends ExplorerView {
         .where((um) => um.header == 'EXPLORER_REMOVE')
         .listen((um) => removeUpdate(um.body));
 
+    ws.onMessage
+        .transform(updroidTransformer)
+        .where((um) => um.header == 'WORKSPACE_CLEAN')
+        .listen((um) => cs.add(new CommanderMessage('CLIENT', 'WORKSPACE_CLEAN')));
+
     _controlToggle.onClick.listen((e) => showControl());
 
     _drop.onClick.listen((e) {

@@ -70,8 +70,8 @@ class UpDroidClient {
   }
 
   void pulseFeedback(AnchorElement feedbackButton) {
-    // Initial pulse - 3 seconds in.
-    new Timer(new Duration(seconds: 3), () {
+    // Initial pulse - 30 seconds in.
+    new Timer(new Duration(seconds: 30), () {
       feedbackButton.classes.add('feedback-bold');
       new Timer(new Duration(milliseconds: 500), () {
         feedbackButton.classes.remove('feedback-bold');

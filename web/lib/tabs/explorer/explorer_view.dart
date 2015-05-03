@@ -10,6 +10,10 @@ abstract class ExplorerView {
   ButtonElement _controlToggle;
   ParagraphElement _recycle;
   DivElement _explorer;
+  DivElement _hrContainer;
+  SpanElement _folder;
+  SpanElement _file;
+  DivElement _drop;
 
   ExplorerView() {
     separator = querySelector('#side-menu-separator');
@@ -44,28 +48,28 @@ abstract class ExplorerView {
       ..classes.add('new')
       ..text = "New";
     explorerHead.append(newDnd);
-    SpanElement folder = new SpanElement()
+    _folder = new SpanElement()
       ..id = "folder-$num"
       ..classes.addAll(["glyphicon glyphicon-folder-close", 'folder']);
-    SpanElement file = new SpanElement()
+    _file = new SpanElement()
       ..id = "file-$num"
       ..classes.addAll(["glyphicon glyphicon-file", 'file']);
-    explorerRefs['file'] = file;
-    explorerRefs['folder'] = folder;
-    newDnd.append(folder);
-    newDnd.append(file);
-    DivElement hrContainer = new DivElement()
+    explorerRefs['file'] = _file;
+    explorerRefs['folder'] = _folder;
+    newDnd.append(_folder);
+    newDnd.append(_file);
+    _hrContainer = new DivElement()
       ..id = "file-explorer-hr-container-$num";
-    explorerHead.append(hrContainer);
-    explorerRefs['hrContainer'] = hrContainer;
-    DivElement drop = new DivElement()
+    explorerHead.append(_hrContainer);
+    explorerRefs['hrContainer'] = _hrContainer;
+    _drop = new DivElement()
       ..classes.add("new-file-drop")
       ..id = "new-file-drop-$num";
-    hrContainer.append(drop);
-    explorerRefs['drop'] = drop;
+    _hrContainer.append(_drop);
+    explorerRefs['drop'] = _drop;
     ParagraphElement p = new ParagraphElement();
     p.text = "Top Level";
-    drop.append(p);
+    _drop.append(p);
     DivElement body = new DivElement()
       ..classes.addAll(['well', 'well-sm', 'explorer-container'])
       ..id = "explorer-$num";

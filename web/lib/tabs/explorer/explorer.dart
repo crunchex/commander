@@ -19,21 +19,12 @@ class UpDroidExplorer extends ExplorerView {
 
   // Make dynamic
   int expNum;
-  DivElement _explorersDiv;
-  DivElement explorer;
 
   String workspacePath;
   DivElement currentSelected;
   String currentSelectedPath;
 
-  LIElement title;
   DivElement editorDiv;
-  ButtonElement controlToggle;
-  DivElement controlPanel;
-  SpanElement newFile;
-  SpanElement newFolder;
-  DivElement newFileDrop;
-  ParagraphElement recycle;
   LIElement fileName;
 
   Draggable dragNewFile;
@@ -58,22 +49,12 @@ class UpDroidExplorer extends ExplorerView {
     expNum = num;
     this.cs = cs;
     expRefs = createExplorer(num, name);
-    _explorersDiv = expRefs['explorersDiv'];
-    explorer = expRefs['explorer'];
 
-    newFile = expRefs['file'];
     newFileDragSetup();
-
-    newFolder = expRefs['folder'];
     newFolderDragSetup();
 
-    title = expRefs['title'];
-    controlToggle = expRefs['controlToggle'];
-    controlPanel = expRefs['control'];
-    newFileDrop = expRefs['drop'];
-    dzTopLevel = new Dropzone(expRefs['hrContainer']);
-    recycle = expRefs['recycle'];
-    dzRecycle = new Dropzone(recycle);
+    dzTopLevel = new Dropzone(_hrContainer);
+    dzRecycle = new Dropzone(_recycle);
 
     // Create the server <-> client [WebSocket].
     // Port 12060 is the default port that UpDroid uses.
@@ -104,7 +85,7 @@ class UpDroidExplorer extends ExplorerView {
         break;
 
       case 'REQUEST_PARENT_PATH':
-        if (!explorer.classes.contains('hidden')) {
+        if (!_explorer.classes.contains('hidden')) {
           cs.add(new CommanderMessage('EDITOR', 'PARENT_PATH', body: currentSelectedPath));
         }
         break;
@@ -137,7 +118,7 @@ class UpDroidExplorer extends ExplorerView {
         .listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
 
     var drop = dzEditor.onDrop.listen((e) {
-      if (!explorer.classes.contains('hidden')) {
+      if (!_explorer.classes.contains('hidden')) {
         var isDir = e.draggableElement.dataset['isDir'];
         if (isDir == 'false') {
           var num = editors[dzEditor];
@@ -184,9 +165,9 @@ class UpDroidExplorer extends ExplorerView {
         .where((um) => um.header == 'EXPLORER_REMOVE')
         .listen((um) => removeUpdate(um.body));
 
-    controlToggle.onClick.listen((e) => showControl());
+    _controlToggle.onClick.listen((e) => showControl());
 
-    newFileDrop.onClick.listen((e) {
+    _drop.onClick.listen((e) {
       if (currentSelected != null) {
         currentSelected.classes.remove('highlighted');
       }
@@ -194,8 +175,8 @@ class UpDroidExplorer extends ExplorerView {
       currentSelectedPath = workspacePath;
     });
 
-    dzTopLevel.onDragEnter.listen((e) => newFileDrop.classes.add('file-drop-entered'));
-    dzTopLevel.onDragLeave.listen((e) => newFileDrop.classes.remove('file-drop-entered'));
+    dzTopLevel.onDragEnter.listen((e) => _drop.classes.add('file-drop-entered'));
+    dzTopLevel.onDragLeave.listen((e) => _drop.classes.remove('file-drop-entered'));
 
     dzTopLevel.onDrop.listen((e) {
       String dragType = e.draggableElement.className;
@@ -249,22 +230,22 @@ class UpDroidExplorer extends ExplorerView {
       }
     });
 
-    newFolder.onDoubleClick.listen((e) {
+    _folder.onDoubleClick.listen((e) {
       String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
       ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled');
     });
 
-    newFile.onDoubleClick.listen((e) {
+    _file.onDoubleClick.listen((e) {
       String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
       ws.send('[[EXPLORER_NEW_FILE]]' + path);
     });
 
     // TODO: cancel when inactive
-    dzRecycle.onDragEnter.listen((e) => recycle.classes.add('recycle-entered'));
-    dzRecycle.onDragLeave.listen((e) => recycle.classes.remove('recycle-entered'));
+    dzRecycle.onDragEnter.listen((e) => _recycle.classes.add('recycle-entered'));
+    dzRecycle.onDragLeave.listen((e) => _recycle.classes.remove('recycle-entered'));
 
     dzRecycle.onDrop.listen((e) {
-      if (!explorer.classes.contains('hidden')) {
+      if (!_explorer.classes.contains('hidden')) {
         var path = getPath(e.draggableElement);
 
         // Draggable is an empty folder
@@ -302,15 +283,15 @@ class UpDroidExplorer extends ExplorerView {
   /// Shows control panel
   void showControl() {
     if (_explorersDiv != null) _explorersDiv.classes.add('hidden');
-    controlPanel.classes.remove('hidden');
-    controlLeave = title.onClick.listen((e) {
+    _controlPanel.classes.remove('hidden');
+    controlLeave = _title.onClick.listen((e) {
       hideControl();
       controlLeave.cancel();
     });
   }
 
   void hideControl() {
-    controlPanel.classes.add('hidden');
+    _controlPanel.classes.add('hidden');
     _explorersDiv.classes.remove('hidden');
   }
 
@@ -605,11 +586,11 @@ class UpDroidExplorer extends ExplorerView {
   void newFileDragSetup() {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
-    Draggable d = new Draggable(newFile, avatarHandler: new AvatarHandler.clone());
+    Draggable d = new Draggable(_file, avatarHandler: new AvatarHandler.clone());
 
     // Highlight valid dropzones: rootline, editor, any workspace folder.
     d.onDragStart.listen((event) {
-      newFileDrop.classes.add('file-drop-ondrag');
+      _drop.classes.add('file-drop-ondrag');
       cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
@@ -622,7 +603,7 @@ class UpDroidExplorer extends ExplorerView {
     });
 
     d.onDragEnd.listen((event) {
-      newFileDrop.classes.remove('file-drop-ondrag');
+      _drop.classes.remove('file-drop-ondrag');
       cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
@@ -639,11 +620,11 @@ class UpDroidExplorer extends ExplorerView {
   void newFolderDragSetup() {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
-    Draggable d = new Draggable(newFolder, avatarHandler: new AvatarHandler.clone());
+    Draggable d = new Draggable(_folder, avatarHandler: new AvatarHandler.clone());
 
     // Highlight valid dropzones: rootline, any workspace folder.
     d.onDragStart.listen((event) {
-      newFileDrop.classes.add('file-drop-ondrag');
+      _drop.classes.add('file-drop-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -655,7 +636,7 @@ class UpDroidExplorer extends ExplorerView {
     });
 
     d.onDragEnd.listen((event) {
-      newFileDrop.classes.remove('file-drop-ondrag');
+      _drop.classes.remove('file-drop-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -678,8 +659,8 @@ class UpDroidExplorer extends ExplorerView {
       d.avatarHandler.avatar.children.first.classes.remove('highlighted');
       print(li.dataset['path']);
       print(workspacePath);
-      if (pathLib.dirname(li.dataset['path']) != workspacePath) newFileDrop.classes.add('file-drop-ondrag');
-      recycle.classes.add('recycle-ondrag');
+      if (pathLib.dirname(li.dataset['path']) != workspacePath) _drop.classes.add('file-drop-ondrag');
+      _recycle.classes.add('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -694,8 +675,8 @@ class UpDroidExplorer extends ExplorerView {
     });
 
     d.onDragEnd.listen((event) {
-      newFileDrop.classes.remove('file-drop-ondrag');
-      recycle.classes.remove('recycle-ondrag');
+      _drop.classes.remove('file-drop-ondrag');
+      _recycle.classes.remove('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {

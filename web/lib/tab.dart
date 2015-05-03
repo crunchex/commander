@@ -5,32 +5,61 @@ import 'dart:async';
 
 /// [UpDroidTab] contains methods to generate [Element]s that make up a tab
 /// and menu bar in the UpDroid Commander GUI.
-abstract class UpDroidTab {
-  LIElement _tabHandle;
-  DivElement _tabContainer;
-  DivElement _tabContent;
+class TabView {
+
+  /// Returns an initialized [TabView] as a [Future] given all normal constructors.
+  ///
+  /// Use this instead of calling the constructor directly.
+  static Future<TabView> createTabView(int num, int col, String title, bool active, List config) {
+    Completer c = new Completer();
+    c.complete(new TabView(num, col, title, active, config));
+    return c.future;
+  }
+
+  int num, col;
+  String title;
+  bool active;
+  Map refMap;
 
   AnchorElement tabHandleButton;
+  DivElement content;
+  LIElement extra;
 
-  void makeTabActive() {
+  LIElement _tabHandle;
+  DivElement _tabContainer,_tabContent;
+  List _config;
+
+  TabView(this.num, this.col, this.title, this.active, config) {
+    _config = config;
+
+    refMap = {};
+
+    _setUpTabHandle();
+    _setUpTabContainer();
+  }
+
+  /// Adds the CSS classes to make a tab 'active'.
+  void makeActive() {
     _tabHandle.classes.add('active');
     _tabContainer.classes.add('active');
     _tabContent.classes.add('active');
   }
 
-  void makeTabInactive() {
+  /// Removes the CSS classes to make a tab 'inactive'.
+  void makeInactive() {
     _tabHandle.classes.remove('active');
     _tabContainer.classes.remove('active');
     _tabContent.classes.remove('active');
   }
 
-  void destroyTab() {
+  /// Removes the tab elements from the DOM.
+  void destroy() {
     _tabHandle.remove();
     _tabContainer.remove();
   }
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
-  void setUpTabHandle(int num, int col, String title, bool active) {
+  void _setUpTabHandle() {
     _tabHandle = new LIElement()
       ..classes.add('tab-handle');
     if (active) _tabHandle.classes.add('active');
@@ -55,11 +84,7 @@ abstract class UpDroidTab {
 
   /// Takes a [num], [col], [title], [config], and [active] to generate the menu bar and menu items
   /// for a tab. Returns a [Map] of references to the new [Element]s as a [Future].
-  Future<Map> setUpTabContainer(int num, int col, String title, List config, bool active) {
-    Completer completer = new Completer();
-
-    Map configRefs = new Map();
-
+  void _setUpTabContainer() {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     _tabContainer = new DivElement()
@@ -74,35 +99,30 @@ abstract class UpDroidTab {
         ..attributes['role'] = 'tablist';
     _tabContainer.children.add(tabList);
 
-    for (Map configItem in config) {
-      tabList.children.add(_createDropdownMenu(configItem, configRefs));
+    for (Map configItem in _config) {
+      tabList.children.add(_createDropdownMenu(configItem));
     }
 
-    LIElement extra = new LIElement();
+    extra = new LIElement();
     extra.id = 'filename-$num';
     extra.classes.add('editor-file-name');
     tabList.children.add(extra);
-    configRefs['extra'] = extra;
 
     _tabContent = new DivElement()
         ..classes.add('tab-content');
     if (active) _tabContent.classes.add('active');
     _tabContainer.children.add(_tabContent);
 
-    DivElement content = new DivElement()
+    content = new DivElement()
         ..classes.add(id);
     _tabContent.children.add(content);
-    configRefs['content'] = content;
 
     DivElement colOneTabContent = querySelector('#col-$col-tab-content');
     colOneTabContent.children.insert(0, _tabContainer);
-
-    completer.complete(configRefs);
-    return completer.future;
   }
 
   /// Generates a dropdown menu and returns the new [LIElement].
-  LIElement _createDropdownMenu(Map config, Map configRefs) {
+  LIElement _createDropdownMenu(Map config) {
     String title = config['title'];
     List items = config['items'];
 
@@ -124,9 +144,9 @@ abstract class UpDroidTab {
     LIElement item;
     for (Map i in items) {
       if (i['type'] == 'toggle') {
-        item = _createToggleItem(i['title'], configRefs);
+        item = _createToggleItem(i['title']);
       } else if (i['type'] == 'input') {
-        item = _createInputItem(i['title'], configRefs);
+        item = _createInputItem(i['title']);
       }
       dropdownMenu.children.add(item);
     }
@@ -136,7 +156,7 @@ abstract class UpDroidTab {
 
   /// Generates an input item (label and input field) and returns
   /// the new [LIElement].
-  LIElement _createInputItem(String title, Map configRefs) {
+  LIElement _createInputItem(String title) {
     LIElement li = new LIElement();
 
     DivElement d = new DivElement()..style.display = 'inline-block';
@@ -153,13 +173,13 @@ abstract class UpDroidTab {
         ..id = '$id-input'
         ..type = 'text';
     d.children.add(i);
-    configRefs[id] = i;
+    refMap[id] = i;
 
     return li;
   }
 
   /// Generates a toggle item (button) and returns the new [LIElement].
-  LIElement _createToggleItem(String title, Map configRefs) {
+  LIElement _createToggleItem(String title) {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     LIElement buttonList = new LIElement();
@@ -169,7 +189,7 @@ abstract class UpDroidTab {
         ..attributes['role'] = 'button'
         ..text = title;
     buttonList.children.add(button);
-    configRefs[id] = button;
+    refMap[id] = button;
 
     return buttonList;
   }

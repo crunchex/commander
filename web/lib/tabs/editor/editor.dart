@@ -17,15 +17,16 @@ part 'templates.dart';
 
 /// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
 /// for the editor and an additional menu bar with some filesystem operations.
-class UpDroidEditor extends UpDroidTab {
+class UpDroidEditor {
   static const String className = 'UpDroidEditor';
   String type = 'UpDroidEditor';
 
-  WebSocket _ws;
-  StreamController<CommanderMessage> _cs;
   int num;
   int _col;
+  StreamController<CommanderMessage> _cs;
 
+  TabView _view;
+  WebSocket _ws;
   Map _pathMap;
   String _absolutePathPrefix;
 
@@ -65,34 +66,39 @@ class UpDroidEditor extends UpDroidTab {
     _col = col;
     _cs = cs;
 
-    setUpTabHandle(num, _col, 'Editor', active);
-    setUpTabContainer(num, _col, 'Editor', _getMenuConfig(), active).then((Map configRefs) {
-      setUpUI(configRefs);
-
-      _fontSizeInput.placeholder = _fontSize.toString();
-
-      // Create the server <-> client [WebSocket].
-      // Port 12060 is the default port that UpDroid uses.
-      String url = window.location.host;
-      url = url.split(':')[0];
-      _ws = new WebSocket('ws://' + url + ':12060/editor/$num');
-
-      _setUpEditor();
-      _registerEditorEventHandlers();
-
-      _cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [num, _content]));
+    TabView.createTabView(num, _col, 'Editor', active, _getMenuConfig()).then((tabView) {
+      _view = tabView;
+      setUpController();
     });
   }
 
-  void setUpUI(Map configRefs) {
-    _content = configRefs['content'];
-    _fileName = configRefs['extra'];
-    _newButton = configRefs['new'];
-    _saveButton = configRefs['save'];
-    _saveAsButton = configRefs['save-as'];
-    _closeTabButton = configRefs['close-tab'];
-    _themeButton = configRefs['invert'];
-    _fontSizeInput = configRefs['font-size'];
+  void setUpController() {
+    setUpUI();
+
+    _fontSizeInput.placeholder = _fontSize.toString();
+
+    // Create the server <-> client [WebSocket].
+    // Port 12060 is the default port that UpDroid uses.
+    String url = window.location.host;
+    url = url.split(':')[0];
+    _ws = new WebSocket('ws://' + url + ':12060/editor/$num');
+
+    _setUpEditor();
+    _registerEditorEventHandlers();
+
+    _cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [num, _content]));
+  }
+
+  void setUpUI() {
+    _content = _view.content;
+    _fileName = _view.extra;
+
+    _newButton = _view.refMap['new'];
+    _saveButton = _view.refMap['save'];
+    _saveAsButton = _view.refMap['save-as'];
+    _closeTabButton = _view.refMap['close-tab'];
+    _themeButton = _view.refMap['invert'];
+    _fontSizeInput = _view.refMap['font-size'];
 
   }
 
@@ -205,13 +211,13 @@ class UpDroidEditor extends UpDroidTab {
       });
     });
 
-    tabHandleButton.onDoubleClick.listen((e) {
+    _view.tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
       _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidEditor'));
     });
 
     _closeTabButton.onClick.listen((e) {
-      destroyTab();
+      _view.destroy();
       _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
       _cs.add(new CommanderMessage('EXPLORER', 'REMOVE_EDITOR', body: linkedDropzone));
     });
@@ -400,6 +406,10 @@ class UpDroidEditor extends UpDroidTab {
 
   /// Resets the save point based on the Editor's current text.
   String _resetSavePoint() => _originalContents = _aceEditor.value;
+
+  /// TODO: put these into super class.
+  void makeActive() => _view.makeActive();
+  void makeInactive() => _view.makeInactive();
 
   List _getMenuConfig() {
     List menu = [

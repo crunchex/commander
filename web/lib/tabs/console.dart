@@ -12,14 +12,16 @@ import '../updroid_message.dart';
 import '../tab.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
-/// and [WebSocket], into an UpDroid Commander tab.
-class UpDroidConsole extends UpDroidTab {
+/// and [WebSocket] into an UpDroid Commander tab.
+class UpDroidConsole {
   static const String className = 'UpDroidConsole';
   String type = 'UpDroidConsole';
 
-  StreamController<CommanderMessage> _cs;
   int num;
   int _col;
+  StreamController<CommanderMessage> _cs;
+
+  TabView _view;
   WebSocket _ws;
   WebSocket _wsMain;
   Terminal _term;
@@ -33,31 +35,36 @@ class UpDroidConsole extends UpDroidTab {
     _col = col;
     _cs = cs;
 
-    setUpTabHandle(num, _col, 'Console', active);
-    setUpTabContainer(num, _col, 'Console', _getMenuConfig(), active).then((Map configRefs) {
-      _console = configRefs['content'];
-      _console.tabIndex = 0;
-      _console.contentEditable = "true";
-      _closeTabButton = configRefs['close-tab'];
-      _themeButton = configRefs['invert'];
-      _blinkButton = configRefs['cursor-blink'];
-
-      _term = new Terminal(_console)
-        ..scrollSpeed = 3
-        ..cursorBlink = true
-        ..theme = new Theme.SolarizedDark();
-
-      String url = window.location.host;
-      url = url.split(':')[0];
-      // Create the server <-> client [WebSocket].
-      // Port 12060 is the default port that UpDroid uses.
-      _wsMain = new WebSocket('ws://' + url + ':12060/pty/$num');
-      // window.location.host returns whatever is in the URL bar (including port).
-      // Since the port here needs to be dynamic, the default needs to be replaced.
-      _initWebSocket('ws://' + url + ':1206$num/pty');
-
-      _registerConsoleEventHandlers();
+    TabView.createTabView(num, _col, 'Console', active, _getMenuConfig()).then((tabView) {
+      _view = tabView;
+      setUpController();
     });
+  }
+
+  void setUpController() {
+    _console = _view.content;
+    _console.tabIndex = 0;
+    _console.contentEditable = "true";
+
+    _closeTabButton = _view.refMap['close-tab'];
+    _themeButton = _view.refMap['invert'];
+    _blinkButton = _view.refMap['cursor-blink'];
+
+    _term = new Terminal(_console)
+      ..scrollSpeed = 3
+      ..cursorBlink = true
+      ..theme = new Theme.SolarizedDark();
+
+    String url = window.location.host;
+    url = url.split(':')[0];
+    // Create the server <-> client [WebSocket].
+    // Port 12060 is the default port that UpDroid uses.
+    _wsMain = new WebSocket('ws://' + url + ':12060/pty/$num');
+    // window.location.host returns whatever is in the URL bar (including port).
+    // Since the port here needs to be dynamic, the default needs to be replaced.
+    _initWebSocket('ws://' + url + ':1206$num/pty');
+
+    _registerConsoleEventHandlers();
   }
 
   /// Process messages according to the type.
@@ -106,7 +113,7 @@ class UpDroidConsole extends UpDroidTab {
     });
 
     _closeTabButton.onClick.listen((e) {
-      destroyTab();
+      _view.destroy();
       _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
     });
 
@@ -120,7 +127,7 @@ class UpDroidConsole extends UpDroidTab {
       e.preventDefault();
     });
 
-    tabHandleButton.onDoubleClick.listen((e) {
+    _view.tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
       _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidConsole'));
     });
@@ -155,6 +162,10 @@ class UpDroidConsole extends UpDroidTab {
       encounteredError = true;
     });
   }
+
+  /// TODO: put these into super class.
+  void makeActive() => _view.makeActive();
+  void makeInactive() => _view.makeInactive();
 
   List _getMenuConfig() {
     List menu = [

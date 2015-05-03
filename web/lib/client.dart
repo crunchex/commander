@@ -285,7 +285,7 @@ class UpDroidClient {
   void _openTab(int column, int id, String className) {
     if (_tabs[column].isNotEmpty) {
       for (var tab in _tabs[column]) {
-        tab.makeTabInactive();
+        tab.makeInactive();
       }
     }
 
@@ -313,7 +313,7 @@ class UpDroidClient {
       for (int j = 0; j < _tabs[i].length; j++) {
         if (_tabs[i][j].type == type && _tabs[i][j].num == num) {
           _tabs[i].removeAt(j);
-          _tabs[i].last.makeTabActive();
+          _tabs[i].last.makeActive();
         }
       }
     }

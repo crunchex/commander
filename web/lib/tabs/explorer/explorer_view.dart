@@ -15,7 +15,9 @@ abstract class ExplorerView {
   SpanElement _file;
   DivElement _drop;
 
-  ExplorerView() {
+  Future createExplorer(int num, String name) {
+    Completer completer = new Completer();
+
     separator = querySelector('#side-menu-separator');
 
     _explorersDiv = querySelector("#exp-container");
@@ -24,18 +26,13 @@ abstract class ExplorerView {
     _title = querySelector('#file-explorer-title');
     _controlToggle = querySelector('#control-toggle');
     _recycle = querySelector('#recycle');
-  }
 
-  Map createExplorer(int num, String name) {
-
-    Map explorerRefs = {'explorersDiv' : _explorersDiv, 'control' : _controlPanel, 'title' : _title, 'controlToggle' : _controlToggle, 'recycle' : _recycle};
     ParagraphElement recycle = querySelector("#recycle");
     makeExpButton(num, name);
     _explorer = new DivElement()
       ..id = "exp-$num"
       ..dataset['num'] = num.toString();
     _explorersDiv.insertBefore(_explorer, recycle);
-    explorerRefs['explorer'] = _explorer;
 
     DivElement explorerHead = new DivElement()
       ..classes.add('explorer-head');
@@ -54,19 +51,15 @@ abstract class ExplorerView {
     _file = new SpanElement()
       ..id = "file-$num"
       ..classes.addAll(["glyphicon glyphicon-file", 'file']);
-    explorerRefs['file'] = _file;
-    explorerRefs['folder'] = _folder;
     newDnd.append(_folder);
     newDnd.append(_file);
     _hrContainer = new DivElement()
       ..id = "file-explorer-hr-container-$num";
     explorerHead.append(_hrContainer);
-    explorerRefs['hrContainer'] = _hrContainer;
     _drop = new DivElement()
       ..classes.add("new-file-drop")
       ..id = "new-file-drop-$num";
     _hrContainer.append(_drop);
-    explorerRefs['drop'] = _drop;
     ParagraphElement p = new ParagraphElement();
     p.text = "Top Level";
     _drop.append(p);
@@ -74,13 +67,13 @@ abstract class ExplorerView {
       ..classes.addAll(['well', 'well-sm', 'explorer-container'])
       ..id = "explorer-$num";
     _explorer.append(body);
-    explorerRefs['expBody'] = body;
     UListElement guts = new UListElement()
       ..classes.add("explorer-body")
       ..id = "explorer-body-$num";
     body.append(guts);
-    explorerRefs['expList'] = guts;
-    return explorerRefs;
+
+    completer.complete();
+    return completer.future;
   }
 
   makeExpButton (int num, name) {

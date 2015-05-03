@@ -34,7 +34,7 @@ class UpDroidExplorer extends ExplorerView {
   Dropzone dzRecycle;
   StreamSubscription outsideClickListener;
   StreamSubscription controlLeave;
-  Map expRefs;
+
   Map editors = {};
   Map editorListeners = {};
   Map fileInfo = {};
@@ -45,24 +45,24 @@ class UpDroidExplorer extends ExplorerView {
   StreamController<CommanderMessage> cs;
 
   UpDroidExplorer(StreamController<CommanderMessage> cs, num, name) {
-
     expNum = num;
     this.cs = cs;
-    expRefs = createExplorer(num, name);
 
-    newFileDragSetup();
-    newFolderDragSetup();
+    createExplorer(num, name).then((d) {
+      newFileDragSetup();
+      newFolderDragSetup();
 
-    dzTopLevel = new Dropzone(_hrContainer);
-    dzRecycle = new Dropzone(_recycle);
+      dzTopLevel = new Dropzone(_hrContainer);
+      dzRecycle = new Dropzone(_recycle);
 
-    // Create the server <-> client [WebSocket].
-    // Port 12060 is the default port that UpDroid uses.
-    String url = window.location.host;
-    url = url.split(':')[0];
-    ws = new WebSocket('ws://' + url + ':12060/explorer/${expNum.toString()}');
+      // Create the server <-> client [WebSocket].
+      // Port 12060 is the default port that UpDroid uses.
+      String url = window.location.host;
+      url = url.split(':')[0];
+      ws = new WebSocket('ws://' + url + ':12060/explorer/${expNum.toString()}');
 
-    registerExplorerEventHandlers();
+      registerExplorerEventHandlers();
+    });
   }
 
   /// Process messages according to the type.

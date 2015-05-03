@@ -76,7 +76,7 @@ abstract class ExplorerView {
     return completer.future;
   }
 
-  makeExpButton (int num, name) {
+  makeExpButton (int num, String name) {
     LIElement item = new LIElement();
     AnchorElement link = new AnchorElement()
       ..id = "exp-button-$num"
@@ -107,7 +107,7 @@ abstract class ExplorerView {
     _explorer.classes.add('hidden');
   }
 
-  void showExlorer() {
+  void showExplorer() {
     _explorer.classes.remove('hidden');
   }
 }

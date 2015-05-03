@@ -34,18 +34,8 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-    Workspace ws = _setUpWorkspace(results['workspace']);
+    Workspace ws = new Workspace(results['workspace']);
     _initServer(ws, dir, _getVirDir(results));
-  }
-
-  /// Ensure that the workspace exists and is in good order.
-  Workspace _setUpWorkspace(String path) {
-    Workspace ws = new Workspace(path);
-//    ws.create(recursive: true).then((ws) {
-//      ws.initSync();
-//    });
-
-    return ws;
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -98,9 +88,7 @@ class CmdrServer {
       case 'explorer':
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) {
-            _explorers[objectID].handleWebSocket(ws, request);
-        });
+          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
         break;
 
       case 'camera':
@@ -151,12 +139,6 @@ class CmdrServer {
         case 'CLIENT_CONFIG':
           _initBackendClasses(dir).then((value) {
             socket.add('[[CLIENT_SERVER_READY]]' + JSON.encode(value));
-          });
-          break;
-
-        case 'WORKSPACE_CLEAN':
-          workspace.clean().then((result) {
-            socket.add('[[WORKSPACE_CLEAN_DONE]]');
           });
           break;
 

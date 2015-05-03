@@ -198,7 +198,8 @@ class UpDroidClient {
       _cleanButton.children.first.classes.remove('glyphicons-cleaning');
       _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
 
-      ws.send('[[WORKSPACE_CLEAN]]');
+      cs.add(new CommanderMessage('EXPLORER', 'WORKSPACE_CLEAN'));
+      //ws.send('[[WORKSPACE_CLEAN]]');
 
       _runButton.classes.add('control-button-disabled');
       _runButtonEnabled = false;

@@ -90,6 +90,12 @@ class UpDroidExplorer extends ExplorerView {
         }
         break;
 
+      case 'WORKSPACE_CLEAN':
+        if (isActive()) {
+          ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
+        }
+        break;
+
       case 'REMOVE_EDITOR':
         editors.remove(m.body);
         for (var stream in editorListeners[m.body]) {
@@ -262,6 +268,8 @@ class UpDroidExplorer extends ExplorerView {
       }
     });
   }
+
+  bool isActive() => !_explorer.classes.contains('hidden');
 
   /// Returns a list of file objects from the flattened string returned from
   /// the server.

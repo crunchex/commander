@@ -3,7 +3,6 @@ library updroid_camera;
 import 'dart:html';
 import 'dart:async';
 import 'dart:js' as js;
-import 'package:dquery/dquery.dart' as dQuery;
 
 import '../../updroid_message.dart';
 import '../../tab.dart';

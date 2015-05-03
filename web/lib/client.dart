@@ -4,10 +4,9 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
-import 'tab.dart';
+import 'explorer/explorer.dart';
 import 'tabs/editor/editor.dart';
 import 'tabs/console.dart';
-import 'explorer/explorer.dart';
 import 'tabs/camera/camera.dart';
 import 'modal/modal.dart';
 import 'updroid_message.dart';

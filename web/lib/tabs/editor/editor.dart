@@ -5,7 +5,6 @@ import 'dart:async';
 import 'package:dnd/dnd.dart';
 
 import 'package:ace/ace.dart' as ace;
-import 'package:bootjack/bootjack.dart';
 import 'package:ace/proxy.dart';
 import "package:path/path.dart" as pathLib;
 

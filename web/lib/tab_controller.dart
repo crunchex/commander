@@ -7,18 +7,18 @@ import 'updroid_message.dart';
 import 'tab_view.dart';
 
 class TabController {
-  int num;
+  int id;
   int col;
   StreamController<CommanderMessage> cs;
+  bool active;
 
   TabView view;
   Mailbox mailbox;
 
-  TabController(this.num, int col, String className, StreamController<CommanderMessage> cs, {bool active: false}) {
-    col = col;
-    cs = cs;
+  TabController(this.id, this.col, String className, this.cs, {bool active: false}) {
+    if (active != null) this.active = active;
 
-    mailbox = new Mailbox(className, num, cs);
+    mailbox = new Mailbox(className, id, cs);
   }
 
   void makeActive() => view.makeActive();

@@ -11,7 +11,7 @@ enum EventType { ON_OPEN, ON_MESSAGE, ON_CLOSE }
 /// [CommanderMessage] stream.
 class Mailbox {
   String _name;
-  int _num;
+  int _id;
   StreamController<CommanderMessage> _cs;
   WebSocket ws;
 
@@ -20,7 +20,7 @@ class Mailbox {
 
   Mailbox(String name, int num, StreamController<CommanderMessage> cs) {
     _name = name;
-    _num = num;
+    _id = num;
     _cs = cs;
 
     _wsRegistry = { EventType.ON_OPEN: [], EventType.ON_MESSAGE: {}, EventType.ON_CLOSE: [] };
@@ -55,7 +55,7 @@ class Mailbox {
   void _initWebSocket(String url, [int retrySeconds = 2]) {
     bool encounteredError = false;
 
-    ws = new WebSocket('ws://' + url + ':12060/${_name.toLowerCase()}/$_num');
+    ws = new WebSocket('ws://' + url + ':12060/${_name.toLowerCase()}/$_id');
 
     // Call all the functions registered to ON_OPEN.
     ws.onOpen.listen((e) => _wsRegistry[EventType.ON_OPEN].forEach((f(e)) => f(e)));
@@ -66,7 +66,7 @@ class Mailbox {
     ws.onClose.listen((e) {
       _wsRegistry[EventType.ON_CLOSE].forEach((f(e)) => f(e));
 
-      print('$_name-$_num disconnected. Retrying...');
+      print('$_name-$_id disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }
@@ -74,7 +74,7 @@ class Mailbox {
     });
 
     ws.onError.listen((e) {
-      print('$_name-$_num disconnected. Retrying...');
+      print('$_name-$_id disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }

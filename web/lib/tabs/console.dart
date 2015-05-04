@@ -25,9 +25,8 @@ class UpDroidConsole extends TabController {
   AnchorElement _themeButton;
   AnchorElement _blinkButton;
 
-  UpDroidConsole(int num, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(num, col, className, cs, active: true) {
-
-    TabView.createTabView(num, col, className, active, _getMenuConfig()).then((tabView) {
+  UpDroidConsole(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
+    TabView.createTabView(id, col, className, active, _getMenuConfig()).then((tabView) {
       view = tabView;
       setUpController();
     });
@@ -53,7 +52,7 @@ class UpDroidConsole extends TabController {
     url = url.split(':')[0];
     // window.location.host returns whatever is in the URL bar (including port).
     // Since the port here needs to be dynamic, the default needs to be replaced.
-    _initWebSocket('ws://' + url + ':1206$num/pty');
+    _initWebSocket('ws://' + url + ':1206$id/pty');
 
     _registerConsoleEventHandlers();
   }
@@ -90,7 +89,7 @@ class UpDroidConsole extends TabController {
     _ws.binaryType = "arraybuffer";
 
     _ws.onClose.listen((e) {
-      print('Console-$num disconnected. Retrying...');
+      print('Console-$id disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }
@@ -98,7 +97,7 @@ class UpDroidConsole extends TabController {
     });
 
     _ws.onError.listen((e) {
-      print('Console-$num disconnected. Retrying...');
+      print('Console-$id disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }
@@ -124,7 +123,7 @@ class UpDroidConsole extends TabController {
 
     _closeTabButton.onClick.listen((e) {
       view.destroy();
-      cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${className}_$num'));
+      cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });
 
     _themeButton.onClick.listen((e) {

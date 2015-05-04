@@ -10,18 +10,13 @@ import 'package:terminal/theme.dart';
 import '../mailbox.dart';
 import '../updroid_message.dart';
 import '../tab_view.dart';
+import '../tab_controller.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket] into an UpDroid Commander tab.
-class UpDroidConsole {
-  String className = 'UpDroidConsole';
+class UpDroidConsole extends TabController {
+  static String className = 'UpDroidConsole';
 
-  int num;
-  int _col;
-  StreamController<CommanderMessage> _cs;
-
-  TabView _view;
-  Mailbox _mailbox;
   WebSocket _ws;
   Terminal _term;
 
@@ -30,32 +25,29 @@ class UpDroidConsole {
   AnchorElement _themeButton;
   AnchorElement _blinkButton;
 
-  UpDroidConsole(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
-    _col = col;
-    _cs = cs;
+  UpDroidConsole(int num, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(num, col, className, cs, active: true) {
 
-    TabView.createTabView(num, _col, className, active, _getMenuConfig()).then((tabView) {
-      _view = tabView;
+    TabView.createTabView(num, col, className, active, _getMenuConfig()).then((tabView) {
+      view = tabView;
       setUpController();
     });
   }
 
   void setUpController() {
-    _console = _view.content;
+    _console = view.content;
     _console.tabIndex = 0;
     _console.contentEditable = "true";
 
-    _closeTabButton = _view.refMap['close-tab'];
-    _themeButton = _view.refMap['invert'];
-    _blinkButton = _view.refMap['cursor-blink'];
+    _closeTabButton = view.refMap['close-tab'];
+    _themeButton = view.refMap['invert'];
+    _blinkButton = view.refMap['cursor-blink'];
+
+    _registerMailbox();
 
     _term = new Terminal(_console)
       ..scrollSpeed = 3
       ..cursorBlink = true
       ..theme = new Theme.SolarizedDark();
-
-    _mailbox = new Mailbox(className, num, _cs);
-    _registerMailbox();
 
     String url = window.location.host;
     url = url.split(':')[0];
@@ -78,7 +70,7 @@ class UpDroidConsole {
 
   void _initialResize(MessageEvent e) {
     List<int> size = _term.currentSize();
-    _mailbox.ws.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
+    mailbox.ws.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
   }
 
   void _resizeEvent(CommanderMessage m) {
@@ -88,7 +80,7 @@ class UpDroidConsole {
     int newCol = int.parse(newSize[1]);
     _term.resize(newRow, newCol);
     // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
-    _mailbox.ws.send('[[RESIZE]]' + '${newRow - 1}x${newCol - 1}');
+    mailbox.ws.send('[[RESIZE]]' + '${newRow - 1}x${newCol - 1}');
   }
 
   void _initWebSocket(String url, [int retrySeconds = 2]) {
@@ -115,8 +107,8 @@ class UpDroidConsole {
   }
 
   void _registerMailbox() {
-    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'Initial-Resize', _initialResize);
-    _mailbox.registerCommanderEvent('Resize', _resizeEvent);
+    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'FIRST_RESIZE', _initialResize);
+    mailbox.registerCommanderEvent('Resize', _resizeEvent);
   }
 
   /// Sets up the event handlers for the console.
@@ -131,8 +123,8 @@ class UpDroidConsole {
     });
 
     _closeTabButton.onClick.listen((e) {
-      _view.destroy();
-      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${className}_$num'));
+      view.destroy();
+      cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${className}_$num'));
     });
 
     _themeButton.onClick.listen((e) {
@@ -145,22 +137,18 @@ class UpDroidConsole {
       e.preventDefault();
     });
 
-    _view.tabHandleButton.onDoubleClick.listen((e) {
+    view.tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
-      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidConsole'));
+      cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${col}_UpDroidConsole'));
     });
 
     window.onResize.listen((e) {
       if (_console.parent.classes.contains('active')) {
         List<int> newSize = _term.calculateSize();
-        _cs.add(new CommanderMessage('UpDroidConsole', 'Resize', body: '${newSize[0]}x${newSize[1]}'));
+        cs.add(new CommanderMessage('UpDroidConsole', 'Resize', body: '${newSize[0]}x${newSize[1]}'));
       }
     });
   }
-
-  /// TODO: put these into super class.
-  void makeActive() => _view.makeActive();
-  void makeInactive() => _view.makeInactive();
 
   List _getMenuConfig() {
     List menu = [

@@ -47,7 +47,7 @@ abstract class ExplorerView {
     explorerHead.append(newDnd);
     _folder = new SpanElement()
       ..id = "folder-$num"
-      ..classes.addAll(['glyphicons', 'glyphicons-folder-close', 'folder']);
+      ..classes.addAll(['glyphicons', 'glyphicons-folder-closed', 'folder']);
     _file = new SpanElement()
       ..id = "file-$num"
       ..classes.addAll(['glyphicons', 'glyphicons-file', 'file']);

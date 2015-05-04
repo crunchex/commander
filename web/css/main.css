@@ -544,7 +544,7 @@ li div input {
   padding: 5px;
 }
 
-.console {
+.updroidconsole {
   width: 100%;
   min-height: 100px;
   height: 100%;
@@ -554,7 +554,7 @@ li div input {
   overflow-y: none;
 }
 
-.console:focus {
+.updroidconsole:focus {
   outline: none;
 }
 

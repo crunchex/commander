@@ -14,9 +14,7 @@ import '../tab_view.dart';
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket] into an UpDroid Commander tab.
 class UpDroidConsole {
-  // TODO: combine these three.
-  static const String shortName = 'Console';
-  String type = 'UpDroidConsole';
+  String className = 'UpDroidConsole';
 
   int num;
   int _col;
@@ -36,7 +34,7 @@ class UpDroidConsole {
     _col = col;
     _cs = cs;
 
-    TabView.createTabView(num, _col, shortName, active, _getMenuConfig()).then((tabView) {
+    TabView.createTabView(num, _col, className, active, _getMenuConfig()).then((tabView) {
       _view = tabView;
       setUpController();
     });
@@ -56,7 +54,7 @@ class UpDroidConsole {
       ..cursorBlink = true
       ..theme = new Theme.SolarizedDark();
 
-    _mailbox = new Mailbox(shortName, num, _cs);
+    _mailbox = new Mailbox(className, num, _cs);
     _registerMailbox();
 
     String url = window.location.host;
@@ -117,8 +115,8 @@ class UpDroidConsole {
   }
 
   void _registerMailbox() {
-    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'FIRST_RESIZE', _initialResize);
-    _mailbox.registerCommanderEvent('RESIZE', _resizeEvent);
+    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'Initial-Resize', _initialResize);
+    _mailbox.registerCommanderEvent('Resize', _resizeEvent);
   }
 
   /// Sets up the event handlers for the console.
@@ -134,7 +132,7 @@ class UpDroidConsole {
 
     _closeTabButton.onClick.listen((e) {
       _view.destroy();
-      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
+      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${className}_$num'));
     });
 
     _themeButton.onClick.listen((e) {
@@ -155,7 +153,7 @@ class UpDroidConsole {
     window.onResize.listen((e) {
       if (_console.parent.classes.contains('active')) {
         List<int> newSize = _term.calculateSize();
-        _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
+        _cs.add(new CommanderMessage('UpDroidConsole', 'Resize', body: '${newSize[0]}x${newSize[1]}'));
       }
     });
   }

@@ -10,7 +10,6 @@ import '../../tab_view.dart';
 /// [UpDroidCamera] is a client-side class that uses the jsmpeg library
 /// to render a video stream from a [WebSocket] onto a [CanvasElement].
 class UpDroidCamera {
-  static const String className = 'UpDroidCamera';
   String type = 'UpDroidCamera';
 
   int num;

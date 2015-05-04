@@ -15,7 +15,6 @@ import '../tab_view.dart';
 /// and [WebSocket] into an UpDroid Commander tab.
 class UpDroidConsole {
   // TODO: combine these three.
-  static const String className = 'UpDroidConsole';
   static const String shortName = 'Console';
   String type = 'UpDroidConsole';
 

@@ -288,13 +288,13 @@ class UpDroidClient {
       }
     }
 
-    if (className == UpDroidEditor.className) {
+    if (className == 'UpDroidEditor') {
       _tabs[column].add(new UpDroidEditor(id, column, cs, active: true));
       ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-    } else if (className == UpDroidCamera.className) {
+    } else if (className == 'UpDroidCamera') {
       _tabs[column].add(new UpDroidCamera(id, column, cs, active: true));
       ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-    } else if (className == UpDroidConsole.className) {
+    } else if (className == 'UpDroidConsole') {
       UpDroidConsole console = new UpDroidConsole(id, column, cs, active: true);
       _tabs[column].add(console);
       // TODO: initial size should not be hardcoded.

@@ -17,7 +17,6 @@ part 'templates.dart';
 /// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
 /// for the editor and an additional menu bar with some filesystem operations.
 class UpDroidEditor {
-  static const String className = 'UpDroidEditor';
   String type = 'UpDroidEditor';
 
   int num;

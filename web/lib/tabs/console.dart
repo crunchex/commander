@@ -1,5 +1,3 @@
-library updroid_console;
-
 import 'dart:html';
 import 'dart:async';
 import 'dart:typed_data';
@@ -157,4 +155,14 @@ class UpDroidConsole extends TabController {
     ];
     return menu;
   }
+}
+
+void main() {
+//  int id = message[0];
+//  int column = message[1];
+//  bool active = message[2];
+
+  StreamController<CommanderMessage> cs = new StreamController<CommanderMessage>.broadcast();
+
+  new UpDroidConsole(1, 2, cs, active: true);
 }

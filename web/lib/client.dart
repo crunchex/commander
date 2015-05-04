@@ -3,6 +3,7 @@ library updroid_client;
 import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'explorer/explorer.dart';
 import 'tabs/editor/editor.dart';
@@ -281,7 +282,7 @@ class UpDroidClient {
     _tabs[0].add(new UpDroidExplorer(cs, id, name));
   }
 
-  void _openTab(int column, int id, String className) {
+  Future _openTab (int column, int id, String className) async {
     if (_tabs[column].isNotEmpty) {
       for (var tab in _tabs[column]) {
         tab.makeInactive();
@@ -295,8 +296,9 @@ class UpDroidClient {
       _tabs[column].add(new UpDroidCamera(id, column, cs, active: true));
       ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
     } else if (className == 'UpDroidConsole') {
-      UpDroidConsole console = new UpDroidConsole(id, column, cs, active: true);
-      _tabs[column].add(console);
+      Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
+      //UpDroidConsole console = new UpDroidConsole(id, column, cs, active: true);
+      //_tabs[column].add(console);
       // TODO: initial size should not be hardcoded.
       ws.send('[[OPEN_TAB]]' + '$column-$id-$className-25-80');
     }

@@ -5,7 +5,7 @@ import 'dart:async';
 import 'dart:js' as js;
 
 import '../../updroid_message.dart';
-import '../../tab.dart';
+import '../../tab_view.dart';
 
 /// [UpDroidCamera] is a client-side class that uses the jsmpeg library
 /// to render a video stream from a [WebSocket] onto a [CanvasElement].

@@ -9,11 +9,11 @@ import 'package:bootjack/bootjack.dart';
 import 'package:ace/proxy.dart';
 import "package:path/path.dart" as pathLib;
 
-import 'lib/updroid_message.dart';
-import 'tab.dart';
-import  'modal.dart';
+import '../../updroid_message.dart';
+import '../../tab.dart';
+import '../../modal/modal.dart';
 
-part 'lib/editor/templates.dart';
+part 'templates.dart';
 
 /// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
 /// for the editor and an additional menu bar with some filesystem operations.

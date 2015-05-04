@@ -6,14 +6,14 @@ import 'dart:convert';
 
 import 'package:bootjack/bootjack.dart';
 
-import 'lib/updroid_message.dart';
+import '../updroid_message.dart';
 
-part 'lib/modal/unsaved.dart';
-part 'lib/modal/saved.dart';
-part 'lib/modal/open_tab.dart';
-part 'lib/modal/build_results.dart';
-part 'lib/modal/run_node.dart';
-part 'lib/modal/git_pass.dart';
+part 'unsaved.dart';
+part 'saved.dart';
+part 'open_tab.dart';
+part 'build_results.dart';
+part 'run_node.dart';
+part 'git_pass.dart';
 
 /// [UpDroidModal] contains methods to generate [Element]s that make up
 /// a modal in the UpDroid Commander GUI.

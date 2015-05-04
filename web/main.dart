@@ -1,6 +1,6 @@
 import 'package:bootjack/bootjack.dart';
 
-import 'client.dart';
+import 'lib/client.dart';
 
 void main() {
   setUpBootstrap();

@@ -5,7 +5,7 @@ build/
 packages
 
 # Or the directories and files created by any UpDroid tools.
-bin/
+bin/cmdr
 *.deb
 deploy/
 src-min-noconflict/
@@ -27,3 +27,6 @@ pubspec.lock
 
 # Mac OS X
 *.DS_Store
+
+#WebStorm
+.idea/

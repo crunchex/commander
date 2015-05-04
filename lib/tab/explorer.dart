@@ -5,12 +5,15 @@ class CmdrExplorer {
 
   Directory _dir;
   DirectoryWatcher _watcher;
+  Workspace _workspace;
   int expNum;
   var expPath;
 
   //TODO: make asynchroneous
   CmdrExplorer(Directory dir, num) {
-    for(var item in dir.listSync()) {
+    _workspace = new Workspace(dir.path);
+
+    for (var item in dir.listSync()) {
       if(pathLib.basename(item.path) == 'src') _dir = item;
       expNum = num;
 
@@ -20,7 +23,7 @@ class CmdrExplorer {
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
-  void handleWebSocket(WebSocket ws, HttpRequest request) {
+  void handleWebSocket(WebSocket ws) {
     help.debug('Explorer client connected.', 0);
 
     ws.listen((String s) {
@@ -67,6 +70,14 @@ class CmdrExplorer {
 
         case 'EXPLORER_DELETE':
           _fsDelete(um.body, ws);
+          break;
+
+        case 'EXPLORER_WORKSPACE_CLEAN':
+          _workspaceClean(ws);
+          break;
+
+        case 'EXPLORER_WORKSPACE_BUILD':
+          _workspaceBuild(ws);
           break;
 
         default:
@@ -152,5 +163,18 @@ class CmdrExplorer {
       var fileToDelete = new File(path);
       fileToDelete.delete();
     }
+  }
+
+  void _workspaceClean(WebSocket s) {
+    _workspace.clean().then((result) {
+      s.add('[[WORKSPACE_CLEAN]]');
+    });
+  }
+
+  void _workspaceBuild(WebSocket s) {
+    _workspace.build().then((result) {
+      String resultString = result.exitCode == 0 ? '' : result.stderr;
+      s.add('[[WORKSPACE_BUILD]]' + resultString);
+    });
   }
 }

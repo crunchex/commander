@@ -11,15 +11,15 @@ import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
-import 'lib/ros/ros.dart';
-import 'lib/git.dart';
-import 'lib/server_helper.dart' as help;
+import 'ros/ros.dart';
+import 'git.dart';
+import 'server_helper.dart' as help;
 
-part 'pty.dart';
-part 'camera.dart';
 part 'commands.dart';
-part 'editor.dart';
-part 'explorer.dart';
+part 'tab/pty.dart';
+part 'tab/camera.dart';
+part 'tab/editor.dart';
+part 'tab/explorer.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
@@ -34,18 +34,8 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-    Workspace ws = _setUpWorkspace(results['workspace']);
+    Workspace ws = new Workspace(results['workspace']);
     _initServer(ws, dir, _getVirDir(results));
-  }
-
-  /// Ensure that the workspace exists and is in good order.
-  Workspace _setUpWorkspace(String path) {
-    Workspace ws = new Workspace(path);
-//    ws.create(recursive: true).then((ws) {
-//      ws.initSync();
-//    });
-
-    return ws;
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -69,6 +59,8 @@ class CmdrServer {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
+      print('[UpDroid Commander serving on port 12060]');
+      print('You can now enter "localhost:12060" in your browser.\nCtrl-C to exit.');
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
           .listen((HttpRequest request) => _routeRequest(request, ws, dir, virDir))
@@ -96,9 +88,7 @@ class CmdrServer {
       case 'explorer':
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) {
-            _explorers[objectID].handleWebSocket(ws, request);
-        });
+          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
         break;
 
       case 'camera':
@@ -149,19 +139,6 @@ class CmdrServer {
         case 'CLIENT_CONFIG':
           _initBackendClasses(dir).then((value) {
             socket.add('[[CLIENT_SERVER_READY]]' + JSON.encode(value));
-          });
-          break;
-
-        case 'WORKSPACE_CLEAN':
-          workspace.clean().then((result) {
-            socket.add('[[WORKSPACE_CLEAN_DONE]]');
-          });
-          break;
-
-        case 'WORKSPACE_BUILD':
-          workspace.build().then((ProcessResult result) {
-            String resultString = result.exitCode == 0 ? '' : result.stderr;
-            socket.add('[[BUILD_RESULT]]' + resultString);
           });
           break;
 

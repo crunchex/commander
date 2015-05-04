@@ -26,8 +26,8 @@ done
 
 ### build ###
 if [ $nobuild == 0 ]; then
-    $TOPDIR/tools/build_cmdr.sh
-    $TOPDIR/tools/build_cmdr_pty.sh
+    $TOPDIR/tool/build_cmdr.sh
+    $TOPDIR/tool/build_cmdr_pty.sh
 fi
 
 ### start packaging ###
@@ -60,11 +60,11 @@ fpm -s dir -t deb -n cmdr -v 0.4.1 -p $TOPDIR/deploy/ \
     --iteration 1 \
     --url http://www.updroid.com \
     -d 'dart >= 1.9.3' -d 'ffmpeg >= 2.6.2' \
-    --before-install=$TOPDIR/tools/packaging/before-install.sh \
-    --after-install=$TOPDIR/tools/packaging/after-install.sh \
-    ./gui/build/web=/opt/updroid/cmdr \
-    ./cmdr/bin/cmdr=/usr/local/bin/cmdr \
-    ./cmdr/bin/cmdr-pty=/usr/local/bin/cmdr-pty > /dev/null
+    --before-install=$TOPDIR/tool/packaging/before-install.sh \
+    --after-install=$TOPDIR/tool/packaging/after-install.sh \
+    ./build/web=/opt/updroid/cmdr \
+    ./bin/cmdr=/usr/local/bin/cmdr \
+    $GOPATH/bin/cmdr-pty=/usr/local/bin/cmdr-pty #> /dev/null
 
 echo "OK"
 

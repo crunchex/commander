@@ -7,13 +7,16 @@ import 'dart:typed_data';
 import 'package:terminal/terminal.dart';
 import 'package:terminal/theme.dart';
 
+import '../mailbox.dart';
 import '../updroid_message.dart';
 import '../tab.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket] into an UpDroid Commander tab.
 class UpDroidConsole {
+  // TODO: combine these three.
   static const String className = 'UpDroidConsole';
+  static const String shortName = 'Console';
   String type = 'UpDroidConsole';
 
   int num;
@@ -21,8 +24,8 @@ class UpDroidConsole {
   StreamController<CommanderMessage> _cs;
 
   TabView _view;
+  Mailbox _mailbox;
   WebSocket _ws;
-  WebSocket _wsMain;
   Terminal _term;
 
   DivElement _console;
@@ -34,7 +37,7 @@ class UpDroidConsole {
     _col = col;
     _cs = cs;
 
-    TabView.createTabView(num, _col, 'Console', active, _getMenuConfig()).then((tabView) {
+    TabView.createTabView(num, _col, shortName, active, _getMenuConfig()).then((tabView) {
       _view = tabView;
       setUpController();
     });
@@ -54,33 +57,16 @@ class UpDroidConsole {
       ..cursorBlink = true
       ..theme = new Theme.SolarizedDark();
 
+    _mailbox = new Mailbox(shortName, num, _cs);
+    _registerMailbox();
+
     String url = window.location.host;
     url = url.split(':')[0];
-    // Create the server <-> client [WebSocket].
-    // Port 12060 is the default port that UpDroid uses.
-    _wsMain = new WebSocket('ws://' + url + ':12060/pty/$num');
     // window.location.host returns whatever is in the URL bar (including port).
     // Since the port here needs to be dynamic, the default needs to be replaced.
     _initWebSocket('ws://' + url + ':1206$num/pty');
 
     _registerConsoleEventHandlers();
-  }
-
-  /// Process messages according to the type.
-  void _processMessage(CommanderMessage m) {
-    switch (m.type) {
-      case 'RESIZE':
-        List newSize = m.body.split('x');
-        int newRow = int.parse(newSize[0]);
-        int newCol = int.parse(newSize[1]);
-        _term.resize(newRow, newCol);
-        // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
-        _wsMain.send('[[RESIZE]]' + '${newRow - 1}x${newCol - 1}');
-        break;
-
-      default:
-        print('Console error: unrecognized message type: ' + m.type);
-    }
   }
 
   /// Toggles between a Solarized dark and light theme.
@@ -93,15 +79,51 @@ class UpDroidConsole {
     _term.cursorBlink = _term.cursorBlink ? false : true;
   }
 
-  /// Sets up the event handlers for the console.
-  void _registerConsoleEventHandlers() {
-    _cs.stream.where((m) => m.dest == 'CONSOLE').listen((m) => _processMessage(m));
+  void _initialResize(MessageEvent e) {
+    List<int> size = _term.currentSize();
+    _mailbox.ws.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
+  }
 
-    _wsMain.onOpen.listen((e) {
-      List<int> size = _term.currentSize();
-      _wsMain.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
+  void _resizeEvent(CommanderMessage m) {
+    print('Resizing');
+    List newSize = m.body.split('x');
+    int newRow = int.parse(newSize[0]);
+    int newCol = int.parse(newSize[1]);
+    _term.resize(newRow, newCol);
+    // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
+    _mailbox.ws.send('[[RESIZE]]' + '${newRow - 1}x${newCol - 1}');
+  }
+
+  void _initWebSocket(String url, [int retrySeconds = 2]) {
+    bool encounteredError = false;
+
+    _ws = new WebSocket(url);
+    _ws.binaryType = "arraybuffer";
+
+    _ws.onClose.listen((e) {
+      print('Console-$num disconnected. Retrying...');
+      if (!encounteredError) {
+        new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
+      }
+      encounteredError = true;
     });
 
+    _ws.onError.listen((e) {
+      print('Console-$num disconnected. Retrying...');
+      if (!encounteredError) {
+        new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
+      }
+      encounteredError = true;
+    });
+  }
+
+  void _registerMailbox() {
+    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'FIRST_RESIZE', _initialResize);
+    _mailbox.registerCommanderEvent('RESIZE', _resizeEvent);
+  }
+
+  /// Sets up the event handlers for the console.
+  void _registerConsoleEventHandlers() {
     _ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;
       _term.stdout.add(buf.asUint8List());
@@ -136,29 +158,6 @@ class UpDroidConsole {
         List<int> newSize = _term.calculateSize();
         _cs.add(new CommanderMessage('CONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
       }
-    });
-  }
-
-  void _initWebSocket(String url, [int retrySeconds = 2]) {
-    bool encounteredError = false;
-
-    _ws = new WebSocket(url);
-    _ws.binaryType = "arraybuffer";
-
-    _ws.onClose.listen((e) {
-      print('Console-$num disconnected. Retrying...');
-      if (!encounteredError) {
-        new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
-      }
-      encounteredError = true;
-    });
-
-    _ws.onError.listen((e) {
-      print('Console-$num disconnected. Retrying...');
-      if (!encounteredError) {
-        new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
-      }
-      encounteredError = true;
     });
   }
 

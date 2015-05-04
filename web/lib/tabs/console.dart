@@ -20,7 +20,6 @@ class UpDroidConsole extends TabController {
   WebSocket _ws;
   Terminal _term;
 
-  DivElement _console;
   AnchorElement _closeTabButton;
   AnchorElement _themeButton;
   AnchorElement _blinkButton;
@@ -33,9 +32,8 @@ class UpDroidConsole extends TabController {
   }
 
   void setUpController() {
-    _console = view.content;
-    _console.tabIndex = 0;
-    _console.contentEditable = "true";
+    view.content.tabIndex = 0;
+    view.content.contentEditable = "true";
 
     _closeTabButton = view.refMap['close-tab'];
     _themeButton = view.refMap['invert'];
@@ -43,7 +41,7 @@ class UpDroidConsole extends TabController {
 
     _registerMailbox();
 
-    _term = new Terminal(_console)
+    _term = new Terminal(view.content)
       ..scrollSpeed = 3
       ..cursorBlink = true
       ..theme = new Theme.SolarizedDark();
@@ -142,7 +140,7 @@ class UpDroidConsole extends TabController {
     });
 
     window.onResize.listen((e) {
-      if (_console.parent.classes.contains('active')) {
+      if (view.content.parent.classes.contains('active')) {
         List<int> newSize = _term.calculateSize();
         cs.add(new CommanderMessage('UpDroidConsole', 'Resize', body: '${newSize[0]}x${newSize[1]}'));
       }

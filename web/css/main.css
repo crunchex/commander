@@ -500,7 +500,7 @@ li div input {
 }
 
 .file-container.highlighted,
-.file-container.highlighted>div>.glyphicon {
+.file-container.highlighted>div>.glyphicons {
   color: #ffffff;
   background-color: #ff2919;
 }

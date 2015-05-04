@@ -629,7 +629,7 @@ class UpDroidExplorer extends ExplorerView {
     d.onDragEnd.listen((event) {
       _drop.classes.remove('file-drop-ondrag');
       cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.remove('span-ondrag');
@@ -649,7 +649,7 @@ class UpDroidExplorer extends ExplorerView {
     // Highlight valid dropzones: rootline, any workspace folder.
     d.onDragStart.listen((event) {
       _drop.classes.add('file-drop-ondrag');
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.add('span-ondrag');
@@ -661,7 +661,7 @@ class UpDroidExplorer extends ExplorerView {
 
     d.onDragEnd.listen((event) {
       _drop.classes.remove('file-drop-ondrag');
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.remove('span-ondrag');
@@ -685,7 +685,7 @@ class UpDroidExplorer extends ExplorerView {
       print(workspacePath);
       if (pathLib.dirname(li.dataset['path']) != workspacePath) _drop.classes.add('file-drop-ondrag');
       _recycle.classes.add('recycle-ondrag');
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.add('span-ondrag');
@@ -701,7 +701,7 @@ class UpDroidExplorer extends ExplorerView {
     d.onDragEnd.listen((event) {
       _drop.classes.remove('file-drop-ondrag');
       _recycle.classes.remove('recycle-ondrag');
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicon-folder-open');
+      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
         span.classes.remove('span-ondrag');

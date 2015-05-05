@@ -63,21 +63,6 @@ class UpDroidConsole extends TabController {
     _term.cursorBlink = _term.cursorBlink ? false : true;
   }
 
-  void _initialResize(UpDroidMessage um) {
-    List<int> size = _term.currentSize();
-    mailbox.ws.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
-  }
-
-  void _resizeEvent(CommanderMessage m) {
-    print('Resizing');
-    List newSize = m.body.split('x');
-    int newRow = int.parse(newSize[0]);
-    int newCol = int.parse(newSize[1]);
-    _term.resize(newRow, newCol);
-    // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
-    mailbox.ws.send('[[RESIZE]]' + '${newRow - 1}x${newCol - 1}');
-  }
-
   void _initWebSocket(String url, [int retrySeconds = 2]) {
     bool encounteredError = false;
 
@@ -100,6 +85,23 @@ class UpDroidConsole extends TabController {
       encounteredError = true;
     });
   }
+
+  void _initialResize(UpDroidMessage um) {
+    List<int> size = _term.currentSize();
+    mailbox.ws.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
+  }
+
+  void _resizeEvent(CommanderMessage m) {
+    print('Resizing');
+    List newSize = m.body.split('x');
+    int newRow = int.parse(newSize[0]);
+    int newCol = int.parse(newSize[1]);
+    _term.resize(newRow, newCol);
+    // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
+    mailbox.ws.send('[[RESIZE]]' + '${newRow - 1}x${newCol - 1}');
+  }
+
+  //\/\/ Mailbox Handlers /\/\//
 
   void _registerMailbox() {
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'FIRST_RESIZE', _initialResize);

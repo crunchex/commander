@@ -100,21 +100,7 @@ class UpDroidEditor extends TabController {
     _resetSavePoint();
   }
 
-  _registerMailbox() {
-    mailbox.registerCommanderEvent('CLASS_ADD', _classAddHandler);
-    mailbox.registerCommanderEvent('CLASS_REMOVE', _classAddHandler);
-    mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
-    mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
-    mailbox.registerCommanderEvent('PASS_EDITOR_INFO', _passEditorHandler);
-
-    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'OPEN_DIRECTORY_PATH', _openDirPathHandler);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_DIRECTORY_PATH', _editorDirPathHandler);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_FILE_TEXT', _editorFileTextHandler);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_NEW_FILENAME', _editorNewFilenameHandler);
-  }
-
-  //\/\/ Mailbox Handler Definitions. /\/\//
+  //\/\/ Mailbox Handlers /\/\//
 
   bool _classAddHandler(CommanderMessage m) => view.content.classes.add(m.body);
   bool _classRemoveHandler(CommanderMessage m) => view.content.classes.remove(m.body);
@@ -147,6 +133,20 @@ class UpDroidEditor extends TabController {
     var newText = RosTemplates.templateCode;
     var newPath = _absolutePathPrefix + '/' + um.body;
     _handleNewText(newPath, newText);
+  }
+
+  _registerMailbox() {
+    mailbox.registerCommanderEvent('CLASS_ADD', _classAddHandler);
+    mailbox.registerCommanderEvent('CLASS_REMOVE', _classAddHandler);
+    mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
+    mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
+    mailbox.registerCommanderEvent('PASS_EDITOR_INFO', _passEditorHandler);
+
+    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'OPEN_DIRECTORY_PATH', _openDirPathHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_DIRECTORY_PATH', _editorDirPathHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_FILE_TEXT', _editorFileTextHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_NEW_FILENAME', _editorNewFilenameHandler);
   }
 
   /// Sets up event handlers for the editor's menu buttons.

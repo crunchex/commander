@@ -92,7 +92,6 @@ class UpDroidConsole extends TabController {
   }
 
   void _resizeEvent(CommanderMessage m) {
-    print('Resizing');
     List newSize = m.body.split('x');
     int newRow = int.parse(newSize[0]);
     int newCol = int.parse(newSize[1]);
@@ -105,7 +104,7 @@ class UpDroidConsole extends TabController {
 
   void _registerMailbox() {
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'FIRST_RESIZE', _initialResize);
-    mailbox.registerCommanderEvent('Resize', _resizeEvent);
+    mailbox.registerCommanderEvent('RESIZE', _resizeEvent);
   }
 
   /// Sets up the event handlers for the console.

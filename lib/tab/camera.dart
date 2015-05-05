@@ -30,10 +30,10 @@ class CmdrCamera {
 
   /// Route websocket connections to messages (cmdr) and video data (input).
   void handleWebSocket(WebSocket ws, HttpRequest request) {
-    String type = request.uri.pathSegments[2];
-    if (type == 'cmdr') {
+    if (request.uri.pathSegments.length == 2) {
       ws.add('[[CAMERA_READY]]');
     } else {
+      // request.uri is updroidcamera/id/input
       ws.add(_streamHeader);
       _transStream.stream.listen((data) {
         ws.add(data);

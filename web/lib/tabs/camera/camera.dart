@@ -4,115 +4,97 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:js' as js;
 
+import '../../mailbox.dart';
 import '../../updroid_message.dart';
 import '../../tab_view.dart';
+import '../../tab_controller.dart';
 
 /// [UpDroidCamera] is a client-side class that uses the jsmpeg library
-/// to render a video stream from a [WebSocket] onto a [CanvasElement].
-class UpDroidCamera {
-  String type = 'UpDroidCamera';
+/// to render a video stream from a [WebSocket] onto a [_canvasElement].
+class UpDroidCamera extends TabController {
+  static String className = 'UpDroidCamera';
 
-  int num;
-  int _col;
-  StreamController<CommanderMessage> _cs;
+  CanvasElement _canvas;
 
-  TabView _view;
-  WebSocket _ws;
-
-  DivElement _content;
   AnchorElement _closeTabButton;
 
-  UpDroidCamera(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
-    _col = col;
-    _cs = cs;
-
-    TabView.createTabView(num, _col, 'Camera', active, _getMenuConfig()).then((tabView) {
-      _view = tabView;
+  UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
+    TabView.createTabView(id, col, className, active, _getMenuConfig()).then((tabView) {
+      view = tabView;
       setUpController();
     });
   }
 
   void setUpController() {
-    _closeTabButton = _view.refMap['close-tab'];
+    _closeTabButton = view.refMap['close-tab'];
 
-    _content = _view.content;
-    CanvasElement canvas = new CanvasElement();
-    canvas.classes.add('video-canvas');
-    setDimensions(canvas);
-    _content.children.add(canvas);
+    _registerMailbox();
+    
+    _canvas = new CanvasElement();
+    _canvas.classes.add('video-canvas');
+    setDimensions();
+    view.content.children.add(_canvas);
 
-    _drawLoading(canvas);
+    _drawLoading();
 
-    // Create the server <-> client [WebSocket].
-    // Port 12060 is the default port that UpDroid uses.
-    String url = window.location.host;
-    url = url.split(':')[0];
-    _ws = new WebSocket('ws://' + url + ':12060/camera/$num/cmdr');
-
-    _registerEventHandlers(canvas);
+    _registerEventHandlers();
   }
 
-  void setDimensions (CanvasElement canvas) {
-    var con = querySelector('#col-$num-tab-content');
+  void setDimensions() {
+    var con = querySelector('#col-$id-tab-content');
     var width = (con.borderEdge.width - 13);
     var height = (con.borderEdge.height - 13);
 
-    width <= 640 ? canvas.width = width : canvas.width = 640;
-    height <= 480 ? canvas.height = height : canvas.height = 482;
+    width <= 640 ? _canvas.width = width : _canvas.width = 640;
+    height <= 480 ? _canvas.height = height : _canvas.height = 482;
   }
 
-  void resizeCanvas(CanvasElement canvas){
-      var con = querySelector('#col-$num-tab-content'),
-          width = (con.borderEdge.width - 13),
-          height = (con.borderEdge.height - 13);
+  void resizeCanvas() {
+    var con = querySelector('#col-$id-tab-content'),
+    width = (con.borderEdge.width - 13),
+    height = (con.borderEdge.height - 13);
 
-      width <= 640 ? canvas.width = width : canvas.width = 640;
-      height <= 480 ? canvas.height = height : canvas.height = 482;
-
+    width <= 640 ? _canvas.width = width : _canvas.width = 640;
+    height <= 480 ? _canvas.height = height : _canvas.height = 482;
   }
 
-  void _registerEventHandlers(CanvasElement canvas) {
+  void _drawLoading() {
+    CanvasRenderingContext2D context = _canvas.context2D;
+    context.fillStyle = 444;
+    context.fillText('Loading...', _canvas.width/2-30, _canvas.height/3);
+  }
 
-    window.onResize.listen((e){
-      resizeCanvas(canvas);
+  //\/\/ Mailbox Handlers /\/\//
+
+  void _startPlayer(UpDroidMessage um) {
+    String url = window.location.host;
+    url = url.split(':')[0];
+    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/${className.toLowerCase()}/$id/input']);
+
+    var options = new js.JsObject.jsify({'canvas': _canvas});
+
+    new js.JsObject(js.context['jsmpeg'], [client, options]);
+  }
+
+  void _registerMailbox() {
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CAMERA_READY', _startPlayer);
+  }
+
+  void _registerEventHandlers() {
+    window.onResize.listen((e) {
+      resizeCanvas();
     });
 
-    _ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'CAMERA_READY').listen((um) {
-      _startPlayer(canvas);
-    });
-
-    _view.tabHandleButton.onDoubleClick.listen((e) {
+    view.tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
-      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidCamera'));
+      cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${col}_UpDroidCamera'));
     });
 
     _closeTabButton.onClick.listen((e) {
-      _view.destroy();
-      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
+      view.destroy();
+      cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });
-
   }
-
-  void _drawLoading(CanvasElement canvas) {
-    CanvasRenderingContext2D context = canvas.context2D;
-    context.fillStyle = 444;
-    context.fillText('Loading...', canvas.width/2-30, canvas.height/3);
-  }
-
-  void _startPlayer(CanvasElement canvas) {
-    String url = window.location.host;
-    url = url.split(':')[0];
-    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/camera/$num/input']);
-
-    var options = new js.JsObject.jsify({'canvas': canvas});
-
-    new js.JsObject(js.context['jsmpeg'], [client, options]);
-
-  }
-
-  /// TODO: put these into super class.
-  void makeActive() => _view.makeActive();
-  void makeInactive() => _view.makeInactive();
 
   List _getMenuConfig() {
     List menu = [

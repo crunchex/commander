@@ -13,8 +13,6 @@ import 'modal/modal.dart';
 import 'updroid_message.dart';
 
 class UpDroidClient {
-  // TODO: find syntax to make this not such a long line.
-
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 

@@ -21,15 +21,15 @@ class UpDroidOpenTabModal extends UpDroidModal {
     _modalBody.children.add(selectorWrap);
 
     ButtonElement sEditor = _createButton('default', 'Editor', method: () {
-      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_side}_UpDroidEditor'));
+      _cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${_side}_UpDroidEditor'));
     });
 
     ButtonElement sConsole = _createButton('default', 'Console', method: () {
-      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_side}_UpDroidConsole'));
+      _cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${_side}_UpDroidConsole'));
     });
 
     ButtonElement sCamera = _createButton('default', 'Camera', method: () {
-      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_side}_UpDroidCamera'));
+      _cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${_side}_UpDroidCamera'));
     });
 
     selectorWrap.children.addAll([sEditor, sConsole, sCamera]);

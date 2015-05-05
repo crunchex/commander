@@ -42,7 +42,7 @@ chmod +x cmdr
 echo "OK"
 
 ### gui ###
-cd $TOPDIR/web
+cd $TOPDIR/web/lib/tabs/editor
 
 echo -n "Getting more gui deps..........."
 if [ ! -d "src-min-noconflict" ]; then
@@ -52,7 +52,7 @@ if [ ! -d "src-min-noconflict" ]; then
 	git checkout --quiet beb9ff68e397b4dcaa1d40f79651a063fc917736
 	mv src-min-noconflict ../src-min-noconflict
 fi
-cd $TOPDIR/web
+
 rm -rf ace-builds
 echo "OK"
 

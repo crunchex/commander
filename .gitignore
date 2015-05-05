@@ -1,8 +1,24 @@
-# Don’t commit the following directories created by pub.
+# pub, DartEditor, dart2js
 .buildlog
 .pub/
 build/
 packages
+*.dart.js
+*.dart.precompiled.js
+*.js_
+*.js.deps
+*.js.map
+
+# Log files
+*.log
+
+# Dev Environments
+.project
+*.iml
+*.ipr
+*.iws
+.idea/
+*.DS_Store
 
 # Or the directories and files created by any UpDroid tools.
 bin/cmdr
@@ -10,23 +26,3 @@ bin/cmdr
 deploy/
 src-min-noconflict/
 cmdr.css
-
-
-# Or the files created by dart2js.
-*.dart.js
-*.dart.precompiled.js
-*.js_
-*.js.deps
-*.js.map
-
-# Include when developing application packages.
-pubspec.lock
-
-# Log files
-*.log
-
-# Mac OS X
-*.DS_Store
-
-#WebStorm
-.idea/

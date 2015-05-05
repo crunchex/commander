@@ -5,32 +5,25 @@ import 'dart:async';
 import 'package:dnd/dnd.dart';
 
 import 'package:ace/ace.dart' as ace;
-import 'package:bootjack/bootjack.dart';
 import 'package:ace/proxy.dart';
 import "package:path/path.dart" as pathLib;
 
+import '../../mailbox.dart';
 import '../../updroid_message.dart';
-import '../../tab.dart';
+import '../../tab_view.dart';
+import '../../tab_controller.dart';
 import '../../modal/modal.dart';
 
 part 'templates.dart';
 
 /// [UpDroidEditor] is a wrapper for an embedded Ace Editor. Sets styles
 /// for the editor and an additional menu bar with some filesystem operations.
-class UpDroidEditor extends UpDroidTab {
-  static const String className = 'UpDroidEditor';
-  String type = 'UpDroidEditor';
-
-  WebSocket _ws;
-  StreamController<CommanderMessage> _cs;
-  int num;
-  int _col;
+class UpDroidEditor extends TabController {
+  static String className = 'UpDroidEditor';
 
   Map _pathMap;
   String _absolutePathPrefix;
 
-  DivElement _content;
-  LIElement _fileName;
   AnchorElement _newButton;
   AnchorElement _saveButton;
   AnchorElement _saveAsButton;
@@ -61,38 +54,33 @@ class UpDroidEditor extends UpDroidTab {
   String _originalContents;
   String _currentParPath;
 
-  UpDroidEditor(this.num, int col, StreamController<CommanderMessage> cs, {bool active: false}) {
-    _col = col;
-    _cs = cs;
-
-    setUpTabHandle(num, _col, 'Editor', active);
-    setUpTabContainer(num, _col, 'Editor', _getMenuConfig(), active).then((Map configRefs) {
-      setUpUI(configRefs);
-
-      _fontSizeInput.placeholder = _fontSize.toString();
-
-      // Create the server <-> client [WebSocket].
-      // Port 12060 is the default port that UpDroid uses.
-      String url = window.location.host;
-      url = url.split(':')[0];
-      _ws = new WebSocket('ws://' + url + ':12060/editor/$num');
-
-      _setUpEditor();
-      _registerEditorEventHandlers();
-
-      _cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [num, _content]));
+  UpDroidEditor(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
+    TabView.createTabView(id, col, className, active, _getMenuConfig()).then((tabView) {
+      view = tabView;
+      setUpController();
     });
   }
 
-  void setUpUI(Map configRefs) {
-    _content = configRefs['content'];
-    _fileName = configRefs['extra'];
-    _newButton = configRefs['new'];
-    _saveButton = configRefs['save'];
-    _saveAsButton = configRefs['save-as'];
-    _closeTabButton = configRefs['close-tab'];
-    _themeButton = configRefs['invert'];
-    _fontSizeInput = configRefs['font-size'];
+  void setUpController() {
+    setUpUI();
+
+    _fontSizeInput.placeholder = _fontSize.toString();
+
+    _registerMailbox();
+
+    _setUpEditor();
+    _registerEditorEventHandlers();
+
+    cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [id, view.content]));
+  }
+
+  void setUpUI() {
+    _newButton = view.refMap['new'];
+    _saveButton = view.refMap['save'];
+    _saveAsButton = view.refMap['save-as'];
+    _closeTabButton = view.refMap['close-tab'];
+    _themeButton = view.refMap['invert'];
+    _fontSizeInput = view.refMap['font-size'];
 
   }
 
@@ -100,85 +88,69 @@ class UpDroidEditor extends UpDroidTab {
   void _setUpEditor() {
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
 
-    _aceEditor = ace.edit(_content);
+    _aceEditor = ace.edit(view.content);
     _aceEditor
       ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
       ..fontSize = _fontSize
       ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK);
 
     // Necessary to allow our styling (in main.css) to override Ace's.
-    _content.classes.add('updroid_editor');
+    view.content.classes.add('updroid_editor');
 
     _resetSavePoint();
   }
 
-  /// Process messages according to the type.
-  void _processMessage(CommanderMessage m) {
-    switch (m.type) {
-      case 'CLASS_ADD':
-        _content.classes.add(m.body);
-        break;
+  //\/\/ Mailbox Handlers /\/\//
 
-      case 'CLASS_REMOVE':
-        _content.classes.remove(m.body);
-        break;
+  bool _classAddHandler(CommanderMessage m) => view.content.classes.add(m.body);
+  bool _classRemoveHandler(CommanderMessage m) => view.content.classes.remove(m.body);
+  void _currentPathHandler(CommanderMessage m) => _currentParPath = m.body;
 
-      case 'OPEN_FILE':
-        if(num == m.body[0]) {
-          _ws.send('[[EDITOR_OPEN]]' + m.body[1]);
-          _fileName.text = pathLib.basename(m.body[1]);
-        }
-        break;
+  void _openFileHandler(CommanderMessage m) {
+    if (id != m.body[0]) return;
+    mailbox.ws.send('[[EDITOR_OPEN]]' + m.body[1]);
+    view.extra.text = pathLib.basename(m.body[1]);
+  }
 
-      case 'PARENT_PATH':
-        _currentParPath = m.body;
-        break;
+  void _passEditorHandler(CommanderMessage m) {
+    if (id != m.body[0]) return;
+    linkedDropzone = m.body[1];
+  }
 
-      case 'PASS_EDITOR_INFO':
-        if(num == m.body[0]){
-          linkedDropzone = m.body[1];
-        }
-        break;
+  void _openDirPathHandler(UpDroidMessage um) => mailbox.ws.send('[[EDITOR_DIRECTORY_PATH]]');
+  void _pathListHandler(UpDroidMessage um) => _pullPaths(um.body);
+  void _editorDirPathHandler(UpDroidMessage um) { _absolutePathPrefix = um.body; }
 
-      default:
-        print('Client error: unrecognized message type: ' + m.type);
-    }
+  // Editor receives the open file contents from the server.
+  void _editorFileTextHandler(UpDroidMessage um) {
+    var returnedData = um.body.split('[[CONTENTS]]');
+    var newPath = returnedData[0];
+    var newText = returnedData[1];
+    _handleNewText(newPath, newText);
+  }
+
+  void _editorNewFilenameHandler(UpDroidMessage um) {
+    var newText = RosTemplates.templateCode;
+    var newPath = _absolutePathPrefix + '/' + um.body;
+    _handleNewText(newPath, newText);
+  }
+
+  _registerMailbox() {
+    mailbox.registerCommanderEvent('CLASS_ADD', _classAddHandler);
+    mailbox.registerCommanderEvent('CLASS_REMOVE', _classAddHandler);
+    mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
+    mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
+    mailbox.registerCommanderEvent('PASS_EDITOR_INFO', _passEditorHandler);
+
+    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'OPEN_DIRECTORY_PATH', _openDirPathHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_DIRECTORY_PATH', _editorDirPathHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_FILE_TEXT', _editorFileTextHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_NEW_FILENAME', _editorNewFilenameHandler);
   }
 
   /// Sets up event handlers for the editor's menu buttons.
   void _registerEditorEventHandlers() {
-    _cs.stream
-        .where((m) => m.dest == 'EDITOR')
-        .listen((m) => _processMessage(m));
-
-    _ws.onOpen.listen((e) => _ws.send('[[EDITOR_DIRECTORY_PATH]]'));
-
-    // Editor receives the open file contents from the server.
-    _ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EDITOR_FILE_TEXT')
-        .listen((um) {
-          var returnedData = um.body.split('[[CONTENTS]]');
-          var newPath = returnedData[0];
-          var newText = returnedData[1];
-          _handleNewText(newPath, newText);
-        });
-
-    _ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EDITOR_DIRECTORY_PATH')
-        .listen((um) => _absolutePathPrefix = um.body);
-
-    _ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'EDITOR_NEW_FILENAME')
-        .listen((um) {
-          var newText = RosTemplates.templateCode;
-          var newPath = _absolutePathPrefix + '/' + um.body;
-          _handleNewText(newPath, newText);
-        });
-
-    _ws.onMessage.transform(updroidTransformer)
-        .where((um) => um.header == 'PATH_LIST')
-        .listen((um) => _pullPaths(um.body));
-
     _fontSizeInput.onClick.listen((e) {
       // Keeps bootjack dropdown from closing
       e.stopPropagation();
@@ -205,22 +177,22 @@ class UpDroidEditor extends UpDroidTab {
       });
     });
 
-    tabHandleButton.onDoubleClick.listen((e) {
+    view.tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
-      _cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${_col}_UpDroidEditor'));
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_UpDroidEditor'));
     });
 
     _closeTabButton.onClick.listen((e) {
-      destroyTab();
-      _cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${type}_$num'));
-      _cs.add(new CommanderMessage('EXPLORER', 'REMOVE_EDITOR', body: linkedDropzone));
+      view.destroy();
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
+      cs.add(new CommanderMessage('EXPLORER', 'REMOVE_EDITOR', body: linkedDropzone));
     });
 
     _newButton.onClick.listen((e) {
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.templateCode, 1);
-        _fileName.text = "untitled";
+        view.extra.text = "untitled";
       }
       else{
         e.preventDefault();
@@ -233,12 +205,12 @@ class UpDroidEditor extends UpDroidTab {
         _unsavedSave = _modalSaveButton.onClick.listen((e) {
           _saveText();
           _aceEditor.setValue(RosTemplates.templateCode, 1);
-          _fileName.text = "untitled";
+          view.extra.text = "untitled";
           _unsavedSave.cancel();
         });
         _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
           _aceEditor.setValue(RosTemplates.templateCode, 1);
-          _fileName.text = "untitled";
+          view.extra.text = "untitled";
           _unsavedDiscard.cancel();
         });
       }
@@ -253,8 +225,8 @@ class UpDroidEditor extends UpDroidTab {
     /// Save as click handler
 
     _saveAsButton.onClick.listen((e) {
-      _cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
-      _ws.send("[[EDITOR_REQUEST_LIST]]");
+      cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
+      mailbox.ws.send("[[EDITOR_REQUEST_LIST]]");
       if(_curModal != null) _curModal.hide();
 
       String saveAsPath = '';
@@ -265,8 +237,8 @@ class UpDroidEditor extends UpDroidTab {
       _warning = querySelector('#warning');
 
       void completeSave() {
-          _ws.send('[[EDITOR_SAVE]]' + _aceEditor.value + '[[PATH]]' + saveAsPath);
-          _fileName.text = input.value;
+          mailbox.ws.send('[[EDITOR_SAVE]]' + _aceEditor.value + '[[PATH]]' + saveAsPath);
+          view.extra.text = input.value;
           _curModal.hide();
           input.value = '';
           _resetSavePoint();
@@ -379,7 +351,7 @@ class UpDroidEditor extends UpDroidTab {
       _saveAsButton.click();
     }
     else {
-      _ws.send('[[EDITOR_SAVE]]' + _aceEditor.value + '[[PATH]]' + _openFilePath);
+      mailbox.ws.send('[[EDITOR_SAVE]]' + _aceEditor.value + '[[PATH]]' + _openFilePath);
       _resetSavePoint();
 
     }

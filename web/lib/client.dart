@@ -27,10 +27,6 @@ class UpDroidClient {
   ButtonElement _uploadButton;
 
   Mailbox _mailbox;
-
-  String status;
-  bool encounteredError;
-  String currentPath;
   bool _runButtonEnabled;
 
   UpDroidClient() {
@@ -53,12 +49,12 @@ class UpDroidClient {
     _mailbox = new Mailbox('updroidclient', 1, _cs);
 
     _registerMailbox();
-    registerEventHandlers(_getConfig());
+    _registerEventHandlers(_getConfig());
 
-    pulseFeedback(querySelector('#feedback-button'));
+    _pulseFeedback(querySelector('#feedback-button'));
   }
 
-  void pulseFeedback(AnchorElement feedbackButton) {
+  void _pulseFeedback(AnchorElement feedbackButton) {
     // Initial pulse - 30 seconds in.
     new Timer(new Duration(seconds: 30), () {
       feedbackButton.classes.add('feedback-bold');
@@ -232,7 +228,7 @@ class UpDroidClient {
 
   /// Sets up external event handlers for the various Commander classes. These
   /// are mostly listening events for [WebSocket] messages.
-  void registerEventHandlers(String config) {
+  void _registerEventHandlers(String config) {
     _newButtonLeft.onClick.listen((e) {
       e.preventDefault();
       if (_tabs[1].length >= 4) return;

@@ -228,7 +228,7 @@ class UpDroidClient {
 
     List listConfig = [
       [{'id': 1, 'class': 'UpDroidEditor'}],
-      [{'id': 2, 'class': 'UpDroidEditor'}]
+      [{'id': 1, 'class': 'UpDroidConsole'}]
     ];
 
     return JSON.encode(listConfig);
@@ -296,9 +296,8 @@ class UpDroidClient {
       _tabs[column].add(new UpDroidCamera(id, column, cs, active: true));
       ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
     } else if (className == 'UpDroidConsole') {
-      Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
-      //UpDroidConsole console = new UpDroidConsole(id, column, cs, active: true);
-      //_tabs[column].add(console);
+      //Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
+      _tabs[column].add(new UpDroidConsole(id, column, cs, active: true));
       // TODO: initial size should not be hardcoded.
       ws.send('[[OPEN_TAB]]' + '$column-$id-$className-25-80');
     }

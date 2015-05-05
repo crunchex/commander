@@ -120,7 +120,7 @@ class UpDroidConsole extends TabController {
 
     _closeTabButton.onClick.listen((e) {
       view.destroy();
-      cs.add(new CommanderMessage('CLIENT', 'CLOSE_TAB', body: '${className}_$id'));
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });
 
     _themeButton.onClick.listen((e) {
@@ -135,13 +135,13 @@ class UpDroidConsole extends TabController {
 
     view.tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
-      cs.add(new CommanderMessage('CLIENT', 'OPEN_TAB', body: '${col}_UpDroidConsole'));
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_UpDroidConsole'));
     });
 
     window.onResize.listen((e) {
       if (view.content.parent.classes.contains('active')) {
         List<int> newSize = _term.calculateSize();
-        cs.add(new CommanderMessage('UpDroidConsole', 'Resize', body: '${newSize[0]}x${newSize[1]}'));
+        cs.add(new CommanderMessage('UPDROIDCONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
       }
     });
   }

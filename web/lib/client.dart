@@ -55,8 +55,7 @@ class UpDroidClient {
     _registerMailbox();
     registerEventHandlers(_getConfig());
 
-    AnchorElement feedbackButton = querySelector('#feedback-button');
-    pulseFeedback(feedbackButton);
+    pulseFeedback(querySelector('#feedback-button'));
   }
 
   void pulseFeedback(AnchorElement feedbackButton) {

@@ -3,8 +3,8 @@ library updroid_explorer;
 import 'dart:html';
 import 'dart:async';
 
-import '../../../packages/dnd/dnd.dart';
-import "../../../packages/path/path.dart" as pathLib;
+import 'package:dnd/dnd.dart';
+import 'package:path/path.dart' as pathLib;
 
 import '../updroid_message.dart';
 import 'explorer_helper.dart';

@@ -33,10 +33,6 @@ class UpDroidClient {
   String currentPath;
   bool _runButtonEnabled;
 
-  ElementStream chooseEditor;
-  ElementStream chooseConsole;
-  ElementStream chooseVideo;
-
   UpDroidClient() {
     _config = _getConfig();
 

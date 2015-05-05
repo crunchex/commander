@@ -104,8 +104,8 @@ class TabView {
     }
 
     extra = new LIElement();
-    extra.id = 'filename-$num';
-    extra.classes.add('editor-file-name');
+    extra.id = 'extra-$num';
+    extra.classes.add('extra-menubar');
     tabList.children.add(extra);
 
     _tabContent = new DivElement()

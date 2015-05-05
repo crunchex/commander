@@ -37,7 +37,7 @@ class Mailbox {
 
   /// Registers a [function] to be called on one of the [WebSocket] events.
   /// If registering for ON_MESSAGE, [msg] is required to know which function to call.
-  void registerWebSocketEvent(EventType type, String msg, function(MessageEvent e)) {
+  void registerWebSocketEvent(EventType type, String msg, function(UpDroidMessage um)) {
     if (type == EventType.ON_MESSAGE) {
       _wsRegistry[type][msg] = function;
       return;
@@ -61,7 +61,7 @@ class Mailbox {
     ws.onOpen.listen((e) => _wsRegistry[EventType.ON_OPEN].forEach((f(e)) => f(e)));
 
     // Call the function registered to ON_MESSAGE[um.header].
-    ws.onMessage.transform(updroidTransformer).listen((um) => _wsRegistry[EventType.ON_MESSAGE][um.header]());
+    ws.onMessage.transform(updroidTransformer).listen((um) => _wsRegistry[EventType.ON_MESSAGE][um.header](um));
 
     ws.onClose.listen((e) {
       _wsRegistry[EventType.ON_CLOSE].forEach((f(e)) => f(e));

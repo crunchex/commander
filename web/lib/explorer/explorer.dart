@@ -122,12 +122,12 @@ class UpDroidExplorer extends ExplorerView {
     var enter = dzEditor.onDragEnter.listen((e) {
       var isDir = e.draggableElement.dataset['isDir'];
       if (isDir == 'false') {
-        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-entered'));
+        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'updroideditor-entered'));
       }
     });
 
     var leave = dzEditor.onDragLeave
-        .listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-entered')));
+        .listen((e) => cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'updroideditor-entered')));
 
     var drop = dzEditor.onDrop.listen((e) {
       if (!_explorer.classes.contains('hidden')) {
@@ -615,7 +615,7 @@ class UpDroidExplorer extends ExplorerView {
     // Highlight valid dropzones: rootline, editor, any workspace folder.
     d.onDragStart.listen((event) {
       _drop.classes.add('file-drop-ondrag');
-      cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
+      cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'updroideditor-ondrag'));
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -628,7 +628,7 @@ class UpDroidExplorer extends ExplorerView {
 
     d.onDragEnd.listen((event) {
       _drop.classes.remove('file-drop-ondrag');
-      cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
+      cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'updroideditor-ondrag'));
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -694,7 +694,7 @@ class UpDroidExplorer extends ExplorerView {
         span.classes.add('span-ondrag');
       }
       if (!file.isDirectory) {
-        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'editor-ondrag'));
+        cs.add(new CommanderMessage('EDITOR', 'CLASS_ADD', body: 'updroideditor-ondrag'));
       }
     });
 
@@ -710,7 +710,7 @@ class UpDroidExplorer extends ExplorerView {
         span.classes.remove('span-ondrag');
       }
       if (!file.isDirectory) {
-        cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'editor-ondrag'));
+        cs.add(new CommanderMessage('EDITOR', 'CLASS_REMOVE', body: 'updroideditor-ondrag'));
       }
     });
   }

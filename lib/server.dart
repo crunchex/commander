@@ -79,7 +79,7 @@ class CmdrServer {
     // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
     int objectID = int.parse(request.uri.pathSegments[1]) - 1;
     switch (request.uri.pathSegments[0]) {
-      case 'editor':
+      case 'updroideditor':
         WebSocketTransformer
           .upgrade(request)
           .then((WebSocket ws) => _editors[objectID].handleWebSocket(ws));
@@ -97,7 +97,7 @@ class CmdrServer {
           .then((WebSocket ws) => _cameras[objectID].handleWebSocket(ws, request));
         break;
 
-      case 'console':
+      case 'updroidconsole':
         WebSocketTransformer
           .upgrade(request)
           .then((WebSocket ws) => _ptys[objectID].handleWebSocket(ws));

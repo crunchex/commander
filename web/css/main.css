@@ -481,17 +481,17 @@ li div input {
   font-family: "Monosten A", "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;
 }
 
-.editor {
+.updroideditor {
   width: 100%;
   min-height: 100px;
   height: 100%;
 }
 
-.editor.editor-ondrag {
+.updroideditor.updroideditor-ondrag {
   border: 10px solid #ff2919;
 }
 
-.editor.editor-entered {
+.updroideditor.updroideditor-entered {
   border: 10px solid #ffffff;
 }
 
@@ -505,7 +505,7 @@ li div input {
   background-color: #ff2919;
 }
 
-.editor-file-name {
+.extra-menubar {
   font-family: "Monosten A";
   font-size: 13px;
   padding: 7px 20px 0 0;

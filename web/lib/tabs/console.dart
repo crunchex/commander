@@ -63,7 +63,7 @@ class UpDroidConsole extends TabController {
     _term.cursorBlink = _term.cursorBlink ? false : true;
   }
 
-  void _initialResize(MessageEvent e) {
+  void _initialResize(UpDroidMessage um) {
     List<int> size = _term.currentSize();
     mailbox.ws.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
   }

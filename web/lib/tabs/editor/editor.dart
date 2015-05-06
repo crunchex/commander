@@ -148,7 +148,7 @@ class UpDroidEditor extends TabController {
 
   _registerMailbox() {
     mailbox.registerCommanderEvent('CLASS_ADD', _classAddHandler);
-    mailbox.registerCommanderEvent('CLASS_REMOVE', _classAddHandler);
+    mailbox.registerCommanderEvent('CLASS_REMOVE', _classRemoveHandler);
     mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
     mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
     mailbox.registerCommanderEvent('PASS_EDITOR_INFO', _passEditorHandler);

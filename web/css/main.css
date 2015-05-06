@@ -375,6 +375,20 @@ li div input {
   background-color: #ffffff;
 }
 
+.control-buttons button {
+  width: 100%;
+  margin-top: 5px;
+  -webkit-transition: all 0.25s ease-in;
+  -moz-transition: all 0.25s ease-in;
+  -ms-transition: all 0.25s ease-in;
+  -o-transition: all 0.25s ease-in;
+  transition: all 0.25s ease-in;
+}
+
+.control-buttons button:hover {
+  background-color: #ff2919;
+}
+
 #recycle {
   margin-top: 5px;
   padding: 4px;

@@ -147,9 +147,6 @@ class CmdrServer {
           break;
 
 		//TODO: Need to change to grab all directories
-        case 'CATKIN_NODE_LIST':
-          Ros.nodeList(workspace, socket);
-          break;
 
         case 'GIT_PUSH':
           List runArgs = um.body.split('++');

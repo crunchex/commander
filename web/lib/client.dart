@@ -212,7 +212,6 @@ class UpDroidClient {
 
   void _sendClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
   void _serverReady(UpDroidMessage um) => _initializeTabs(_config, JSON.decode(um.body));
-  void _nodeList(UpDroidMessage um) { new UpDroidRunNodeModal(JSON.decode(um.body), _mailbox.ws); }
 
   void _registerMailbox() {
     _mailbox.registerCommanderEvent('CLOSE_TAB', _closeTab);
@@ -223,8 +222,7 @@ class UpDroidClient {
 
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'CLIENT_CONFIG', _sendClientConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLIENT_SERVER_READY', _serverReady);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CATKIN_NODE_LIST', _nodeList);
-  }
+}
 
   /// Sets up external event handlers for the various Commander classes. These
   /// are mostly listening events for [WebSocket] messages.
@@ -262,7 +260,7 @@ class UpDroidClient {
 
     _runButton.onClick.listen((e) {
       if (!_runButtonEnabled) return;
-      _mailbox.ws.send('[[CATKIN_NODE_LIST]]');
+      _cs.add(new CommanderMessage('EXPLORER', 'CATKIN_NODE_LIST'));
     });
 
     _uploadButton.onClick.listen((e) {

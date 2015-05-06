@@ -2,11 +2,13 @@ library updroid_explorer;
 
 import 'dart:html';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dnd/dnd.dart';
 import 'package:path/path.dart' as pathLib;
 
 import '../updroid_message.dart';
+import '../modal/modal.dart';
 import 'explorer_helper.dart';
 
 part 'explorer_view.dart';
@@ -75,7 +77,8 @@ class UpDroidExplorer extends ExplorerView {
         break;
 
       case 'EDITOR_READY':
-        var num = m.body[0]; // Editor num
+        var num = m.body[0];
+        // Editor num
         var dropDiv = m.body[1];
 
         var dzEditor = new Dropzone(dropDiv);
@@ -99,6 +102,12 @@ class UpDroidExplorer extends ExplorerView {
       case 'WORKSPACE_BUILD':
         if (isActive()) {
           ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
+        }
+        break;
+
+      case 'CATKIN_NODE_LIST':
+        if (isActive()) {
+          ws.send('[[CATKIN_NODE_LIST]]');
         }
         break;
 
@@ -127,7 +136,7 @@ class UpDroidExplorer extends ExplorerView {
     });
 
     var leave = dzEditor.onDragLeave
-        .listen((e) => cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-entered')));
+    .listen((e) => cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-entered')));
 
     var drop = dzEditor.onDrop.listen((e) {
       if (!_explorer.classes.contains('hidden')) {
@@ -186,6 +195,11 @@ class UpDroidExplorer extends ExplorerView {
         .transform(updroidTransformer)
         .where((um) => um.header == 'WORKSPACE_BUILD')
         .listen((um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_BUILD', body: um.body)));
+
+    ws.onMessage
+        .transform(updroidTransformer)
+        .where((um) => um.header == 'CATKIN_NODE_LIST')
+        .listen((um) => new UpDroidRunNodeModal(JSON.decode(um.body), ws));
 
     _controlToggle.onClick.listen((e) => showControl());
 

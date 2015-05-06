@@ -80,6 +80,10 @@ class CmdrExplorer {
           _workspaceBuild(ws);
           break;
 
+        case 'CATKIN_NODE_LIST':
+          _nodeList(ws);
+          break;
+
         default:
           help.debug('Explorer: message received without updroid header.', 1);
       }
@@ -176,5 +180,9 @@ class CmdrExplorer {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       s.add('[[WORKSPACE_BUILD]]' + resultString);
     });
+  }
+
+  void _nodeList(WebSocket s) {
+    Ros.nodeList(_workspace, s);
   }
 }

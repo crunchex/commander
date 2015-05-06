@@ -141,7 +141,7 @@ class UpDroidEditor extends TabController {
     if (_openFilePath != null) {
       if (_openFilePath == um.body[0]) {
         _openFilePath = um.body[1];
-        view.extra.text = pathLib.basename(m.body[1]);
+        view.extra.text = pathLib.basename(um.body[1]);
       }
     }
   }

@@ -682,8 +682,6 @@ class UpDroidExplorer extends ExplorerView {
     // Dragging through nested dropzones appears to be glitchy.
     d.onDragStart.listen((event) {
       d.avatarHandler.avatar.children.first.classes.remove('highlighted');
-      print(li.dataset['path']);
-      print(workspacePath);
       if (pathLib.dirname(li.dataset['path']) != workspacePath) _drop.classes.add('file-drop-ondrag');
       _recycle.classes.add('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');

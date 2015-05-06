@@ -345,6 +345,7 @@ class UpDroidEditor extends TabController {
 
     // Set focus to the interactive area so the user can typing immediately.
     _aceEditor.focus();
+    _aceEditor.scrollToLine(0);
   }
 
   /// Sends the file path and contents to the server to be saved to disk.

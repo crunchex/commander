@@ -91,7 +91,7 @@ abstract class ExplorerView {
         _controlPanel.classes.add('hidden');
       }
       for(var explorer in _explorersDiv.children) {
-        if(explorer.id != 'recycle' && explorer.id != 'control-buttons') {
+        if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
           if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
             explorer.classes.add('hidden');
           }

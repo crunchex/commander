@@ -23,6 +23,7 @@ class UpDroidEditor extends TabController {
 
   Map _pathMap;
   String _absolutePathPrefix;
+  DivElement _content;
 
   AnchorElement _newButton;
   AnchorElement _saveButton;
@@ -81,6 +82,7 @@ class UpDroidEditor extends TabController {
     _closeTabButton = view.refMap['close-tab'];
     _themeButton = view.refMap['invert'];
     _fontSizeInput = view.refMap['font-size'];
+    _content = view.refMap['content'];
 
   }
 
@@ -135,12 +137,22 @@ class UpDroidEditor extends TabController {
     _handleNewText(newPath, newText);
   }
 
+  void _editorRenameHandler(UpDroidMessage um) {
+    if (_openFilePath != null) {
+      if (_openFilePath == um.body[0]) {
+        _openFilePath = um.body[1];
+        view.extra.text = pathLib.basename(um.body[1]);
+      }
+    }
+  }
+
   _registerMailbox() {
     mailbox.registerCommanderEvent('CLASS_ADD', _classAddHandler);
-    mailbox.registerCommanderEvent('CLASS_REMOVE', _classAddHandler);
+    mailbox.registerCommanderEvent('CLASS_REMOVE', _classRemoveHandler);
     mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
     mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
     mailbox.registerCommanderEvent('PASS_EDITOR_INFO', _passEditorHandler);
+    mailbox.registerCommanderEvent('FILE_UPDATE', _editorRenameHandler);
 
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'OPEN_DIRECTORY_PATH', _openDirPathHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);
@@ -169,7 +181,7 @@ class UpDroidEditor extends TabController {
           }
           finally {
             _fontSizeInput.value = "";
-            querySelector('#editor').click();
+            _content.click();
             _aceEditor.focus();
             _fontInputListener.cancel();
           }
@@ -343,6 +355,7 @@ class UpDroidEditor extends TabController {
 
     // Set focus to the interactive area so the user can typing immediately.
     _aceEditor.focus();
+    _aceEditor.scrollToLine(0);
   }
 
   /// Sends the file path and contents to the server to be saved to disk.

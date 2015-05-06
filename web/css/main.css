@@ -346,7 +346,8 @@ li div input {
 .file-container input {
   width: 35%;
   font-family: "Avenir Next LT Pro Demi";
-  font-size: 14px;
+  color: #0c0c0c;
+  font-size: 12px;
 }
 
 .new-file-drop {
@@ -372,6 +373,20 @@ li div input {
   color: #ff2919;
   border-top-width: 2px;
   background-color: #ffffff;
+}
+
+.control-buttons button {
+  width: 100%;
+  margin-top: 5px;
+  -webkit-transition: all 0.25s ease-in;
+  -moz-transition: all 0.25s ease-in;
+  -ms-transition: all 0.25s ease-in;
+  -o-transition: all 0.25s ease-in;
+  transition: all 0.25s ease-in;
+}
+
+.control-buttons button:hover {
+  background-color: #ff2919;
 }
 
 #recycle {

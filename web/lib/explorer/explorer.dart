@@ -246,6 +246,7 @@ class UpDroidExplorer extends ExplorerView {
       }
 
       ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+      cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
       if (e.draggableElement.dataset['isDir'] == 'true') {
         // Avoid an exception thrown when the new name already exists or dragging to same folder.
         if (currentPath != newPath && alert == false) {
@@ -483,12 +484,14 @@ class UpDroidExplorer extends ExplorerView {
                 item.remove();
               } else if (checkContents(item) == true) {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
                 removeSubFolders(item);
                 removeFileData(e.draggableElement, currentPath);
                 ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
                 item.remove();
               } else {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
                 item.remove();
                 removeFileData(e.draggableElement, currentPath);
               }
@@ -498,6 +501,7 @@ class UpDroidExplorer extends ExplorerView {
                 duplicate == false &&
                 !getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
             }
           }
 
@@ -565,6 +569,7 @@ class UpDroidExplorer extends ExplorerView {
           bool duplicate = pathToFile.containsKey(newPath);
           if (duplicate == false) {
             ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
+            cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [file.path, newPath]));
             if (folder == true) {
               removeFileData(li, file.path);
             }
@@ -695,8 +700,6 @@ class UpDroidExplorer extends ExplorerView {
     // Dragging through nested dropzones appears to be glitchy.
     d.onDragStart.listen((event) {
       d.avatarHandler.avatar.children.first.classes.remove('highlighted');
-      print(li.dataset['path']);
-      print(workspacePath);
       if (pathLib.dirname(li.dataset['path']) != workspacePath) _drop.classes.add('file-drop-ondrag');
       _recycle.classes.add('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');

@@ -119,7 +119,7 @@ packages:
     version: "1.3.2"
   terminal:
     description:
-      path: "/home/crunchex/work/terminal"
+      path: "/home/dong/git/terminal"
       relative: false
     source: path
     version: "0.0.1"

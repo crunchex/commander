@@ -323,6 +323,10 @@ li div input {
   vertical-align: middle;
 }
 
+#file-explorer-title:hover {
+  cursor: pointer;
+}
+
 #file-explorer-title #folder {
   margin-left: 4px;
 }
@@ -381,12 +385,14 @@ li div input {
 
 }
 
-#control>div {
-  margin-top: -25px;
+#control div h3 {
+  padding: 15px 5px;
+  border-bottom: 4px solid white;
+  margin: 0;
 }
 
-#control div h3 {
-  padding-top: 15px;
+#nodes {
+  min-height: 200px;
 }
 
 .control-buttons {

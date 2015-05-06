@@ -23,11 +23,13 @@ class UpDroidClient {
   AnchorElement _newButtonRight;
   ButtonElement _cleanButton;
   ButtonElement _buildButton;
+  ButtonElement _listButton;
   ButtonElement _runButton;
   ButtonElement _uploadButton;
 
   Mailbox _mailbox;
   bool _runButtonEnabled;
+  bool _listButtonEnabled;
 
   UpDroidClient() {
     _config = _getConfig();
@@ -37,11 +39,13 @@ class UpDroidClient {
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
     _cleanButton = querySelector('#clean-button');
+    _listButton = querySelector('#list-button');
     _buildButton = querySelector('#build-button');
     _runButton = querySelector('#run-button');
     _uploadButton = querySelector('#upload');
 
     _runButtonEnabled = true;
+    _listButtonEnabled = true;
 
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.
@@ -201,7 +205,9 @@ class UpDroidClient {
     // Success else failure.
     if (m.body == '') {
       _runButton.classes.remove('control-button-disabled');
+      _listButton.classes.remove('control-button-disabled');
       _runButtonEnabled = true;
+      _listButtonEnabled = true;
     } else {
       new UpDroidBuildResultsModal(m.body);
     }
@@ -247,8 +253,10 @@ class UpDroidClient {
 
       _cs.add(new CommanderMessage('EXPLORER', 'WORKSPACE_CLEAN'));
 
+      _listButton.classes.add('control-button-disabled');
       _runButton.classes.add('control-button-disabled');
       _runButtonEnabled = false;
+      _listButtonEnabled = false;
     });
 
     _buildButton.onClick.listen((e) {
@@ -258,8 +266,8 @@ class UpDroidClient {
       _cs.add(new CommanderMessage('EXPLORER', 'WORKSPACE_BUILD'));
     });
 
-    _runButton.onClick.listen((e) {
-      if (!_runButtonEnabled) return;
+    _listButton.onClick.listen((e) {
+      if (!_listButtonEnabled) return;
       _cs.add(new CommanderMessage('EXPLORER', 'CATKIN_NODE_LIST'));
     });
 

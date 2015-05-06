@@ -232,6 +232,7 @@ class UpDroidExplorer extends ExplorerView {
       }
 
       ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+      cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
       if (e.draggableElement.dataset['isDir'] == 'true') {
         // Avoid an exception thrown when the new name already exists or dragging to same folder.
         if (currentPath != newPath && alert == false) {
@@ -469,12 +470,14 @@ class UpDroidExplorer extends ExplorerView {
                 item.remove();
               } else if (checkContents(item) == true) {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
                 removeSubFolders(item);
                 removeFileData(e.draggableElement, currentPath);
                 ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
                 item.remove();
               } else {
                 ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
                 item.remove();
                 removeFileData(e.draggableElement, currentPath);
               }
@@ -484,6 +487,7 @@ class UpDroidExplorer extends ExplorerView {
                 duplicate == false &&
                 !getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
               ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
             }
           }
 

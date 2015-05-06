@@ -199,7 +199,7 @@ class UpDroidExplorer extends ExplorerView {
     ws.onMessage
         .transform(updroidTransformer)
         .where((um) => um.header == 'CATKIN_NODE_LIST')
-        .listen((um) => new UpDroidRunNodeModal(JSON.decode(um.body), ws));
+        .listen((um) => new UpDroidRunNodeModal(JSON.decode(um.body), ws, cs));
 
     _controlToggle.onClick.listen((e) => showControl());
 

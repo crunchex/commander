@@ -3,10 +3,12 @@ part of updroid_modal;
 class UpDroidRunNodeModal extends UpDroidModal {
   List<Map> _nodeList;
   WebSocket _ws;
+  StreamController<CommanderMessage> _cs;
 
-  UpDroidRunNodeModal(List<Map> nodeList, WebSocket ws) {
+  UpDroidRunNodeModal(List<Map> nodeList, WebSocket ws, StreamController<CommanderMessage> cs) {
     _nodeList = nodeList;
     _ws = ws;
+    _cs = cs;
 
     _setupHead('Available Nodes');
     _setupBody();
@@ -42,11 +44,14 @@ class UpDroidRunNodeModal extends UpDroidModal {
       String nodeName = packageNode['node'];
       String buttonText = nodeName.length <= 15 ? nodeName : nodeName.substring(0, 15) + ' ...';
       ButtonElement nodeButton = _createButton('default', buttonText, method: () {
+        String runCommand;
         if (nodeArgs.value.isEmpty) {
-          _ws.send('[[CATKIN_RUN]]' + JSON.encode([packageNode['package'], packageNode['package-path'], packageNode['node']]));
+          runCommand = JSON.encode([packageNode['package'], packageNode['package-path'], packageNode['node']]);
         } else {
-          _ws.send('[[CATKIN_RUN]]' + JSON.encode([packageNode['package'], packageNode['package-path'], packageNode['node'], nodeArgs.value]));
+          runCommand = JSON.encode([packageNode['package'], packageNode['package-path'], packageNode['node'], nodeArgs.value]);
         }
+        //_ws.send('[[CATKIN_RUN]]' + runCommand);
+        _cs.add(new CommanderMessage('EXPLORER', 'CATKIN_RUN', body: runCommand));
       });
       nodeButton
         ..dataset['toggle'] = 'tooltip'

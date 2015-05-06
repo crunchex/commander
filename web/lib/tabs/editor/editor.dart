@@ -23,6 +23,7 @@ class UpDroidEditor extends TabController {
 
   Map _pathMap;
   String _absolutePathPrefix;
+  DivElement _content;
 
   AnchorElement _newButton;
   AnchorElement _saveButton;
@@ -81,6 +82,7 @@ class UpDroidEditor extends TabController {
     _closeTabButton = view.refMap['close-tab'];
     _themeButton = view.refMap['invert'];
     _fontSizeInput = view.refMap['font-size'];
+    _content = view.refMap['content'];
 
   }
 
@@ -169,7 +171,7 @@ class UpDroidEditor extends TabController {
           }
           finally {
             _fontSizeInput.value = "";
-            querySelector('#editor').click();
+            _content.click();
             _aceEditor.focus();
             _fontInputListener.cancel();
           }

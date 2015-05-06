@@ -116,6 +116,7 @@ class TabView {
     content = new DivElement()
         ..classes.add(id);
     _tabContent.children.add(content);
+    refMap['content'] = content;
 
     DivElement colOneTabContent = querySelector('#col-$col-tab-content');
     colOneTabContent.children.insert(0, _tabContainer);

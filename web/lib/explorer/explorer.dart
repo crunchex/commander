@@ -551,6 +551,7 @@ class UpDroidExplorer extends ExplorerView {
           bool duplicate = pathToFile.containsKey(newPath);
           if (duplicate == false) {
             ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
+            cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [file.path, newPath]));
             if (folder == true) {
               removeFileData(li, file.path);
             }

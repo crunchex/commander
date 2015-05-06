@@ -137,12 +137,22 @@ class UpDroidEditor extends TabController {
     _handleNewText(newPath, newText);
   }
 
+  void _editorRenameHandler(UpDroidMessage um) {
+    if (_openFilePath != null) {
+      if (_openFilePath == um.body[0]) {
+        _openFilePath = um.body[1];
+        view.extra.text = pathLib.basename(m.body[1]);
+      }
+    }
+  }
+
   _registerMailbox() {
     mailbox.registerCommanderEvent('CLASS_ADD', _classAddHandler);
     mailbox.registerCommanderEvent('CLASS_REMOVE', _classAddHandler);
     mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
     mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
     mailbox.registerCommanderEvent('PASS_EDITOR_INFO', _passEditorHandler);
+    mailbox.registerCommanderEvent('FILE_UPDATE', _editorRenameHandler);
 
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'OPEN_DIRECTORY_PATH', _openDirPathHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);

@@ -111,6 +111,12 @@ class UpDroidExplorer extends ExplorerView {
         }
         break;
 
+      case 'CATKIN_RUN':
+        if (isActive()) {
+          ws.send('[[CATKIN_RUN]]' + m.body);
+        }
+        break;
+
       case 'REMOVE_EDITOR':
         editors.remove(m.body);
         for (var stream in editorListeners[m.body]) {

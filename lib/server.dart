@@ -142,10 +142,6 @@ class CmdrServer {
           });
           break;
 
-        case 'CATKIN_RUN':
-          Ros.runNode(workspace, um.body);
-          break;
-
 		//TODO: Need to change to grab all directories
 
         case 'GIT_PUSH':

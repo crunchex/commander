@@ -11,14 +11,15 @@ class TabController {
   int col;
   StreamController<CommanderMessage> cs;
   bool active;
+  String tabType;
 
   TabView view;
   Mailbox mailbox;
 
-  TabController(this.id, this.col, String className, this.cs, {bool active: false}) {
+  TabController(this.id, this.col, this.tabType, this.cs, {bool active: false}) {
     if (active != null) this.active = active;
 
-    mailbox = new Mailbox(className, id, cs);
+    mailbox = new Mailbox(tabType, id, cs);
   }
 
   void makeActive() => view.makeActive();

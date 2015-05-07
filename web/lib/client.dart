@@ -99,7 +99,8 @@ class UpDroidClient {
     // Add all used ids for [className] to ids.
     for (int i = 1; i <= 2; i++) {
       _tabs[i].forEach((tab) {
-        if (tab.type == className) ids.add(tab.num);
+
+        if (tab.tabType == className) ids.add(tab.id);
       });
     }
 
@@ -173,7 +174,7 @@ class UpDroidClient {
     // Add all used ids for [className] to ids.
     for (int i = 1; i <= 2; i++) {
       for (int j = 0; j < _tabs[i].length; j++) {
-        if (_tabs[i][j].type == type && _tabs[i][j].num == num) {
+        if (_tabs[i][j].tabType == type && _tabs[i][j].id == num) {
           _tabs[i].removeAt(j);
           _tabs[i].last.makeActive();
         }

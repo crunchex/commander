@@ -18,3 +18,19 @@ class CmdrGuiCommand extends Command {
     new CmdrServer(argResults);
   }
 }
+
+class InfoCommand extends Command {
+  final name = "info";
+  final description = "Display general information about cmdr.";
+
+  String version;
+
+  InfoCommand(this.version) {
+    argParser.addFlag('version', abbr: 'v', defaultsTo: false,
+      help: 'Prints the version number.');
+  }
+
+  void run() {
+    if (argResults['version']) print(version);
+  }
+}

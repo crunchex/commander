@@ -253,8 +253,7 @@ li div input {
 
 .explorer-container {
   background-color: #eaecec;
-  border-width: 1px;
-  border-color: solid #e3e3e3;
+  border: 1px solid #e3e3e3;
   min-height: 300px;
   margin-top: 5px;
   margin-bottom: 5px;
@@ -293,7 +292,7 @@ li div input {
 .explorer-li {
   list-style: none;
   min-width: 200px;
-  cursor: pointer;
+  cursor: default;
 }
 
 #title-container {
@@ -407,11 +406,11 @@ li div input {
   width: 120%;
 }
 
-.package-title .package-name {
+.package-name {
   margin: 0 0 0 8px;
   display: inline-block;
   font-family: Avenir Next LT Pro Demi;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .package-files {
@@ -426,10 +425,20 @@ li div input {
 
 /** Node in list **/
 #packages ul li {
-  min-width: 200px;
+  padding: 2px 5px;
   margin-top: 2px;
   list-style: none;
   font-size: 14px;
+  cursor: default;
+}
+
+#packages ul li.highlighted {
+  background-color: #ff2919;
+}
+
+.node-args-input {
+  display: block;
+  margin: 2px 5px;
 }
 
 .control-buttons {
@@ -604,7 +613,6 @@ li div input {
 }
 
 .updroidcamera {
-  margin: none;
   height: 100%;
   border: none;
   background-color: #D1CFD5;
@@ -627,7 +635,7 @@ li div input {
   padding: 5px;
   font-size: 11px;
   font-family: "DejaVu Sans Mono", "Liberation Mono", "Andale Mono", monospace;
-  overflow-y: none;
+  overflow-y: hidden;
 }
 
 .updroidconsole:focus {
@@ -777,14 +785,13 @@ code, kbd, pre, samp {
   font-size: 10px;
 }
 
-/* Control panel */
+/* Explorer */
 
 .explorer-container{
-  border: 0 1px 1px 1px;
   min-height: 300px;
   max-height: 400px;
   overflow: auto;
-  padding: none;
+  padding: 0;
 }
 
 .explorer-li{

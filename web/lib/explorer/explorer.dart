@@ -24,7 +24,9 @@ class UpDroidExplorer extends ExplorerView {
 
   String workspacePath;
   DivElement currentSelected;
+  LIElement currentSelectedNode;
   String currentSelectedPath;
+  InputElement nodeArgs;
 
   DivElement editorDiv;
   LIElement fileName;
@@ -42,6 +44,7 @@ class UpDroidExplorer extends ExplorerView {
   Map fileInfo = {};
   Map pathToFile = {};
   Map ulInfo = {};
+  Map runParams = {};
 
   WebSocket ws;
   StreamController<CommanderMessage> cs;
@@ -529,6 +532,34 @@ class UpDroidExplorer extends ExplorerView {
       div.parent.dataset['isDir'] == 'true'
           ? currentSelectedPath = getPath(div.parent)
           : currentSelectedPath = pathLib.dirname(getPath(div.parent));
+    });
+  }
+
+  void populateNodes(List<Map> nodeList) {
+    Map packageMap = createPackageList(nodeList);
+
+    for (var packageNode in nodeList) {
+      if(!packageNode['node'].contains('.xml')) {
+        var element = createNodeLi(packageNode);
+        var listToAppend = packageMap[packageNode['package']];
+        listToAppend.append(element);
+        setupNodeHighlighter(element);
+      }
+    }
+  }
+
+  void setupNodeHighlighter (LIElement li) {
+    li.onClick.listen((e) {
+      if(currentSelectedNode != null) {
+        currentSelectedNode.classes.remove('highlighted');
+        nodeArgs.classes.add('hidden');
+      }
+      li.classes.add('highlighted');
+      currentSelectedNode = li;
+      nodeArgs = li.lastChild;
+      runParams.addAll({'name' : li.dataset['name'], 'package' : li.dataset['package'], 'package-path' : li.dataset['package-path']});
+      print(runParams);
+      nodeArgs.classes.remove('hidden');
     });
   }
 

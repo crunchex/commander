@@ -106,19 +106,6 @@ abstract class ExplorerView {
   }
 
   ///Create Node List
-  void populateNodes(List<Map> nodeList) {
-    Map packageMap = createPackageList(nodeList);
-
-    for (var packageNode in nodeList) {
-      if(!packageNode['node'].contains('.xml')) {
-        var element = createNodeLi(packageNode);
-        var listToAppend = packageMap[packageNode['package']];
-        print(packageMap);
-        print(packageNode['node']);
-        listToAppend.append(element);
-      }
-    }
-  }
 
   Map createPackageList (List<Map> nodeList) {
     List packages = [];
@@ -152,7 +139,9 @@ abstract class ExplorerView {
   LIElement createNodeLi(Map packageNode) {
     String _fileName = packageNode['node'];
     LIElement packageFile = new LIElement()
-      ..dataset['name'] = _fileName;
+      ..dataset['name'] = _fileName
+      ..dataset['package'] = packageNode['package']
+      ..dataset['package-path'] = packageNode['package-path'];
     if (packageNode['node'].contains('.launch')) {
       SpanElement launch = new SpanElement();
       launch.classes.addAll(['glyphicons', 'glyphicons-send']);
@@ -168,7 +157,6 @@ abstract class ExplorerView {
     SpanElement nodeLaunch = new SpanElement();
     var shortened = _fileName.replaceAll('.launch', '');
     shortened = shortened.replaceAll('.py', '');
-    nodeLaunch.text = shortened;
     nodeLaunch.text = shortened;
     packageFile.append(nodeLaunch);
 
@@ -186,6 +174,7 @@ abstract class ExplorerView {
         }
       });
       nodeArgs.placeholder = arguments;
+      packageFile.append(nodeArgs);
     }
 
     return packageFile;

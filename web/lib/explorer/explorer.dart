@@ -319,14 +319,6 @@ class UpDroidExplorer extends ExplorerView {
     return files;
   }
 
-  ///Create Node List
-  void populateNodes(List<Map> nodeList) {
-    print(nodeList.toString());
-    for (var node in nodeList) {
-      createNodeLi(node);
-    }
-  }
-
   /// Shows control panel
   void showControl() {
     if (_explorersDiv != null) _explorersDiv.classes.add('hidden');

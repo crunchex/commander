@@ -24,7 +24,7 @@ abstract class ExplorerView {
     _explorersDiv = querySelector("#exp-container");
     _expList = querySelector("#side-menu ul");
     _controlPanel = querySelector('#control');
-    _nodeList = querySelector('#nodes ul');
+    _nodeList = querySelector('#packages ul');
     _title = querySelector('#file-explorer-title');
     _controlToggle = querySelector('#control-toggle');
     _recycle = querySelector('#recycle');
@@ -105,6 +105,23 @@ abstract class ExplorerView {
     });
   }
 
+  ///Create Node List
+  void populateNodes(List<Map> nodeList) {
+    List packages = [];
+//    for (var node in nodeList) {
+//
+//    }
+    for (var packageNode in nodeList) {
+      print(packageNode['package']);
+      if(!packageNode['node'].contains('.xml')) {
+        createNodeLi(packageNode);
+      }
+    }
+  }
+
+  createPackage() {
+
+  }
   createNodeLi(Map packageNode) {
     String _nodeName = packageNode['node'];
     LIElement node = new LIElement()

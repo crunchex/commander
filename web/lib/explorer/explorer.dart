@@ -199,7 +199,7 @@ class UpDroidExplorer extends ExplorerView {
     ws.onMessage
         .transform(updroidTransformer)
         .where((um) => um.header == 'CATKIN_NODE_LIST')
-        .listen((um) => new UpDroidRunNodeModal(JSON.decode(um.body), ws, cs));
+        .listen((um) => populateNodes(JSON.decode(um.body)));
 
     _controlToggle.onClick.listen((e) => showControl());
 
@@ -317,6 +317,14 @@ class UpDroidExplorer extends ExplorerView {
     }
 
     return files;
+  }
+
+  ///Create Node List
+  void populateNodes(List<Map> nodeList) {
+    print(nodeList.toString());
+    for (var node in nodeList) {
+      createNodeLi(node);
+    }
   }
 
   /// Shows control panel

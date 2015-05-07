@@ -14,6 +14,7 @@ abstract class ExplorerView {
   SpanElement _folder;
   SpanElement _file;
   DivElement _drop;
+  UListElement _nodeList;
 
   Future createExplorer(int num, String name) {
     Completer completer = new Completer();
@@ -23,6 +24,7 @@ abstract class ExplorerView {
     _explorersDiv = querySelector("#exp-container");
     _expList = querySelector("#side-menu ul");
     _controlPanel = querySelector('#control');
+    _nodeList = querySelector('#nodes ul');
     _title = querySelector('#file-explorer-title');
     _controlToggle = querySelector('#control-toggle');
     _recycle = querySelector('#recycle');
@@ -101,6 +103,50 @@ abstract class ExplorerView {
         }
       }
     });
+  }
+
+  createNodeLi(Map packageNode) {
+    String _nodeName = packageNode['node'];
+    LIElement node = new LIElement()
+      ..classes.add('node')
+      ..dataset['name'] = _nodeName
+      ..text = _nodeName;
+    _nodeList.append(node);
+    InputElement nodeArgs = new InputElement()
+      ..classes.add('node-args-input')
+      ..classes.add('hidden');
+
+    if (packageNode.containsKey('args')) {
+      String arguments = '';
+      packageNode['args'].forEach((List arg) {
+        if (arg.length == 1) {
+          arguments += '${arg[0]}:=';
+        } else {
+          arguments += ' ${arg[0]}:=${arg[1]}';
+        }
+      });
+      nodeArgs.placeholder = arguments;
+    }
+
+    _nodeList.append(nodeArgs);
+
+//    ButtonElement nodeButton = _createButton('default', buttonText, method: () {
+//      String runCommand;
+//      if (nodeArgs.value.isEmpty) {
+//        runCommand = JSON.encode([packageNode['package'], packageNode['package-path'], packageNode['node']]);
+//      } else {
+//        runCommand = JSON.encode([packageNode['package'], packageNode['package-path'], packageNode['node'], nodeArgs.value]);
+//      }
+//      //_ws.send('[[CATKIN_RUN]]' + runCommand);
+//      _cs.add(new CommanderMessage('EXPLORER', 'CATKIN_RUN', body: runCommand));
+//    });
+//    nodeButton
+//      ..dataset['toggle'] = 'tooltip'
+//      ..dataset['placement'] = 'bottom'
+//      ..title = nodeName;
+//    new Tooltip(nodeButton, showDelay: 700, container: _nodeList);
+//    nodeWrap.children.add(nodeButton);
+//    nodeWrap.children.add(nodeArgs);
   }
 
   void hideExplorer() {

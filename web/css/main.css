@@ -393,6 +393,20 @@ li div input {
 
 #nodes {
   min-height: 200px;
+    max-height: 300px;
+  overflow: auto;
+}
+
+#nodes ul {
+  padding: 15px 20px;
+}
+
+/** Node in list **/
+#nodes ul li {
+  margin-top: 2px;
+  list-style: none;
+  font-family: Avenir Next LT Pro Demi;
+  font-size: 14px;
 }
 
 .control-buttons {

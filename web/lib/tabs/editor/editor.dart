@@ -152,13 +152,13 @@ class UpDroidEditor extends TabController {
     mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
     mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
     mailbox.registerCommanderEvent('PASS_EDITOR_INFO', _passEditorHandler);
-    mailbox.registerCommanderEvent('FILE_UPDATE', _editorRenameHandler);
 
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'OPEN_DIRECTORY_PATH', _openDirPathHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_DIRECTORY_PATH', _editorDirPathHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_FILE_TEXT', _editorFileTextHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_NEW_FILENAME', _editorNewFilenameHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'FILE_UPDATE', _editorRenameHandler);
   }
 
   /// Sets up event handlers for the editor's menu buttons.

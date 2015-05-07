@@ -14,7 +14,7 @@ abstract class ExplorerView {
   SpanElement _folder;
   SpanElement _file;
   DivElement _drop;
-  UListElement _nodeList;
+  UListElement _packageList;
 
   Future createExplorer(int num, String name) {
     Completer completer = new Completer();
@@ -24,7 +24,7 @@ abstract class ExplorerView {
     _explorersDiv = querySelector("#exp-container");
     _expList = querySelector("#side-menu ul");
     _controlPanel = querySelector('#control');
-    _nodeList = querySelector('#packages ul');
+    _packageList = querySelector('#packages');
     _title = querySelector('#file-explorer-title');
     _controlToggle = querySelector('#control-toggle');
     _recycle = querySelector('#recycle');
@@ -107,28 +107,50 @@ abstract class ExplorerView {
 
   ///Create Node List
   void populateNodes(List<Map> nodeList) {
-    List packages = [];
-//    for (var node in nodeList) {
-//
+    Map packageMap = createPackageList(nodeList);
+    print(packageMap);
+
+//    for (var packageNode in nodeList) {
+//      if(!packageNode['node'].contains('.xml')) {
+//        createNodeLi(packageNode);
+//      }
 //    }
-    for (var packageNode in nodeList) {
-      print(packageNode['package']);
-      if(!packageNode['node'].contains('.xml')) {
-        createNodeLi(packageNode);
-      }
+  }
+
+  Map createPackageList (List<Map> nodeList) {
+    List packages = [];
+    Map packageList = {};
+    for (var item in nodeList) {
+      if (!packages.contains(item['package'])) packages.add(item['package']);
     }
+    for(var package in packages) {
+      DivElement packageWrap = new DivElement();
+      _packageList.append(packageWrap);
+      LIElement title = new LIElement()
+        ..classes.add('package-title');
+      packageWrap.append(title);
+      SpanElement icon = new SpanElement()
+        ..classes.addAll(['glyphicons', 'glyphicons-cargo']);
+      HeadingElement packageName = new HeadingElement.h5()
+        ..text = package;
+      title.append(icon);
+      title.append(packageName);
+      UListElement packageFiles = new UListElement()
+        ..classes.add('package-files');
+      // map of ulist items to append launch files and nodes
+      packageList[package] = packageFiles;
+      packageWrap.append(packageFiles);
+    }
+
+    return packageList;
   }
 
-  createPackage() {
-
-  }
-  createNodeLi(Map packageNode) {
-    String _nodeName = packageNode['node'];
-    LIElement node = new LIElement()
-      ..classes.add('node')
-      ..dataset['name'] = _nodeName
-      ..text = _nodeName;
-    _nodeList.append(node);
+  LIElement createNodeLi(Map packageNode) {
+    String _fileName = packageNode['node'];
+    LIElement packageFile = new LIElement()
+      ..dataset['name'] = _fileName
+      ..text = _fileName;
+    _fileName.contains('.launch') ? packageFile.classes.add('launch') : packageFile.classes.add('node');
     InputElement nodeArgs = new InputElement()
       ..classes.add('node-args-input')
       ..classes.add('hidden');
@@ -146,6 +168,8 @@ abstract class ExplorerView {
     }
 
     _nodeList.append(nodeArgs);
+
+    return packageFile;
 
 //    ButtonElement nodeButton = _createButton('default', buttonText, method: () {
 //      String runCommand;

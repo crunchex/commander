@@ -407,17 +407,28 @@ li div input {
   width: 120%;
 }
 
-.package-title h5 {
+.package-title .package-name {
   margin: 0 0 0 8px;
   display: inline-block;
   font-family: Avenir Next LT Pro Demi;
+  font-size: 12px;
+}
+
+.package-files {
+  display: inline-block;
+  padding: 0 5px;
+  white-space: nowrap;
+}
+
+.launch span, .node span {
+  padding-right: 5px;
 }
 
 /** Node in list **/
 #packages ul li {
+  min-width: 200px;
   margin-top: 2px;
   list-style: none;
-  font-family: Avenir Next LT Pro Demi;
   font-size: 14px;
 }
 
@@ -767,14 +778,6 @@ code, kbd, pre, samp {
 }
 
 /* Control panel */
-
-#control{
-
-}
-
-#control h3 {
-  text-align: center;
-}
 
 .explorer-container{
   border: 0 1px 1px 1px;

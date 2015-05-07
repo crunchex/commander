@@ -108,13 +108,16 @@ abstract class ExplorerView {
   ///Create Node List
   void populateNodes(List<Map> nodeList) {
     Map packageMap = createPackageList(nodeList);
-    print(packageMap);
 
-//    for (var packageNode in nodeList) {
-//      if(!packageNode['node'].contains('.xml')) {
-//        createNodeLi(packageNode);
-//      }
-//    }
+    for (var packageNode in nodeList) {
+      if(!packageNode['node'].contains('.xml')) {
+        var element = createNodeLi(packageNode);
+        var listToAppend = packageMap[packageNode['package']];
+        print(packageMap);
+        print(packageNode['node']);
+        listToAppend.append(element);
+      }
+    }
   }
 
   Map createPackageList (List<Map> nodeList) {
@@ -131,7 +134,8 @@ abstract class ExplorerView {
       packageWrap.append(title);
       SpanElement icon = new SpanElement()
         ..classes.addAll(['glyphicons', 'glyphicons-cargo']);
-      HeadingElement packageName = new HeadingElement.h5()
+      SpanElement packageName = new SpanElement()
+        ..classes.add('package-name')
         ..text = package;
       title.append(icon);
       title.append(packageName);
@@ -148,9 +152,26 @@ abstract class ExplorerView {
   LIElement createNodeLi(Map packageNode) {
     String _fileName = packageNode['node'];
     LIElement packageFile = new LIElement()
-      ..dataset['name'] = _fileName
-      ..text = _fileName;
-    _fileName.contains('.launch') ? packageFile.classes.add('launch') : packageFile.classes.add('node');
+      ..dataset['name'] = _fileName;
+    if (packageNode['node'].contains('.launch')) {
+      SpanElement launch = new SpanElement();
+      launch.classes.addAll(['glyphicons', 'glyphicons-send']);
+      packageFile.append(launch);
+      packageFile.classes.add('launch');
+    }
+    else {
+      SpanElement node = new SpanElement();
+      node.classes.addAll(['glyphicons', 'glyphicons-collapse']);
+      packageFile.append(node);
+      packageFile.classes.add('node');
+    }
+    SpanElement nodeLaunch = new SpanElement();
+    var shortened = _fileName.replaceAll('.launch', '');
+    shortened = shortened.replaceAll('.py', '');
+    nodeLaunch.text = shortened;
+    nodeLaunch.text = shortened;
+    packageFile.append(nodeLaunch);
+
     InputElement nodeArgs = new InputElement()
       ..classes.add('node-args-input')
       ..classes.add('hidden');
@@ -166,8 +187,6 @@ abstract class ExplorerView {
       });
       nodeArgs.placeholder = arguments;
     }
-
-    _nodeList.append(nodeArgs);
 
     return packageFile;
 

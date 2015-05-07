@@ -564,7 +564,6 @@ class UpDroidExplorer extends ExplorerView {
       currentSelectedNode = li;
       nodeArgs = li.lastChild;
       runParams.addAll({'name' : li.dataset['name'], 'package' : li.dataset['package'], 'package-path' : li.dataset['package-path']});
-      print(runParams);
       nodeArgs.classes.remove('hidden');
     });
   }

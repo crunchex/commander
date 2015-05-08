@@ -19,8 +19,8 @@ class Workspace implements Directory {
   /// current working directory.
   Workspace(String path) : _delegate = new Directory(path);
 
-  /// Returns the [Directory] for the top-level src directory.
-  Directory get src => new Directory('$path/src');
+  /// Returns the [Directory] for the default src directory.
+  Directory get src => new Directory('$path/up_ws1/src');
 
   /// Creates a [Workspace] with this name and a src directory within.
   ///

@@ -114,9 +114,15 @@ class UpDroidExplorer extends ExplorerView {
         }
         break;
 
-      case 'CATKIN_RUN':
+      case 'RUN_NODE':
         if (isActive()) {
-          ws.send('[[CATKIN_RUN]]' + m.body);
+          String runCommand;
+          if (nodeArgs.value.isEmpty) {
+            runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name']]);
+          } else {
+            runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
+          }
+          ws.send('[[CATKIN_RUN]]' + runCommand);
         }
         break;
 

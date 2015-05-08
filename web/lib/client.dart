@@ -272,6 +272,11 @@ class UpDroidClient {
       _cs.add(new CommanderMessage('EXPLORER', 'CATKIN_NODE_LIST'));
     });
 
+    _runButton.onClick.listen((e) {
+      if (!_listButtonEnabled) return;
+      _cs.add(new CommanderMessage('EXPLORER', 'RUN_NODE'));
+    });
+
     _uploadButton.onClick.listen((e) {
       new UpDroidGitPassModal(_cs);
     });

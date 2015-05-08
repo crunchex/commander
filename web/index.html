@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content=="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UpDroid Commander</title>
+  <link rel="stylesheet" href="packages/bootjack/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/glyphicons.css">
+  <link rel="stylesheet" href="css/cosmos-bootstrap.min.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <script type="text/javascript" src="lib/tabs/editor/src-min-noconflict/ace.js"></script>
+  <script type="text/javascript" src="lib/tabs/camera/jsmpg.js"></script>
+  <script async type="application/dart" src="main.dart"></script>
+  <script async data-pub-inline src="./packages/browser/dart.js"></script>
+</head>
+
+<body>
+
+  <!-- Modal Template -->
+
+  <div class="modal fade modal-base" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+
+      <div class="modal-content">
+        <!-- insert content here -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Top Nav -->
+
+  <nav id="navbar" class="navbar navbar-inverse" role="navigation">
+    <a class="nav navbar-nav navbar-left" href="javascript: void(0)">
+      <img id="updroid" src="assets/commander_logo_black.png" alt="UpDroid Commander">
+    </a>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a id="feedback-button" href="http://goo.gl/forms/rgy5NCeC42" target="_blank">Send Us Feedback!</a>
+      </li>
+      <li><a href="http://www.updroid.com" target="_blank">UpDroid.com</a>
+      </li>
+      <!--li><a href="javascript: void(0)">Tutorials</a></li>
+      <li><a href="javascript: void(0)">Forums</a></li-->
+    </ul>
+  </nav>
+
+  <!-- Commander Body -->
+
+  <div class="container-fluid">
+    <div id="row-main" class="row">
+
+      <!-- Col 0 -->
+
+      <div id="column-0" class="col-xs-2">
+      <div>
+        <div id="title-wrapper">
+          <li id="file-explorer-title">UP-Root</li>
+        </div>
+
+        <!-- Side Menu -->
+
+          <div id="side-menu" class="btn-group">
+            <button id="control-toggle" type="button" class="btn">Control</button>
+            <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li id="side-menu-separator" class="divider"></li>
+              <li><a href="#">Close Workspace</a></li>
+              <li><a href="#">Add Workspace</a></li>
+            </ul>
+          </div>
+        </div>
+
+      <!-- Explorers added here -->
+      <div id="exp-container">
+
+        <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span></p>
+        <div class="control-buttons btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
+          <button id="clean-button" type="button" class="btn btn-sm">Clean <span class="glyphicons glyphicons-cleaning"></span>
+        </button>
+        <button id="build-button" type="button" class="btn btn-sm">Build <span class="glyphicons glyphicons-classic-hammer"></span>
+        </button>
+        <button id="upload" type="button" class="btn btn-sm">Upload <span class="glyphicons glyphicons-share"></span>
+        </button>
+        </div>
+      </div>
+
+      <!-- Control Div -->
+       <div id="control" class="hidden">
+        <div>
+          <h4>Nodes</h4>
+          <div id="packages">
+          </div>
+          <div class="control-buttons btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
+            <button id="list-button" type="button" class="btn btn-sm">List <span class="glyphicons glyphicons-refresh"></span>
+            <button id="run-button" type="button" class="btn btn-sm">Run <span class="glyphicons glyphicons-person-running"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <!-- Col 1 -->
+
+      <div id="column-1" class="col-xs-5 column-content">
+        <ul class="nav nav-tabs" role="tablist">
+          <li><a id="column-1-new" class="new-tab-button"><span class="glyphicons glyphicons-plus"></span></a>
+          </li>
+        </ul>
+
+        <div id="col-1-tab-content" class="tab-content"></div>
+      </div>
+
+      <!-- Col 2 -->
+
+      <div id="column-2" class="col-xs-5 column-content">
+        <ul class="nav nav-tabs" role="tablist">
+          <li><a id="column-2-new" class="new-tab-button"><span class="glyphicons glyphicons-plus"></span></a>
+          </li>
+        </ul>
+
+        <div id="col-2-tab-content" class="tab-content"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    <p class="text-muted">Copyright 2014 UpDroid, Inc. All rights reserved.</p>
+  </div>
+
+</body>
+
+</html>

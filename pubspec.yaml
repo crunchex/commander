@@ -1,0 +1,22 @@
+name: updroidrobot
+dependencies:
+  args: any
+  http_server: '>=0.9.3 <0.10.0'
+  logging: any
+  logging_handlers: any
+  tokenizr: any
+  watcher: any
+  xml: any
+  ace: '0.6.1+3.3.15'
+  bootjack: any
+  browser: any
+  collection: any
+  dnd: any
+  dquery: any
+  path: any
+  quiver: any
+  script_inliner: any
+  terminal:
+    path: /home/dong/git/terminal
+transformers:
+- script_inliner

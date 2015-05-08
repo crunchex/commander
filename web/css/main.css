@@ -315,10 +315,15 @@ li div input {
 }
 
 #file-explorer-title {
+  font-family: "Avenir Next LT Pro Demi";
   display: inline-block;
   margin-right: 5px;
   text-align: center;
   vertical-align: middle;
+}
+
+.workspaceName {
+  font-family: "Avenir Next LT Pro Demi";
 }
 
 #file-explorer-title:hover {
@@ -358,6 +363,7 @@ li div input {
 }
 
 .new-file-drop p {
+  font-family: "Avenir Next LT Pro Demi";
   margin-top: 5px;
   margin-bottom: 5px;
   padding-top: 5px;
@@ -443,6 +449,7 @@ li div input {
 
 .control-buttons {
   width: 100%;
+  font-family: "Avenir Next LT Pro Demi";
 }
 
 .control-buttons button {
@@ -453,6 +460,10 @@ li div input {
   -ms-transition: all 0.25s ease-in;
   -o-transition: all 0.25s ease-in;
   transition: all 0.25s ease-in;
+}
+
+#control-toggle {
+  font-family: "Avenir Next LT Pro Demi";
 }
 
 .control-buttons button:hover {

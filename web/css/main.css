@@ -492,17 +492,22 @@ li div input {
   border-color: #ffffff;
 }
 
-.col-xs-2>.btn.btn-sm,
+.col-xs-2>div>.control-buttons>.btn.btn-sm,
+.col-xs-2>div>div>.control-buttons>.btn.btn-sm,
+.col-xs-2>div>.control-buttons>.btn.btn-sm.active,
+.col-xs-2>div>div>.control-buttons>.btn.btn-sm.active,
 .btn-primary,
 .btn-warning {
+  box-shadow: none;
   width: 100%;
-  background-color: #ffffff;
+  background-color: #eaecec;
   color: #0c0c0c;
   border-width: 1px;
   border-color: #e3e3e3;
   text-align: center;
   font-family: "Avenir Next LT Pro Bold";
   margin-top: 5px;
+  margin-left: 0px;
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
   -ms-transition: all 0.25s ease;
@@ -510,7 +515,8 @@ li div input {
   transition: all 0.25s ease;
 }
 
-.col-xs-2>.btn.btn-sm:hover,
+.col-xs-2>div>.control-buttons>.btn.btn-sm:hover,
+.col-xs-2>div>div>.control-buttons>.btn.btn-sm:hover,
 .btn-primary:hover,
 .btn-warning:hover {
   background-color: #ff2919;
@@ -519,22 +525,28 @@ li div input {
   border-color: #ff2919;
 }
 
-.col-xs-2>.btn.btn-sm:focus {
+.col-xs-2>div>.control-buttons>.btn.btn-sm:focus,
+.col-xs-2>div>div>.control-buttons>.btn.btn-sm:focus {
+  box-shadow: none;
   outline: none;
 }
 
-.col-xs-2>.btn.btn-sm.control-button-disabled,
-.col-xs-2>.btn.btn-sm.control-button-disabled:hover {
+.col-xs-2>div>.control-buttons>.btn.btn-sm.control-button-disabled,
+.col-xs-2>div>.control-buttons>.btn.btn-sm.control-button-disabled:hover
+.col-xs-2>div>div>.control-buttons>.btn.btn-sm.control-button-disabled,
+.col-xs-2>div>div>.control-buttons>.btn.btn-sm.control-button-disabled:hover {
   color: #e3e3e3;
 }
 
-.col-xs-2>.btn.btn-sm>span,
-.col-xs-2>.btn.btn-sm:hover>span {
+.col-xs-2>div>.control-buttons>.btn.btn-sm>span,
+.col-xs-2>div>.control-buttons>.btn.btn-sm:hover>span,
+.col-xs-2>div>div>.control-buttons>.btn.btn-sm>span,
+.col-xs-2>div>div>.control-buttons>.btn.btn-sm:hover>span {
   margin-left: 3px;
 }
 
-.col-xs-2>.btn.btn-sm>span.glyphicons-refresh.glyph-progress,
-.col-xs-2>.btn.btn-sm:hover>span.glyphicons-refresh.glyph-progress {
+.col-xs-2>div>.control-buttons>.btn.btn-sm>span.glyphicons-refresh.glyph-progress,
+.col-xs-2>div>.control-buttons>.btn.btn-sm:hover>span.glyphicons-refresh.glyph-progress {
   -webkit-animation:spin 1.5s linear infinite;
   -moz-animation:spin 1.5s linear infinite;
   animation:spin 1.5s linear infinite;

@@ -13,7 +13,9 @@ import '../tab_controller.dart';
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket] into an UpDroid Commander tab.
 class UpDroidConsole extends TabController {
-  static String className = 'UpDroidConsole';
+  static const String className = 'UpDroidConsole';
+  // Only use where space is constrained, otherwise use className.
+  static const String shortName = 'Console';
 
   WebSocket _ws;
   Terminal _term;
@@ -23,7 +25,7 @@ class UpDroidConsole extends TabController {
   AnchorElement _blinkButton;
 
   UpDroidConsole(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
-    TabView.createTabView(id, col, className, active, _getMenuConfig()).then((tabView) {
+    TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
       view = tabView;
       setUpController();
     });

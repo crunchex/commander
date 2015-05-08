@@ -13,13 +13,15 @@ import '../../tab_controller.dart';
 /// to render a video stream from a [WebSocket] onto a [_canvasElement].
 class UpDroidCamera extends TabController {
   static String className = 'UpDroidCamera';
+  // Only use where space is constrained, otherwise use className.
+  static const String shortName = 'Camera';
 
   CanvasElement _canvas;
 
   AnchorElement _closeTabButton;
 
   UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
-    TabView.createTabView(id, col, className, active, _getMenuConfig()).then((tabView) {
+    TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
       view = tabView;
       setUpController();
     });

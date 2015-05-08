@@ -10,14 +10,15 @@ class TabView {
   /// Returns an initialized [TabView] as a [Future] given all normal constructors.
   ///
   /// Use this instead of calling the constructor directly.
-  static Future<TabView> createTabView(int num, int col, String title, bool active, List config) {
+  static Future<TabView> createTabView(int num, int col, String title, String shortName, bool active, List config) {
     Completer c = new Completer();
-    c.complete(new TabView(num, col, title, active, config));
+    c.complete(new TabView(num, col, title, shortName, active, config));
     return c.future;
   }
 
   int num, col;
   String title;
+  String shortName;
   bool active;
   Map refMap;
 
@@ -29,7 +30,7 @@ class TabView {
   DivElement _tabContainer,_tabContent;
   List _config;
 
-  TabView(this.num, this.col, this.title, this.active, config) {
+  TabView(this.num, this.col, this.title, this.shortName, this.active, config) {
     _config = config;
 
     refMap = {};
@@ -70,7 +71,7 @@ class TabView {
         ..id = 'button-$id-$num'
         ..href = '#tab-$id-$num-container'
         ..dataset['toggle'] = 'tab'
-        ..text = '$title-$num';
+        ..text = '$shortName-$num';
     tabHandleButton.onClick.listen((e) {
       //e.preventDefault();
       //e.stopImmediatePropagation();

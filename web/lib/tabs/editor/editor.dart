@@ -20,6 +20,8 @@ part 'templates.dart';
 /// for the editor and an additional menu bar with some filesystem operations.
 class UpDroidEditor extends TabController {
   static String className = 'UpDroidEditor';
+  // Only use where space is constrained, otherwise use className.
+  static const String shortName = 'Editor';
 
   Map _pathMap;
   String _absolutePathPrefix;
@@ -56,7 +58,7 @@ class UpDroidEditor extends TabController {
   String _currentParPath;
 
   UpDroidEditor(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
-    TabView.createTabView(id, col, className, active, _getMenuConfig()).then((tabView) {
+    TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
       view = tabView;
       setUpController();
     });

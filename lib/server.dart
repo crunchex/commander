@@ -160,12 +160,21 @@ class CmdrServer {
           _openTab(um.body, dir);
           break;
 
+
+        //TODO: Dynamic explorers
+        case 'ADD_EXPLORER':
+          break;
+
+        case 'CLOSE_EXPLORER':
+          break;
+
         default:
           help.debug('Message received without updroid header.', 1);
       }
     }).onDone(() => _cleanUpBackend());
   }
 
+  // TODO: foldername passed but not used
   Future _initBackendClasses(Directory dir) {
     var completer = new Completer();
 
@@ -173,6 +182,7 @@ class CmdrServer {
     srcDir.list().toList().then((folderList) {
       var result = [];
       var names = [];
+      bool workspace;
       for(FileSystemEntity item in folderList) {
         if(item.runtimeType.toString() == "_Directory"){
           result.add(item);
@@ -182,11 +192,21 @@ class CmdrServer {
 
       int num = 1;
       for(var folder in folderList) {
-        names.add(pathLib.basename(folder.path));
-        _explorers.add(new CmdrExplorer(folder, num));
-        num += 1;
+        workspace = false;
+        for (var subFolder in folder.listSync()) {
+          if(pathLib.basename(subFolder.path) == 'src') workspace = true;
+        }
+        if (workspace == true) {
+          print(folder.path);
+          names.add(pathLib.basename(folder.path));
+          _explorers.add(new CmdrExplorer(folder, num));
+          print(num);
+          num += 1;
+        }
       }
 
+      print(names);
+      print(_explorers);
       completer.complete(names);
     });
 

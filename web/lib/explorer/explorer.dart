@@ -214,7 +214,7 @@ class UpDroidExplorer extends ExplorerView {
     ws.onMessage
         .transform(updroidTransformer)
         .where((um) => um.header == 'CATKIN_NODE_LIST')
-        .listen((um) => populateNodes(JSON.decode(um.body)));
+        .listen((um) => populateNodes(cs, JSON.decode(um.body)));
 
     _controlToggle.onClick.listen((e) => showControl());
 
@@ -547,12 +547,12 @@ class UpDroidExplorer extends ExplorerView {
     });
   }
 
-  void populateNodes(List<Map> nodeList) {
+  void populateNodes(StreamController<CommanderMessage> cs, List<Map> nodeList) {
     Map packageMap = createPackageList(nodeList);
 
     for (var packageNode in nodeList) {
       if(!packageNode['node'].contains('.xml')) {
-        var element = createNodeLi(packageNode);
+        var element = createNodeLi(cs, packageNode);
         var listToAppend = packageMap[packageNode['package']];
         listToAppend.append(element);
         setupNodeHighlighter(element);

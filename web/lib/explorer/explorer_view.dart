@@ -136,7 +136,7 @@ abstract class ExplorerView {
     return packageList;
   }
 
-  LIElement createNodeLi(Map packageNode) {
+  LIElement createNodeLi(StreamController<CommanderMessage> cs, Map packageNode) {
     String _fileName = packageNode['node'];
     LIElement packageFile = new LIElement()
       ..dataset['name'] = _fileName
@@ -174,6 +174,14 @@ abstract class ExplorerView {
         }
       });
       nodeArgs.placeholder = arguments;
+
+      nodeArgs.onKeyUp.listen((e) {
+        var keyEvent = new KeyEvent.wrap(e);
+        if (keyEvent.keyCode == KeyCode.ENTER) {
+          cs.add(new CommanderMessage('EXPLORER', 'RUN_NODE'));
+        }
+      });
+
       packageFile.append(nodeArgs);
     }
 

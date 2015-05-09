@@ -12,6 +12,7 @@ class CmdrExplorer {
   //TODO: make asynchroneous
   CmdrExplorer(Directory dir, num) {
     _workspace = new Workspace(dir.path);
+    this.expPath = dir.path;
     this.expNum = num;
 
     for (var item in dir.listSync()) {

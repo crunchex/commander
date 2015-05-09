@@ -79,9 +79,9 @@ abstract class ExplorerView {
   }
 
   makeExpButton (int num, String name) {
-    LIElement item = new LIElement();
+    LIElement item = new LIElement()
+      ..id = "exp-li-$num";
     AnchorElement link = new AnchorElement()
-      ..id = "exp-button-$num"
       ..href = "#"
       ..text = name
       ..attributes['role'] = 'button';

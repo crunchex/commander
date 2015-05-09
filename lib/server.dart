@@ -167,6 +167,7 @@ class CmdrServer {
           break;
 
         case 'CLOSE_EXPLORER':
+          _closeExplorerCmdr(int.parse(um.body));
           break;
 
         default:
@@ -198,16 +199,11 @@ class CmdrServer {
           if(pathLib.basename(subFolder.path) == 'src') workspace = true;
         }
         if (workspace == true) {
-          print(folder.path);
           names.add(pathLib.basename(folder.path));
           _explorers.add(new CmdrExplorer(folder, num));
-          print(num);
           num += 1;
         }
       }
-
-      print(names);
-      print(_explorers);
       completer.complete(names);
     });
 
@@ -219,6 +215,18 @@ class CmdrServer {
     Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
     source.createSync(recursive: true);
     _explorers.add(new CmdrExplorer(newWorkspace, expNum));
+  }
+
+  void _closeExplorerCmdr(int expNum) {
+    var closeNum = expNum;
+    var toRemove;
+
+    for( var explorer in _explorers) {
+      if(closeNum == explorer.expNum) {
+        toRemove = explorer;
+      }
+    }
+    _explorers.remove(toRemove);
   }
 
   void _openTab(String id, Directory dir) {

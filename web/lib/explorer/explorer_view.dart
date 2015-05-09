@@ -33,6 +33,7 @@ abstract class ExplorerView {
     makeExpButton(num, name);
     _explorer = new DivElement()
       ..id = "exp-$num"
+      ..classes.add('exp')
       ..dataset['num'] = num.toString();
     _explorersDiv.insertBefore(_explorer, recycle);
 

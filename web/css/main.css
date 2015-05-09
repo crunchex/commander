@@ -24,7 +24,7 @@
 }
 
 html {
-  position: relative;
+  /*position: relative;*/
   height: 100%;
 }
 
@@ -35,16 +35,23 @@ body {
 html, body {
   min-width: 1100px;
   width: auto !important;
-  height: 85%;
+  height: 100%;
   min-height: 460px;
 }
 
-#row-main {
+.row {
   height: 100%;
+  /*padding-bottom: 10px;*/
+}
+
+.fill {
+  min-height: 400px;
+  /* Height of navbar + navbar padding + footer */
+  height: calc(100% - 91px);
 }
 
 .container-fluid {
-  height: 100%;
+  /*height: 100%;*/
 }
 
 #column-0, #column-1, #column-2 {
@@ -137,6 +144,10 @@ body>.navbar.navbar-inverse {
 
 .nav-tabs>li>a.inner-tabs {
   border-bottom: 0px;
+}
+
+.nav-tabs.inner-tabs {
+  margin-bottom: 1px;
 }
 
 .nav-tabs>.tab-handle {
@@ -251,10 +262,18 @@ li div input {
   font-size: 14px;
 }
 
+#exp-container {
+  height: calc(100% - 28px);
+}
+
+.exp {
+  height: calc(100% - 153px);
+}
+
 .explorer-container {
   background-color: #eaecec;
   border: 1px solid #e3e3e3;
-  min-height: 300px;
+/*  min-height: 300px;*/
   margin-top: 5px;
   margin-bottom: 5px;
   /*max-height: 400px;*/
@@ -622,19 +641,36 @@ li div input {
   float: right !important;
 }
 
-.new-tab-button:hover {
-  cursor: pointer;
+.nav-tabs>li>a.new-tab-button {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: transparent;
+  border-bottom-width: 0px;
+  font-family: "Avenir Next LT Pro Demi";
 }
 
-.tab-content {
+.nav-tabs>li>a.new-tab-button:hover {
+  cursor: pointer;
+  color: #ffffff;
+  background-color: #ff2919;
+  font-family: "Avenir Next LT Pro Demi";
+}
+
+
+.column-content>.tab-content {
   border: 1px solid #e3e3e3;
   min-height: 447px;
-  height: 100%;
+  /* Height of nav-tabs */
+  height: calc(100% - 40px);
+}
+
+.tab-pane>.tab-content {
+  height: calc(100% - 30px);
 }
 
 #col-1-tab-content, #col-2-tab-content {
-  height: 100%;
-  border-bottom: none;
+  /*height: 100%;*/
+  /*border-bottom: none;*/
 }
 
 .updroidcamera {
@@ -794,11 +830,9 @@ code, kbd, pre, samp {
 }
 
 .footer {
-  position: relative;
-  bottom: -170px;
   width: 100%;
-  /* Set the fixed height of the footer here */
   height: 30px;
+  padding-top: 5px;
   background-color: #ffffff;
 }
 
@@ -813,10 +847,11 @@ code, kbd, pre, samp {
 /* Explorer */
 
 .explorer-container{
-  min-height: 300px;
-  max-height: 400px;
+  /*min-height: 300px;*/
+  /*max-height: 400px;*/
   overflow: auto;
-  padding: 0;
+  padding: 0px;
+  height: calc(100% - 104px);
 }
 
 .explorer-li{

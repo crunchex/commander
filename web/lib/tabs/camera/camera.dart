@@ -44,8 +44,8 @@ class UpDroidCamera extends TabController {
 
   void setDimensions() {
     var con = querySelector('#col-$id-tab-content');
-    var width = (con.borderEdge.width - 13);
-    var height = (con.borderEdge.height - 13);
+    var width = (con.contentEdge.width - 13);
+    var height = (con.contentEdge.height - 13);
 
     width <= 640 ? _canvas.width = width : _canvas.width = 640;
     height <= 480 ? _canvas.height = height : _canvas.height = 482;
@@ -53,8 +53,8 @@ class UpDroidCamera extends TabController {
 
   void resizeCanvas() {
     var con = querySelector('#col-$id-tab-content'),
-    width = (con.borderEdge.width - 13),
-    height = (con.borderEdge.height - 13);
+    width = (con.contentEdge.width - 13),
+    height = (con.contentEdge.height - 13);
 
     width <= 640 ? _canvas.width = width : _canvas.width = 640;
     height <= 480 ? _canvas.height = height : _canvas.height = 482;

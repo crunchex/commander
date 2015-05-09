@@ -46,7 +46,8 @@ html, body {
 
 .fill {
   min-height: 400px;
-  height: calc(100% - 61px);
+  /* Height of navbar + navbar padding + footer */
+  height: calc(100% - 91px);
 }
 
 .container-fluid {
@@ -645,6 +646,7 @@ li div input {
 .tab-content {
   border: 1px solid #e3e3e3;
   min-height: 447px;
+  /* Height of nav-tabs */
   height: calc(100% - 40px);
 }
 
@@ -810,8 +812,8 @@ code, kbd, pre, samp {
 }
 
 .footer {
-  position: relative;
-  bottom: -170px;
+/*  position: relative;
+  bottom: -170px;*/
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 30px;

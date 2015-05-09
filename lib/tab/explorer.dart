@@ -12,11 +12,10 @@ class CmdrExplorer {
   //TODO: make asynchroneous
   CmdrExplorer(Directory dir, num) {
     _workspace = new Workspace(dir.path);
+    this.expNum = num;
 
     for (var item in dir.listSync()) {
       if(pathLib.basename(item.path) == 'src') _dir = item;
-      expNum = num;
-
       _watcher = new DirectoryWatcher(dir.path + '/src');
     }
   }

@@ -50,7 +50,7 @@ class UpDroidExplorer extends ExplorerView {
   StreamController<CommanderMessage> cs;
 
   UpDroidExplorer(StreamController<CommanderMessage> cs, num, name) {
-    expNum = num;
+    this.expNum = num;;
     this.cs = cs;
 
     createExplorer(num, name).then((d) {

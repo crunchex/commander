@@ -19,6 +19,8 @@ class UpDroidClient {
   List<List> _tabs;
   String _config;
 
+  AnchorElement _addWorkspace;
+  AnchorElement _closeWorkspace;
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
   ButtonElement _cleanButton;
@@ -36,6 +38,8 @@ class UpDroidClient {
 
     _tabs = [[], [], []];
 
+    _addWorkspace = querySelector('#add-ws');
+    _closeWorkspace = querySelector('#close-ws');
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
     _cleanButton = querySelector('#clean-button');
@@ -234,6 +238,23 @@ class UpDroidClient {
   /// Sets up external event handlers for the various Commander classes. These
   /// are mostly listening events for [WebSocket] messages.
   void _registerEventHandlers(String config) {
+
+    _addWorkspace.onClick.listen((e) {
+      var newNum = 1;
+      var nums = [];
+      for (var explorer in _tabs[0]) {
+        nums.add(explorer.expNum);
+      }
+      while(nums.contains(newNum)){
+        newNum ++;
+      }
+      
+    });
+
+    _closeWorkspace.onClick.listen((e) {
+
+    });
+
     _newButtonLeft.onClick.listen((e) {
       e.preventDefault();
       if (_tabs[1].length >= 4) return;

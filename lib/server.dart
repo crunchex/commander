@@ -211,8 +211,8 @@ class CmdrServer {
   }
 
   void _newExplorerCmdr(int expNum, Directory dir) {
-    Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + "ws_$expNum"));
-    Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
+    Workspace newWorkspace = new Workspace(pathLib.normalize(dir.path + "/" + "ws_$expNum"));
+//    Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
     source.createSync(recursive: true);
     _explorers.add(new CmdrExplorer(newWorkspace, expNum));
   }

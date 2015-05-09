@@ -262,10 +262,18 @@ li div input {
   font-size: 14px;
 }
 
+#exp-container {
+  height: calc(100% - 28px);
+}
+
+.exp {
+  height: calc(100% - 153px);
+}
+
 .explorer-container {
   background-color: #eaecec;
   border: 1px solid #e3e3e3;
-  min-height: 300px;
+/*  min-height: 300px;*/
   margin-top: 5px;
   margin-bottom: 5px;
   /*max-height: 400px;*/
@@ -837,10 +845,11 @@ code, kbd, pre, samp {
 /* Explorer */
 
 .explorer-container{
-  min-height: 300px;
+  /*min-height: 300px;*/
   /*max-height: 400px;*/
   overflow: auto;
-  padding: 0;
+  padding: 0px;
+  height: calc(100% - 104px);
 }
 
 .explorer-li{

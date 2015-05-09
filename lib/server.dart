@@ -34,7 +34,7 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-    if(results['workspace'] == defaultUprootPath) dir.create();
+    dir.create();
     _initServer(dir, _getVirDir(results));
   }
 

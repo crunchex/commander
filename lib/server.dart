@@ -34,7 +34,7 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-    if(results['workspace'] == defaultUprootPath) dir.create();
+    dir.create();
     _initServer(dir, _getVirDir(results));
   }
 
@@ -214,6 +214,7 @@ class CmdrServer {
     Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + "ws_$expNum"));
     Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
     source.createSync(recursive: true);
+    Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: pathLib.normalize(newWorkspace.path + "/src"), runInShell: true);
     _explorers.add(new CmdrExplorer(newWorkspace, expNum));
   }
 

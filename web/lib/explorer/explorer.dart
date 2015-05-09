@@ -328,9 +328,8 @@ class UpDroidExplorer extends ExplorerView {
 
     // Build SimpleFile list our of raw strings.
     for (String entity in entities) {
-      files.add(new SimpleFile.fromDirectoryList(entity, workspacePath));
+      if(entity != "") files.add(new SimpleFile.fromDirectoryList(entity, workspacePath));
     }
-
     return files;
   }
 

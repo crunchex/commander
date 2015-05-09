@@ -463,6 +463,8 @@ li div input {
 }
 
 #control-toggle {
+  padding-top: 5px;
+  font-size: 14px;
   font-family: "Avenir Next LT Pro Demi";
 }
 
@@ -737,7 +739,7 @@ code, kbd, pre, samp {
   width: 50%;
   text-align: center;
   display: inline-block;
-  padding: 5px 0 0 15px;
+  padding: 5px 0 0 5px;
 }
 
 #side-menu button {

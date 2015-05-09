@@ -16,7 +16,7 @@ class CmdrExplorer {
 
     for (var item in dir.listSync()) {
       if(pathLib.basename(item.path) == 'src') _dir = item;
-      _watcher = new DirectoryWatcher(dir.path + '/src');
+      _watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
     }
   }
 

@@ -248,7 +248,8 @@ class UpDroidClient {
       while(nums.contains(newNum)){
         newNum ++;
       }
-      
+      _mailbox.ws.send('[[ADD_EXPLORER]]' + newNum.toString());
+      _openExplorer(newNum, 'ws_$newNum');
     });
 
     _closeWorkspace.onClick.listen((e) {

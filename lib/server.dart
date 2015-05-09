@@ -163,6 +163,7 @@ class CmdrServer {
 
         //TODO: Dynamic explorers
         case 'ADD_EXPLORER':
+          _newExplorerCmdr(int.parse(um.body), dir);
           break;
 
         case 'CLOSE_EXPLORER':
@@ -213,8 +214,11 @@ class CmdrServer {
     return completer.future;
   }
 
-  void _openExplorer(String id, Directory dir) {
-
+  void _newExplorerCmdr(int expNum, Directory dir) {
+    Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + "ws_$expNum"));
+    Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
+    source.createSync(recursive: true);
+    _explorers.add(new CmdrExplorer(newWorkspace, expNum));
   }
 
   void _openTab(String id, Directory dir) {

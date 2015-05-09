@@ -32,7 +32,10 @@ class Mailbox {
     _initWebSocket(url);
 
     // Call the function registered to m.type.
-    _cs.stream.where((m) => m.dest == _name.toUpperCase()).listen((CommanderMessage m) => _csRegistry[m.type](m));
+    _cs.stream.where((m) => m.dest == _name.toUpperCase()).listen((CommanderMessage m) {
+      //print('Commander Message received of type: ${m.type}');
+      _csRegistry[m.type](m);
+    });
   }
 
   /// Registers a [function] to be called on one of the [WebSocket] events.

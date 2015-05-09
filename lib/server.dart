@@ -211,9 +211,10 @@ class CmdrServer {
   }
 
   void _newExplorerCmdr(int expNum, Directory dir) {
-    Workspace newWorkspace = new Workspace(pathLib.normalize(dir.path + "/" + "ws_$expNum"));
-//    Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
-//    source.createSync(recursive: true);
+    Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + "ws_$expNum"));
+    Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
+    source.createSync(recursive: true);
+    Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: pathLib.normalize(newWorkspace.path + "/src"), runInShell: true);
     _explorers.add(new CmdrExplorer(newWorkspace, expNum));
   }
 

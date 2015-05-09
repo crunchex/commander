@@ -405,7 +405,11 @@ li div input {
 /** Control **/
 
 #control {
+  height: calc(100% - 28px);
+}
 
+#control>div {
+  height: 100%;
 }
 
 #control div h4 {
@@ -418,8 +422,9 @@ li div input {
 
 #packages {
   margin-top: 10px;
-  min-height: 200px;
-  max-height: 300px;
+/*  min-height: 200px;
+  max-height: 300px;*/
+  height: calc(100% - 125px);
   overflow: auto;
 }
 

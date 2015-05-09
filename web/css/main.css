@@ -41,7 +41,7 @@ html, body {
 
 .row {
   height: 100%;
-  padding-bottom: 10px;
+  /*padding-bottom: 10px;*/
 }
 
 .fill {
@@ -144,6 +144,10 @@ body>.navbar.navbar-inverse {
 
 .nav-tabs>li>a.inner-tabs {
   border-bottom: 0px;
+}
+
+.nav-tabs.inner-tabs {
+  margin-bottom: 1px;
 }
 
 .nav-tabs>.tab-handle {
@@ -643,11 +647,15 @@ li div input {
 }
 
 
-.tab-content {
+.column-content>.tab-content {
   border: 1px solid #e3e3e3;
   min-height: 447px;
   /* Height of nav-tabs */
   height: calc(100% - 40px);
+}
+
+.tab-pane>.tab-content {
+  height: calc(100% - 30px);
 }
 
 #col-1-tab-content, #col-2-tab-content {
@@ -812,11 +820,9 @@ code, kbd, pre, samp {
 }
 
 .footer {
-/*  position: relative;
-  bottom: -170px;*/
   width: 100%;
-  /* Set the fixed height of the footer here */
   height: 30px;
+  padding-top: 5px;
   background-color: #ffffff;
 }
 
@@ -832,7 +838,7 @@ code, kbd, pre, samp {
 
 .explorer-container{
   min-height: 300px;
-  max-height: 400px;
+  /*max-height: 400px;*/
   overflow: auto;
   padding: 0;
 }

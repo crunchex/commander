@@ -36,7 +36,7 @@ html, body {
   min-width: 1100px;
   width: auto !important;
   height: 100%;
-  min-height: 700px;
+  min-height: 650px;
 }
 
 .row {
@@ -691,7 +691,7 @@ li div input {
 .updroidcamera {
   height: 100%;
   border: none;
-  background-color: #ffffff;
+  background-color: #0c0c0c;
 }
 
 .video-canvas {

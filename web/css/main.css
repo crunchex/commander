@@ -492,8 +492,18 @@ li div input {
   font-family: "Avenir Next LT Pro Demi";
 }
 
+
+/**TODO: this is a hack to make this sit evenly with the control toggle**/
+#exp-dropdown {
+  height: 25px;
+}
+
 .control-buttons button:hover {
   background-color: #ff2919;
+}
+
+#dummy {
+  min-height: 300px;
 }
 
 #recycle {

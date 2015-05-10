@@ -250,6 +250,7 @@ class UpDroidClient {
       }
       _mailbox.ws.send('[[ADD_EXPLORER]]' + newNum.toString());
       _openExplorer(newNum, 'ws_$newNum');
+      _cs.add(new CommanderMessage('UPDROIDEDITOR', 'RESEND_DROP'));
     });
 
     // TODO: need to find better way for client to track active explorer

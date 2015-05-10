@@ -216,6 +216,7 @@ class CmdrServer {
     source.createSync(recursive: true);
     Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: pathLib.normalize(newWorkspace.path + "/src"), runInShell: true);
     _explorers.add(new CmdrExplorer(newWorkspace, expNum));
+
   }
 
   void _closeExplorerCmdr(int expNum) {

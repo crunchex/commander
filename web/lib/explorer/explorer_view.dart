@@ -33,6 +33,7 @@ abstract class ExplorerView {
     makeExpButton(num, name);
     _explorer = new DivElement()
       ..id = "exp-$num"
+      ..classes.add('exp')
       ..dataset['num'] = num.toString();
     _explorersDiv.insertBefore(_explorer, recycle);
 
@@ -79,9 +80,9 @@ abstract class ExplorerView {
   }
 
   makeExpButton (int num, String name) {
-    LIElement item = new LIElement();
+    LIElement item = new LIElement()
+      ..id = "exp-li-$num";
     AnchorElement link = new AnchorElement()
-      ..id = "exp-button-$num"
       ..href = "#"
       ..text = name
       ..attributes['role'] = 'button';

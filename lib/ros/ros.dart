@@ -15,7 +15,7 @@ abstract class Ros {
     List launchList = [];
     List nodeList = [];
 
-    Directory src = new Directory('${workspace.path}/src');
+    Directory src = new Directory('${workspace.path}/up_ws1/src');
 
     help.getDirectory(src).then((fsEntities) {
       Directory package;

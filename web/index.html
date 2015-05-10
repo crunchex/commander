@@ -38,7 +38,7 @@
       <img id="updroid" src="assets/commander_logo_black.png" alt="UpDroid Commander">
     </a>
     <ul class="nav navbar-nav navbar-right">
-      <li><a id="feedback-button" href="http://goo.gl/forms/rgy5NCeC42" target="_blank">Send Us Feedback!</a>
+      <li><a id="feedback-button" href="http://goo.gl/forms/rgy5NCeC42" target="_blank">Report a Bug</a>
       </li>
       <li><a href="http://www.updroid.com" target="_blank">UpDroid.com</a>
       </li>
@@ -49,7 +49,7 @@
 
   <!-- Commander Body -->
 
-  <div class="container-fluid">
+  <div class="container-fluid fill">
     <div id="row-main" class="row">
 
       <!-- Col 0 -->
@@ -64,14 +64,14 @@
 
           <div id="side-menu" class="btn-group">
             <button id="control-toggle" type="button" class="btn">Control</button>
-            <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <button id="exp-dropdown" type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
               <span class="caret"></span>
               <span class="sr-only">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu" role="menu">
               <li id="side-menu-separator" class="divider"></li>
-              <li><a href="#">Close Workspace</a></li>
-              <li><a href="#">Add Workspace</a></li>
+              <li><a id="close-ws" href="#">Close Workspace</a></li>
+              <li><a id="add-ws" href="#">Add Workspace</a></li>
             </ul>
           </div>
         </div>
@@ -97,9 +97,8 @@
           <div id="packages">
           </div>
           <div class="control-buttons btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
-            <button id="list-button" type="button" class="btn btn-sm">List <span class="glyphicons glyphicons-refresh"></span>
-            <button id="run-button" type="button" class="btn btn-sm">Run <span class="glyphicons glyphicons-person-running"></span>
-            </button>
+            <button id="list-button" type="button" class="btn btn-sm">List <span class="glyphicons glyphicons-refresh"></span></button>
+            <button id="run-button" type="button" class="btn btn-sm">Run <span class="glyphicons glyphicons-person-running"></span></button>
           </div>
         </div>
       </div>

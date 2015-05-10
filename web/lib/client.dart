@@ -19,6 +19,8 @@ class UpDroidClient {
   List<List> _tabs;
   String _config;
 
+  AnchorElement _addWorkspace;
+  AnchorElement _closeWorkspace;
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
   ButtonElement _cleanButton;
@@ -36,6 +38,8 @@ class UpDroidClient {
 
     _tabs = [[], [], []];
 
+    _addWorkspace = querySelector('#add-ws');
+    _closeWorkspace = querySelector('#close-ws');
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
     _cleanButton = querySelector('#clean-button');
@@ -176,7 +180,9 @@ class UpDroidClient {
       for (int j = 0; j < _tabs[i].length; j++) {
         if (_tabs[i][j].tabType == type && _tabs[i][j].id == num) {
           _tabs[i].removeAt(j);
-          _tabs[i].last.makeActive();
+          if (_tabs[i].length != 0) {
+            _tabs[i].last.makeActive();
+          }
         }
       }
     }
@@ -234,6 +240,52 @@ class UpDroidClient {
   /// Sets up external event handlers for the various Commander classes. These
   /// are mostly listening events for [WebSocket] messages.
   void _registerEventHandlers(String config) {
+
+    _addWorkspace.onClick.listen((e) {
+      var newNum = 1;
+      var nums = [];
+      for (var explorer in _tabs[0]) {
+        nums.add(explorer.expNum);
+      }
+      while(nums.contains(newNum)){
+        newNum ++;
+      }
+      _mailbox.ws.send('[[ADD_EXPLORER]]' + newNum.toString());
+      _openExplorer(newNum, 'ws_$newNum');
+      _cs.add(new CommanderMessage('UPDROIDEDITOR', 'RESEND_DROP'));
+    });
+
+    // TODO: need to find better way for client to track active explorer
+    _closeWorkspace.onClick.listen((e) {
+      String activeNum;
+      var explorersDiv = querySelector('#exp-container');
+      for(var explorer in explorersDiv.children) {
+        if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
+          if(!explorer.classes.contains('hidden')) {
+            activeNum = explorer.dataset['num'];
+            // remove dom element
+            explorer.remove();
+            // remove corresponding list item
+            querySelector("#exp-li-$activeNum").remove();
+            // remove from list of updroid explorers
+            var toRemove;
+            for(var upExp in _tabs[0]) {
+              if (int.parse(activeNum) == upExp.expNum) {
+                toRemove = upExp;
+              }
+            }
+            _tabs[0].remove(toRemove);
+          }
+        }
+      }
+      // make first explorer visible
+      if (explorersDiv.children.length > 2) {
+        explorersDiv.children[0].classes.remove('hidden');
+      }
+      // Destroy cmdr explorer
+      _mailbox.ws.send('[[CLOSE_EXPLORER]]' + activeNum);
+    });
+
     _newButtonLeft.onClick.listen((e) {
       e.preventDefault();
       if (_tabs[1].length >= 4) return;

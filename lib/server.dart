@@ -23,7 +23,7 @@ part 'tab/explorer.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
-  static String defaultWorkspacePath = '/home/${Platform.environment['USER']}/uproot';
+  static String defaultUprootPath = '/home/${Platform.environment['USER']}/uproot';
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
@@ -34,8 +34,8 @@ class CmdrServer {
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
-    Workspace ws = new Workspace(results['workspace']);
-    _initServer(ws, dir, _getVirDir(results));
+    dir.create();
+    _initServer(dir, _getVirDir(results));
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -55,7 +55,7 @@ class CmdrServer {
   }
 
   /// Initializes and HTTP server to serve the gui and handle [WebSocket] requests.
-  void _initServer(Workspace ws, Directory dir, VirtualDirectory virDir) {
+  void _initServer(Directory dir, VirtualDirectory virDir) {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
@@ -63,18 +63,20 @@ class CmdrServer {
       print('You can now enter "localhost:12060" in your browser.\nCtrl-C to exit.');
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
-          .listen((HttpRequest request) => _routeRequest(request, ws, dir, virDir))
+          .listen((HttpRequest request) => _routeRequest(request, dir, virDir))
           .asFuture()  // Automatically cancels on error.
           .catchError((_) => help.debug("caught error", 1));
     });
   }
 
-  void _routeRequest(HttpRequest request, Workspace workspace, Directory dir, VirtualDirectory virDir) {
+  void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir) {
     // WebSocket requests are considered "upgraded" HTTP requests.
     if (!WebSocketTransformer.isUpgradeRequest(request)) {
       _handleStandardRequest(request, virDir);
       return;
     }
+
+    help.debug('Upgraded request received: ${request.uri.path}', 0);
 
     // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
     int objectID = int.parse(request.uri.pathSegments[1]) - 1;
@@ -106,7 +108,7 @@ class CmdrServer {
       default:
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _handleWebSocket(ws, workspace, dir));
+          .then((WebSocket ws) => _handleWebSocket(ws, dir));
     }
   }
 
@@ -128,7 +130,7 @@ class CmdrServer {
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
-  void _handleWebSocket(WebSocket socket, Workspace workspace, Directory dir) {
+  void _handleWebSocket(WebSocket socket, Directory dir) {
     help.debug('Commander client connected.', 0);
 
     socket.listen((String s) {
@@ -160,12 +162,23 @@ class CmdrServer {
           _openTab(um.body, dir);
           break;
 
+
+        //TODO: Dynamic explorers
+        case 'ADD_EXPLORER':
+          _newExplorerCmdr(int.parse(um.body), dir);
+          break;
+
+        case 'CLOSE_EXPLORER':
+          _closeExplorerCmdr(int.parse(um.body));
+          break;
+
         default:
           help.debug('Message received without updroid header.', 1);
       }
     }).onDone(() => _cleanUpBackend());
   }
 
+  // TODO: foldername passed but not used
   Future _initBackendClasses(Directory dir) {
     var completer = new Completer();
 
@@ -173,6 +186,7 @@ class CmdrServer {
     srcDir.list().toList().then((folderList) {
       var result = [];
       var names = [];
+      bool workspace;
       for(FileSystemEntity item in folderList) {
         if(item.runtimeType.toString() == "_Directory"){
           result.add(item);
@@ -182,19 +196,41 @@ class CmdrServer {
 
       int num = 1;
       for(var folder in folderList) {
-        names.add(pathLib.basename(folder.path));
-        _explorers.add(new CmdrExplorer(folder, num));
-        num += 1;
+        workspace = false;
+        for (var subFolder in folder.listSync()) {
+          if(pathLib.basename(subFolder.path) == 'src') workspace = true;
+        }
+        if (workspace == true) {
+          names.add(pathLib.basename(folder.path));
+          _explorers.add(new CmdrExplorer(folder, num));
+          num += 1;
+        }
       }
-
       completer.complete(names);
     });
 
     return completer.future;
   }
 
-  void _openExplorer(String id, Directory dir) {
+  void _newExplorerCmdr(int expNum, Directory dir) {
+    Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + "ws_$expNum"));
+    Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
+    source.createSync(recursive: true);
+    Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: pathLib.normalize(newWorkspace.path + "/src"), runInShell: true);
+    _explorers.add(new CmdrExplorer(newWorkspace, expNum));
 
+  }
+
+  void _closeExplorerCmdr(int expNum) {
+    var closeNum = expNum;
+    var toRemove;
+
+    for( var explorer in _explorers) {
+      if(closeNum == explorer.expNum) {
+        toRemove = explorer;
+      }
+    }
+    _explorers.remove(toRemove);
   }
 
   void _openTab(String id, Directory dir) {
@@ -202,6 +238,8 @@ class CmdrServer {
     int col = int.parse(idList[0]);
     int num = int.parse(idList[1]);
     String type = idList[2];
+
+    help.debug('Open tab request received: $id', 0);
 
     switch (type) {
       case 'UpDroidEditor':
@@ -224,16 +262,21 @@ class CmdrServer {
     String type = idList[0];
     int num = int.parse(idList[1]);
 
+    help.debug('Close tab request received: $id', 0);
+
     switch (type) {
       case 'UpDroidEditor':
+        _editors[num - 1].cleanup();
         _editors.removeAt(num - 1);
         break;
 
       case 'UpDroidCamera':
+        _cameras[num - 1].cleanup();
         _cameras.removeAt(num - 1);
         break;
 
       case 'UpDroidConsole':
+        _ptys[num - 1].cleanup();
         _ptys.removeAt(num - 1);
         break;
     }

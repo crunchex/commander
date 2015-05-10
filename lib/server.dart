@@ -76,6 +76,8 @@ class CmdrServer {
       return;
     }
 
+    help.debug('Upgraded request received: ${request.uri.path}', 0);
+
     // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
     int objectID = int.parse(request.uri.pathSegments[1]) - 1;
     switch (request.uri.pathSegments[0]) {
@@ -237,6 +239,8 @@ class CmdrServer {
     int num = int.parse(idList[1]);
     String type = idList[2];
 
+    help.debug('Open tab request received: $id', 0);
+
     switch (type) {
       case 'UpDroidEditor':
         _editors.add(new CmdrEditor(dir));
@@ -257,6 +261,8 @@ class CmdrServer {
     List idList = id.split('_');
     String type = idList[0];
     int num = int.parse(idList[1]);
+
+    help.debug('Close tab request received: $id', 0);
 
     switch (type) {
       case 'UpDroidEditor':

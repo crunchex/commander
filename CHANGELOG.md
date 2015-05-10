@@ -1,5 +1,20 @@
 # Change Log
 
+## 0.4.4 - 2015-5-9
+
+### Important
+
+
+### New
+
+
+### Changed
+
+
+### Fixed
+
+	- Fixed List Nodes button crashing cmdr.
+
 ## 0.4.3 - 2015-5-9
 
 ### Important

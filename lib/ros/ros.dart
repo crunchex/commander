@@ -3,6 +3,7 @@ library ros;
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'package:path/path.dart' as pathLib;
 
 import 'package:xml/xml.dart';
 
@@ -15,7 +16,7 @@ abstract class Ros {
     List launchList = [];
     List nodeList = [];
 
-    Directory src = new Directory('${workspace.path}/up_ws1/src');
+    Directory src = new Directory(pathLib.normalize(workspace.path + '/src'));
 
     help.getDirectory(src).then((fsEntities) {
       Directory package;

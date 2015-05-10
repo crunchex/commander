@@ -71,14 +71,6 @@ class UpDroidConsole extends TabController {
     _ws = new WebSocket(url);
     _ws.binaryType = "arraybuffer";
 
-    _ws.onClose.listen((e) {
-      print('Console-$id disconnected. Retrying...');
-      if (!encounteredError) {
-        new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
-      }
-      encounteredError = true;
-    });
-
     _ws.onError.listen((e) {
       print('Console-$id disconnected. Retrying...');
       if (!encounteredError) {
@@ -122,6 +114,7 @@ class UpDroidConsole extends TabController {
 
     _closeTabButton.onClick.listen((e) {
       view.destroy();
+      _ws.close();
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });
 

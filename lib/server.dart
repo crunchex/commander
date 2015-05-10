@@ -260,14 +260,17 @@ class CmdrServer {
 
     switch (type) {
       case 'UpDroidEditor':
+        _editors[num - 1].cleanup();
         _editors.removeAt(num - 1);
         break;
 
       case 'UpDroidCamera':
+        _cameras[num - 1].cleanup();
         _cameras.removeAt(num - 1);
         break;
 
       case 'UpDroidConsole':
+        _ptys[num - 1].cleanup();
         _ptys.removeAt(num - 1);
         break;
     }

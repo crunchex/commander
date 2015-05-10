@@ -180,7 +180,9 @@ class UpDroidClient {
       for (int j = 0; j < _tabs[i].length; j++) {
         if (_tabs[i][j].tabType == type && _tabs[i][j].id == num) {
           _tabs[i].removeAt(j);
-          _tabs[i].last.makeActive();
+          if (_tabs[i].length != 0) {
+            _tabs[i].last.makeActive();
+          }
         }
       }
     }

@@ -49,4 +49,8 @@ class CmdrPty {
   void _resize(String newSize) {
     _shell.stdin.writeln(newSize);
   }
+
+  void cleanup() {
+    _shell.kill();
+  }
 }

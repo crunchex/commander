@@ -67,4 +67,8 @@ class CmdrEditor {
     var fileToSave = new File(argsList[1]);
     fileToSave.writeAsString(argsList[0]);
   }
+
+  void cleanup() {
+
+  }
 }

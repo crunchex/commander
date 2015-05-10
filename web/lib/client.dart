@@ -125,6 +125,9 @@ class UpDroidClient {
   void _initializeTabs(String strConfig, List explorerPaths) {
     List config = JSON.decode(strConfig);
     int i = 1;
+    if(explorerPaths.isEmpty) {
+      _addWorkspace.click();
+    }
     for (var name in explorerPaths) {
       _openExplorer(i, name);
       i += 1;

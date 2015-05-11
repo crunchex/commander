@@ -3,13 +3,8 @@
 ## 0.4.4 - 2015-5-9
 
 ### Important
-
-
 ### New
-
-
 ### Changed
-
 
 ### Fixed
 

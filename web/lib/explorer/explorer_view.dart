@@ -34,7 +34,8 @@ abstract class ExplorerView {
     _explorer = new DivElement()
       ..id = "exp-$num"
       ..classes.add('exp')
-      ..dataset['num'] = num.toString();
+      ..dataset['num'] = num.toString()
+      ..dataset['name'] = name;
     _explorersDiv.insertBefore(_explorer, recycle);
 
     DivElement explorerHead = new DivElement()

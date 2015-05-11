@@ -30,7 +30,7 @@ class CmdrCamera {
     var codec = new Utf8Codec();
     List<int> dataToSend = codec.encode(data);
     var addressesIListenFrom = InternetAddress.ANY_IP_V4;
-    int portIListenOn = 16123; //0 is random
+    int portIListenOn = 13060 + cameraNum; //0 is random
     RawDatagramSocket.bind(addressesIListenFrom, portIListenOn)
     .then((RawDatagramSocket udpSocket) {
       udpSocket.listen((RawSocketEvent event) {
@@ -71,7 +71,7 @@ class CmdrCamera {
   void _runFFMpeg() {
     // Only one camera per USB controller (check lsusb -> bus00x), or bump size down to 320x240 to avoid bus saturation.
     // ffmpeg -s 640x480 -f video4linux2 -input_format mjpeg -i /dev/video${cameraNum - 1} -f mpeg1video -b 800k -r 20 http://127.0.0.1:12060/video/$cameraNum/640/480
-    List<String> options = ['-s', '640x480', '-f', 'video4linux2', '-input_format', 'mjpeg', '-i', '/dev/video${cameraNum - 1}', '-f', 'mpeg1video', '-b', '800k', '-r', '20', 'udp://127.0.0.1:16123'];
+    List<String> options = ['-s', '640x480', '-f', 'video4linux2', '-input_format', 'mjpeg', '-i', '/dev/video${cameraNum - 1}', '-f', 'mpeg1video', '-b', '800k', '-r', '20', 'udp://127.0.0.1:1306${cameraNum}'];
     Process.start('ffmpeg', options).then((shell) {
       _shell = shell;
       //shell.stdout.listen((data) => help.debug('camera [$cameraNum] stdout: ${UTF8.decode(data)}', 0));

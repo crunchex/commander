@@ -21,6 +21,7 @@ class UpDroidExplorer extends ExplorerView {
 
   // Make dynamic
   int expNum;
+  String name;
 
   String workspacePath;
   DivElement currentSelected;
@@ -49,11 +50,12 @@ class UpDroidExplorer extends ExplorerView {
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 
-  UpDroidExplorer(StreamController<CommanderMessage> cs, num, name) {
+  UpDroidExplorer(StreamController<CommanderMessage> cs, num, folderName) {
+    this.name = folderName;
     this.expNum = num;;
     this.cs = cs;
 
-    createExplorer(num, name).then((d) {
+    createExplorer(num, folderName).then((d) {
       newFileDragSetup();
       newFolderDragSetup();
 

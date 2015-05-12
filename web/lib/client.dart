@@ -253,11 +253,21 @@ class UpDroidClient {
       void complete() {
         var newNum = 1;
         var nums = [];
+        var names = [];
         for (var explorer in _tabs[0]) {
           nums.add(explorer.expNum);
+          names.add(explorer.name);
         }
         while(nums.contains(newNum)){
           newNum ++;
+        }
+        if (names.contains(name)) {
+          var prefix = name;
+          num suffix = 1;
+          while (names.contains(name)) {
+            name = prefix + "_" + suffix.toString();
+            suffix ++;
+          }
         }
         _mailbox.ws.send('[[ADD_EXPLORER]]' + JSON.encode([newNum.toString(), name]));
         _openExplorer(newNum, name);
@@ -269,6 +279,7 @@ class UpDroidClient {
       var input = eles[0];
       var save = eles[1];
       save.onClick.listen((e){
+        input.focus();
         name = input.value;
         complete();
       });

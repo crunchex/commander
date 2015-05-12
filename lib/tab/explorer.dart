@@ -9,15 +9,19 @@ class CmdrExplorer {
   int _expNum;
   var _expPath;
 
-  //TODO: make asynchroneous
+  //TODO: make asynchroneous, watcher watches the wrong path
   CmdrExplorer(Directory dir, num) {
     this._workspace = new Workspace(dir.path);
     this._expPath = dir.path;
+    print("cmdr explorer path: " + _expPath);
     this._expNum = num;
+    print("cmdr explorer num: " +_expNum.toString());
 
     for (var item in dir.listSync()) {
       if(pathLib.basename(item.path) == 'src') {
         _dir = item;
+        var watchPath = dir.path + '/src';
+        print(watchPath);
         this._watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
       }
     }

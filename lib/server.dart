@@ -91,6 +91,8 @@ class CmdrServer {
         WebSocketTransformer
           .upgrade(request)
           .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
+        print(objectID);
+        print(_explorers[objectID]);
         break;
 
       case 'updroidcamera':
@@ -225,6 +227,7 @@ class CmdrServer {
 
   void _closeExplorerCmdr(int expNum) {
     var closeNum = expNum;
+    print("cmdr num closed: " + expNum.toString());
     var toRemove;
 
     for( var explorer in _explorers) {

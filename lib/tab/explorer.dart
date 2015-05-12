@@ -16,8 +16,10 @@ class CmdrExplorer {
     this._expNum = num;
 
     for (var item in dir.listSync()) {
-      if(pathLib.basename(item.path) == 'src') _dir = item;
-      this._watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
+      if(pathLib.basename(item.path) == 'src') {
+        _dir = item;
+        this._watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
+      }
     }
   }
 

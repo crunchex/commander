@@ -261,6 +261,7 @@ class UpDroidClient {
         while(nums.contains(newNum)){
           newNum ++;
         }
+
         if (names.contains(name)) {
           var prefix = name;
           num suffix = 1;
@@ -279,7 +280,6 @@ class UpDroidClient {
       var input = eles[0];
       var save = eles[1];
       save.onClick.listen((e){
-        input.focus();
         name = input.value;
         complete();
       });
@@ -291,6 +291,7 @@ class UpDroidClient {
           complete();
         }
       });
+
     });
 
     // TODO: need to find better way for client to track active explorer

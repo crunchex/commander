@@ -17,7 +17,8 @@ import 'server_helper.dart' as help;
 
 part 'commands.dart';
 part 'tab/pty.dart';
-part 'tab/camera.dart';
+part 'tab/camera/camera.dart';
+part 'tab/camera/camera_server.dart';
 part 'tab/editor.dart';
 part 'tab/explorer.dart';
 
@@ -31,6 +32,7 @@ class CmdrServer {
   List<CmdrEditor> _editors = [];
   List<CmdrPty> _ptys = [];
   List<CmdrCamera> _cameras = [];
+  List<CameraServer> _camServers = {};
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
@@ -246,7 +248,10 @@ class CmdrServer {
         _editors.add(new CmdrEditor(dir));
         break;
       case 'UpDroidCamera':
-        _cameras.add(new CmdrCamera(num));
+        if (_camServers[num] == null) {
+          _camServers[num] = new CameraServer(num);
+        }
+        _cameras.add(new CmdrCamera(num, _camServers[num]));
         break;
 
       case 'UpDroidConsole':
@@ -271,7 +276,9 @@ class CmdrServer {
         break;
 
       case 'UpDroidCamera':
-        _cameras[num - 1].cleanup();
+        // TODO: figure out what should happen here now with the camera server.
+        //_cameras[num - 1].cleanup();
+        print('cameras length: $num');
         _cameras.removeAt(num - 1);
         break;
 

@@ -234,6 +234,7 @@ class CmdrServer {
     }
     _explorers.remove(toRemove);
     Directory workspace = new Directory(toRemove._expPath);
+    workspace.delete(recursive: true);
     toRemove._killExplorer();
   }
 

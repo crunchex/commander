@@ -13,7 +13,7 @@ class UpDroidDeleteWorkspaceModal extends UpDroidModal {
 
   void _setupBody() {
     ParagraphElement p = new ParagraphElement()
-      ..text = "Workspace folder and all files will be deleted";
+      ..text = "Workspace folder and all files will be deleted.";
     _modalBody.children.add(p);
   }
 

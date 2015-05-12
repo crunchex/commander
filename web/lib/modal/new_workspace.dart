@@ -39,6 +39,7 @@ class UpDroidWorkspaceModal extends UpDroidModal {
     discard.text = "Cancel";
     ButtonElement save = _createButton('primary', 'Save');
     save.classes.add('modal-save');
+    save.text = "Create";
     _refs.add(save);
     _modalFooter.children.addAll([save, discard]);
   }

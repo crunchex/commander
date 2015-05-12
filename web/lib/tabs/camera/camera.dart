@@ -102,11 +102,7 @@ class UpDroidCamera extends TabController {
     List menu = [
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'Close Tab'}]},
-      {'title': 'Settings', 'items': [
-        {'type': 'toggle', 'title': 'Quality'},
-        {'type': 'toggle', 'title': 'Aspect Ratio'},
-        {'type': 'toggle', 'title': 'Resolution'},
-        {'type': 'toggle', 'title': 'CV Overlay'}]}
+      {'title': 'Settings', 'items': []},
     ];
     return menu;
   }

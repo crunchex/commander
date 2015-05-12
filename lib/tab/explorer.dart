@@ -9,7 +9,7 @@ class CmdrExplorer {
   int _expNum;
   var _expPath;
 
-  //TODO: make asynchroneous
+  //TODO: make asynchroneous, watcher watches the wrong path
   CmdrExplorer(Directory dir, num) {
     this._workspace = new Workspace(dir.path);
     this._expPath = dir.path;

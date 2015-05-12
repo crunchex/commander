@@ -280,14 +280,24 @@ class UpDroidClient {
       var input = eles[0];
       var save = eles[1];
       save.onClick.listen((e){
-        name = input.value;
+        if(input.value == "") {
+          name = "untitled";
+        }
+        else {
+          name = input.value;
+        }
         complete();
       });
 
       input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
-          name = input.value;
+          if(input.value == "") {
+            name = "untitled";
+          }
+          else {
+            name = input.value;
+          }
           complete();
         }
       });

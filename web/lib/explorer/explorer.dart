@@ -47,6 +47,8 @@ class UpDroidExplorer extends ExplorerView {
   Map ulInfo = {};
   Map runParams = {};
 
+  List recycleListeners = [];
+
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 
@@ -295,10 +297,11 @@ class UpDroidExplorer extends ExplorerView {
     });
 
     // TODO: cancel when inactive
-    dzRecycle.onDragEnter.listen((e) => _recycle.classes.add('recycle-entered'));
-    dzRecycle.onDragLeave.listen((e) => _recycle.classes.remove('recycle-entered'));
 
-    dzRecycle.onDrop.listen((e) {
+    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _recycle.classes.add('recycle-entered'));
+    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _recycle.classes.remove('recycle-entered'));
+
+    var recycleDrop = dzRecycle.onDrop.listen((e) {
       if (!_explorer.classes.contains('hidden')) {
         var path = getPath(e.draggableElement);
 
@@ -315,6 +318,7 @@ class UpDroidExplorer extends ExplorerView {
         ws.send('[[EXPLORER_DELETE]]' + path);
       }
     });
+    recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
   }
 
   bool isActive() => !_explorer.classes.contains('hidden');
@@ -807,6 +811,12 @@ class UpDroidExplorer extends ExplorerView {
     if (li != null) li.remove();
 
     removeFileData(li, path);
+  }
+
+  void removeRecycleListeners() {
+    for (var listener in recycleListeners) {
+      listener.cancel();
+    }
   }
 
   /// Sets up a new HTML element from a SimpleFile.

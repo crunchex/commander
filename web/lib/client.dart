@@ -329,6 +329,10 @@ class UpDroidClient {
                 }
               }
               _tabs[0].remove(toRemove);
+              toRemove.removeRecycleListeners();
+              // Destroy UpDroid Explorer
+              _destroyExplorer(toRemove);
+              print(toRemove);
             }
           }
         }
@@ -391,5 +395,9 @@ class UpDroidClient {
     _uploadButton.onClick.listen((e) {
       new UpDroidGitPassModal(_cs);
     });
+  }
+
+  void _destroyExplorer(UpDroidExplorer explorer) {
+    explorer = null;
   }
 }

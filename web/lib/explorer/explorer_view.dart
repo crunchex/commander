@@ -90,8 +90,6 @@ abstract class ExplorerView {
     item.append(link);
     _expList.insertBefore(item, separator);
     item.onClick.listen((e){
-      print("List num: " + num.toString());
-      print("list name: " + name);
       if(_explorersDiv.classes.contains('hidden')) {
         _explorersDiv.classes.remove('hidden');
         _controlPanel.classes.add('hidden');

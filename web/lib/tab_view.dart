@@ -27,12 +27,11 @@ class TabView {
   LIElement extra;
 
   LIElement _tabHandle;
+  UListElement _menus;
   DivElement _tabContainer,_tabContent;
-  List _config;
+  List config;
 
-  TabView(this.num, this.col, this.title, this.shortName, this.active, config) {
-    _config = config;
-
+  TabView(this.num, this.col, this.title, this.shortName, this.active, this.config) {
     refMap = {};
 
     _setUpTabHandle();
@@ -57,6 +56,12 @@ class TabView {
   void destroy() {
     _tabHandle.remove();
     _tabContainer.remove();
+  }
+
+  refreshMenus() {
+    for (Map configItem in config) {
+      _menus.children.add(_createDropdownMenu(configItem));
+    }
   }
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
@@ -93,21 +98,22 @@ class TabView {
         ..classes.add('tab-pane');
     if (active) _tabContainer.classes.add('active');
 
-    UListElement tabList = new UListElement()
+    _menus = new UListElement()
         ..classes.add('nav')
         ..classes.add('nav-tabs')
         ..classes.add('inner-tabs')
         ..attributes['role'] = 'tablist';
-    _tabContainer.children.add(tabList);
+    _tabContainer.children.add(_menus);
 
-    for (Map configItem in _config) {
-      tabList.children.add(_createDropdownMenu(configItem));
+    //refreshMenus();
+    for (Map configItem in config) {
+      _menus.children.add(_createDropdownMenu(configItem));
     }
 
     extra = new LIElement();
     extra.id = 'extra-$num';
     extra.classes.add('extra-menubar');
-    tabList.children.add(extra);
+    _menus.children.add(extra);
 
     _tabContent = new DivElement()
         ..classes.add('tab-content');

@@ -18,7 +18,7 @@ class CmdrCamera {
   /// Route websocket connections to messages (cmdr) and video data (input).
   void handleWebSocket(WebSocket ws, HttpRequest request) {
     if (request.uri.pathSegments.length == 2) {
-      ws.add('[[CAMERA_READY]]');
+      ws.add('[[CAMERA_READY]]' + _getNumDevices().toString());
     } else {
       // request.uri is updroidcamera/id/input
       ws.add(server.streamHeader);
@@ -33,5 +33,11 @@ class CmdrCamera {
     request.listen((data) {
       server.transStream.add(data);
     });
+  }
+
+  int _getNumDevices() {
+    Directory dev = new Directory('/dev');
+    ProcessResult result = Process.runSync('bash', ['-c', 'find /dev -name "video*" | wc -l']);
+    return int.parse(result.stdout);
   }
 }

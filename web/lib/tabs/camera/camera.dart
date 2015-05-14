@@ -16,11 +16,13 @@ class UpDroidCamera extends TabController {
   // Only use where space is constrained, otherwise use className.
   static const String shortName = 'Camera';
 
-  CanvasElement _canvas;
+  List<String> _devices;
 
+  CanvasElement _canvas;
   AnchorElement _closeTabButton;
 
   UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
+    _devices = 0;
     TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
       view = tabView;
       setUpController();
@@ -66,9 +68,15 @@ class UpDroidCamera extends TabController {
     context.fillText('Loading...', _canvas.width/2-30, _canvas.height/3);
   }
 
-  //\/\/ Mailbox Handlers /\/\//
+  void _setDevices(String devices) {
+    int numDevices = int.parse(devices);
+    for (int i = 0; i < numDevices; i++) {
+      view.config.last['items'].add('Video$i');
+      view.refreshMenus();
+    }
+  }
 
-  void _startPlayer(UpDroidMessage um) {
+  void _startPlayer() {
     String url = window.location.host;
     url = url.split(':')[0];
     js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/${className.toLowerCase()}/$id/input']);
@@ -78,8 +86,15 @@ class UpDroidCamera extends TabController {
     new js.JsObject(js.context['jsmpeg'], [client, options]);
   }
 
+  //\/\/ Mailbox Handlers /\/\//
+
+  void _postReadySetup(UpDroidMessage um) {
+    _setDevices(um.body);
+    _startPlayer();
+  }
+
   void _registerMailbox() {
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CAMERA_READY', _startPlayer);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CAMERA_READY', _postReadySetup);
   }
 
   void _registerEventHandlers() {
@@ -103,6 +118,7 @@ class UpDroidCamera extends TabController {
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'Close Tab'}]},
       {'title': 'Settings', 'items': []},
+      {'title': 'Device', 'items:': []}
     ];
     return menu;
   }

@@ -332,9 +332,11 @@ class UpDroidClient {
                 }
               }
               _tabs[0].remove(toRemove);
-              toRemove.removeRecycleListeners();
+              toRemove.destroyRecycleListeners();
+              toRemove.destroyEditorListeners();
               // Destroy UpDroid Explorer
               _destroyExplorer(toRemove);
+              print(toRemove);
               print("UpDroid Explorer Removed Num: " + toRemove.expNum.toString());
               print("UpDroid Explorer Removed name: " + toRemove.name);
             }

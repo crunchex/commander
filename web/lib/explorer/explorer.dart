@@ -89,9 +89,11 @@ class UpDroidExplorer extends ExplorerView {
         var dropDiv = m.body[1];
 
         var dzEditor = new Dropzone(dropDiv);
-        editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
-        editors.putIfAbsent(dzEditor, () => num);
-        cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
+        if (editorListeners != null) {
+          editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
+          editors.putIfAbsent(dzEditor, () => num);
+          cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
+        }
         break;
 
       case 'REQUEST_PARENT_PATH':
@@ -537,6 +539,17 @@ class UpDroidExplorer extends ExplorerView {
     }
   }
 
+  void cancelEditorListeners(List streams) {
+    for (var stream in streams) {
+      stream.cancel();
+    }
+  }
+
+  void destroyEditorListeners() {
+    editorListeners.forEach((k,v) => cancelEditorListeners(v));
+    editorListeners = null;
+  }
+
   void setupHighlighter(DivElement div) {
     div.onClick.listen((e) {
       // This case only covers the first click
@@ -813,7 +826,7 @@ class UpDroidExplorer extends ExplorerView {
     removeFileData(li, path);
   }
 
-  void removeRecycleListeners() {
+  void destroyRecycleListeners() {
     for (var listener in recycleListeners) {
       listener.cancel();
     }

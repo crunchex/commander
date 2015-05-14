@@ -59,6 +59,7 @@ class TabView {
   }
 
   refreshMenus() {
+    _menus.children = new List<Element>();
     for (Map configItem in config) {
       _menus.children.add(_createDropdownMenu(configItem));
     }
@@ -105,10 +106,7 @@ class TabView {
         ..attributes['role'] = 'tablist';
     _tabContainer.children.add(_menus);
 
-    //refreshMenus();
-    for (Map configItem in config) {
-      _menus.children.add(_createDropdownMenu(configItem));
-    }
+    refreshMenus();
 
     extra = new LIElement();
     extra.id = 'extra-$num';

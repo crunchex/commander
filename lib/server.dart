@@ -27,7 +27,7 @@ class CmdrServer {
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
-  List<CmdrExplorer> _explorers = [];
+  Map _explorers = {};
   List<CmdrEditor> _editors = [];
   List<CmdrPty> _ptys = [];
   List<CmdrCamera> _cameras = [];
@@ -90,7 +90,7 @@ class CmdrServer {
       case 'explorer':
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
+          .then((WebSocket ws) => _explorers[objectID + 1].handleWebSocket(ws));
         print(objectID);
         print(_explorers[objectID]);
         break;
@@ -164,8 +164,6 @@ class CmdrServer {
           _openTab(um.body, dir);
           break;
 
-
-        //TODO: Dynamic explorers
         case 'ADD_EXPLORER':
           _newExplorerCmdr(JSON.decode(um.body), dir);
           break;
@@ -204,7 +202,7 @@ class CmdrServer {
         }
         if (workspace == true) {
           names.add(pathLib.basename(folder.path));
-          _explorers.add(new CmdrExplorer(folder, num));
+          _explorers[num] = new CmdrExplorer(folder, num);
           num += 1;
         }
       }
@@ -221,7 +219,7 @@ class CmdrServer {
     Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
     source.createSync(recursive: true);
     Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: pathLib.normalize(newWorkspace.path + "/src"), runInShell: true);
-    _explorers.add(new CmdrExplorer(newWorkspace, expNum));
+    _explorers[expNum] = (new CmdrExplorer(newWorkspace, expNum));
 
   }
 
@@ -230,12 +228,8 @@ class CmdrServer {
     print("cmdr num closed: " + expNum.toString());
     var toRemove;
 
-    for( var explorer in _explorers) {
-      if(closeNum == explorer._expNum) {
-        toRemove = explorer;
-      }
-    }
-    _explorers.remove(toRemove);
+    toRemove = _explorers[expNum];
+    _explorers.remove(expNum);
     Directory workspace = new Directory(toRemove._expPath);
     workspace.delete(recursive: true);
     toRemove._killExplorer();

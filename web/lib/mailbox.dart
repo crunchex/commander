@@ -33,7 +33,7 @@ class Mailbox {
 
     // Call the function registered to m.type.
     _cs.stream.where((m) => m.dest == _name.toUpperCase()).listen((CommanderMessage m) {
-      //print('Commander Message received of type: ${m.type}');
+    // print('Commander Message received of type: ${m.type}');
       _csRegistry[m.type](m);
     });
   }

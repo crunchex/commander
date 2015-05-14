@@ -16,13 +16,10 @@ class UpDroidCamera extends TabController {
   // Only use where space is constrained, otherwise use className.
   static const String shortName = 'Camera';
 
-  List<String> _devices;
-
   CanvasElement _canvas;
   AnchorElement _closeTabButton;
 
   UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
-    _devices = 0;
     TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
       view = tabView;
       setUpController();
@@ -71,7 +68,7 @@ class UpDroidCamera extends TabController {
   void _setDevices(String devices) {
     int numDevices = int.parse(devices);
     for (int i = 0; i < numDevices; i++) {
-      view.config.last['items'].add('Video$i');
+      view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i'});
       view.refreshMenus();
     }
   }
@@ -117,8 +114,7 @@ class UpDroidCamera extends TabController {
     List menu = [
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'Close Tab'}]},
-      {'title': 'Settings', 'items': []},
-      {'title': 'Device', 'items:': []}
+      {'title': 'Devices', 'items': []}
     ];
     return menu;
   }

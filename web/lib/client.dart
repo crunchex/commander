@@ -272,8 +272,6 @@ class UpDroidClient {
         }
         _mailbox.ws.send('[[ADD_EXPLORER]]' + JSON.encode([newNum.toString(), name]));
         _openExplorer(newNum, name);
-        print("UpDroid explorer num: " + newNum.toString());
-        print("UpDroid explorer name: " + name);
         _cs.add(new CommanderMessage('UPDROIDEDITOR', 'RESEND_DROP'));
       }
 
@@ -319,7 +317,6 @@ class UpDroidClient {
           if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
             if(!explorer.classes.contains('hidden')) {
               activeNum = explorer.dataset['num'];
-              print("Active Num: " + activeNum);
               // remove dom element
               explorer.remove();
               // remove corresponding list item
@@ -336,9 +333,6 @@ class UpDroidClient {
               toRemove.destroyEditorListeners();
               // Destroy UpDroid Explorer
               _destroyExplorer(toRemove);
-              print(toRemove);
-              print("UpDroid Explorer Removed Num: " + toRemove.expNum.toString());
-              print("UpDroid Explorer Removed name: " + toRemove.name);
             }
           }
         }

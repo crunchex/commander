@@ -223,7 +223,6 @@ class CmdrServer {
 
   void _closeExplorerCmdr(int expNum) {
     var closeNum = expNum;
-    print("cmdr num closed: " + expNum.toString());
     var toRemove;
 
     toRemove = _explorers[expNum];

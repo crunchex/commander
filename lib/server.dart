@@ -282,7 +282,7 @@ class CmdrServer {
   }
 
   void _cleanUpBackend() {
-    _explorers = [];
+    _explorers = {};
     _editors = [];
     _ptys = [];
     _cameras = [];

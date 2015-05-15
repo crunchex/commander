@@ -17,7 +17,8 @@ import 'server_helper.dart' as help;
 
 part 'commands.dart';
 part 'tab/pty.dart';
-part 'tab/camera.dart';
+part 'tab/camera/camera.dart';
+part 'tab/camera/camera_server.dart';
 part 'tab/editor.dart';
 part 'tab/explorer.dart';
 
@@ -31,6 +32,7 @@ class CmdrServer {
   List<CmdrEditor> _editors = [];
   List<CmdrPty> _ptys = [];
   List<CmdrCamera> _cameras = [];
+  Map<int, CameraServer> _camServers = {};
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
@@ -114,12 +116,6 @@ class CmdrServer {
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
     help.debug("${request.method} request for: ${request.uri.path}", 0);
-
-    if (request.uri.pathSegments.length != 0 && request.uri.pathSegments[0] == 'video') {
-      int objectID = int.parse(request.uri.pathSegments[1]) - 1;
-      _cameras[objectID].handleVideoFeed(request);
-      return;
-    }
 
     if (virDir != null) {
       virDir.serveRequest(request);
@@ -245,7 +241,7 @@ class CmdrServer {
         _editors.add(new CmdrEditor(dir));
         break;
       case 'UpDroidCamera':
-        _cameras.add(new CmdrCamera(num));
+        _cameras.add(new CmdrCamera(num, _camServers));
         break;
 
       case 'UpDroidConsole':
@@ -270,7 +266,9 @@ class CmdrServer {
         break;
 
       case 'UpDroidCamera':
-        _cameras[num - 1].cleanup();
+        // TODO: figure out what should happen here now with the camera server.
+        //_cameras[num - 1].cleanup();
+        print('cameras length: $num');
         _cameras.removeAt(num - 1);
         break;
 
@@ -286,5 +284,6 @@ class CmdrServer {
     _editors = [];
     _ptys = [];
     _cameras = [];
+    _camServers = {};
   }
 }

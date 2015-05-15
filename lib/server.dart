@@ -32,7 +32,7 @@ class CmdrServer {
   List<CmdrEditor> _editors = [];
   List<CmdrPty> _ptys = [];
   List<CmdrCamera> _cameras = [];
-  List<CameraServer> _camServers = {};
+  Map<int, CameraServer> _camServers = {};
 
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
@@ -116,12 +116,6 @@ class CmdrServer {
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
     help.debug("${request.method} request for: ${request.uri.path}", 0);
-
-    if (request.uri.pathSegments.length != 0 && request.uri.pathSegments[0] == 'video') {
-      int objectID = int.parse(request.uri.pathSegments[1]) - 1;
-      _cameras[objectID].handleVideoFeed(request);
-      return;
-    }
 
     if (virDir != null) {
       virDir.serveRequest(request);
@@ -248,10 +242,7 @@ class CmdrServer {
         _editors.add(new CmdrEditor(dir));
         break;
       case 'UpDroidCamera':
-        if (_camServers[num] == null) {
-          _camServers[num] = new CameraServer(num);
-        }
-        _cameras.add(new CmdrCamera(num, _camServers[num]));
+        _cameras.add(new CmdrCamera(num, _camServers));
         break;
 
       case 'UpDroidConsole':
@@ -294,5 +285,6 @@ class CmdrServer {
     _editors = [];
     _ptys = [];
     _cameras = [];
+    _camServers = {};
   }
 }

@@ -2,6 +2,7 @@ library updroid_camera;
 
 import 'dart:html';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:js' as js;
 
 import '../../mailbox.dart';
@@ -42,7 +43,8 @@ class UpDroidCamera extends TabController {
   }
 
   void setDimensions() {
-    var con = querySelector('#col-$id-tab-content');
+    // TODO: fix this fixed query selector.
+    var con = querySelector('#col-1-tab-content');
     var width = (con.contentEdge.width - 13);
     var height = (con.contentEdge.height - 13);
 
@@ -51,9 +53,10 @@ class UpDroidCamera extends TabController {
   }
 
   void resizeCanvas() {
-    var con = querySelector('#col-$id-tab-content'),
-    width = (con.contentEdge.width - 13),
-    height = (con.contentEdge.height - 13);
+    // TODO: fix this fixed query selector.
+    var con = querySelector('#col-1-tab-content');
+    var width = (con.contentEdge.width - 13);
+    var height = (con.contentEdge.height - 13);
 
     width <= 640 ? _canvas.width = width : _canvas.width = 640;
     height <= 480 ? _canvas.height = height : _canvas.height = 482;
@@ -66,28 +69,34 @@ class UpDroidCamera extends TabController {
   }
 
   void _setDevices(String devices) {
-    int numDevices = int.parse(devices);
-    for (int i = 0; i < numDevices; i++) {
-      view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i'});
-      view.refreshMenus();
-    }
+    List<int> deviceIds = JSON.decode(devices);
+    deviceIds.forEach((int i) {
+      view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': [i]});
+    });
+    view.refreshMenus();
   }
 
-  void _startPlayer() {
+  void _startPlayer(List args) {
+    String deviceId = '${args[0]}';
     String url = window.location.host;
     url = url.split(':')[0];
-    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/${className.toLowerCase()}/$id/input']);
+    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/${className.toLowerCase()}/$id/input/$deviceId']);
 
     var options = new js.JsObject.jsify({'canvas': _canvas});
 
     new js.JsObject(js.context['jsmpeg'], [client, options]);
   }
 
+  void _closeTab() {
+    view.destroy();
+    cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
+  }
+
   //\/\/ Mailbox Handlers /\/\//
 
   void _postReadySetup(UpDroidMessage um) {
     _setDevices(um.body);
-    _startPlayer();
+    //_startPlayer();
   }
 
   void _registerMailbox() {
@@ -103,17 +112,12 @@ class UpDroidCamera extends TabController {
       e.preventDefault();
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_UpDroidCamera'));
     });
-
-    _closeTabButton.onClick.listen((e) {
-      view.destroy();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
-    });
   }
 
   List _getMenuConfig() {
     List menu = [
       {'title': 'File', 'items': [
-        {'type': 'toggle', 'title': 'Close Tab'}]},
+        {'type': 'toggle', 'title': 'Close Tab', 'handler': _closeTab}]},
       {'title': 'Devices', 'items': []}
     ];
     return menu;

@@ -150,7 +150,15 @@ class TabView {
     LIElement item;
     for (Map i in items) {
       if (i['type'] == 'toggle') {
-        item = _createToggleItem(i['title']);
+        if (i.containsKey('handler')) {
+          if (i.containsKey('args')) {
+            item = _createToggleItem(i['title'], i['handler'], i['args']);
+          } else {
+            item = _createToggleItem(i['title'], i['handler']);
+          }
+        } else {
+          item = _createToggleItem(i['title']);
+        }
       } else if (i['type'] == 'input') {
         item = _createInputItem(i['title']);
       }
@@ -185,7 +193,7 @@ class TabView {
   }
 
   /// Generates a toggle item (button) and returns the new [LIElement].
-  LIElement _createToggleItem(String title) {
+  LIElement _createToggleItem(String title, [onClick, args]) {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     LIElement buttonList = new LIElement();
@@ -194,6 +202,15 @@ class TabView {
         ..href = '#'
         ..attributes['role'] = 'button'
         ..text = title;
+    if (onClick != null) {
+      button.onClick.listen((e) {
+        if (args != null) {
+          onClick(args);
+        } else {
+          onClick();
+        }
+      });
+    }
     buttonList.children.add(button);
     refMap[id] = button;
 

@@ -1,5 +1,27 @@
 # Change Log
 
+## 0.4.5 - 2015-5-15
+
+### Important
+
+	- Raspberry Pi support is still very early, so please take consider the inherent limitations of the hardware and things that still need to be optimized.
+
+### New
+
+	- Initial Raspberry Pi support (experimental!).
+	- Naming a workspace when a new one is added (via the Control dropdown button).
+	- Camera Tab now includes a Devices menu to select the video input source.
+
+### Changed
+
+	- Replaced the Close Workspace button with a Delete Workspace button.
+	- Settings menu (with placeholder menu items) is gone from the Camera tab. But will reappear again in the future as fully functional.
+
+### Fixed
+
+	- Fixed some freezing issues with live video streaming in the Camera Tab on the desktop version.
+	- Fixed a bug with Explorer picking up filesystem changes to closed workspaces.
+
 ## 0.4.4 - 2015-5-9
 
 ### Important

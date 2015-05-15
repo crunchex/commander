@@ -22,6 +22,7 @@ class UpDroidExplorer extends ExplorerView {
   // Make dynamic
   int expNum;
   String name;
+  bool closed;
 
   String workspacePath;
   DivElement currentSelected;
@@ -56,6 +57,7 @@ class UpDroidExplorer extends ExplorerView {
     this.name = folderName;
     this.expNum = num;;
     this.cs = cs;
+    this.closed = false;
 
     createExplorer(num, folderName).then((d) {
       newFileDragSetup();
@@ -323,7 +325,17 @@ class UpDroidExplorer extends ExplorerView {
     recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
   }
 
-  bool isActive() => !_explorer.classes.contains('hidden');
+  bool isActive() {
+    bool active;
+    if (closed == true) active = false;
+    else {
+      if (!_explorer.classes.contains('hidden')) active = true;
+      else {
+        active = false;
+      }
+    }
+    return active;
+  }
 
   /// Returns a list of file objects from the flattened string returned from
   /// the server.

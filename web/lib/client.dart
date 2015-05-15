@@ -398,6 +398,7 @@ class UpDroidClient {
   }
 
   void _destroyExplorer(UpDroidExplorer explorer) {
+    explorer.closed = true;
     explorer = null;
   }
 }

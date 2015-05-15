@@ -139,11 +139,11 @@ class UpDroidEditor extends TabController {
     _handleNewText(newPath, newText);
   }
 
-  void _editorRenameHandler(UpDroidMessage um) {
+  void _editorRenameHandler(CommanderMessage m) {
     if (_openFilePath != null) {
-      if (_openFilePath == um.body[0]) {
-        _openFilePath = um.body[1];
-        view.extra.text = pathLib.basename(um.body[1]);
+      if (_openFilePath == m.body[0]) {
+        _openFilePath = m.body[1];
+        view.extra.text = pathLib.basename(m.body[1]);
       }
     }
   }

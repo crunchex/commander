@@ -6,18 +6,21 @@ class CmdrExplorer {
   Directory _dir;
   DirectoryWatcher _watcher;
   Workspace _workspace;
-  int expNum;
-  var expPath;
+  int _expNum;
+  var _expPath;
 
-  //TODO: make asynchroneous
+  //TODO: make asynchroneous, watcher watches the wrong path
   CmdrExplorer(Directory dir, num) {
-    _workspace = new Workspace(dir.path);
-    this.expPath = dir.path;
-    this.expNum = num;
+    this._workspace = new Workspace(dir.path);
+    this._expPath = dir.path;
+    this._expNum = num;
 
     for (var item in dir.listSync()) {
-      if(pathLib.basename(item.path) == 'src') _dir = item;
-      _watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
+      if(pathLib.basename(item.path) == 'src') {
+        _dir = item;
+        var watchPath = dir.path + '/src';
+        this._watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
+      }
     }
   }
 
@@ -94,6 +97,13 @@ class CmdrExplorer {
 
     });
     _watcher.events.listen((e) => help.formattedFsUpdate(ws, e));
+  }
+
+  void _killExplorer() {
+    this._workspace = null;
+    this._expPath = null;
+    this._expNum = null;
+    this._watcher = null;
   }
 
   void _sendInitial(WebSocket s) {

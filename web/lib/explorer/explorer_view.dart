@@ -34,7 +34,8 @@ abstract class ExplorerView {
     _explorer = new DivElement()
       ..id = "exp-$num"
       ..classes.add('exp')
-      ..dataset['num'] = num.toString();
+      ..dataset['num'] = num.toString()
+      ..dataset['name'] = name;
     _explorersDiv.insertBefore(_explorer, recycle);
 
     DivElement explorerHead = new DivElement()
@@ -89,6 +90,8 @@ abstract class ExplorerView {
     item.append(link);
     _expList.insertBefore(item, separator);
     item.onClick.listen((e){
+      print("List num: " + num.toString());
+      print("list name: " + name);
       if(_explorersDiv.classes.contains('hidden')) {
         _explorersDiv.classes.remove('hidden');
         _controlPanel.classes.add('hidden');

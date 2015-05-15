@@ -21,6 +21,7 @@ class UpDroidExplorer extends ExplorerView {
 
   // Make dynamic
   int expNum;
+  String name;
 
   String workspacePath;
   DivElement currentSelected;
@@ -46,14 +47,17 @@ class UpDroidExplorer extends ExplorerView {
   Map ulInfo = {};
   Map runParams = {};
 
+  List recycleListeners = [];
+
   WebSocket ws;
   StreamController<CommanderMessage> cs;
 
-  UpDroidExplorer(StreamController<CommanderMessage> cs, num, name) {
+  UpDroidExplorer(StreamController<CommanderMessage> cs, num, folderName) {
+    this.name = folderName;
     this.expNum = num;;
     this.cs = cs;
 
-    createExplorer(num, name).then((d) {
+    createExplorer(num, folderName).then((d) {
       newFileDragSetup();
       newFolderDragSetup();
 
@@ -85,9 +89,11 @@ class UpDroidExplorer extends ExplorerView {
         var dropDiv = m.body[1];
 
         var dzEditor = new Dropzone(dropDiv);
-        editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
-        editors.putIfAbsent(dzEditor, () => num);
-        cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
+        if (editorListeners != null) {
+          editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
+          editors.putIfAbsent(dzEditor, () => num);
+          cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
+        }
         break;
 
       case 'REQUEST_PARENT_PATH':
@@ -293,10 +299,11 @@ class UpDroidExplorer extends ExplorerView {
     });
 
     // TODO: cancel when inactive
-    dzRecycle.onDragEnter.listen((e) => _recycle.classes.add('recycle-entered'));
-    dzRecycle.onDragLeave.listen((e) => _recycle.classes.remove('recycle-entered'));
 
-    dzRecycle.onDrop.listen((e) {
+    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _recycle.classes.add('recycle-entered'));
+    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _recycle.classes.remove('recycle-entered'));
+
+    var recycleDrop = dzRecycle.onDrop.listen((e) {
       if (!_explorer.classes.contains('hidden')) {
         var path = getPath(e.draggableElement);
 
@@ -313,6 +320,7 @@ class UpDroidExplorer extends ExplorerView {
         ws.send('[[EXPLORER_DELETE]]' + path);
       }
     });
+    recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
   }
 
   bool isActive() => !_explorer.classes.contains('hidden');
@@ -529,6 +537,17 @@ class UpDroidExplorer extends ExplorerView {
         }
       });
     }
+  }
+
+  void cancelEditorListeners(List streams) {
+    for (var stream in streams) {
+      stream.cancel();
+    }
+  }
+
+  void destroyEditorListeners() {
+    editorListeners.forEach((k,v) => cancelEditorListeners(v));
+    editorListeners = null;
   }
 
   void setupHighlighter(DivElement div) {
@@ -805,6 +824,12 @@ class UpDroidExplorer extends ExplorerView {
     if (li != null) li.remove();
 
     removeFileData(li, path);
+  }
+
+  void destroyRecycleListeners() {
+    for (var listener in recycleListeners) {
+      listener.cancel();
+    }
   }
 
   /// Sets up a new HTML element from a SimpleFile.

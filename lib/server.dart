@@ -28,7 +28,7 @@ class CmdrServer {
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
-  List<CmdrExplorer> _explorers = [];
+  Map _explorers = {};
   List<CmdrEditor> _editors = [];
   List<CmdrPty> _ptys = [];
   List<CmdrCamera> _cameras = [];
@@ -92,7 +92,7 @@ class CmdrServer {
       case 'explorer':
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
+          .then((WebSocket ws) => _explorers[objectID + 1].handleWebSocket(ws));
         break;
 
       case 'updroidcamera':
@@ -158,10 +158,8 @@ class CmdrServer {
           _openTab(um.body, dir);
           break;
 
-
-        //TODO: Dynamic explorers
         case 'ADD_EXPLORER':
-          _newExplorerCmdr(int.parse(um.body), dir);
+          _newExplorerCmdr(JSON.decode(um.body), dir);
           break;
 
         case 'CLOSE_EXPLORER':
@@ -184,7 +182,7 @@ class CmdrServer {
       var names = [];
       bool workspace;
       for(FileSystemEntity item in folderList) {
-        if(item.runtimeType.toString() == "_Directory"){
+        if(item.runtimeType.toString() == "_Directory") {
           result.add(item);
         }
       }
@@ -198,7 +196,7 @@ class CmdrServer {
         }
         if (workspace == true) {
           names.add(pathLib.basename(folder.path));
-          _explorers.add(new CmdrExplorer(folder, num));
+          _explorers[num] = new CmdrExplorer(folder, num);
           num += 1;
         }
       }
@@ -208,12 +206,14 @@ class CmdrServer {
     return completer.future;
   }
 
-  void _newExplorerCmdr(int expNum, Directory dir) {
-    Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + "ws_$expNum"));
+  void _newExplorerCmdr(List explorerInfo, Directory dir) {
+    int expNum = int.parse(explorerInfo[0]);
+    String name = explorerInfo[1];
+    Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + name));
     Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
     source.createSync(recursive: true);
     Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: pathLib.normalize(newWorkspace.path + "/src"), runInShell: true);
-    _explorers.add(new CmdrExplorer(newWorkspace, expNum));
+    _explorers[expNum] = (new CmdrExplorer(newWorkspace, expNum));
 
   }
 
@@ -221,12 +221,11 @@ class CmdrServer {
     var closeNum = expNum;
     var toRemove;
 
-    for( var explorer in _explorers) {
-      if(closeNum == explorer.expNum) {
-        toRemove = explorer;
-      }
-    }
-    _explorers.remove(toRemove);
+    toRemove = _explorers[expNum];
+    _explorers.remove(expNum);
+    Directory workspace = new Directory(toRemove._expPath);
+    workspace.delete(recursive: true);
+    toRemove._killExplorer();
   }
 
   void _openTab(String id, Directory dir) {

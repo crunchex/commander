@@ -14,6 +14,8 @@ part 'open_tab.dart';
 part 'build_results.dart';
 part 'run_node.dart';
 part 'git_pass.dart';
+part 'new_workspace.dart';
+part 'delete_workspace.dart';
 
 /// [UpDroidModal] contains methods to generate [Element]s that make up
 /// a modal in the UpDroid Commander GUI.

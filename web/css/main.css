@@ -782,6 +782,13 @@ code, kbd, pre, samp {
   padding: 5px;
 }
 
+/* workspace modal */
+
+#workspace-input *{
+  margin-left: 20px;
+  display: inline-block;;
+}
+
 #column-0 > div {
   background-color: #eaecec;
 }

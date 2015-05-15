@@ -20,7 +20,7 @@ class UpDroidClient {
   String _config;
 
   AnchorElement _addWorkspace;
-  AnchorElement _closeWorkspace;
+  AnchorElement _deleteWorkspace;
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
   ButtonElement _cleanButton;
@@ -28,6 +28,9 @@ class UpDroidClient {
   ButtonElement _listButton;
   ButtonElement _runButton;
   ButtonElement _uploadButton;
+
+  StreamSubscription _workspaceNameClick;
+  StreamSubscription _workspaceNameEnter;
 
   Mailbox _mailbox;
   bool _runButtonEnabled;
@@ -39,7 +42,7 @@ class UpDroidClient {
     _tabs = [[], [], []];
 
     _addWorkspace = querySelector('#add-ws');
-    _closeWorkspace = querySelector('#close-ws');
+    _deleteWorkspace = querySelector('#delete-ws');
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
     _cleanButton = querySelector('#clean-button');
@@ -245,48 +248,105 @@ class UpDroidClient {
   void _registerEventHandlers(String config) {
 
     _addWorkspace.onClick.listen((e) {
-      var newNum = 1;
-      var nums = [];
-      for (var explorer in _tabs[0]) {
-        nums.add(explorer.expNum);
+      String name;
+
+      void complete() {
+        var newNum = 1;
+        var nums = [];
+        var names = [];
+        for (var explorer in _tabs[0]) {
+          nums.add(explorer.expNum);
+          names.add(explorer.name);
+        }
+        while(nums.contains(newNum)){
+          newNum ++;
+        }
+
+        if (names.contains(name)) {
+          var prefix = name;
+          num suffix = 1;
+          while (names.contains(name)) {
+            name = prefix + "_" + suffix.toString();
+            suffix ++;
+          }
+        }
+        _mailbox.ws.send('[[ADD_EXPLORER]]' + JSON.encode([newNum.toString(), name]));
+        _openExplorer(newNum, name);
+        _cs.add(new CommanderMessage('UPDROIDEDITOR', 'RESEND_DROP'));
       }
-      while(nums.contains(newNum)){
-        newNum ++;
-      }
-      _mailbox.ws.send('[[ADD_EXPLORER]]' + newNum.toString());
-      _openExplorer(newNum, 'ws_$newNum');
-      _cs.add(new CommanderMessage('UPDROIDEDITOR', 'RESEND_DROP'));
+
+      var workspaceModal = new UpDroidWorkspaceModal();
+      List eles = workspaceModal.passRefs();
+      var input = eles[0];
+      var save = eles[1];
+      save.onClick.listen((e){
+        if(input.value == "") {
+          name = "untitled";
+        }
+        else {
+          name = input.value;
+        }
+        complete();
+      });
+
+      input.onKeyUp.listen((e) {
+        var keyEvent = new KeyEvent.wrap(e);
+        if (keyEvent.keyCode == KeyCode.ENTER) {
+          if(input.value == "") {
+            name = "untitled";
+          }
+          else {
+            name = input.value;
+          }
+          complete();
+        }
+      });
+
     });
 
     // TODO: need to find better way for client to track active explorer
-    _closeWorkspace.onClick.listen((e) {
-      String activeNum;
-      var explorersDiv = querySelector('#exp-container');
-      for(var explorer in explorersDiv.children) {
-        if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
-          if(!explorer.classes.contains('hidden')) {
-            activeNum = explorer.dataset['num'];
-            // remove dom element
-            explorer.remove();
-            // remove corresponding list item
-            querySelector("#exp-li-$activeNum").remove();
-            // remove from list of updroid explorers
-            var toRemove;
-            for(var upExp in _tabs[0]) {
-              if (int.parse(activeNum) == upExp.expNum) {
-                toRemove = upExp;
+    _deleteWorkspace.onClick.listen((e) {
+      var modal = new UpDroidDeleteWorkspaceModal();
+      ButtonElement commit = modal.passRefs();
+
+      void complete() {
+        String activeNum;
+        String name;
+        var explorersDiv = querySelector('#exp-container');
+        for(var explorer in explorersDiv.children) {
+          if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
+            if(!explorer.classes.contains('hidden')) {
+              activeNum = explorer.dataset['num'];
+              // remove dom element
+              explorer.remove();
+              // remove corresponding list item
+              querySelector("#exp-li-$activeNum").remove();
+              // remove from list of updroid explorers
+              var toRemove;
+              for(var upExp in _tabs[0]) {
+                if (int.parse(activeNum) == upExp.expNum) {
+                  toRemove = upExp;
+                }
               }
+              _tabs[0].remove(toRemove);
+              toRemove.destroyRecycleListeners();
+              toRemove.destroyEditorListeners();
+              // Destroy UpDroid Explorer
+              _destroyExplorer(toRemove);
             }
-            _tabs[0].remove(toRemove);
           }
         }
+        // make first explorer visible
+        if (explorersDiv.children.length > 2) {
+          explorersDiv.children[0].classes.remove('hidden');
+        }
+        // Destroy cmdr explorer
+        _mailbox.ws.send('[[CLOSE_EXPLORER]]' + activeNum);
       }
-      // make first explorer visible
-      if (explorersDiv.children.length > 2) {
-        explorersDiv.children[0].classes.remove('hidden');
-      }
-      // Destroy cmdr explorer
-      _mailbox.ws.send('[[CLOSE_EXPLORER]]' + activeNum);
+
+      commit.onClick.listen((e) {
+        complete();
+      });
     });
 
     _newButtonLeft.onClick.listen((e) {
@@ -335,5 +395,9 @@ class UpDroidClient {
     _uploadButton.onClick.listen((e) {
       new UpDroidGitPassModal(_cs);
     });
+  }
+
+  void _destroyExplorer(UpDroidExplorer explorer) {
+    explorer = null;
   }
 }

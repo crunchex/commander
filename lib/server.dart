@@ -1,4 +1,4 @@
-library updroid_server;
+library cmdr;
 
 import 'dart:io';
 import 'dart:async';

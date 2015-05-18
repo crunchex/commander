@@ -1,4 +1,4 @@
-part of cmdr;
+part of cmdr_camera;
 
 class CameraServer {
   int videoId;

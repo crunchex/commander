@@ -1,4 +1,11 @@
-part of cmdr;
+library cmdr_explorer;
+
+import 'dart:io';
+import 'package:watcher/watcher.dart';
+import 'package:path/path.dart' as pathLib;
+
+import '../ros/ros.dart';
+import '../server_helper.dart' as help;
 
 class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';

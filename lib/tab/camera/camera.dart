@@ -1,4 +1,13 @@
-part of cmdr;
+library cmdr_camera;
+
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+
+import '../../server_helper.dart' as help;
+
+part 'camera_server.dart';
 
 class CmdrCamera {
   static const String guiName = 'UpDroidCamera';

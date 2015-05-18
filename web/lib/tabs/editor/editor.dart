@@ -39,6 +39,7 @@ class UpDroidEditor extends TabController {
   ButtonElement _modalDiscardButton;
   Element _warning;
   Element _overwriteCommit;
+  DivElement _explorersDiv;
   var _curModal;
   Dropzone linkedDropzone;
 
@@ -85,7 +86,7 @@ class UpDroidEditor extends TabController {
     _themeButton = view.refMap['invert'];
     _fontSizeInput = view.refMap['font-size'];
     _content = view.refMap['content'];
-
+    _explorersDiv = querySelector('#exp-container');
   }
 
   /// Sets up the editor and styles.
@@ -279,7 +280,8 @@ class UpDroidEditor extends TabController {
         // Determining the save path
         if (_openFilePath == null) {
           if(_currentParPath == null) {
-            saveAsPath = pathLib.normalize(pathLib.normalize(_absolutePathPrefix+ '/src') + "/${input.value}");
+            var activeFolderName = _checkActiveExplorer();
+            saveAsPath = pathLib.normalize(pathLib.normalize(_absolutePathPrefix + '/' + activeFolderName +'/src') + "/${input.value}");
           }
           else{
             saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
@@ -363,6 +365,19 @@ class UpDroidEditor extends TabController {
     // Set focus to the interactive area so the user can typing immediately.
     _aceEditor.focus();
     _aceEditor.scrollToLine(0);
+  }
+
+  /// parses through DOM to get the current active explorer
+  String _checkActiveExplorer() {
+    String activeName;
+    for (var explorer in _explorersDiv.children) {
+      if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
+        if (!explorer.classes.contains('hidden')) {
+          activeName = explorer.dataset['name'];
+        }
+      }
+    }
+    return activeName;
   }
 
   /// Sends the file path and contents to the server to be saved to disk.

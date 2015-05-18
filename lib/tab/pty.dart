@@ -1,4 +1,9 @@
-part of updroid_server;
+library cmdr_console;
+
+import 'dart:io';
+import 'dart:convert';
+
+import '../server_helper.dart' as help;
 
 class CmdrPty {
   static const String guiName = 'UpDroidConsole';

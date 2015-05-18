@@ -27,12 +27,11 @@ class TabView {
   LIElement extra;
 
   LIElement _tabHandle;
+  UListElement _menus;
   DivElement _tabContainer,_tabContent;
-  List _config;
+  List config;
 
-  TabView(this.num, this.col, this.title, this.shortName, this.active, config) {
-    _config = config;
-
+  TabView(this.num, this.col, this.title, this.shortName, this.active, this.config) {
     refMap = {};
 
     _setUpTabHandle();
@@ -57,6 +56,13 @@ class TabView {
   void destroy() {
     _tabHandle.remove();
     _tabContainer.remove();
+  }
+
+  refreshMenus() {
+    _menus.children = new List<Element>();
+    for (Map configItem in config) {
+      _menus.children.add(_createDropdownMenu(configItem));
+    }
   }
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
@@ -93,21 +99,19 @@ class TabView {
         ..classes.add('tab-pane');
     if (active) _tabContainer.classes.add('active');
 
-    UListElement tabList = new UListElement()
+    _menus = new UListElement()
         ..classes.add('nav')
         ..classes.add('nav-tabs')
         ..classes.add('inner-tabs')
         ..attributes['role'] = 'tablist';
-    _tabContainer.children.add(tabList);
+    _tabContainer.children.add(_menus);
 
-    for (Map configItem in _config) {
-      tabList.children.add(_createDropdownMenu(configItem));
-    }
+    refreshMenus();
 
     extra = new LIElement();
     extra.id = 'extra-$num';
     extra.classes.add('extra-menubar');
-    tabList.children.add(extra);
+    _menus.children.add(extra);
 
     _tabContent = new DivElement()
         ..classes.add('tab-content');
@@ -146,7 +150,15 @@ class TabView {
     LIElement item;
     for (Map i in items) {
       if (i['type'] == 'toggle') {
-        item = _createToggleItem(i['title']);
+        if (i.containsKey('handler')) {
+          if (i.containsKey('args')) {
+            item = _createToggleItem(i['title'], i['handler'], i['args']);
+          } else {
+            item = _createToggleItem(i['title'], i['handler']);
+          }
+        } else {
+          item = _createToggleItem(i['title']);
+        }
       } else if (i['type'] == 'input') {
         item = _createInputItem(i['title']);
       }
@@ -181,7 +193,7 @@ class TabView {
   }
 
   /// Generates a toggle item (button) and returns the new [LIElement].
-  LIElement _createToggleItem(String title) {
+  LIElement _createToggleItem(String title, [onClick, args]) {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     LIElement buttonList = new LIElement();
@@ -190,6 +202,15 @@ class TabView {
         ..href = '#'
         ..attributes['role'] = 'button'
         ..text = title;
+    if (onClick != null) {
+      button.onClick.listen((e) {
+        if (args != null) {
+          onClick(args);
+        } else {
+          onClick();
+        }
+      });
+    }
     buttonList.children.add(button);
     refMap[id] = button;
 

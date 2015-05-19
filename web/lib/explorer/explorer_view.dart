@@ -4,6 +4,7 @@ abstract class ExplorerView {
   Element separator = querySelector('#side-menu-separator');
 
   DivElement _explorersDiv;
+  DivElement _titleWrap;
   UListElement _expList;
   DivElement _controlPanel;
   LIElement _title;
@@ -21,6 +22,7 @@ abstract class ExplorerView {
 
     separator = querySelector('#side-menu-separator');
 
+    _titleWrap = querySelector('#title-wrapper');
     _explorersDiv = querySelector("#exp-container");
     _expList = querySelector("#side-menu ul");
     _controlPanel = querySelector('#control');

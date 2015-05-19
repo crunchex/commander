@@ -33,7 +33,7 @@ body {
 }
 
 html, body {
-  min-width: 1100px;
+  min-width: 1110px;
   width: auto !important;
   height: 100%;
   min-height: 650px;
@@ -487,15 +487,7 @@ li div input {
 }
 
 #control-toggle {
-  padding-top: 5px;
-  font-size: 14px;
   font-family: "Avenir Next LT Pro Demi";
-}
-
-
-/**TODO: this is a hack to make this sit evenly with the control toggle**/
-#exp-dropdown {
-  height: 25px;
 }
 
 .control-buttons button:hover {
@@ -801,7 +793,22 @@ code, kbd, pre, samp {
 }
 
 #side-menu button {
-  padding: 2px 5px;
+  padding: 5px 5px;
+  background-color: #eaecec;
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -ms-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+}
+
+#side-menu button:focus {
+  color: #333333;
+}
+
+#side-menu button:hover {
+  color: #ffffff;
+  background-color: #ff2919;
 }
 
 #side-menu {

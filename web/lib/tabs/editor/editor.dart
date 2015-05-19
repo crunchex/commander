@@ -92,17 +92,24 @@ class UpDroidEditor extends TabController {
   /// Sets up the editor and styles.
   void _setUpEditor() {
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
+    ace.BindKey ctrlS = new ace.BindKey(win: "Ctrl-S", mac: "Command-S");
+    ace.Command save = new ace.Command('save', ctrlS, sendSave);
 
     _aceEditor = ace.edit(view.content);
     _aceEditor
       ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
       ..fontSize = _fontSize
-      ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK);
+      ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
+      ..commands.addCommand(save);
 
     // Necessary to allow our styling (in main.css) to override Ace's.
     view.content.classes.add('updroid_editor');
 
     _resetSavePoint();
+  }
+
+  void sendSave(d) {
+    _saveButton.click();
   }
 
   //\/\/ Mailbox Handlers /\/\//

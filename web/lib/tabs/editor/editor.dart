@@ -212,7 +212,6 @@ class UpDroidEditor extends TabController {
     _closeTabButton.onClick.listen((e) {
       view.destroy();
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
-      cs.add(new CommanderMessage('EXPLORER', 'REMOVE_EDITOR', body: linkedDropzone));
     });
 
     _newButton.onClick.listen((e) {

@@ -134,14 +134,6 @@ class UpDroidExplorer extends ExplorerView {
         }
         break;
 
-      case 'REMOVE_EDITOR':
-        editors.remove(m.body);
-        for (var stream in editorListeners[m.body]) {
-          stream.cancel();
-        }
-        editorListeners.remove(m.body);
-        break;
-
       default:
         print('Explorer error: unrecognized message type: ' + m.type);
     }

@@ -220,10 +220,10 @@ class CmdrServer {
     var toRemove;
 
     toRemove = _explorers[expNum];
+    Directory workspace = new Directory(toRemove.expPath);
     _explorers.remove(expNum);
-    Directory workspace = new Directory(toRemove._expPath);
     workspace.delete(recursive: true);
-    toRemove._killExplorer();
+    toRemove.killExplorer();
   }
 
   void _openTab(String id, Directory dir) {

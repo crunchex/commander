@@ -247,7 +247,6 @@ li div input {
 }
 
 .explorer-head {
-  padding-top: 10px;
   clear: both;
   text-align: center;
 }
@@ -499,7 +498,7 @@ li div input {
 }
 
 #recycle {
-  margin-top: 5px;
+  margin-top: 15px;
   padding: 4px;
   text-align: center;
   vertical-align: middle;

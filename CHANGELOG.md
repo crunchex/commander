@@ -1,10 +1,27 @@
 # Change Log
 
+## 0.4.6 - 2015-5-21
+
+### New
+	
+	- Added Ctrl+S hotkey for saving in editor
+	- Added favicon
+
+### Changed
+
+	- Switching from Control to Explorer more clear
+	- Improved stability for multiple workspaces
+	- Minor UI tweaks
+
+### Fixed
+
+	- Fixed bug where saving a new file in editor without a selected path caused UpCom to crash
+
 ## 0.4.5 - 2015-5-15
 
 ### Important
 
-	- Raspberry Pi support is still very early, so please take consider the inherent limitations of the hardware and things that still need to be optimized.
+	- Raspberry Pi support is still very early, so please consider the inherent limitations of the hardware and things that still need to be optimized.
 
 ### New
 
@@ -23,10 +40,6 @@
 	- Fixed a bug with Explorer picking up filesystem changes to closed workspaces.
 
 ## 0.4.4 - 2015-5-9
-
-### Important
-### New
-### Changed
 
 ### Fixed
 

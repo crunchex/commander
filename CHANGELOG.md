@@ -9,7 +9,7 @@
 
 ### Changed
 
-	- Switching from Control to Explorer more clear
+	- Switching between Control and Explorer more clear
 	- Improved stability for multiple workspaces
 	- Minor UI tweaks
 

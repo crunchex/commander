@@ -29,6 +29,7 @@ class UpDroidExplorer extends ExplorerView {
   LIElement currentSelectedNode;
   String currentSelectedPath;
   InputElement nodeArgs;
+  ButtonElement _dropdown;
 
   DivElement editorDiv;
   LIElement fileName;
@@ -349,8 +350,14 @@ class UpDroidExplorer extends ExplorerView {
   void showControl() {
     if (_explorersDiv != null) _explorersDiv.classes.add('hidden');
     _controlPanel.classes.remove('hidden');
+    _controlToggle.classes.remove('shadow');
+    _dropdown.classes.remove('shadow');
+    _titleWrap.classes.add('shadow');
     controlLeave = _title.onClick.listen((e) {
       hideControl();
+      _controlToggle.classes.add('shadow');
+      _dropdown.classes.add('shadow');
+      _titleWrap.classes.remove('shadow');
       controlLeave.cancel();
     });
   }

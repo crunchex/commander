@@ -16,12 +16,14 @@ abstract class ExplorerView {
   SpanElement _file;
   DivElement _drop;
   UListElement _packageList;
+  ButtonElement _dropdown;
 
   Future createExplorer(int num, String name) {
     Completer completer = new Completer();
 
     separator = querySelector('#side-menu-separator');
 
+    _dropdown = querySelector('#exp-dropdown');
     _titleWrap = querySelector('#title-wrapper');
     _explorersDiv = querySelector("#exp-container");
     _expList = querySelector("#side-menu ul");
@@ -95,6 +97,9 @@ abstract class ExplorerView {
       if(_explorersDiv.classes.contains('hidden')) {
         _explorersDiv.classes.remove('hidden');
         _controlPanel.classes.add('hidden');
+        _controlToggle.classes.add('shadow');
+        _dropdown.classes.add('shadow');
+        _titleWrap.classes.remove('shadow');
       }
       for(var explorer in _explorersDiv.children) {
         if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {

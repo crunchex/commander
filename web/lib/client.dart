@@ -28,6 +28,7 @@ class UpDroidClient {
   ButtonElement _listButton;
   ButtonElement _runButton;
   ButtonElement _uploadButton;
+  DivElement _explorersDiv;
 
   StreamSubscription _workspaceNameClick;
   StreamSubscription _workspaceNameEnter;
@@ -41,6 +42,7 @@ class UpDroidClient {
 
     _tabs = [[], [], []];
 
+    _explorersDiv = querySelector('#exp-container');
     _addWorkspace = querySelector('#add-ws');
     _deleteWorkspace = querySelector('#delete-ws');
     _newButtonLeft = querySelector('#column-1-new');
@@ -273,6 +275,11 @@ class UpDroidClient {
         _mailbox.ws.send('[[ADD_EXPLORER]]' + JSON.encode([newNum.toString(), name]));
         _openExplorer(newNum, name);
         _cs.add(new CommanderMessage('UPDROIDEDITOR', 'RESEND_DROP'));
+        if(_explorersDiv.classes.contains('hidden')) {
+          DivElement control = querySelector('#control');
+          _explorersDiv.classes.remove('hidden');
+          control.classes.add('hidden');
+        }
       }
 
       var workspaceModal = new UpDroidWorkspaceModal();
@@ -312,8 +319,7 @@ class UpDroidClient {
       void complete() {
         String activeNum;
         String name;
-        var explorersDiv = querySelector('#exp-container');
-        for(var explorer in explorersDiv.children) {
+        for(var explorer in _explorersDiv.children) {
           if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
             if(!explorer.classes.contains('hidden')) {
               activeNum = explorer.dataset['num'];
@@ -337,8 +343,8 @@ class UpDroidClient {
           }
         }
         // make first explorer visible
-        if (explorersDiv.children.length > 2) {
-          explorersDiv.children[0].classes.remove('hidden');
+        if (_explorersDiv.children.length > 2) {
+          _explorersDiv.children[0].classes.remove('hidden');
         }
         // Destroy cmdr explorer
         _mailbox.ws.send('[[CLOSE_EXPLORER]]' + activeNum);
@@ -398,6 +404,7 @@ class UpDroidClient {
   }
 
   void _destroyExplorer(UpDroidExplorer explorer) {
+    explorer.closed = true;
     explorer = null;
   }
 }

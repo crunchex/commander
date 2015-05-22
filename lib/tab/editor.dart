@@ -1,4 +1,10 @@
-part of updroid_server;
+library cmdr_editor;
+
+import 'dart:io';
+
+import 'package:watcher/watcher.dart';
+
+import '../server_helper.dart' as help;
 
 class CmdrEditor {
   static const String guiName = 'UpDroidEditor';

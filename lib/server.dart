@@ -1,4 +1,4 @@
-library updroid_server;
+library cmdr;
 
 import 'dart:io';
 import 'dart:async';
@@ -6,21 +6,19 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:args/args.dart';
-import 'package:watcher/watcher.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
+import 'tab/pty.dart';
+import 'tab/camera/camera.dart';
+import 'tab/editor.dart';
+import 'tab/explorer.dart';
 import 'ros/ros.dart';
 import 'git.dart';
 import 'server_helper.dart' as help;
 
 part 'commands.dart';
-part 'tab/pty.dart';
-part 'tab/camera/camera.dart';
-part 'tab/camera/camera_server.dart';
-part 'tab/editor.dart';
-part 'tab/explorer.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
@@ -222,10 +220,10 @@ class CmdrServer {
     var toRemove;
 
     toRemove = _explorers[expNum];
+    Directory workspace = new Directory(toRemove.expPath);
     _explorers.remove(expNum);
-    Directory workspace = new Directory(toRemove._expPath);
     workspace.delete(recursive: true);
-    toRemove._killExplorer();
+    toRemove.killExplorer();
   }
 
   void _openTab(String id, Directory dir) {

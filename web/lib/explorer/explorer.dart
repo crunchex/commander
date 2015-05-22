@@ -22,12 +22,14 @@ class UpDroidExplorer extends ExplorerView {
   // Make dynamic
   int expNum;
   String name;
+  bool closed;
 
   String workspacePath;
   DivElement currentSelected;
   LIElement currentSelectedNode;
   String currentSelectedPath;
   InputElement nodeArgs;
+  ButtonElement _dropdown;
 
   DivElement editorDiv;
   LIElement fileName;
@@ -56,6 +58,7 @@ class UpDroidExplorer extends ExplorerView {
     this.name = folderName;
     this.expNum = num;;
     this.cs = cs;
+    this.closed = false;
 
     createExplorer(num, folderName).then((d) {
       newFileDragSetup();
@@ -130,14 +133,6 @@ class UpDroidExplorer extends ExplorerView {
           }
           ws.send('[[CATKIN_RUN]]' + runCommand);
         }
-        break;
-
-      case 'REMOVE_EDITOR':
-        editors.remove(m.body);
-        for (var stream in editorListeners[m.body]) {
-          stream.cancel();
-        }
-        editorListeners.remove(m.body);
         break;
 
       default:
@@ -323,7 +318,17 @@ class UpDroidExplorer extends ExplorerView {
     recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
   }
 
-  bool isActive() => !_explorer.classes.contains('hidden');
+  bool isActive() {
+    bool active;
+    if (closed == true) active = false;
+    else {
+      if (!_explorer.classes.contains('hidden')) active = true;
+      else {
+        active = false;
+      }
+    }
+    return active;
+  }
 
   /// Returns a list of file objects from the flattened string returned from
   /// the server.
@@ -345,8 +350,14 @@ class UpDroidExplorer extends ExplorerView {
   void showControl() {
     if (_explorersDiv != null) _explorersDiv.classes.add('hidden');
     _controlPanel.classes.remove('hidden');
+    _controlToggle.classes.remove('shadow');
+    _dropdown.classes.remove('shadow');
+    _titleWrap.classes.add('shadow');
     controlLeave = _title.onClick.listen((e) {
       hideControl();
+      _controlToggle.classes.add('shadow');
+      _dropdown.classes.add('shadow');
+      _titleWrap.classes.remove('shadow');
       controlLeave.cancel();
     });
   }

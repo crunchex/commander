@@ -1,4 +1,4 @@
-part of updroid_server;
+part of cmdr_camera;
 
 class CameraServer {
   int videoId;

@@ -1,25 +1,32 @@
-part of updroid_server;
+library cmdr_explorer;
+
+import 'dart:io';
+import 'package:watcher/watcher.dart';
+import 'package:path/path.dart' as pathLib;
+
+import '../ros/ros.dart';
+import '../server_helper.dart' as help;
 
 class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';
 
   Directory _dir;
-  DirectoryWatcher _watcher;
-  Workspace _workspace;
-  int _expNum;
-  var _expPath;
+  DirectoryWatcher watcher;
+  Workspace workspace;
+  int expNum;
+  String expPath;
 
   //TODO: make asynchroneous, watcher watches the wrong path
   CmdrExplorer(Directory dir, num) {
-    this._workspace = new Workspace(dir.path);
-    this._expPath = dir.path;
-    this._expNum = num;
+    this.workspace = new Workspace(dir.path);
+    this.expPath = dir.path;
+    this.expNum = num;
 
     for (var item in dir.listSync()) {
       if(pathLib.basename(item.path) == 'src') {
         _dir = item;
         var watchPath = dir.path + '/src';
-        this._watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
+        this.watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
       }
     }
   }
@@ -96,14 +103,14 @@ class CmdrExplorer {
       }
 
     });
-    _watcher.events.listen((e) => help.formattedFsUpdate(ws, e));
+    watcher.events.listen((e) => help.formattedFsUpdate(ws, e));
   }
 
-  void _killExplorer() {
-    this._workspace = null;
-    this._expPath = null;
-    this._expNum = null;
-    this._watcher = null;
+  void killExplorer() {
+    this.workspace = null;
+    this.expPath = null;
+    this.expNum = null;
+    this.watcher = null;
   }
 
   void _sendInitial(WebSocket s) {
@@ -184,23 +191,23 @@ class CmdrExplorer {
   }
 
   void _workspaceClean(WebSocket s) {
-    _workspace.clean().then((result) {
+    workspace.clean().then((result) {
       s.add('[[WORKSPACE_CLEAN]]');
     });
   }
 
   void _workspaceBuild(WebSocket s) {
-    _workspace.build().then((result) {
+    workspace.build().then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       s.add('[[WORKSPACE_BUILD]]' + resultString);
     });
   }
 
   void _nodeList(WebSocket s) {
-    Ros.nodeList(_workspace, s);
+    Ros.nodeList(workspace, s);
   }
 
   void _runNode(String runCommand) {
-    Ros.runNode(_workspace, runCommand);
+    Ros.runNode(workspace, runCommand);
   }
 }

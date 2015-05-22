@@ -30,6 +30,8 @@ class UpDroidClient {
   ButtonElement _uploadButton;
   DivElement _explorersDiv;
 
+  bool disconnectAlert = false;
+
   StreamSubscription _workspaceNameClick;
   StreamSubscription _workspaceNameEnter;
 
@@ -145,6 +147,13 @@ class UpDroidClient {
     }
   }
 
+  void _alertDisconnect(CommanderMessage m) {
+    if (disconnectAlert == false) {
+      window.alert("UpDroid Commander has lost connection to the server.");
+      disconnectAlert = true;
+    }
+  }
+
   void _openExplorer(int id, name) {
     if (_tabs[0].isNotEmpty) {
       for (var explorer in _tabs[0]) {
@@ -240,6 +249,7 @@ class UpDroidClient {
     _mailbox.registerCommanderEvent('GIT_PASSWORD', _gitPassword);
     _mailbox.registerCommanderEvent('WORKSPACE_CLEAN', _workspaceClean);
     _mailbox.registerCommanderEvent('WORKSPACE_BUILD', _workspaceBuild);
+    _mailbox.registerCommanderEvent('SERVER_DISCONNECT', _alertDisconnect);
 
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'CLIENT_CONFIG', _sendClientConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLIENT_SERVER_READY', _serverReady);

@@ -8,18 +8,18 @@
 
 ### New
 	
-	- Added Ctrl+S hotkey for saving in editor
-	- Added favicon
+	- Added Ctrl+S hotkey for saving in editor.
+	- Added favicon.
 
 ### Changed
 
-	- Switching between Control and Explorer more clear
-	- Improved stability for multiple workspaces
-	- Minor UI tweaks
+	- Switching between Control and Explorer more clear.
+	- Improved stability for multiple workspaces.
+	- Minor UI tweaks.
 
 ### Fixed
 
-	- Fixed bug where saving a new file in editor without a selected path caused UpCom to crash
+	- Fixed bug where saving a new file in editor without a selected path caused UpCom to crash.
 
 ## 0.4.5 - 2015-5-15
 

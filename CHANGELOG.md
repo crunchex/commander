@@ -2,6 +2,10 @@
 
 ## 0.4.6 - 2015-5-21
 
+### Important
+	
+	- Raspberry Pi users need to install ffmpeg >=2.6.2 before using UpCom
+
 ### New
 	
 	- Added Ctrl+S hotkey for saving in editor

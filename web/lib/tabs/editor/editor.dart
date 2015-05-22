@@ -52,6 +52,7 @@ class UpDroidEditor extends TabController {
   StreamSubscription _unsavedDiscard;
   StreamSubscription _overwrite;
   StreamSubscription _fontInputListener;
+  StreamSubscription _fileChangesListener;
 
   ace.Editor _aceEditor;
   String _openFilePath;
@@ -106,6 +107,11 @@ class UpDroidEditor extends TabController {
     view.content.classes.add('updroid_editor');
 
     _resetSavePoint();
+
+    // Create listener to indicate that there are unsaved changes when file is altered
+    _fileChangesListener = _aceEditor.onChange.listen((e) {
+      if (_openFilePath != null) view.extra.text = pathLib.basename(_openFilePath) + '*';
+    });
   }
 
   void sendSave(d) {
@@ -218,7 +224,7 @@ class UpDroidEditor extends TabController {
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.templateCode, 1);
-        view.extra.text = "untitled";
+        view.extra.text = "untitled*";
       }
       else{
         e.preventDefault();
@@ -231,12 +237,12 @@ class UpDroidEditor extends TabController {
         _unsavedSave = _modalSaveButton.onClick.listen((e) {
           _saveText();
           _aceEditor.setValue(RosTemplates.templateCode, 1);
-          view.extra.text = "untitled";
+          view.extra.text = "untitled*";
           _unsavedSave.cancel();
         });
         _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
           _aceEditor.setValue(RosTemplates.templateCode, 1);
-          view.extra.text = "untitled";
+          view.extra.text = "untitled*";
           _unsavedDiscard.cancel();
         });
       }
@@ -249,7 +255,6 @@ class UpDroidEditor extends TabController {
 
 
     /// Save as click handler
-
     _saveAsButton.onClick.listen((e) {
       cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
       mailbox.ws.send("[[EDITOR_REQUEST_LIST]]");
@@ -394,7 +399,7 @@ class UpDroidEditor extends TabController {
     else {
       mailbox.ws.send('[[EDITOR_SAVE]]' + _aceEditor.value + '[[PATH]]' + _openFilePath);
       _resetSavePoint();
-
+      view.extra.text = pathLib.basename(_openFilePath);
     }
   }
 

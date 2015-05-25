@@ -84,7 +84,7 @@ class UpDroidEditor extends TabController {
   void setUpUI() {
     _newButton = view.refMap['new'];
     _subButton = view.refMap['template:-subscribe'];
-    _pubButton = view.refMap['template:-publisher'];
+    _pubButton = view.refMap['template:-publish'];
     _saveButton = view.refMap['save'];
     _saveAsButton = view.refMap['save-as'];
     _closeTabButton = view.refMap['close-tab'];
@@ -482,7 +482,7 @@ class UpDroidEditor extends TabController {
     List menu = [
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'New'},
-        {'type': 'toggle', 'title': 'Template: Publisher'},
+        {'type': 'toggle', 'title': 'Template: Publish'},
         {'type': 'toggle', 'title': 'Template: Subscribe'},
         {'type': 'toggle', 'title': 'Save'},
         {'type': 'toggle', 'title': 'Save As'},

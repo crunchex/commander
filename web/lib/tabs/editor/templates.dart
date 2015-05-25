@@ -3,7 +3,7 @@ part of updroid_editor;
 class RosTemplates {
   // Template for a new file.
   // TODO: make this contain boilerplate ROS code
-  static const String templateCode =
+  static const String pubTemplate =
   r'''
 #!/usr/bin/env python
 

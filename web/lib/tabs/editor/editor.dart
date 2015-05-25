@@ -28,6 +28,7 @@ class UpDroidEditor extends TabController {
   DivElement _content;
 
   AnchorElement _newButton;
+  AnchorElement _pubButton;
   AnchorElement _subButton;
   AnchorElement _saveButton;
   AnchorElement _saveAsButton;
@@ -82,7 +83,8 @@ class UpDroidEditor extends TabController {
 
   void setUpUI() {
     _newButton = view.refMap['new'];
-    _subButton = view.refMap['template-subscribe'];
+    _subButton = view.refMap['template:-subscribe'];
+    _pubButton = view.refMap['template:-publisher'];
     _saveButton = view.refMap['save'];
     _saveAsButton = view.refMap['save-as'];
     _closeTabButton = view.refMap['close-tab'];
@@ -218,7 +220,7 @@ class UpDroidEditor extends TabController {
     _newButton.onClick.listen((e) {
       _openFilePath = null;
       if (_noUnsavedChanges()) {
-        _aceEditor.setValue(RosTemplates.templateCode, 1);
+        _aceEditor.setValue('', 1);
         view.extra.text = "untitled*";
       }
       else{
@@ -231,12 +233,43 @@ class UpDroidEditor extends TabController {
 
         _unsavedSave = _modalSaveButton.onClick.listen((e) {
           _saveText();
-          _aceEditor.setValue(RosTemplates.templateCode, 1);
+          _aceEditor.setValue('', 1);
           view.extra.text = "untitled*";
           _unsavedSave.cancel();
         });
         _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
-          _aceEditor.setValue(RosTemplates.templateCode, 1);
+          _aceEditor.setValue('', 1);
+          view.extra.text = "untitled*";
+          _unsavedDiscard.cancel();
+        });
+      }
+      _aceEditor.focus();
+      // Stops the button from sending the page to the top (href=#).
+      e.preventDefault();
+    });
+
+    _pubButton.onClick.listen((e) {
+      _openFilePath = null;
+      if (_noUnsavedChanges()) {
+        _aceEditor.setValue(RosTemplates.pubTemplate, 1);
+        view.extra.text = "untitled*";
+      }
+      else{
+        e.preventDefault();
+        new UpDroidUnsavedModal();
+
+        // TODO: refine this case
+        _modalSaveButton = querySelector('.modal-save');
+        _modalDiscardButton = querySelector('.modal-discard');
+
+        _unsavedSave = _modalSaveButton.onClick.listen((e) {
+          _saveText();
+          _aceEditor.setValue(RosTemplates.pubTemplate, 1);
+          view.extra.text = "untitled*";
+          _unsavedSave.cancel();
+        });
+        _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
+          _aceEditor.setValue(RosTemplates.pubTemplate, 1);
           view.extra.text = "untitled*";
           _unsavedDiscard.cancel();
         });
@@ -449,7 +482,8 @@ class UpDroidEditor extends TabController {
     List menu = [
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'New'},
-        {'type': 'toggle', 'title': 'Template-Subscribe'},
+        {'type': 'toggle', 'title': 'Template: Publisher'},
+        {'type': 'toggle', 'title': 'Template: Subscribe'},
         {'type': 'toggle', 'title': 'Save'},
         {'type': 'toggle', 'title': 'Save As'},
         {'type': 'toggle', 'title': 'Close Tab'}]},

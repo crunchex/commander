@@ -32,9 +32,6 @@ class UpDroidConsole extends TabController {
   }
 
   void setUpController() {
-    view.content.tabIndex = 0;
-    view.content.contentEditable = "true";
-
     _closeTabButton = view.refMap['close-tab'];
     _themeButton = view.refMap['invert'];
     _blinkButton = view.refMap['cursor-blink'];
@@ -82,7 +79,7 @@ class UpDroidConsole extends TabController {
 
   void _initialResize(UpDroidMessage um) {
     List<int> size = _term.currentSize();
-    mailbox.ws.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
+    mailbox.ws.send('[[RESIZE]]' + '${size[0]}x${size[1] - 1}');
   }
 
   void _resizeEvent(CommanderMessage m) {
@@ -91,7 +88,7 @@ class UpDroidConsole extends TabController {
     int newCol = int.parse(newSize[1]);
     _term.resize(newRow, newCol);
     // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
-    mailbox.ws.send('[[RESIZE]]' + '${newRow - 1}x${newCol - 1}');
+    mailbox.ws.send('[[RESIZE]]' + '${newRow}x${newCol - 1}');
   }
 
   //\/\/ Mailbox Handlers /\/\//

@@ -24,6 +24,8 @@ class UpDroidConsole extends TabController {
   AnchorElement _themeButton;
   AnchorElement _blinkButton;
 
+  Timer _resizeTimer;
+
   UpDroidConsole(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
     TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
       view = tabView;
@@ -132,8 +134,12 @@ class UpDroidConsole extends TabController {
 
     window.onResize.listen((e) {
       if (view.content.parent.classes.contains('active')) {
-        List<int> newSize = _term.calculateSize();
-        cs.add(new CommanderMessage('UPDROIDCONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
+        // Timer prevents a flood of resize events slowing down the system and allows the window to settle.
+        if (_resizeTimer != null) _resizeTimer.cancel();
+        _resizeTimer = new Timer(new Duration(milliseconds: 500), () {
+          List<int> newSize = _term.calculateSize();
+          cs.add(new CommanderMessage('UPDROIDCONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
+        });
       }
     });
   }

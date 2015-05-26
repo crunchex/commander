@@ -33,7 +33,7 @@ body {
 }
 
 html, body {
-  min-width: 1110px;
+  min-width: 1120px;
   width: auto !important;
   height: 100%;
   min-height: 650px;
@@ -698,17 +698,35 @@ li div input {
 }
 
 .updroidconsole {
+  position: relative;
   width: 100%;
-  /*min-height: 100px;*/
   height: 100%;
-  padding: 5px;
-  font-size: 11px;
-  font-family: "DejaVu Sans Mono", "Liberation Mono", "Andale Mono", monospace;
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 
-.updroidconsole:focus {
+.terminal-output,
+.terminal-cursor {
+  display: inline-block;
+  font-size: 11px;
+  font-family: "DejaVu Sans Mono", "Liberation Mono", "Andale Mono", monospace;
+}
+
+.terminal-output {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+}
+
+.terminal-output:focus {
   outline: none;
+}
+
+.terminal-cursor {
+  position: absolute;
+  width: calc(299px / 45);
+  height: 14px;
+  background-color: transparent;
 }
 
 .termrow {

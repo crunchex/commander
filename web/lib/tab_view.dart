@@ -161,11 +161,40 @@ class TabView {
         }
       } else if (i['type'] == 'input') {
         item = _createInputItem(i['title']);
+      } else if (i['type'] == 'submenu') {
+        item = _createSubMenu("Templates", ['Publisher', 'Subscriber']);
       }
       dropdownMenu.children.add(item);
     }
 
     return dropdown;
+  }
+
+  ///Create a submenu within a dropdown
+  LIElement _createSubMenu(String title, List<String> items) {
+    LIElement item = new LIElement()
+      ..classes.add('dropdown-submenu');
+    AnchorElement button = new AnchorElement()
+      ..tabIndex = -1
+      ..href = '#'
+      ..text = title;
+    item.append(button);
+    UListElement dropdown = new UListElement()
+      ..classes.add('dropdown-menu');
+    item.append(dropdown);
+
+    for (String item in items) {
+      LIElement menuItem = new LIElement();
+      AnchorElement inner = new AnchorElement()
+        ..tabIndex = -1
+        ..href = "#"
+        ..text = item
+        ..id = "${item.toLowerCase().replaceAll(' ', '-')}-button";
+      menuItem.append(inner);
+      dropdown.append(menuItem);
+      refMap[inner.id] = inner;
+    }
+    return item;
   }
 
   /// Generates an input item (label and input field) and returns

@@ -863,7 +863,7 @@ class UpDroidExplorer extends ExplorerView {
     if (file.parentDir == '' && !file.path.contains('/.')) {
       dirElement = querySelector('#explorer-body-$expNum');
       dirElement.append(li);
-    } else if (!file.path.contains('/.') && !file.path.contains('CMakeLists.txt')) {
+    } else if (!file.path.contains('/.')) {
       dirElement = ulInfo[pathLib.dirname(file.path)];
       dirElement.append(li);
     }

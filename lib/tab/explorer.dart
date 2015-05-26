@@ -16,19 +16,21 @@ class CmdrExplorer {
   int expNum;
   String expPath;
 
-  //TODO: make asynchroneous, watcher watches the wrong path
+  //TODO: make asynchroneous
   CmdrExplorer(Directory dir, num) {
     this.workspace = new Workspace(dir.path);
     this.expPath = dir.path;
     this.expNum = num;
 
-    for (var item in dir.listSync()) {
-      if(pathLib.basename(item.path) == 'src') {
-        _dir = item;
-        var watchPath = dir.path + '/src';
-        this.watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
+    dir.list().toList().then((folderList) {
+      for (var item in folderList) {
+        if(pathLib.basename(item.path) == 'src') {
+          _dir = item;
+          var watchPath = dir.path + '/src';
+          this.watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
+        }
       }
-    }
+    });
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests

@@ -22,15 +22,13 @@ class CmdrExplorer {
     this.expPath = dir.path;
     this.expNum = num;
 
-    dir.list().toList().then((folderList) {
-      for (var item in folderList) {
-        if(pathLib.basename(item.path) == 'src') {
-          _dir = item;
-          var watchPath = dir.path + '/src';
-          this.watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
-        }
+    for (var item in dir.listSync()) {
+      if(pathLib.basename(item.path) == 'src') {
+        _dir = item;
+        var watchPath = item.path;
+        this.watcher = new DirectoryWatcher(pathLib.normalize(item.path));
       }
-    });
+    }
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests

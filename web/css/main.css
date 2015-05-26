@@ -434,7 +434,8 @@ li div input {
 }
 
 .package-title {
-  width: 120%;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .package-name {

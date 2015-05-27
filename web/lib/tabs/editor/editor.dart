@@ -28,6 +28,9 @@ class UpDroidEditor extends TabController {
   DivElement _content;
 
   AnchorElement _newButton;
+  AnchorElement _launchButton;
+  AnchorElement _talkerButton;
+  AnchorElement _listenerButton;
   AnchorElement _pubButton;
   AnchorElement _subButton;
   AnchorElement _saveButton;
@@ -85,6 +88,9 @@ class UpDroidEditor extends TabController {
     _newButton = view.refMap['new'];
     _subButton = view.refMap['subscriber-button'];
     _pubButton = view.refMap['publisher-button'];
+    _talkerButton = view.refMap['hello-world-talker-button'];
+    _listenerButton = view.refMap['hello-world-listener-button'];
+    _launchButton = view.refMap['basic-launch-file-button'];
     _saveButton = view.refMap['save'];
     _saveAsButton = view.refMap['save-as'];
     _closeTabButton = view.refMap['close-tab'];
@@ -239,6 +245,99 @@ class UpDroidEditor extends TabController {
         });
         _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
           _aceEditor.setValue('', 1);
+          view.extra.text = "untitled*";
+          _unsavedDiscard.cancel();
+        });
+      }
+      _aceEditor.focus();
+      // Stops the button from sending the page to the top (href=#).
+      e.preventDefault();
+    });
+
+    _talkerButton.onClick.listen((e) {
+      _openFilePath = null;
+      if (_noUnsavedChanges()) {
+        _aceEditor.setValue(RosTemplates.talkerTemplate, 1);
+        view.extra.text = "untitled*";
+      }
+      else{
+        e.preventDefault();
+        new UpDroidUnsavedModal();
+
+        // TODO: refine this case
+        _modalSaveButton = querySelector('.modal-save');
+        _modalDiscardButton = querySelector('.modal-discard');
+
+        _unsavedSave = _modalSaveButton.onClick.listen((e) {
+          _saveText();
+          _aceEditor.setValue(RosTemplates.talkerTemplate, 1);
+          view.extra.text = "untitled*";
+          _unsavedSave.cancel();
+        });
+        _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
+          _aceEditor.setValue(RosTemplates.talkerTemplate, 1);
+          view.extra.text = "untitled*";
+          _unsavedDiscard.cancel();
+        });
+      }
+      _aceEditor.focus();
+      // Stops the button from sending the page to the top (href=#).
+      e.preventDefault();
+    });
+
+    _listenerButton.onClick.listen((e) {
+      _openFilePath = null;
+      if (_noUnsavedChanges()) {
+        _aceEditor.setValue(RosTemplates.listenerTemplate, 1);
+        view.extra.text = "untitled*";
+      }
+      else{
+        e.preventDefault();
+        new UpDroidUnsavedModal();
+
+        // TODO: refine this case
+        _modalSaveButton = querySelector('.modal-save');
+        _modalDiscardButton = querySelector('.modal-discard');
+
+        _unsavedSave = _modalSaveButton.onClick.listen((e) {
+          _saveText();
+          _aceEditor.setValue(RosTemplates.listenerTemplate, 1);
+          view.extra.text = "untitled*";
+          _unsavedSave.cancel();
+        });
+        _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
+          _aceEditor.setValue(RosTemplates.listenerTemplate, 1);
+          view.extra.text = "untitled*";
+          _unsavedDiscard.cancel();
+        });
+      }
+      _aceEditor.focus();
+      // Stops the button from sending the page to the top (href=#).
+      e.preventDefault();
+    });
+
+    _launchButton.onClick.listen((e) {
+      _openFilePath = null;
+      if (_noUnsavedChanges()) {
+        _aceEditor.setValue(RosTemplates.launchTemplate, 1);
+        view.extra.text = "untitled*";
+      }
+      else{
+        e.preventDefault();
+        new UpDroidUnsavedModal();
+
+        // TODO: refine this case
+        _modalSaveButton = querySelector('.modal-save');
+        _modalDiscardButton = querySelector('.modal-discard');
+
+        _unsavedSave = _modalSaveButton.onClick.listen((e) {
+          _saveText();
+          _aceEditor.setValue(RosTemplates.launchTemplate, 1);
+          view.extra.text = "untitled*";
+          _unsavedSave.cancel();
+        });
+        _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
+          _aceEditor.setValue(RosTemplates.launchTemplate, 1);
           view.extra.text = "untitled*";
           _unsavedDiscard.cancel();
         });

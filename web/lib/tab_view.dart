@@ -162,7 +162,7 @@ class TabView {
       } else if (i['type'] == 'input') {
         item = _createInputItem(i['title']);
       } else if (i['type'] == 'submenu') {
-        item = _createSubMenu("Templates", ['Publisher', 'Subscriber']);
+        item = _createSubMenu("Templates", ['Publisher', 'Subscriber', 'Hello World Talker', 'Hello World Listener', 'Basic Launch File']);
       }
       dropdownMenu.children.add(item);
     }

@@ -26,6 +26,7 @@ class CmdrServer {
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
 
+  StreamSubscription rootWatch;
   Map _explorers = {};
   List<CmdrEditor> _editors = [];
   List<CmdrPty> _ptys = [];
@@ -35,6 +36,10 @@ class CmdrServer {
   CmdrServer (ArgResults results) {
     Directory dir = new Directory(results['workspace']);
     dir.create();
+    rootWatch = dir.watch(recursive: true).listen((e){
+      print(e);
+      print(e.path);
+    });
     _initServer(dir, _getVirDir(results));
   }
 
@@ -166,6 +171,17 @@ class CmdrServer {
 
         default:
           help.debug('Message received without updroid header.', 1);
+      }
+
+      StreamSubscription createRootWatch(FileSystemEntity dir) {
+        dir.watch(recursive: true).listen((e){
+          switch(e.type) {
+            case 1:
+              FileSystemEntity item = ;
+              if (FileSystemEntity())
+              socket.add('[[]]');
+          }
+        });
       }
     }).onDone(() => _cleanUpBackend());
   }

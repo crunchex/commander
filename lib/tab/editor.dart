@@ -71,6 +71,14 @@ class CmdrEditor {
     List<String> argsList = args.split('[[PATH]]');
 
     var fileToSave = new File(argsList[1]);
+
+    // hacked in Chmod for demo
+    //TODO: add chmod option when saving
+    if (fileToSave.path.endsWith('.py')) {
+      Process.run("chmod", ["u+x", fileToSave.path]).then((result) {
+        if (result.exitCode != 0) throw new Exception(result.stderr);
+      });
+    }
     fileToSave.writeAsString(argsList[0]);
   }
 

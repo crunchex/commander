@@ -1,10 +1,9 @@
 part of updroid_editor;
 
 class RosTemplates {
-
     // Template for a new file.
     // TODO: make this contain boilerplate ROS code
-    static const String pubTemplate =
+    static const String talkerTemplate =
     r'''
 #!/usr/bin/env python
 # Software License Agreement (BSD License)
@@ -62,11 +61,9 @@ if __name__ == '__main__':
         talker()
     except rospy.ROSInterruptException:
         pass
-
 ''';
 
-    static const String subTemplate =
-
+    static const String listenerTemplate =
     r'''
 #!/usr/bin/env python
 # Software License Agreement (BSD License)
@@ -128,12 +125,11 @@ def listener():
 
 if __name__ == '__main__':
     listener()
-
 ''';
 
   // Template for a new file.
   // TODO: make this contain boilerplate ROS code
-  static const String pubTemplate_bkup =
+  static const String pubTemplate =
   r'''
 #!/usr/bin/env python
 
@@ -156,8 +152,7 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException: pass
 ''';
 
-    static const String subTemplate_bkup =
-
+    static const String subTemplate =
     r'''
 #!/usr/bin/env python
 
@@ -183,5 +178,12 @@ def listener():
 
 if __name__ == '__main__':
     listener()
+''';
+
+    static const String launchTemplate =
+    r'''
+<launch>
+  <node name="node" pkg="pkg" type="node.py" output="screen" />
+</launch>
 ''';
 }

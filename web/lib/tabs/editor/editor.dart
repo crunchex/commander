@@ -2,6 +2,7 @@ library updroid_editor;
 
 import 'dart:html';
 import 'dart:async';
+import 'dart:convert';
 import 'package:dnd/dnd.dart';
 
 import 'package:ace/ace.dart' as ace;
@@ -414,19 +415,26 @@ class UpDroidEditor extends TabController {
 
     /// Save as click handler
     _saveAsButton.onClick.listen((e) {
+      bool exec = false;
       cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
       mailbox.ws.send("[[EDITOR_REQUEST_LIST]]");
       if(_curModal != null) _curModal.hide();
 
       String saveAsPath = '';
       _curModal = new UpDroidSavedModal();
+
+      //TODO: remove query selectors
       var input = querySelector('#save-as-input');
+      var makeExec = querySelector('#make-exec');
       _saveCommit = querySelector('#save-as-commit');
       _overwriteCommit = querySelector('#warning button');
       _warning = querySelector('#warning');
 
       void completeSave() {
-          mailbox.ws.send('[[EDITOR_SAVE]]' + _aceEditor.value + '[[PATH]]' + saveAsPath);
+        if (exec == true) mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, true]));
+        else {
+          mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, false]));
+        }
           view.extra.text = input.value;
           _curModal.hide();
           input.value = '';
@@ -484,12 +492,19 @@ class UpDroidEditor extends TabController {
       }
 
       _saveAsClickEnd = _saveCommit.onClick.listen((e) {
+
+        if (makeExec.checked == true) {
+          exec = true;
+        }
         _checkSave();
       });
 
       _saveAsEnterEnd = input.onKeyUp.listen((e) {
         var keyEvent = new KeyEvent.wrap(e);
         if (keyEvent.keyCode == KeyCode.ENTER) {
+          if (makeExec.checked == true) {
+            exec = true;
+          }
           _checkSave();
         }
       });
@@ -555,7 +570,7 @@ class UpDroidEditor extends TabController {
       _saveAsButton.click();
     }
     else {
-      mailbox.ws.send('[[EDITOR_SAVE]]' + _aceEditor.value + '[[PATH]]' + _openFilePath);
+      mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, _openFilePath, false]));
       _resetSavePoint();
       view.extra.text = pathLib.basename(_openFilePath);
     }

@@ -1,6 +1,7 @@
 library cmdr_editor;
 
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:watcher/watcher.dart';
 
@@ -40,7 +41,7 @@ class CmdrEditor {
           break;
 
         case 'EDITOR_SAVE':
-          _saveFile(um.body);
+          _saveFile(JSON.decode(um.body));
           break;
 
         default:
@@ -66,20 +67,18 @@ class CmdrEditor {
     });
   }
 
-  void _saveFile(String args) {
-    // List[0] = data, List[1] = path.
-    List<String> argsList = args.split('[[PATH]]');
+  void _saveFile(List args) {
+    // args[0] = data, args[1] = path. args[2] = executable option
 
-    var fileToSave = new File(argsList[1]);
+    var fileToSave = new File(args[1]);
 
-    // hacked in Chmod for demo
-    //TODO: add chmod option when saving
-    if (fileToSave.path.endsWith('.py')) {
+    fileToSave.writeAsString(args[0]);
+
+    if (args[2] == true) {
       Process.run("chmod", ["u+x", fileToSave.path]).then((result) {
         if (result.exitCode != 0) throw new Exception(result.stderr);
       });
     }
-    fileToSave.writeAsString(argsList[0]);
   }
 
   void cleanup() {

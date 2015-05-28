@@ -24,6 +24,7 @@ class UpDroidSavedModal extends UpDroidModal {
 
     // executable option
     var makeExec = new CheckboxInputElement()
+      ..checked = false
       ..id = "make-exec";
     HeadingElement h5 = new HeadingElement.h5()
       ..id = 'exec-flag'

@@ -540,7 +540,7 @@ li div input {
 }
 
 .package-files {
-  display: inline-block;
+  display: block;
   padding: 0 5px;
   white-space: nowrap;
 }

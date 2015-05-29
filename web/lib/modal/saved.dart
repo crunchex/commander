@@ -19,7 +19,19 @@ class UpDroidSavedModal extends UpDroidModal {
     InputElement input = new InputElement()
       ..id = "save-as-input"
       ..attributes['type'] = 'text';
-    saveInput.children.addAll([askName, input]);
+
+    BRElement line = new BRElement();
+
+    // executable option
+    var makeExec = new CheckboxInputElement()
+      ..checked = false
+      ..id = "make-exec";
+    HeadingElement h5 = new HeadingElement.h5()
+      ..id = 'exec-flag'
+      ..text = "Make Executable";
+
+    saveInput.children.addAll([askName, input, line, makeExec, h5]);
+
     _modalBody.children.add(saveInput);
 
     // overwrite warning
@@ -33,13 +45,6 @@ class UpDroidSavedModal extends UpDroidModal {
       ..attributes['type'] = 'button';
     warning.children.addAll([h4, overwrite]);
     _modalBody.children.add(warning);
-
-    _buttonListeners.add(input.onKeyUp.listen((e) {
-      var keyEvent = new KeyEvent.wrap(e);
-      if (keyEvent.keyCode == KeyCode.ENTER) {
-          _destroyModal();
-        }
-    }));
   }
 
   void _setupFooter() {

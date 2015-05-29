@@ -122,6 +122,7 @@ abstract class ExplorerView {
     for (var item in nodeList) {
       if (!packages.contains(item['package'])) packages.add(item['package']);
     }
+    _packageList.innerHtml = '';
     for(var package in packages) {
       DivElement packageWrap = new DivElement();
       _packageList.append(packageWrap);

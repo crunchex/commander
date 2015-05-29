@@ -24,6 +24,8 @@ class UpDroidConsole extends TabController {
   AnchorElement _themeButton;
   AnchorElement _blinkButton;
 
+  Timer _resizeTimer;
+
   UpDroidConsole(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
     TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
       view = tabView;
@@ -32,9 +34,6 @@ class UpDroidConsole extends TabController {
   }
 
   void setUpController() {
-    view.content.tabIndex = 0;
-    view.content.contentEditable = "true";
-
     _closeTabButton = view.refMap['close-tab'];
     _themeButton = view.refMap['invert'];
     _blinkButton = view.refMap['cursor-blink'];
@@ -82,7 +81,7 @@ class UpDroidConsole extends TabController {
 
   void _initialResize(UpDroidMessage um) {
     List<int> size = _term.currentSize();
-    mailbox.ws.send('[[RESIZE]]' + '${size[0] - 1}x${size[1] - 1}');
+    mailbox.ws.send('[[RESIZE]]' + '${size[0]}x${size[1] - 1}');
   }
 
   void _resizeEvent(CommanderMessage m) {
@@ -91,7 +90,7 @@ class UpDroidConsole extends TabController {
     int newCol = int.parse(newSize[1]);
     _term.resize(newRow, newCol);
     // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
-    mailbox.ws.send('[[RESIZE]]' + '${newRow - 1}x${newCol - 1}');
+    mailbox.ws.send('[[RESIZE]]' + '${newRow}x${newCol - 1}');
   }
 
   //\/\/ Mailbox Handlers /\/\//
@@ -135,8 +134,12 @@ class UpDroidConsole extends TabController {
 
     window.onResize.listen((e) {
       if (view.content.parent.classes.contains('active')) {
-        List<int> newSize = _term.calculateSize();
-        cs.add(new CommanderMessage('UPDROIDCONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
+        // Timer prevents a flood of resize events slowing down the system and allows the window to settle.
+        if (_resizeTimer != null) _resizeTimer.cancel();
+        _resizeTimer = new Timer(new Duration(milliseconds: 500), () {
+          List<int> newSize = _term.calculateSize();
+          cs.add(new CommanderMessage('UPDROIDCONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
+        });
       }
     });
   }

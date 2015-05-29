@@ -266,7 +266,6 @@ class CmdrServer {
       case 'UpDroidCamera':
         // TODO: figure out what should happen here now with the camera server.
         //_cameras[num - 1].cleanup();
-        print('cameras length: $num');
         _cameras.removeAt(num - 1);
         break;
 

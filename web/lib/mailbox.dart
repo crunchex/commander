@@ -66,10 +66,12 @@ class Mailbox {
     // Call the function registered to ON_MESSAGE[um.header].
     ws.onMessage.transform(updroidTransformer).listen((um) => _wsRegistry[EventType.ON_MESSAGE][um.header](um));
 
+    //TODO: Should only alert if everything is disconnected (in case only console isnt connected)
     ws.onClose.listen((e) {
       _wsRegistry[EventType.ON_CLOSE].forEach((f(e)) => f(e));
+      _cs.add(new CommanderMessage('UPDROIDCLIENT', 'SERVER_DISCONNECT'));
 
-      print('$_name-$_id disconnected. Retrying...');
+//      print('$_name-$_id disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }
@@ -77,7 +79,7 @@ class Mailbox {
     });
 
     ws.onError.listen((e) {
-      print('$_name-$_id disconnected. Retrying...');
+//      print('$_name-$_id disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }

@@ -25,17 +25,19 @@ class UpDroidClient {
   AnchorElement _newButtonRight;
   ButtonElement _cleanButton;
   ButtonElement _buildButton;
-  ButtonElement _listButton;
+  ButtonElement _controlButton;
   ButtonElement _runButton;
   ButtonElement _uploadButton;
   DivElement _explorersDiv;
+
+  bool disconnectAlert = false;
 
   StreamSubscription _workspaceNameClick;
   StreamSubscription _workspaceNameEnter;
 
   Mailbox _mailbox;
   bool _runButtonEnabled;
-  bool _listButtonEnabled;
+  bool _controlButtonEnabled;
 
   UpDroidClient() {
     _config = _getConfig();
@@ -48,13 +50,13 @@ class UpDroidClient {
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
     _cleanButton = querySelector('#clean-button');
-    _listButton = querySelector('#list-button');
+    _controlButton = querySelector('#control-toggle');
     _buildButton = querySelector('#build-button');
     _runButton = querySelector('#run-button');
     _uploadButton = querySelector('#upload');
 
     _runButtonEnabled = true;
-    _listButtonEnabled = true;
+    _controlButtonEnabled = true;
 
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.
@@ -145,6 +147,13 @@ class UpDroidClient {
     }
   }
 
+  void _alertDisconnect(CommanderMessage m) {
+    if (disconnectAlert == false) {
+      window.alert("UpDroid Commander has lost connection to the server.");
+      disconnectAlert = true;
+    }
+  }
+
   void _openExplorer(int id, name) {
     if (_tabs[0].isNotEmpty) {
       for (var explorer in _tabs[0]) {
@@ -220,9 +229,9 @@ class UpDroidClient {
     // Success else failure.
     if (m.body == '') {
       _runButton.classes.remove('control-button-disabled');
-      _listButton.classes.remove('control-button-disabled');
+      _controlButton.classes.remove('control-button-disabled');
       _runButtonEnabled = true;
-      _listButtonEnabled = true;
+      _controlButtonEnabled = true;
     } else {
       new UpDroidBuildResultsModal(m.body);
     }
@@ -240,6 +249,7 @@ class UpDroidClient {
     _mailbox.registerCommanderEvent('GIT_PASSWORD', _gitPassword);
     _mailbox.registerCommanderEvent('WORKSPACE_CLEAN', _workspaceClean);
     _mailbox.registerCommanderEvent('WORKSPACE_BUILD', _workspaceBuild);
+    _mailbox.registerCommanderEvent('SERVER_DISCONNECT', _alertDisconnect);
 
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'CLIENT_CONFIG', _sendClientConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLIENT_SERVER_READY', _serverReady);
@@ -375,10 +385,10 @@ class UpDroidClient {
 
       _cs.add(new CommanderMessage('EXPLORER', 'WORKSPACE_CLEAN'));
 
-      _listButton.classes.add('control-button-disabled');
+      _controlButton.classes.add('control-button-disabled');
       _runButton.classes.add('control-button-disabled');
       _runButtonEnabled = false;
-      _listButtonEnabled = false;
+      _controlButtonEnabled = false;
     });
 
     _buildButton.onClick.listen((e) {
@@ -388,13 +398,13 @@ class UpDroidClient {
       _cs.add(new CommanderMessage('EXPLORER', 'WORKSPACE_BUILD'));
     });
 
-    _listButton.onClick.listen((e) {
-      if (!_listButtonEnabled) return;
+    _controlButton.onClick.listen((e) {
+      if (!_controlButtonEnabled) return;
       _cs.add(new CommanderMessage('EXPLORER', 'CATKIN_NODE_LIST'));
     });
 
     _runButton.onClick.listen((e) {
-      if (!_listButtonEnabled) return;
+      if (!_controlButtonEnabled) return;
       _cs.add(new CommanderMessage('EXPLORER', 'RUN_NODE'));
     });
 

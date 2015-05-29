@@ -16,7 +16,7 @@ class CmdrExplorer {
   int expNum;
   String expPath;
 
-  //TODO: make asynchroneous, watcher watches the wrong path
+  //TODO: make asynchroneous
   CmdrExplorer(Directory dir, num) {
     this.workspace = new Workspace(dir.path);
     this.expPath = dir.path;
@@ -25,8 +25,8 @@ class CmdrExplorer {
     for (var item in dir.listSync()) {
       if(pathLib.basename(item.path) == 'src') {
         _dir = item;
-        var watchPath = dir.path + '/src';
-        this.watcher = new DirectoryWatcher(pathLib.normalize(dir.path + '/src'));
+        var watchPath = item.path;
+        this.watcher = new DirectoryWatcher(pathLib.normalize(item.path));
       }
     }
   }

@@ -33,10 +33,104 @@ body {
 }
 
 html, body {
-  min-width: 1110px;
+  min-width: 1120px;
   width: auto !important;
   height: 100%;
   min-height: 650px;
+}
+
+.login-overlay {
+  position: absolute;
+  display: none;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  background-color: #ff2919;
+  opacity: 100;
+}
+
+.login-overlay.granted {
+  opacity: 0;
+  -webkit-transition: all 0.8s ease;
+  -moz-transition: all 0.8s ease;
+  -ms-transition: all 0.8s ease;
+  -o-transition: all 0.8s ease;
+  transition: all 0.8s ease;
+}
+
+.login-logo {
+  display: block;
+  width: calc(425px / 2);
+  height: calc(161px / 2);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -100px);
+}
+
+.login-overlay>h1 {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -30px);
+  color: #ffffff;
+  font-size: 36px;
+  font-family: "Avenir Next LT Pro Bold";
+}
+
+.animate-end {
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+.login-logo.animate-end {
+  transform: translate(-50%, -130px);
+}
+
+.login-overlay>h1.animate-end {
+  transform: translate(-50%, -60px);
+}
+
+.login-overlay>input {
+  display: block;
+  opacity: 0;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  border: 5px solid #ffffff;
+  background-color: #ff2919;
+  padding: 2px;
+  font-family: "Monosten A";
+  color: #ffffff;
+}
+
+#login-username-input {
+  /* bring your own prefixes */
+  transform: translate(-50%, 25px);
+}
+
+#login-password-input {
+  /* bring your own prefixes */
+  transform: translate(-50%, 75px);
+}
+
+.login-overlay>input:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+.login-overlay>input.animate-end {
+  opacity: 100;
+  -webkit-transition: all 0.8s ease;
+  -moz-transition: all 0.8s ease;
+  -ms-transition: all 0.8s ease;
+  -o-transition: all 0.8s ease;
+  transition: all 0.8s ease;
 }
 
 .row {
@@ -434,7 +528,8 @@ li div input {
 }
 
 .package-title {
-  width: 120%;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .package-name {
@@ -445,7 +540,7 @@ li div input {
 }
 
 .package-files {
-  display: inline-block;
+  display: block;
   padding: 0 5px;
   white-space: nowrap;
 }
@@ -698,17 +793,35 @@ li div input {
 }
 
 .updroidconsole {
+  position: relative;
   width: 100%;
-  /*min-height: 100px;*/
   height: 100%;
-  padding: 5px;
-  font-size: 11px;
-  font-family: "DejaVu Sans Mono", "Liberation Mono", "Andale Mono", monospace;
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 
-.updroidconsole:focus {
+.terminal-output,
+.terminal-cursor {
+  display: inline-block;
+  font-size: 11px;
+  font-family: "DejaVu Sans Mono", "Liberation Mono", "Andale Mono", monospace;
+}
+
+.terminal-output {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+}
+
+.terminal-output:focus {
   outline: none;
+}
+
+.terminal-cursor {
+  position: absolute;
+  width: calc(299px / 45);
+  height: 14px;
+  background-color: transparent;
 }
 
 .termrow {
@@ -727,6 +840,17 @@ li div input {
 #save-input > * {
   padding: 10px;
   display: inline-block;
+}
+
+#make-exec {
+  margin-left: 190px;
+}
+
+#exec-flag {
+  padding: 0 10px;
+  margin-top: 0;
+  position: relative;
+  bottom: 1px;
 }
 
 .modal-content {
@@ -913,4 +1037,55 @@ code, kbd, pre, samp {
 
 .file {
   cursor: pointer;
+}
+
+/* Submenu CSS */
+
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  -webkit-border-radius: 0 6px 6px 6px;
+  -moz-border-radius: 0 6px 6px;
+  border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #ccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+
+.dropdown-submenu:hover>a:after {
+  border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+  float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  -webkit-border-radius: 6px 0 6px 6px;
+  -moz-border-radius: 6px 0 6px 6px;
+  border-radius: 6px 0 6px 6px;
 }

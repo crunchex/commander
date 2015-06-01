@@ -465,7 +465,10 @@ class UpDroidEditor extends TabController {
           }
         }
         else {
-          saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
+          if(_currentParPath == null) saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
+          else {
+            saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
+          }
         }
 
         // Filename already exists on system

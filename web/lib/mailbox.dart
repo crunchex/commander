@@ -33,7 +33,7 @@ class Mailbox {
 
     // Call the function registered to m.type.
     _cs.stream.where((m) => m.dest == _name.toUpperCase()).listen((CommanderMessage m) {
-    // print('Commander Message received of type: ${m.type}');
+      //print('Commander Message received of type: ${m.type}');
       _csRegistry[m.type](m);
     });
   }
@@ -64,7 +64,10 @@ class Mailbox {
     ws.onOpen.listen((e) => _wsRegistry[EventType.ON_OPEN].forEach((f(e)) => f(e)));
 
     // Call the function registered to ON_MESSAGE[um.header].
-    ws.onMessage.transform(updroidTransformer).listen((um) => _wsRegistry[EventType.ON_MESSAGE][um.header](um));
+    ws.onMessage.transform(updroidTransformer).listen((um) {
+      //print('UpDroidMessage received of type: ${um.header}');
+      _wsRegistry[EventType.ON_MESSAGE][um.header](um);
+    });
 
     //TODO: Should only alert if everything is disconnected (in case only console isnt connected)
     ws.onClose.listen((e) {

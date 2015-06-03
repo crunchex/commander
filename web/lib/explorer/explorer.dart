@@ -74,79 +74,6 @@ class UpDroidExplorer extends ExplorerView {
     });
   }
 
-  void _editorReady(CommanderMessage m) {
-    var num = m.body[0];
-    // Editor num
-    var dropDiv = m.body[1];
-
-    var dzEditor = new Dropzone(dropDiv);
-    if (editorListeners != null) {
-      editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
-      editors.putIfAbsent(dzEditor, () => num);
-      cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
-    }
-  }
-
-  void _requestParentPath(CommanderMessage m) {
-    if (!_explorer.classes.contains('hidden')) {
-      cs.add(new CommanderMessage('UPDROIDEDITOR', 'PARENT_PATH', body: currentSelectedPath));
-    }
-  }
-
-  void _workspaceClean(CommanderMessage m) {
-    if (isActive()) {
-      _mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
-    }
-  }
-
-  void _workspaceBuild(CommanderMessage m) {
-    if (isActive()) {
-      _mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
-    }
-  }
-
-  void _catkinNodeList(CommanderMessage m) {
-    if (isActive()) {
-      _mailbox.ws.send('[[CATKIN_NODE_LIST]]');
-    }
-  }
-
-  void _runNode(CommanderMessage m) {
-    if (isActive()) {
-      String runCommand;
-      if (nodeArgs.value.isEmpty) {
-        runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name']]);
-      } else {
-        runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
-      }
-      _mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
-    }
-  }
-
-  // TODO: cancel when inactive
-  List<StreamSubscription> createEditorListeners(Dropzone dzEditor) {
-    var enter = dzEditor.onDragEnter.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_ADD', body: 'updroideditor-entered'));
-      }
-    });
-
-    var leave = dzEditor.onDragLeave
-    .listen((e) => cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-entered')));
-
-    var drop = dzEditor.onDrop.listen((e) {
-      if (!_explorer.classes.contains('hidden')) {
-        var isDir = e.draggableElement.dataset['isDir'];
-        if (isDir == 'false') {
-          var num = editors[dzEditor];
-          cs.add(new CommanderMessage('UPDROIDEDITOR', 'OPEN_FILE', body: [num, getPath(e.draggableElement)]));
-        }
-      }
-    });
-    return [enter, leave, drop];
-  }
-
   void _registerMailbox() {
     _mailbox.registerCommanderEvent('EDITOR_READY', _editorReady);
     _mailbox.registerCommanderEvent('REQUEST_PARENT_PATH', _requestParentPath);
@@ -272,6 +199,59 @@ class UpDroidExplorer extends ExplorerView {
     recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
   }
 
+  //\/\/ CommanderMessage Handlers /\/\//
+
+  void _editorReady(CommanderMessage m) {
+    var num = m.body[0];
+    // Editor num
+    var dropDiv = m.body[1];
+
+    var dzEditor = new Dropzone(dropDiv);
+    if (editorListeners != null) {
+      editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
+      editors.putIfAbsent(dzEditor, () => num);
+      cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
+    }
+  }
+
+  void _requestParentPath(CommanderMessage m) {
+    if (!_explorer.classes.contains('hidden')) {
+      cs.add(new CommanderMessage('UPDROIDEDITOR', 'PARENT_PATH', body: currentSelectedPath));
+    }
+  }
+
+  void _workspaceClean(CommanderMessage m) {
+    if (isActive()) {
+      _mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
+    }
+  }
+
+  void _workspaceBuild(CommanderMessage m) {
+    if (isActive()) {
+      _mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
+    }
+  }
+
+  void _catkinNodeList(CommanderMessage m) {
+    if (isActive()) {
+      _mailbox.ws.send('[[CATKIN_NODE_LIST]]');
+    }
+  }
+
+  void _runNode(CommanderMessage m) {
+    if (isActive()) {
+      String runCommand;
+      if (nodeArgs.value.isEmpty) {
+        runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name']]);
+      } else {
+        runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
+      }
+      _mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
+    }
+  }
+
+  //\/\/ UpDroidMessage Handlers /\/\//
+
   void _getDirPath(UpDroidMessage um) => _mailbox.ws.send('[[EXPLORER_DIRECTORY_PATH]]');
 
   void _explorerDirPath(UpDroidMessage um) {
@@ -282,6 +262,31 @@ class UpDroidExplorer extends ExplorerView {
   void _relayWorkspaceClean(UpDroidMessage um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_CLEAN'));
   void _relayWorkspaceBuild(UpDroidMessage um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_BUILD', body: um.body));
 
+  //\/\/ Handler Helpers /\/\//
+
+  // TODO: cancel when inactive
+  List<StreamSubscription> createEditorListeners(Dropzone dzEditor) {
+    var enter = dzEditor.onDragEnter.listen((e) {
+      var isDir = e.draggableElement.dataset['isDir'];
+      if (isDir == 'false') {
+        cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_ADD', body: 'updroideditor-entered'));
+      }
+    });
+
+    var leave = dzEditor.onDragLeave
+    .listen((e) => cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-entered')));
+
+    var drop = dzEditor.onDrop.listen((e) {
+      if (!_explorer.classes.contains('hidden')) {
+        var isDir = e.draggableElement.dataset['isDir'];
+        if (isDir == 'false') {
+          var num = editors[dzEditor];
+          cs.add(new CommanderMessage('UPDROIDEDITOR', 'OPEN_FILE', body: [num, getPath(e.draggableElement)]));
+        }
+      }
+    });
+    return [enter, leave, drop];
+  }
 
   bool isActive() {
     bool active;

@@ -3,7 +3,6 @@ library cmdr;
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
@@ -14,7 +13,6 @@ import 'tab/pty.dart';
 import 'tab/camera/camera.dart';
 import 'tab/editor.dart';
 import 'tab/explorer.dart';
-import 'ros/ros.dart';
 import 'git.dart';
 import 'server_helper.dart' as help;
 
@@ -216,7 +214,6 @@ class CmdrServer {
   }
 
   void _closeExplorerCmdr(int expNum) {
-    var closeNum = expNum;
     var toRemove;
 
     toRemove = _explorers[expNum];
@@ -228,7 +225,7 @@ class CmdrServer {
 
   void _openTab(String id, Directory dir) {
     List idList = id.split('-');
-    int col = int.parse(idList[0]);
+    //int col = int.parse(idList[0]);
     int num = int.parse(idList[1]);
     String type = idList[2];
 

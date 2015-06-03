@@ -23,7 +23,7 @@ void main() {
   InputElement username = querySelector('#login-username-input');
   InputElement password = querySelector('#login-password-input');
 
-  Timer t = new Timer(new Duration(seconds: 1), () {
+  new Timer(new Duration(seconds: 1), () {
     loginLogo.classes.add('animate-end');
     loginHeading.classes.add('animate-end');
     username.classes.add('animate-end');
@@ -48,7 +48,7 @@ void checkCredentials(KeyboardEvent e, InputElement username, InputElement passw
       subs.forEach((sub) => sub.cancel());
       new UpDroidClient();
       loginOverlay.classes.add('granted');
-      Timer t = new Timer(new Duration(milliseconds: 800), () {
+      new Timer(new Duration(milliseconds: 800), () {
         loginOverlay.style.display = 'none';
       });
     }

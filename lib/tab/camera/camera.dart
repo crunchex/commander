@@ -15,7 +15,6 @@ class CmdrCamera {
   int cameraNum;
   Map<int, CameraServer> servers;
 
-  WebSocket _ws;
   StreamSubscription _currentDeviceSub;
 
 
@@ -47,7 +46,6 @@ class CmdrCamera {
   }
 
   List<int> _getDeviceIds() {
-    Directory dev = new Directory('/dev');
     ProcessResult result = Process.runSync('bash', ['-c', 'find /dev -name "video*"']);
     List<String> rawDevices = result.stdout.split(new RegExp('/dev/video|\n'));
     rawDevices.removeWhere((String s) => s == '');

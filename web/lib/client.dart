@@ -3,7 +3,6 @@ library updroid_client;
 import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
 
 import 'explorer/explorer.dart';
 import 'tabs/editor/editor.dart';
@@ -31,9 +30,6 @@ class UpDroidClient {
   DivElement _explorersDiv;
 
   bool disconnectAlert = false;
-
-  StreamSubscription _workspaceNameClick;
-  StreamSubscription _workspaceNameEnter;
 
   Mailbox _mailbox;
   bool _runButtonEnabled;
@@ -230,7 +226,6 @@ class UpDroidClient {
     if (m.body == '') {
       _runButton.classes.remove('control-button-disabled');
       _controlButton.classes.remove('control-button-disabled');
-      _runButtonEnabled = true;
       _controlButtonEnabled = true;
     } else {
       new UpDroidBuildResultsModal(m.body);
@@ -328,7 +323,6 @@ class UpDroidClient {
 
       void complete() {
         String activeNum;
-        String name;
         for(var explorer in _explorersDiv.children) {
           if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
             if(!explorer.classes.contains('hidden')) {

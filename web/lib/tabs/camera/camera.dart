@@ -18,7 +18,6 @@ class UpDroidCamera extends TabController {
   static const String shortName = 'Camera';
 
   CanvasElement _canvas;
-  AnchorElement _closeTabButton;
 
   UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
     TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
@@ -28,8 +27,6 @@ class UpDroidCamera extends TabController {
   }
 
   void setUpController() {
-    _closeTabButton = view.refMap['close-tab'];
-
     _registerMailbox();
     
     _canvas = new CanvasElement();

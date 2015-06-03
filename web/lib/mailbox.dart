@@ -33,7 +33,7 @@ class Mailbox {
 
     // Call the function registered to m.type.
     _cs.stream.where((m) => m.dest == _name.toUpperCase()).listen((CommanderMessage m) {
-      //print('Commander Message received of type: ${m.type}');
+      //print('[${_name}\'s Mailbox] Commander Message received of type: ${m.type}');
       _csRegistry[m.type](m);
     });
   }
@@ -65,7 +65,7 @@ class Mailbox {
 
     // Call the function registered to ON_MESSAGE[um.header].
     ws.onMessage.transform(updroidTransformer).listen((um) {
-      //print('UpDroidMessage received of type: ${um.header}');
+      //print('[${_name}\'s Mailbox] UpDroidMessage received of type: ${um.header}');
       _wsRegistry[EventType.ON_MESSAGE][um.header](um);
     });
 

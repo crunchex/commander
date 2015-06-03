@@ -85,7 +85,7 @@ class CmdrServer {
           .then((WebSocket ws) => _editors[objectID].handleWebSocket(ws));
         break;
 
-      case 'explorer':
+      case 'updroidexplorer':
         WebSocketTransformer
           .upgrade(request)
           .then((WebSocket ws) => _explorers[objectID + 1].handleWebSocket(ws));

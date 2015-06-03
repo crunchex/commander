@@ -55,7 +55,7 @@ class UpDroidClient {
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.
     _cs = new StreamController<CommanderMessage>.broadcast();
-    _mailbox = new Mailbox('updroidclient', 1, _cs);
+    _mailbox = new Mailbox('UpDroidClient', 1, _cs);
 
     _registerMailbox();
     _registerEventHandlers(_getConfig());

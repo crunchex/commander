@@ -32,7 +32,6 @@ class UpDroidClient {
   bool disconnectAlert = false;
 
   Mailbox _mailbox;
-  bool _runButtonEnabled;
   bool _controlButtonEnabled;
 
   UpDroidClient() {
@@ -51,7 +50,6 @@ class UpDroidClient {
     _runButton = querySelector('#run-button');
     _uploadButton = querySelector('#upload');
 
-    _runButtonEnabled = true;
     _controlButtonEnabled = true;
 
     // Create the intra-client message stream.
@@ -381,7 +379,6 @@ class UpDroidClient {
 
       _controlButton.classes.add('control-button-disabled');
       _runButton.classes.add('control-button-disabled');
-      _runButtonEnabled = false;
       _controlButtonEnabled = false;
     });
 

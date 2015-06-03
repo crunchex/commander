@@ -71,6 +71,7 @@ class UpDroidCamera extends TabController {
       view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': [i]});
     });
     view.refreshMenus();
+    _startPlayer(deviceIds);
   }
 
   void _startPlayer(List args) {

@@ -375,7 +375,7 @@ class UpDroidClient {
       _cleanButton.children.first.classes.remove('glyphicons-cleaning');
       _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
 
-      _cs.add(new CommanderMessage('EXPLORER', 'WORKSPACE_CLEAN'));
+      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_CLEAN'));
 
       _controlButton.classes.add('control-button-disabled');
       _runButton.classes.add('control-button-disabled');
@@ -386,17 +386,17 @@ class UpDroidClient {
       _buildButton.children.first.classes.remove('glyphicons-classic-hammer');
       _buildButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
 
-      _cs.add(new CommanderMessage('EXPLORER', 'WORKSPACE_BUILD'));
+      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_BUILD'));
     });
 
     _controlButton.onClick.listen((e) {
       if (!_controlButtonEnabled) return;
-      _cs.add(new CommanderMessage('EXPLORER', 'CATKIN_NODE_LIST'));
+      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'CATKIN_NODE_LIST'));
     });
 
     _runButton.onClick.listen((e) {
       if (!_controlButtonEnabled) return;
-      _cs.add(new CommanderMessage('EXPLORER', 'RUN_NODE'));
+      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'RUN_NODE'));
     });
 
     _uploadButton.onClick.listen((e) {

@@ -74,69 +74,53 @@ class UpDroidExplorer extends ExplorerView {
     });
   }
 
-  /// Process messages according to the type.
-  void processMessage(CommanderMessage m) {
-    switch (m.type) {
-      case 'CONNECTED':
-        break;
+  void _editorReady(CommanderMessage m) {
+    var num = m.body[0];
+    // Editor num
+    var dropDiv = m.body[1];
 
-      case 'DISCONNECTED':
-        break;
-
-      case 'EDITOR_READY':
-        var num = m.body[0];
-        // Editor num
-        var dropDiv = m.body[1];
-
-        var dzEditor = new Dropzone(dropDiv);
-        if (editorListeners != null) {
-          editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
-          editors.putIfAbsent(dzEditor, () => num);
-          cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
-        }
-        break;
-
-      case 'REQUEST_PARENT_PATH':
-        if (!_explorer.classes.contains('hidden')) {
-          cs.add(new CommanderMessage('UPDROIDEDITOR', 'PARENT_PATH', body: currentSelectedPath));
-        }
-        break;
-
-      case 'WORKSPACE_CLEAN':
-        if (isActive()) {
-          _mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
-        }
-        break;
-
-      case 'WORKSPACE_BUILD':
-        if (isActive()) {
-          _mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
-        }
-        break;
-
-      case 'CATKIN_NODE_LIST':
-        if (isActive()) {
-          _mailbox.ws.send('[[CATKIN_NODE_LIST]]');
-        }
-        break;
-
-      case 'RUN_NODE':
-        if (isActive()) {
-          String runCommand;
-          if (nodeArgs.value.isEmpty) {
-            runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name']]);
-          } else {
-            runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
-          }
-          _mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
-        }
-        break;
-
-      default:
-        print('Explorer error: unrecognized message type: ' + m.type);
+    var dzEditor = new Dropzone(dropDiv);
+    if (editorListeners != null) {
+      editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
+      editors.putIfAbsent(dzEditor, () => num);
+      cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
     }
-    // Dragging through nested dropzones appears to be glitchy
+  }
 
+  void _requestParentPath(CommanderMessage m) {
+    if (!_explorer.classes.contains('hidden')) {
+      cs.add(new CommanderMessage('UPDROIDEDITOR', 'PARENT_PATH', body: currentSelectedPath));
+    }
+  }
+
+  void _workspaceClean(CommanderMessage m) {
+    if (isActive()) {
+      _mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
+    }
+  }
+
+  void _workspaceBuild(CommanderMessage m) {
+    if (isActive()) {
+      _mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
+    }
+  }
+
+  void _catkinNodeList(CommanderMessage m) {
+    if (isActive()) {
+      _mailbox.ws.send('[[CATKIN_NODE_LIST]]');
+    }
+  }
+
+  void _runNode(CommanderMessage m) {
+    if (isActive()) {
+      String runCommand;
+      if (nodeArgs.value.isEmpty) {
+        runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name']]);
+      } else {
+        runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
+      }
+      _mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
+    }
   }
 
   // TODO: cancel when inactive
@@ -164,7 +148,12 @@ class UpDroidExplorer extends ExplorerView {
   }
 
   void _registerMailbox() {
-//    _mailbox.registerCommanderEvent('CLOSE_TAB', _closeTab);
+    _mailbox.registerCommanderEvent('EDITOR_READY', _editorReady);
+    _mailbox.registerCommanderEvent('REQUEST_PARENT_PATH', _requestParentPath);
+    _mailbox.registerCommanderEvent('WORKSPACE_CLEAN', _workspaceClean);
+    _mailbox.registerCommanderEvent('WORKSPACE_BUILD', _workspaceBuild);
+    _mailbox.registerCommanderEvent('CATKIN_NODE_LIST', _catkinNodeList);
+    _mailbox.registerCommanderEvent('RUN_NODE', _runNode);
 
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SEND_DIRECTORY_PATH', _getDirPath);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_PATH', _explorerDirPath);
@@ -182,8 +171,6 @@ class UpDroidExplorer extends ExplorerView {
 
   /// Sets up the event handlers for the file explorer. Mostly mouse events.
   registerExplorerEventHandlers() {
-    cs.stream.where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL').listen((m) => processMessage(m));
-
     _controlToggle.onClick.listen((e) => showControl());
 
     _drop.onClick.listen((e) {

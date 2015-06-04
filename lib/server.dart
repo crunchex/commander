@@ -25,9 +25,9 @@ class CmdrServer {
   static const bool defaultDebugFlag = false;
 
   Map _explorers = {};
-  List<CmdrEditor> _editors = [];
-  List<CmdrPty> _ptys = [];
-  List<CmdrCamera> _cameras = [];
+  Map<int, CmdrEditor> _editors = {};
+  Map<int, CmdrPty> _ptys = {};
+  Map<int, CmdrCamera> _cameras = {};
   Map<int, CameraServer> _camServers = {};
 
   CmdrServer (ArgResults results) {
@@ -77,7 +77,7 @@ class CmdrServer {
     help.debug('Upgraded request received: ${request.uri.path}', 0);
 
     // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
-    int objectID = int.parse(request.uri.pathSegments[1]) - 1;
+    int objectID = int.parse(request.uri.pathSegments[1]);
     switch (request.uri.pathSegments[0]) {
       case 'updroideditor':
         WebSocketTransformer
@@ -88,7 +88,7 @@ class CmdrServer {
       case 'updroidexplorer':
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _explorers[objectID + 1].handleWebSocket(ws));
+          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
         break;
 
       case 'updroidcamera':
@@ -233,16 +233,16 @@ class CmdrServer {
 
     switch (type) {
       case 'UpDroidEditor':
-        _editors.add(new CmdrEditor(dir));
+        _editors[num] = new CmdrEditor(dir);
         break;
       case 'UpDroidCamera':
-        _cameras.add(new CmdrCamera(num, _camServers));
+        _cameras[num] = new CmdrCamera(num, _camServers);
         break;
 
       case 'UpDroidConsole':
         String numRows = idList[3];
         String numCols = idList[4];
-        _ptys.add(new CmdrPty(num, dir.path, numRows, numCols));
+        _ptys[num] = new CmdrPty(num, dir.path, numRows, numCols);
         break;
     }
   }
@@ -256,28 +256,28 @@ class CmdrServer {
 
     switch (type) {
       case 'UpDroidEditor':
-        _editors[num - 1].cleanup();
-        _editors.removeAt(num - 1);
+        _editors[num].cleanup();
+        _editors[num] = null;
         break;
 
       case 'UpDroidCamera':
         // TODO: figure out what should happen here now with the camera server.
         //_cameras[num - 1].cleanup();
-        _cameras.removeAt(num - 1);
+        _cameras[num] = null;
         break;
 
       case 'UpDroidConsole':
-        _ptys[num - 1].cleanup();
-        _ptys.removeAt(num - 1);
+        _ptys[num].cleanup();
+        _ptys[num] = null;
         break;
     }
   }
 
   void _cleanUpBackend() {
     _explorers = {};
-    _editors = [];
-    _ptys = [];
-    _cameras = [];
+    _editors = {};
+    _ptys = {};
+    _cameras = {};
     _camServers = {};
   }
 }

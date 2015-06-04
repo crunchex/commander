@@ -251,7 +251,6 @@ body>.navbar.navbar-inverse {
 .nav-tabs>.tab-handle>.close-control-hitbox {
   position: relative;
   float: right;
-  top: 0px;
   right: 2px;
   width: 16px;
   height: 16px;
@@ -262,7 +261,6 @@ body>.navbar.navbar-inverse {
 .nav-tabs>.tab-handle>.close-control-hitbox>.close-control {
   position: relative;
   float: right;
-  top: 0px;
   right: 0px;
   width: 16px;
   height: 4px;
@@ -272,22 +270,13 @@ body>.navbar.navbar-inverse {
 }
 
 .nav-tabs>.tab-handle.active>.close-control-hitbox>.close-control {
-  position: relative;
-  float: right;
-  top: 0px;
-  right: 0px;
-  width: 16px;
-  height: 4px;
   /*background-color: #ff2919;*/
   background-color: #7e7e7e;
-  z-index: 2;
 }
 
 .nav-tabs>.tab-handle>.clone-control-hitbox {
   position: relative;
   float: left;
-  top: 0px;
-  right: 0px;
   width: 16px;
   height: 16px;
   background-color: transparent;
@@ -301,14 +290,10 @@ body>.navbar.navbar-inverse {
   width: 16px;
   height: 4px;
   background-color: #e3e3e3;
+  z-index: 2;
 }
 
 .nav-tabs>.tab-handle.active>.clone-control-hitbox>.clone-control {
-  visibility: hidden;
-  position: relative;
-  float: left;
-  width: 16px;
-  height: 4px;
   background-color: #7e7e7e;
 }
 

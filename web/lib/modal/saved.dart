@@ -20,6 +20,10 @@ class UpDroidSavedModal extends UpDroidModal {
       ..id = "save-as-input"
       ..attributes['type'] = 'text';
 
+    ParagraphElement note = new ParagraphElement()
+      ..id = "note"
+      ..text = "File will be saved to current selected path in Explorer";
+
     BRElement line = new BRElement();
 
     // executable option
@@ -30,7 +34,7 @@ class UpDroidSavedModal extends UpDroidModal {
       ..id = 'exec-flag'
       ..text = "Make Executable";
 
-    saveInput.children.addAll([askName, input, line, makeExec, h5]);
+    saveInput.children.addAll([askName, input, line, makeExec, h5, note]);
 
     _modalBody.children.add(saveInput);
 

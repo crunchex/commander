@@ -3,8 +3,6 @@ library cmdr_editor;
 import 'dart:io';
 import 'dart:convert';
 
-import 'package:watcher/watcher.dart';
-
 import '../server_helper.dart' as help;
 
 class CmdrEditor {
@@ -12,7 +10,6 @@ class CmdrEditor {
 
   int editorNum = 1;
   Directory _dir;
-  DirectoryWatcher _watcher;
 
   CmdrEditor(Directory dir) {
     _dir = dir;

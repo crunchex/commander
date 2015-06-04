@@ -120,6 +120,7 @@ class UpDroidEditor extends TabController {
     _resetSavePoint();
 
     // Create listener to indicate that there are unsaved changes when file is altered
+    // TODO: should this listener be cancelled at some point? If not, remove var.
     _fileChangesListener = _aceEditor.onChange.listen((e) {
       if (_openFilePath != null && _noUnsavedChanges() == false) view.extra.text = pathLib.basename(_openFilePath) + '*';
     });
@@ -218,6 +219,12 @@ class UpDroidEditor extends TabController {
     view.tabHandleButton.onDoubleClick.listen((e) {
       e.preventDefault();
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_UpDroidEditor'));
+    });
+
+    // TODO: this should be in tab_controller somehow.
+    view.closeControl.onClick.listen((e) {
+      view.destroy();
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });
 
     _closeTabButton.onClick.listen((e) {
@@ -466,7 +473,10 @@ class UpDroidEditor extends TabController {
           }
         }
         else {
-          saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
+          if(_currentParPath == null) saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
+          else {
+            saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
+          }
         }
 
         // Filename already exists on system

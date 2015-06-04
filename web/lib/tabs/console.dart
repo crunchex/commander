@@ -111,6 +111,16 @@ class UpDroidConsole extends TabController {
       _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
     });
 
+    // TODO: this should be in tab_controller somehow.
+    view.closeControl.onClick.listen((e) {
+      view.destroy();
+
+      // This is specific to Console class.
+      _ws.close();
+
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
+    });
+
     _closeTabButton.onClick.listen((e) {
       view.destroy();
       _ws.close();
@@ -142,6 +152,10 @@ class UpDroidConsole extends TabController {
         });
       }
     });
+  }
+
+  void _consoleSpecificClose() {
+    _ws.close();
   }
 
   List _getMenuConfig() {

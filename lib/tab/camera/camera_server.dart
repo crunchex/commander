@@ -49,6 +49,6 @@ class CameraServer {
   }
 
   void cleanup() {
-    bool success = _shell.kill();
+    _shell.kill();
   }
 }

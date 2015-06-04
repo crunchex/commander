@@ -18,7 +18,6 @@ class UpDroidCamera extends TabController {
   static const String shortName = 'Camera';
 
   CanvasElement _canvas;
-  AnchorElement _closeTabButton;
 
   UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
     TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
@@ -28,8 +27,6 @@ class UpDroidCamera extends TabController {
   }
 
   void setUpController() {
-    _closeTabButton = view.refMap['close-tab'];
-
     _registerMailbox();
     
     _canvas = new CanvasElement();
@@ -74,6 +71,7 @@ class UpDroidCamera extends TabController {
       view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': [i]});
     });
     view.refreshMenus();
+    _startPlayer(deviceIds);
   }
 
   void _startPlayer(List args) {
@@ -106,6 +104,12 @@ class UpDroidCamera extends TabController {
   void _registerEventHandlers() {
     window.onResize.listen((e) {
       resizeCanvas();
+    });
+
+    // TODO: this should be in tab_controller somehow.
+    view.closeControl.onClick.listen((e) {
+      view.destroy();
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });
 
     view.tabHandleButton.onDoubleClick.listen((e) {

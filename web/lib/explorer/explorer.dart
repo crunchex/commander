@@ -8,7 +8,7 @@ import 'package:dnd/dnd.dart';
 import 'package:path/path.dart' as pathLib;
 
 import '../updroid_message.dart';
-import '../modal/modal.dart';
+import '../mailbox.dart';
 import 'explorer_helper.dart';
 
 part 'explorer_view.dart';
@@ -24,6 +24,7 @@ class UpDroidExplorer extends ExplorerView {
   String name;
   bool closed;
 
+  Mailbox _mailbox;
   String workspacePath;
   DivElement currentSelected;
   LIElement currentSelectedNode;
@@ -51,7 +52,6 @@ class UpDroidExplorer extends ExplorerView {
 
   List recycleListeners = [];
 
-  WebSocket ws;
   StreamController<CommanderMessage> cs;
 
   UpDroidExplorer(StreamController<CommanderMessage> cs, num, folderName) {
@@ -67,80 +67,202 @@ class UpDroidExplorer extends ExplorerView {
       dzTopLevel = new Dropzone(_hrContainer);
       dzRecycle = new Dropzone(_recycle);
 
-      // Create the server <-> client [WebSocket].
-      // Port 12060 is the default port that UpDroid uses.
-      String url = window.location.host;
-      url = url.split(':')[0];
-      ws = new WebSocket('ws://' + url + ':12060/explorer/${expNum.toString()}');
+      _mailbox = new Mailbox(className, expNum, cs);
 
+      _registerMailbox();
       registerExplorerEventHandlers();
     });
   }
 
-  /// Process messages according to the type.
-  void processMessage(CommanderMessage m) {
-    switch (m.type) {
-      case 'CONNECTED':
-        break;
+  void _registerMailbox() {
+    _mailbox.registerCommanderEvent('EDITOR_READY', _editorReady);
+    _mailbox.registerCommanderEvent('REQUEST_PARENT_PATH', _requestParentPath);
+    _mailbox.registerCommanderEvent('WORKSPACE_CLEAN', _workspaceClean);
+    _mailbox.registerCommanderEvent('WORKSPACE_BUILD', _workspaceBuild);
+    _mailbox.registerCommanderEvent('CATKIN_NODE_LIST', _catkinNodeList);
+    _mailbox.registerCommanderEvent('RUN_NODE', _runNode);
 
-      case 'DISCONNECTED':
-        break;
-
-      case 'EDITOR_READY':
-        var num = m.body[0];
-        // Editor num
-        var dropDiv = m.body[1];
-
-        var dzEditor = new Dropzone(dropDiv);
-        if (editorListeners != null) {
-          editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
-          editors.putIfAbsent(dzEditor, () => num);
-          cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
-        }
-        break;
-
-      case 'REQUEST_PARENT_PATH':
-        if (!_explorer.classes.contains('hidden')) {
-          cs.add(new CommanderMessage('UPDROIDEDITOR', 'PARENT_PATH', body: currentSelectedPath));
-        }
-        break;
-
-      case 'WORKSPACE_CLEAN':
-        if (isActive()) {
-          ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
-        }
-        break;
-
-      case 'WORKSPACE_BUILD':
-        if (isActive()) {
-          ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
-        }
-        break;
-
-      case 'CATKIN_NODE_LIST':
-        if (isActive()) {
-          ws.send('[[CATKIN_NODE_LIST]]');
-        }
-        break;
-
-      case 'RUN_NODE':
-        if (isActive()) {
-          String runCommand;
-          if (nodeArgs.value.isEmpty) {
-            runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name']]);
-          } else {
-            runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
-          }
-          ws.send('[[CATKIN_RUN]]' + runCommand);
-        }
-        break;
-
-      default:
-        print('Explorer error: unrecognized message type: ' + m.type);
-    }
-    // Dragging through nested dropzones appears to be glitchy
-
+    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SEND_DIRECTORY_PATH', _getDirPath);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_PATH', _explorerDirPath);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'INITIAL_DIRECTORY_LIST', initialDirectoryList);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_LIST', generateDirectoryList);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_REFRESH', refreshPage);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_ADD', addUpdate);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_REMOVE', removeUpdate);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CLEAN', _relayWorkspaceClean);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_BUILD', _relayWorkspaceBuild);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CATKIN_NODE_LIST', populateNodes);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CLEAN', _relayWorkspaceClean);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CLEAN', _relayWorkspaceClean);
   }
+
+  /// Sets up the event handlers for the file explorer. Mostly mouse events.
+  registerExplorerEventHandlers() {
+    _controlToggle.onClick.listen((e) => showControl());
+
+    _drop.onClick.listen((e) {
+      if (currentSelected != null) {
+        currentSelected.classes.remove('highlighted');
+      }
+      currentSelected = null;
+      currentSelectedPath = workspacePath;
+    });
+
+    dzTopLevel.onDragEnter.listen((e) => _drop.classes.add('file-drop-entered'));
+    dzTopLevel.onDragLeave.listen((e) => _drop.classes.remove('file-drop-entered'));
+
+    dzTopLevel.onDrop.listen((e) {
+      String dragType = e.draggableElement.className;
+      if (!(dragType.contains('explorer-li') || dragType.contains('file'))) {
+        _mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
+        return;
+      }
+
+      // The draggable is a new file.
+      if (dragType.contains('file')) {
+        _mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
+        return;
+      }
+
+      // The draggable is an existing file/folder.
+      var currentPath = getPath(e.draggableElement);
+      LIElement item = pathToFile[currentPath];
+      var newPath = '$workspacePath/${getName(e.draggableElement)}';
+      bool duplicate = false;
+
+      // Check for duplicate file name
+      if (pathToFile.containsKey(newPath)) {
+        duplicate = true;
+      }
+
+      bool alert = false;
+
+      if (duplicate) {
+        alert = true;
+        window.alert("Cannot move here, filename already exists");
+      }
+
+      _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+      cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
+      if (e.draggableElement.dataset['isDir'] == 'true') {
+        // Avoid an exception thrown when the new name already exists or dragging to same folder.
+        if (currentPath != newPath && alert == false) {
+          if (item.lastChild.hasChildNodes() == false) {
+            var name = getName(e.draggableElement);
+            removeFileData(item, currentPath);
+            newElementFromFile(new SimpleFile.fromPath(workspacePath + '/' + name, workspacePath, true));
+          } // TODO: Preserve structure
+          else if (checkContents(item) == true) {
+            removeSubFolders(item);
+            removeFileData(e.draggableElement, currentPath);
+            _mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
+          } else {
+            removeFileData(e.draggableElement, currentPath);
+          }
+          item.remove();
+        }
+      }
+    });
+
+    _folder.onDoubleClick.listen((e) {
+      String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
+      _mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled');
+    });
+
+    _file.onDoubleClick.listen((e) {
+      String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
+      _mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + path);
+    });
+
+    // TODO: cancel when inactive
+
+    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _recycle.classes.add('recycle-entered'));
+    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _recycle.classes.remove('recycle-entered'));
+
+    var recycleDrop = dzRecycle.onDrop.listen((e) {
+      if (!_explorer.classes.contains('hidden')) {
+        var path = getPath(e.draggableElement);
+
+        // Draggable is an empty folder
+        if (e.draggableElement.dataset['isDir'] == 'true') {
+          LIElement selectedFolder = pathToFile[path];
+          selectedFolder.remove();
+          removeFileData(selectedFolder, path);
+          if (checkContents(selectedFolder) == true) {
+            removeSubFolders(selectedFolder);
+          }
+        }
+
+        _mailbox.ws.send('[[EXPLORER_DELETE]]' + path);
+      }
+    });
+    recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
+  }
+
+  //\/\/ CommanderMessage Handlers /\/\//
+
+  void _editorReady(CommanderMessage m) {
+    var num = m.body[0];
+    // Editor num
+    var dropDiv = m.body[1];
+
+    var dzEditor = new Dropzone(dropDiv);
+    if (editorListeners != null) {
+      editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
+      editors.putIfAbsent(dzEditor, () => num);
+      cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
+    }
+  }
+
+  void _requestParentPath(CommanderMessage m) {
+    if (!_explorer.classes.contains('hidden')) {
+      cs.add(new CommanderMessage('UPDROIDEDITOR', 'PARENT_PATH', body: currentSelectedPath));
+    }
+  }
+
+  void _workspaceClean(CommanderMessage m) {
+    if (isActive()) {
+      _mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
+    }
+  }
+
+  void _workspaceBuild(CommanderMessage m) {
+    if (isActive()) {
+      _mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
+    }
+  }
+
+  void _catkinNodeList(CommanderMessage m) {
+    if (isActive()) {
+      _mailbox.ws.send('[[CATKIN_NODE_LIST]]');
+    }
+  }
+
+  void _runNode(CommanderMessage m) {
+    if (isActive()) {
+      String runCommand;
+      if (nodeArgs.value.isEmpty) {
+        runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name']]);
+      } else {
+        runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
+      }
+      _mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
+    }
+  }
+
+  //\/\/ UpDroidMessage Handlers /\/\//
+
+  void _getDirPath(UpDroidMessage um) => _mailbox.ws.send('[[EXPLORER_DIRECTORY_PATH]]');
+
+  void _explorerDirPath(UpDroidMessage um) {
+    workspacePath = um.body;
+    _mailbox.ws.send('[[INITIAL_DIRECTORY_LIST]]');
+  }
+
+  void _relayWorkspaceClean(UpDroidMessage um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_CLEAN'));
+  void _relayWorkspaceBuild(UpDroidMessage um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_BUILD', body: um.body));
+
+  //\/\/ Handler Helpers /\/\//
 
   // TODO: cancel when inactive
   List<StreamSubscription> createEditorListeners(Dropzone dzEditor) {
@@ -164,158 +286,6 @@ class UpDroidExplorer extends ExplorerView {
       }
     });
     return [enter, leave, drop];
-  }
-
-  /// Sets up the event handlers for the file explorer. Mostly mouse events.
-  registerExplorerEventHandlers() {
-    cs.stream.where((m) => m.dest == 'EXPLORER' || m.dest == 'ALL').listen((m) => processMessage(m));
-
-    ws.onOpen.listen((e) => ws.send('[[EXPLORER_DIRECTORY_PATH]]'));
-
-    ws.onMessage.transform(updroidTransformer).where((um) => um.header == 'EXPLORER_DIRECTORY_PATH').listen((um) {
-      workspacePath = um.body;
-      ws.send('[[INITIAL_DIRECTORY_LIST]]');
-    });
-
-    ws.onMessage
-        .transform(updroidTransformer)
-        .where((um) => um.header == 'INITIAL_DIRECTORY_LIST')
-        .listen((um) => initialDirectoryList(um.body));
-
-    ws.onMessage
-        .transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_DIRECTORY_LIST')
-        .listen((um) => generateDirectoryList(um.body));
-
-    ws.onMessage
-        .transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_DIRECTORY_REFRESH')
-        .listen((um) => refreshPage(um.body));
-
-    ws.onMessage
-        .transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_ADD')
-        .listen((um) => addUpdate(um.body));
-
-    ws.onMessage
-        .transform(updroidTransformer)
-        .where((um) => um.header == 'EXPLORER_REMOVE')
-        .listen((um) => removeUpdate(um.body));
-
-    ws.onMessage
-        .transform(updroidTransformer)
-        .where((um) => um.header == 'WORKSPACE_CLEAN')
-        .listen((um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_CLEAN')));
-
-    ws.onMessage
-        .transform(updroidTransformer)
-        .where((um) => um.header == 'WORKSPACE_BUILD')
-        .listen((um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_BUILD', body: um.body)));
-
-    ws.onMessage
-        .transform(updroidTransformer)
-        .where((um) => um.header == 'CATKIN_NODE_LIST')
-        .listen((um) => populateNodes(cs, JSON.decode(um.body)));
-
-    _controlToggle.onClick.listen((e) => showControl());
-
-    _drop.onClick.listen((e) {
-      if (currentSelected != null) {
-        currentSelected.classes.remove('highlighted');
-      }
-      currentSelected = null;
-      currentSelectedPath = workspacePath;
-    });
-
-    dzTopLevel.onDragEnter.listen((e) => _drop.classes.add('file-drop-entered'));
-    dzTopLevel.onDragLeave.listen((e) => _drop.classes.remove('file-drop-entered'));
-
-    dzTopLevel.onDrop.listen((e) {
-      String dragType = e.draggableElement.className;
-      if (!(dragType.contains('explorer-li') || dragType.contains('file'))) {
-        ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
-        return;
-      }
-
-      // The draggable is a new file.
-      if (dragType.contains('file')) {
-        ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
-        return;
-      }
-
-      // The draggable is an existing file/folder.
-      var currentPath = getPath(e.draggableElement);
-      LIElement item = pathToFile[currentPath];
-      var newPath = '$workspacePath/${getName(e.draggableElement)}';
-      bool duplicate = false;
-
-      // Check for duplicate file name
-      if (pathToFile.containsKey(newPath)) {
-        duplicate = true;
-      }
-
-      bool alert = false;
-
-      if (duplicate) {
-        alert = true;
-        window.alert("Cannot move here, filename already exists");
-      }
-
-      ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
-      cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
-      if (e.draggableElement.dataset['isDir'] == 'true') {
-        // Avoid an exception thrown when the new name already exists or dragging to same folder.
-        if (currentPath != newPath && alert == false) {
-          if (item.lastChild.hasChildNodes() == false) {
-            var name = getName(e.draggableElement);
-            removeFileData(item, currentPath);
-            newElementFromFile(new SimpleFile.fromPath(workspacePath + '/' + name, workspacePath, true));
-          } // TODO: Preserve structure
-          else if (checkContents(item) == true) {
-            removeSubFolders(item);
-            removeFileData(e.draggableElement, currentPath);
-            ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
-          } else {
-            removeFileData(e.draggableElement, currentPath);
-          }
-          item.remove();
-        }
-      }
-    });
-
-    _folder.onDoubleClick.listen((e) {
-      String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
-      ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled');
-    });
-
-    _file.onDoubleClick.listen((e) {
-      String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
-      ws.send('[[EXPLORER_NEW_FILE]]' + path);
-    });
-
-    // TODO: cancel when inactive
-
-    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _recycle.classes.add('recycle-entered'));
-    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _recycle.classes.remove('recycle-entered'));
-
-    var recycleDrop = dzRecycle.onDrop.listen((e) {
-      if (!_explorer.classes.contains('hidden')) {
-        var path = getPath(e.draggableElement);
-
-        // Draggable is an empty folder
-        if (e.draggableElement.dataset['isDir'] == 'true') {
-          LIElement selectedFolder = pathToFile[path];
-          selectedFolder.remove();
-          removeFileData(selectedFolder, path);
-          if (checkContents(selectedFolder) == true) {
-            removeSubFolders(selectedFolder);
-          }
-        }
-
-        ws.send('[[EXPLORER_DELETE]]' + path);
-      }
-    });
-    recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
   }
 
   bool isActive() {
@@ -509,21 +479,21 @@ class UpDroidExplorer extends ExplorerView {
 
             if (currentPath != newPath && duplicate == false && send == true) {
               if (item.lastChild.hasChildNodes() == false) {
-                ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 var name = getName(e.draggableElement);
                 removeFileData(e.draggableElement, currentPath);
                 newElementFromFile(
                     new SimpleFile.fromPath(getPath(span.parent.parent) + '/' + name, workspacePath, true));
                 item.remove();
               } else if (checkContents(item) == true) {
-                ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
                 removeSubFolders(item);
                 removeFileData(e.draggableElement, currentPath);
-                ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
+                _mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
                 item.remove();
               } else {
-                ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
                 item.remove();
                 removeFileData(e.draggableElement, currentPath);
@@ -533,7 +503,7 @@ class UpDroidExplorer extends ExplorerView {
             if (currentPath != newPath &&
                 duplicate == false &&
                 !getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
-              ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
               cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
             }
           }
@@ -542,9 +512,9 @@ class UpDroidExplorer extends ExplorerView {
             window.alert("Cannot move here, file name already exists");
           }
         } else if (e.draggableElement.classes.contains('file')) {
-          ws.send('[[EXPLORER_NEW_FILE]]' + getPath(span.parent.parent));
+          _mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + getPath(span.parent.parent));
         } else {
-          ws.send('[[EXPLORER_NEW_FOLDER]]' + getPath(span.parent.parent) + '/untitled');
+          _mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + getPath(span.parent.parent) + '/untitled');
         }
       });
     }
@@ -576,7 +546,8 @@ class UpDroidExplorer extends ExplorerView {
     });
   }
 
-  void populateNodes(StreamController<CommanderMessage> cs, List<Map> nodeList) {
+  void populateNodes(UpDroidMessage um) {
+    List<Map> nodeList = JSON.decode(um.body);
     Map packageMap = createPackageList(nodeList);
 
     for (var packageNode in nodeList) {
@@ -626,7 +597,7 @@ class UpDroidExplorer extends ExplorerView {
 
       outsideClickListener = outside.onClick.listen((e) {
         if (e.target != input && renameFinish == false) {
-          ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+          _mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
           outsideClickListener.cancel();
         }
       });
@@ -639,7 +610,7 @@ class UpDroidExplorer extends ExplorerView {
 
           bool duplicate = pathToFile.containsKey(newPath);
           if (duplicate == false) {
-            ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
+            _mailbox.ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
             cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [file.path, newPath]));
             if (folder == true) {
               removeFileData(li, file.path);
@@ -650,10 +621,10 @@ class UpDroidExplorer extends ExplorerView {
 
           if (duplicate == true) {
             if (duplicate == li) {
-              ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+              _mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
             } else {
               window.alert("File name already exists");
-              ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+              _mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
             }
           }
 
@@ -668,13 +639,13 @@ class UpDroidExplorer extends ExplorerView {
           if (file.path == newPath) {
             li.remove();
             if (file.isDirectory == true) {
-              ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+              _mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
             }
           }
 
           if (refresh == true) {
             removeSubFolders(li);
-            ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
+            _mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
           }
 
           // Create a folder icon if the item renamed was an empty folder
@@ -804,7 +775,8 @@ class UpDroidExplorer extends ExplorerView {
   }
 
   /// Handles an Explorer add update for a single file.
-  void addUpdate(String path) {
+  void addUpdate(UpDroidMessage um) {
+    String path = um.body;
     SimpleFile sFile = new SimpleFile.fromPath(path, workspacePath, false);
     var parentPath = pathLib.dirname(sFile.path);
 
@@ -828,7 +800,8 @@ class UpDroidExplorer extends ExplorerView {
   }
 
   /// Handles an Explorer remove update for a single file.
-  void removeUpdate(String path) {
+  void removeUpdate(UpDroidMessage um) {
+    String path = um.body;
     LIElement li = pathToFile[path];
 
     // Case to deal with removeUpdate grabbing null objects when items are renamed
@@ -873,8 +846,8 @@ class UpDroidExplorer extends ExplorerView {
   }
 
   /// First Directory List Generation
-  void initialDirectoryList(String raw) {
-    var files = fileList(raw);
+  void initialDirectoryList(UpDroidMessage um) {
+    var files = fileList(um.body);
 
     UListElement explorer = querySelector('#explorer-body-$expNum');
     explorer.innerHtml = '';
@@ -885,7 +858,8 @@ class UpDroidExplorer extends ExplorerView {
   }
 
   /// Redraws all file explorer views.
-  void generateDirectoryList(String raw) {
+  void generateDirectoryList(UpDroidMessage um) {
+    String raw = um.body;
     var files = fileList(raw);
     var folderStateList = {};
     for (var file in files) {
@@ -911,7 +885,8 @@ class UpDroidExplorer extends ExplorerView {
   }
 
   /// Update the explorer view in case of nested folder movement to cover for empty folders
-  void refreshPage(String raw) {
+  void refreshPage(UpDroidMessage um) {
+    String raw = um.body;
     var files = fileList(raw);
 
     for (SimpleFile file in files) {

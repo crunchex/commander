@@ -78,7 +78,6 @@ class TabView {
     closeControl = new DivElement()
       ..title = 'Close'
       ..classes.add('close-control');
-    if (active) closeControl.classes.add('active');
     _tabHandle.children.add(closeControl);
 
 //    SpanElement closeSymbol = new SpanElement()
@@ -86,10 +85,10 @@ class TabView {
 //      ..text = 'X';
 //    closeControl.children.add(closeSymbol);
 
-//    cloneControl = new DivElement()
-//      ..classes.add('clone-control');
-//    if (active) cloneControl.classes.add('active');
-//    _tabHandle.children.add(cloneControl);
+    cloneControl = new DivElement()
+      ..title = 'Clone'
+      ..classes.add('clone-control');
+    _tabHandle.children.add(cloneControl);
 
     tabHandleButton = new AnchorElement()
         ..id = 'button-$id-$num'

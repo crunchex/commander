@@ -256,6 +256,7 @@ body>.navbar.navbar-inverse {
   width: 13px;
   height: 8px;
   background-color: #7e7e7e;
+  opacity: 1;
   z-index: 1;
 }
 
@@ -266,7 +267,8 @@ body>.navbar.navbar-inverse {
   right: 2px;
   width: 13px;
   height: 8px;
-  background-color: #e3e3e3;
+  background-color: #7e7e7e;
+  opacity: 0.5;
   z-index: 1;
 }
 
@@ -280,13 +282,25 @@ body>.navbar.navbar-inverse {
   /*z-index: 1;*/
 /*}*/
 
+.nav-tabs>.tab-handle.active>.clone-control {
+  position: relative;
+  float: right;
+  right: 4px;
+  width: 13px;
+  height: 8px;
+  background-color: #e3e3e3;
+  opacity: 1;
+  z-index: 1;
+}
+
 .nav-tabs>.tab-handle>.clone-control {
   position: relative;
   float: right;
-  right: 6px;
-  width: 10px;
-  height: 10px;
-  background-color: #7e7e7e;
+  right: 4px;
+  width: 13px;
+  height: 8px;
+  background-color: #e3e3e3;
+  opacity: 0.5;
   z-index: 1;
 }
 

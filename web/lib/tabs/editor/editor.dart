@@ -82,7 +82,7 @@ class UpDroidEditor extends TabController {
     _setUpEditor();
     _registerEditorEventHandlers();
 
-    cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [id, view.content]));
+    cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
   }
 
   void setUpUI() {
@@ -139,7 +139,8 @@ class UpDroidEditor extends TabController {
   void _openFileHandler(CommanderMessage m) {
     if (id != m.body[0]) return;
     mailbox.ws.send('[[EDITOR_OPEN]]' + m.body[1]);
-    view.extra.text = pathLib.basename(m.body[1]);
+    pathLib.basename(m.body[1]) == 'CMakeLists.txt' ? view.extra.text = pathLib.basename(m.body[1]) + ' (Read Only)'
+    : view.extra.text = pathLib.basename(m.body[1]);
   }
 
   void _passEditorHandler(CommanderMessage m) {

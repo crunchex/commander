@@ -216,9 +216,9 @@ class UpDroidEditor extends TabController {
       });
     });
 
-    view.tabHandleButton.onDoubleClick.listen((e) {
+    view.cloneControl.onClick.listen((e) {
       e.preventDefault();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_UpDroidEditor'));
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${className}'));
     });
 
     // TODO: this should be in tab_controller somehow.

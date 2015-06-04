@@ -76,14 +76,19 @@ class TabView {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     closeControl = new DivElement()
+      ..title = 'Close'
       ..classes.add('close-control');
-    if (active) closeControl.classes.add('active');
     _tabHandle.children.add(closeControl);
 
-//    cloneControl = new DivElement()
-//      ..classes.add('clone-control');
-//    if (active) cloneControl.classes.add('active');
-//    _tabHandle.children.add(cloneControl);
+//    SpanElement closeSymbol = new SpanElement()
+//      ..classes.add('close-control-symbol')
+//      ..text = 'X';
+//    closeControl.children.add(closeSymbol);
+
+    cloneControl = new DivElement()
+      ..title = 'Clone'
+      ..classes.add('clone-control');
+    _tabHandle.children.add(cloneControl);
 
     tabHandleButton = new AnchorElement()
         ..id = 'button-$id-$num'

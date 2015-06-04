@@ -111,6 +111,11 @@ class UpDroidConsole extends TabController {
       _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
     });
 
+    view.cloneControl.onClick.listen((e) {
+      e.preventDefault();
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${className}'));
+    });
+
     // TODO: this should be in tab_controller somehow.
     view.closeControl.onClick.listen((e) {
       view.destroy();
@@ -135,11 +140,6 @@ class UpDroidConsole extends TabController {
     _blinkButton.onClick.listen((e) {
       _toggleBlink();
       e.preventDefault();
-    });
-
-    view.tabHandleButton.onDoubleClick.listen((e) {
-      e.preventDefault();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_UpDroidConsole'));
     });
 
     window.onResize.listen((e) {

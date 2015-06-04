@@ -96,9 +96,9 @@ class TabView {
         ..dataset['toggle'] = 'tab'
         ..text = '$shortName-$num';
     tabHandleButton.onClick.listen((e) {
-      //e.preventDefault();
+      e.preventDefault();
       //e.stopImmediatePropagation();
-      _renameEventHandler();
+      //_renameEventHandler();
     });
     _tabHandle.children.add(tabHandleButton);
 

@@ -138,7 +138,8 @@ class UpDroidEditor extends TabController {
   void _openFileHandler(CommanderMessage m) {
     if (id != m.body[0]) return;
     mailbox.ws.send('[[EDITOR_OPEN]]' + m.body[1]);
-    view.extra.text = pathLib.basename(m.body[1]);
+    pathLib.basename(m.body[1]) == 'CMakeLists.txt' ? view.extra.text = pathLib.basename(m.body[1]) + ' (Read Only)'
+    : view.extra.text = pathLib.basename(m.body[1]);
   }
 
   void _passEditorHandler(CommanderMessage m) {

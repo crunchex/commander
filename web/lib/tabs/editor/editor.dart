@@ -221,7 +221,7 @@ class UpDroidEditor extends TabController {
     });
 
     // TODO: this should be in tab_controller somehow.
-    view.closeTriangle.onClick.listen((e) {
+    view.closeControl.onClick.listen((e) {
       view.destroy();
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });

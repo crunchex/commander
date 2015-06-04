@@ -248,12 +248,33 @@ body>.navbar.navbar-inverse {
   width: auto;
 }
 
-.nav-tabs>.tab-handle>.close-triangle {
-  position: absolute;
-  width: 0;
-  height: 0;
-  border-top: 12px solid #ff2919;
-  border-right: 12px solid transparent;
+.nav-tabs>.tab-handle.active>.close-control {
+  position: relative;
+  float:right;
+  right: 2px;
+  width: 13px;
+  height: 8px;
+  background-color: #7e7e7e;
+  z-index: 1;
+}
+
+.nav-tabs>.tab-handle>.close-control {
+  position: relative;
+  float:right;
+  right: 2px;
+  width: 13px;
+  height: 8px;
+  background-color: #e3e3e3;
+  z-index: 1;
+}
+
+.nav-tabs>.tab-handle>.clone-control {
+  position: relative;
+  float: right;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  background-color: #7e7e7e;
   z-index: 1;
 }
 

@@ -112,7 +112,7 @@ class UpDroidConsole extends TabController {
     });
 
     // TODO: this should be in tab_controller somehow.
-    view.closeTriangle.onClick.listen((e) {
+    view.closeControl.onClick.listen((e) {
       view.destroy();
 
       // This is specific to Console class.

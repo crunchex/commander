@@ -23,7 +23,8 @@ class TabView {
   Map refMap;
 
   AnchorElement tabHandleButton;
-  DivElement closeTriangle;
+  DivElement closeControl;
+  DivElement cloneControl;
   DivElement content;
   LIElement extra;
 
@@ -74,10 +75,15 @@ class TabView {
 
     String id = title.toLowerCase().replaceAll(' ', '-');
 
-    closeTriangle = new DivElement()
-      ..classes.add('close-triangle');
-    if (active) closeTriangle.classes.add('active');
-    _tabHandle.children.add(closeTriangle);
+    closeControl = new DivElement()
+      ..classes.add('close-control');
+    if (active) closeControl.classes.add('active');
+    _tabHandle.children.add(closeControl);
+
+//    cloneControl = new DivElement()
+//      ..classes.add('clone-control');
+//    if (active) cloneControl.classes.add('active');
+//    _tabHandle.children.add(cloneControl);
 
     tabHandleButton = new AnchorElement()
         ..id = 'button-$id-$num'

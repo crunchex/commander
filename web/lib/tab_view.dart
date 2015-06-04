@@ -23,8 +23,8 @@ class TabView {
   Map refMap;
 
   AnchorElement tabHandleButton;
-  DivElement closeControl;
-  DivElement cloneControl;
+  DivElement closeControlHitbox;
+  DivElement cloneControlHitbox;
   DivElement content;
   LIElement extra;
 
@@ -75,20 +75,28 @@ class TabView {
 
     String id = title.toLowerCase().replaceAll(' ', '-');
 
-    closeControl = new DivElement()
+    closeControlHitbox = new DivElement()
       ..title = 'Close'
+      ..classes.add('close-control-hitbox');
+    _tabHandle.children.add(closeControlHitbox);
+
+    DivElement closeControl = new DivElement()
       ..classes.add('close-control');
-    _tabHandle.children.add(closeControl);
+    closeControlHitbox.children.add(closeControl);
 
 //    SpanElement closeSymbol = new SpanElement()
 //      ..classes.add('close-control-symbol')
 //      ..text = 'X';
 //    closeControl.children.add(closeSymbol);
 
-    cloneControl = new DivElement()
+    cloneControlHitbox = new DivElement()
       ..title = 'Clone'
+      ..classes.add('clone-control-hitbox');
+    _tabHandle.children.add(cloneControlHitbox);
+
+    DivElement cloneControl = new DivElement()
       ..classes.add('clone-control');
-    _tabHandle.children.add(cloneControl);
+    cloneControlHitbox.children.add(cloneControl);
 
     tabHandleButton = new AnchorElement()
         ..id = 'button-$id-$num'

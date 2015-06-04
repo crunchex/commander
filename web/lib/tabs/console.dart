@@ -111,13 +111,13 @@ class UpDroidConsole extends TabController {
       _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
     });
 
-    view.cloneControl.onClick.listen((e) {
+    view.cloneControlHitbox.onClick.listen((e) {
       e.preventDefault();
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${className}'));
     });
 
     // TODO: this should be in tab_controller somehow.
-    view.closeControl.onClick.listen((e) {
+    view.closeControlHitbox.onClick.listen((e) {
       view.destroy();
 
       // This is specific to Console class.

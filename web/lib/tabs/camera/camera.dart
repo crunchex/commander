@@ -106,13 +106,13 @@ class UpDroidCamera extends TabController {
       resizeCanvas();
     });
 
-    view.cloneControl.onClick.listen((e) {
+    view.cloneControlHitbox.onClick.listen((e) {
       e.preventDefault();
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${className}'));
     });
 
     // TODO: this should be in tab_controller somehow.
-    view.closeControl.onClick.listen((e) {
+    view.closeControlHitbox.onClick.listen((e) {
       view.destroy();
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });

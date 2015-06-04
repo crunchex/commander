@@ -248,68 +248,68 @@ body>.navbar.navbar-inverse {
   width: auto;
 }
 
-.nav-tabs>.tab-handle.active>.close-control {
+.nav-tabs>.tab-handle>.close-control-hitbox {
   position: relative;
   float: right;
   top: 0px;
   right: 2px;
   width: 16px;
-  height: 4px;
-  /*border-top: 12px solid #7e7e7e;*/
-  /*border-left: 12px solid transparent;*/
-  background-color: #7e7e7e;
-  opacity: 1;
-  z-index: 1;
+  height: 16px;
+  background-color: transparent;
+  z-index: 2;
 }
 
-.nav-tabs>.tab-handle>.close-control {
+.nav-tabs>.tab-handle>.close-control-hitbox>.close-control {
   position: relative;
   float: right;
   top: 0px;
-  right: 2px;
+  right: 0px;
   width: 16px;
   height: 4px;
-  /*border-top: 12px solid #7e7e7e;*/
-  /*border-left: 12px solid transparent;*/
+  /*background-color: #ff948c;*/
+  background-color: #e3e3e3;
+  z-index: 2;
+}
+
+.nav-tabs>.tab-handle.active>.close-control-hitbox>.close-control {
+  position: relative;
+  float: right;
+  top: 0px;
+  right: 0px;
+  width: 16px;
+  height: 4px;
+  /*background-color: #ff2919;*/
   background-color: #7e7e7e;
-  opacity: 0.5;
+  z-index: 2;
+}
+
+.nav-tabs>.tab-handle>.clone-control-hitbox {
+  position: relative;
+  float: left;
+  top: 0px;
+  right: 0px;
+  width: 16px;
+  height: 16px;
+  background-color: transparent;
   z-index: 1;
 }
 
-/*.nav-tabs>.tab-handle>.close-control>.close-control-symbol {*/
-  /*position: absolute;*/
-  /*width: 13px;*/
-  /*height: 8px;*/
-  /*font-size: 6px;*/
-  /*color: #ffffff;*/
-  /*background-color: transparent;*/
-  /*z-index: 1;*/
-/*}*/
-
-.nav-tabs>.tab-handle.active>.clone-control {
+.nav-tabs>.tab-handle>.clone-control-hitbox>.clone-control {
+  visibility: hidden;
   position: relative;
   float: left;
-  /*right: 4px;*/
   width: 16px;
   height: 4px;
-  /*border-top: 12px solid #e3e3e3;*/
-  /*border-right: 12px solid transparent;*/
   background-color: #e3e3e3;
-  opacity: 1;
-  z-index: 1;
 }
 
-.nav-tabs>.tab-handle>.clone-control {
+.nav-tabs>.tab-handle.active>.clone-control-hitbox>.clone-control {
+  visibility: hidden;
   position: relative;
   float: left;
-  /*right: 4px;*/
   width: 16px;
   height: 4px;
-  /*border-top: 12px solid #e3e3e3;*/
-  /*border-right: 12px solid transparent;*/
-  background-color: #e3e3e3;
-  opacity: 0.5;
-  z-index: 1;
+  background-color: #7e7e7e;
 }
 
 .nav-tabs>.tab-handle>a {

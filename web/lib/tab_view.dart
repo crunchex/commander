@@ -23,6 +23,7 @@ class TabView {
   Map refMap;
 
   AnchorElement tabHandleButton;
+  DivElement closeTriangle;
   DivElement content;
   LIElement extra;
 
@@ -72,6 +73,11 @@ class TabView {
     if (active) _tabHandle.classes.add('active');
 
     String id = title.toLowerCase().replaceAll(' ', '-');
+
+    closeTriangle = new DivElement()
+      ..classes.add('close-triangle');
+    if (active) closeTriangle.classes.add('active');
+    _tabHandle.children.add(closeTriangle);
 
     tabHandleButton = new AnchorElement()
         ..id = 'button-$id-$num'

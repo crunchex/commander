@@ -248,6 +248,15 @@ body>.navbar.navbar-inverse {
   width: auto;
 }
 
+.nav-tabs>.tab-handle>.close-triangle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-top: 12px solid #ff2919;
+  border-right: 12px solid transparent;
+  z-index: 1;
+}
+
 .nav-tabs>.tab-handle.editing>a {
   padding-top: 7px;
   padding-bottom: 7px;

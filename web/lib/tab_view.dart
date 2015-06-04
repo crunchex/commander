@@ -76,9 +76,15 @@ class TabView {
     String id = title.toLowerCase().replaceAll(' ', '-');
 
     closeControl = new DivElement()
+      ..title = 'Close'
       ..classes.add('close-control');
     if (active) closeControl.classes.add('active');
     _tabHandle.children.add(closeControl);
+
+//    SpanElement closeSymbol = new SpanElement()
+//      ..classes.add('close-control-symbol')
+//      ..text = 'X';
+//    closeControl.children.add(closeSymbol);
 
 //    cloneControl = new DivElement()
 //      ..classes.add('clone-control');

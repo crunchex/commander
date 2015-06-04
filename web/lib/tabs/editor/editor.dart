@@ -82,7 +82,7 @@ class UpDroidEditor extends TabController {
     _setUpEditor();
     _registerEditorEventHandlers();
 
-    cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [id, view.content]));
+    cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
   }
 
   void setUpUI() {

@@ -1,5 +1,30 @@
 # Change Log
 
+## 0.4.7 - 2015-5-28
+
+### New
+	
+	- Unsaved changes to a file loaded in Editor are now indicated via asterisk by the filename.
+	- A browser alert has been added that indicates when UpCom has been disconnected from the server side.
+	- Save-As in the Editor file menu now includes a checkbox to make a file executable.
+	- Added ROS Templates menu to Editor.
+
+### Changed
+
+	- Switching to the Control tab in Explorer now automatically populates the Node/Launch file list.
+	- The Node/Launch file list now clears when switching out of the Control tab.
+	- Console cursor no longer blocks out text character beneath.
+	- General stablity and appearance improvements to Console.
+	- CMakeLists.txt is no longer filtered out of the Explorer view.
+
+### Fixed
+
+	- Fixed broken numpad, delete key, arrow keys, single quotes, & key in Console.
+	- Fixed text highlighting in Console.
+	- Fixed resizing the window spamming Console resize messages on the browser's debug console.
+	- Fixed broken scrolling in some terminal programs when run in Console. For example, vim should work now.
+	- Fixed node titles/graphics not wrapping correctly in Explorer's Control tab.
+
 ## 0.4.6 - 2015-5-21
 
 ### Important

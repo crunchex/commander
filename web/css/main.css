@@ -224,7 +224,8 @@ body>.navbar.navbar-inverse {
 }
 
 .nav-tabs>li.active>a,
-.nav-tabs>li.active>a:hover {
+.nav-tabs>li.active>a:hover,
+.nav-tabs>li.active>a:focus {
   color: #0c0c0c;
   background-color: #ffffff;
   font-family: "Avenir Next LT Pro Demi";
@@ -753,7 +754,7 @@ li div input {
 .inner-tabs .dropdown-toggle:focus {
   border-color: #e3e3e3;
   background-color: #ffffff;
-  color: #ff2919;
+  color: #7e7e7e;
 }
 
 .nav .open>a,

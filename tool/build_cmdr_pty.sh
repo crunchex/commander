@@ -21,11 +21,11 @@ echo "OK"
 echo ""
 echo "##### Building cmdr-pty ##########"
 echo -n "Retrieving cmdr-pty source......"
-GO_UPDROID_PATH=${GOPATH:?"Need to set GOPATH non-empty"}/src/bitbucket.org/updroid
+GO_UPDROID_PATH=${GOPATH:?"Need to set GOPATH non-empty"}/src/github.com/updroidinc
 GO_CMDRPTY_PATH=$GO_UPDROID_PATH/cmdr-pty
 if [ ! -d $GO_CMDRPTY_PATH ]; then
 	mkdir -p $GO_UPDROID_PATH
-	git clone https://crunchex@bitbucket.org/updroid/cmdr-pty.git $GO_CMDRPTY_PATH > /dev/null
+	git clone https://github.com/updroidinc/cmdr-pty.git $GO_CMDRPTY_PATH > /dev/null
 fi
 echo "OK"
 

@@ -139,8 +139,14 @@ class UpDroidEditor extends TabController {
   void _openFileHandler(CommanderMessage m) {
     if (id != m.body[0]) return;
     mailbox.ws.send('[[EDITOR_OPEN]]' + m.body[1]);
-    pathLib.basename(m.body[1]) == 'CMakeLists.txt' ? view.extra.text = pathLib.basename(m.body[1]) + ' (Read Only)'
-    : view.extra.text = pathLib.basename(m.body[1]);
+    if (pathLib.basename(m.body[1]) == 'CMakeLists.txt'){
+      view.extra.text = pathLib.basename(m.body[1]) + ' (Read Only)';
+      _aceEditor.setOptions({'readOnly': true});
+    }
+    else {
+      view.extra.text = pathLib.basename(m.body[1]);
+      _aceEditor.setOptions({'readOnly': false});
+    }
   }
 
   void _passEditorHandler(CommanderMessage m) {
@@ -233,6 +239,7 @@ class UpDroidEditor extends TabController {
     });
 
     _newButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue('', 1);
@@ -264,6 +271,7 @@ class UpDroidEditor extends TabController {
     });
 
     _talkerButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.talkerTemplate, 1);
@@ -295,6 +303,7 @@ class UpDroidEditor extends TabController {
     });
 
     _listenerButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.listenerTemplate, 1);
@@ -326,6 +335,7 @@ class UpDroidEditor extends TabController {
     });
 
     _launchButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.launchTemplate, 1);
@@ -357,6 +367,7 @@ class UpDroidEditor extends TabController {
     });
 
     _pubButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.pubTemplate, 1);
@@ -388,6 +399,7 @@ class UpDroidEditor extends TabController {
     });
 
     _subButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.subTemplate, 1);
@@ -580,7 +592,7 @@ class UpDroidEditor extends TabController {
     if (_openFilePath == null) {
       _saveAsButton.click();
     }
-    else {
+    else if (pathLib.basename(_openFilePath) != 'CMakeLists.txt') {
       mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, _openFilePath, false]));
       _resetSavePoint();
       view.extra.text = pathLib.basename(_openFilePath);

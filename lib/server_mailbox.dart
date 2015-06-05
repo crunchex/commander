@@ -18,7 +18,6 @@ class CmdrMailbox {
   }
 
   void handleWebSocket(WebSocket ws, HttpRequest request) {
-    print(request.uri.path);
     this.ws = ws;
     if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className.toLowerCase()) {
       ws.listen((String s) {

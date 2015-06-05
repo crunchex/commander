@@ -16,9 +16,7 @@ class TabController {
   TabView view;
   Mailbox mailbox;
 
-  TabController(this.id, this.col, this.tabType, this.cs, {bool active: false}) {
-    if (active != null) this.active = active;
-
+  TabController(this.id, this.col, this.tabType, this.cs) {
     mailbox = new Mailbox(tabType, id, cs);
   }
 

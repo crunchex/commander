@@ -10,16 +10,15 @@ class TabView {
   /// Returns an initialized [TabView] as a [Future] given all normal constructors.
   ///
   /// Use this instead of calling the constructor directly.
-  static Future<TabView> createTabView(int num, int col, String title, String shortName, bool active, List config) {
+  static Future<TabView> createTabView(int num, int col, String title, String shortName, List config) {
     Completer c = new Completer();
-    c.complete(new TabView(num, col, title, shortName, active, config));
+    c.complete(new TabView(num, col, title, shortName, config));
     return c.future;
   }
 
   int num, col;
   String title;
   String shortName;
-  bool active;
   Map refMap;
 
   AnchorElement tabHandleButton;
@@ -33,7 +32,7 @@ class TabView {
   DivElement _tabContainer,_tabContent;
   List config;
 
-  TabView(this.num, this.col, this.title, this.shortName, this.active, this.config) {
+  TabView(this.num, this.col, this.title, this.shortName, this.config) {
     refMap = {};
 
     _setUpTabHandle();
@@ -70,8 +69,8 @@ class TabView {
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
   void _setUpTabHandle() {
     _tabHandle = new LIElement()
-      ..classes.add('tab-handle');
-    if (active) _tabHandle.classes.add('active');
+      ..classes.add('tab-handle')
+      ..classes.add('active');
 
     String id = title.toLowerCase().replaceAll(' ', '-');
 
@@ -121,8 +120,8 @@ class TabView {
 
     _tabContainer = new DivElement()
         ..id = 'tab-$id-$num-container'
-        ..classes.add('tab-pane');
-    if (active) _tabContainer.classes.add('active');
+        ..classes.add('tab-pane')
+        ..classes.add('active');
 
     _menus = new UListElement()
         ..classes.add('nav')
@@ -139,8 +138,8 @@ class TabView {
     _menus.children.add(extra);
 
     _tabContent = new DivElement()
-        ..classes.add('tab-content');
-    if (active) _tabContent.classes.add('active');
+        ..classes.add('tab-content')
+        ..classes.add('active');
     _tabContainer.children.add(_tabContent);
 
     content = new DivElement()

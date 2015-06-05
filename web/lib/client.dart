@@ -168,15 +168,15 @@ class UpDroidClient {
 
     if (className == 'UpDroidEditor') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _tabs[column].add(new UpDroidEditor(id, column, _cs, active: true));
+      _tabs[column].add(new UpDroidEditor(id, column, _cs));
     } else if (className == 'UpDroidCamera') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _tabs[column].add(new UpDroidCamera(id, column, _cs, active: true));
+      _tabs[column].add(new UpDroidCamera(id, column, _cs));
     } else if (className == 'UpDroidConsole') {
       // TODO: initial size should not be hardcoded.
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className-25-80');
       //Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
-      _tabs[column].add(new UpDroidConsole(id, column, _cs, active: true));
+      _tabs[column].add(new UpDroidConsole(id, column, _cs));
     }
   }
 

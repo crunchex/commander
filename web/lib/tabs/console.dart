@@ -26,8 +26,8 @@ class UpDroidConsole extends TabController {
 
   Timer _resizeTimer;
 
-  UpDroidConsole(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
-    TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
+  UpDroidConsole(int id, int col, StreamController<CommanderMessage> cs) : super(id, col, className, cs) {
+    TabView.createTabView(id, col, className, shortName, _getMenuConfig()).then((tabView) {
       view = tabView;
       setUpController();
     });

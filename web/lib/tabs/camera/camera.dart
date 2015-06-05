@@ -19,8 +19,8 @@ class UpDroidCamera extends TabController {
 
   CanvasElement _canvas;
 
-  UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
-    TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
+  UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs) : super(id, col, className, cs) {
+    TabView.createTabView(id, col, className, shortName, _getMenuConfig()).then((tabView) {
       view = tabView;
       setUpController();
     });

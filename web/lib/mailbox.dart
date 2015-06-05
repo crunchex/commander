@@ -17,6 +17,7 @@ class Mailbox {
 
   Map _wsRegistry;
   Map _csRegistry;
+  Set<String> _waitForRegistry;
 
   Mailbox(String name, int num, [StreamController<CommanderMessage> cs]) {
     _name = name;
@@ -34,6 +35,7 @@ class Mailbox {
     }
 
     _wsRegistry = { EventType.ON_OPEN: [], EventType.ON_MESSAGE: {}, EventType.ON_CLOSE: [] };
+    _waitForRegistry = [];
 
     // Create the server <-> client [WebSocket].
     // Port 12060 is the default port that UpDroid uses.
@@ -41,9 +43,13 @@ class Mailbox {
     _initWebSocket(url);
   }
 
-  Future<UpDroidMessage> waitFor(UpDroidMessage out) {
+  Future<UpDroidMessage> waitFor(UpDroidMessage out) async {
+    _waitForRegistry.add(out.header);
     ws.send(out.s);
-    return ws.onMessage.transform(toUpDroidMessage).firstWhere((UpDroidMessage um) => um.header == out.header);
+
+    UpDroidMessage received = await ws.onMessage.transform(toUpDroidMessage).firstWhere((UpDroidMessage um) => um.header == out.header);
+    _waitForRegistry.remove(out.header);
+    return received;
   }
 
   /// Registers a [function] to be called on one of the [WebSocket] events.
@@ -73,7 +79,9 @@ class Mailbox {
     ws.onOpen.listen((e) => _wsRegistry[EventType.ON_OPEN].forEach((f(e)) => f(e)));
 
     // Call the function registered to ON_MESSAGE[um.header].
-    ws.onMessage.transform(toUpDroidMessage).listen((um) {
+    ws.onMessage.transform(toUpDroidMessage)
+    .where((UpDroidMessage um) => !_waitForRegistry.contains(um.header))
+    .listen((UpDroidMessage um) {
       //print('[${_name}\'s Mailbox] UpDroidMessage received of type: ${um.header}');
       _wsRegistry[EventType.ON_MESSAGE][um.header](um);
     });

@@ -157,7 +157,7 @@ class UpDroidClient {
     _tabs[0].add(new UpDroidExplorer(_cs, id, name));
   }
 
-  void _openTab (int column, int id, String className) async {
+  void _openTab (int column, int id, String className) {
     if (_tabs[column].length >= 4) return;
 
     if (_tabs[column].isNotEmpty) {

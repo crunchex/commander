@@ -6,7 +6,7 @@ import 'mailbox.dart';
 import 'updroid_message.dart';
 import 'tab_view.dart';
 
-class TabController {
+abstract class TabController {
   int id;
   int col;
   StreamController<CommanderMessage> cs;
@@ -22,4 +22,6 @@ class TabController {
 
   void makeActive() => view.makeActive();
   void makeInactive() => view.makeInactive();
+
+  List _getMenuConfig();
 }

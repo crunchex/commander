@@ -50,11 +50,20 @@ abstract class TabController {
   void _closeTab() {
     view.destroy();
     cleanUp();
-    cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${tabType}_$id'));
+
+    if (cs != null) {
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${tabType}_$id'));
+    } else {
+      mailbox.ws.send(new UpDroidMessage('CLOSE_TAB', '${tabType}_$id'));
+    }
   }
 
   void _cloneTab(Event e) {
     e.preventDefault();
-    cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${tabType}'));
+    if (cs != null) {
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${tabType}'));
+    } else {
+      mailbox.ws.send(new UpDroidMessage('OPEN_TAB', '${col}_${tabType}'));
+    }
   }
 }

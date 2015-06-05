@@ -7,26 +7,33 @@ import 'dart:js' as js;
 
 import '../../mailbox.dart';
 import '../../updroid_message.dart';
-import '../../tab_view.dart';
 import '../../tab_controller.dart';
 
 /// [UpDroidCamera] is a client-side class that uses the jsmpeg library
 /// to render a video stream from a [WebSocket] onto a [_canvasElement].
 class UpDroidCamera extends TabController {
   static String className = 'UpDroidCamera';
-  // Only use where space is constrained, otherwise use className.
-  static const String shortName = 'Camera';
+
+  static List getMenuConfig() {
+    List menu = [
+      {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'Close Tab'}]},
+      {'title': 'Devices', 'items': []}
+    ];
+    return menu;
+  }
 
   CanvasElement _canvas;
+  AnchorElement _closeTabButton;
 
-  UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs) : super(id, col, className, cs) {
-    TabView.createTabView(id, col, className, shortName, _getMenuConfig()).then((tabView) {
-      view = tabView;
-      setUpController();
-    });
+  UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs) :
+  super(id, col, className, 'Camera', getMenuConfig(), cs) {
+
   }
 
   void setUpController() {
+    _closeTabButton = view.refMap['close-tab'];
+
     _registerMailbox();
     
     _canvas = new CanvasElement();
@@ -85,11 +92,6 @@ class UpDroidCamera extends TabController {
     new js.JsObject(js.context['jsmpeg'], [client, options]);
   }
 
-  void _closeTab() {
-    view.destroy();
-    cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
-  }
-
   //\/\/ Mailbox Handlers /\/\//
 
   void _postReadySetup(UpDroidMessage um) {
@@ -116,14 +118,10 @@ class UpDroidCamera extends TabController {
       view.destroy();
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });
-  }
 
-  List _getMenuConfig() {
-    List menu = [
-      {'title': 'File', 'items': [
-        {'type': 'toggle', 'title': 'Close Tab', 'handler': _closeTab}]},
-      {'title': 'Devices', 'items': []}
-    ];
-    return menu;
+    _closeTabButton.onClick.listen((e) {
+      view.destroy();
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
+    });
   }
 }

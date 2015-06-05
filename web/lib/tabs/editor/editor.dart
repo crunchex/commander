@@ -11,7 +11,6 @@ import "package:path/path.dart" as pathLib;
 
 import '../../mailbox.dart';
 import '../../updroid_message.dart';
-import '../../tab_view.dart';
 import '../../tab_controller.dart';
 import '../../modal/modal.dart';
 
@@ -21,8 +20,21 @@ part 'templates.dart';
 /// for the editor and an additional menu bar with some filesystem operations.
 class UpDroidEditor extends TabController {
   static String className = 'UpDroidEditor';
-  // Only use where space is constrained, otherwise use className.
-  static const String shortName = 'Editor';
+
+  static List getMenuConfig() {
+    List menu = [
+      {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'New'},
+        {'type': 'submenu', 'title': 'Templates'},
+        {'type': 'toggle', 'title': 'Save'},
+        {'type': 'toggle', 'title': 'Save As'},
+        {'type': 'toggle', 'title': 'Close Tab'}]},
+      {'title': 'Settings', 'items': [
+        {'type': 'toggle', 'title': 'Invert'},
+        {'type': 'input', 'title': 'Font Size'}]}
+    ];
+    return menu;
+  }
 
   Map _pathMap;
   String _absolutePathPrefix;
@@ -65,11 +77,9 @@ class UpDroidEditor extends TabController {
   String _originalContents;
   String _currentParPath;
 
-  UpDroidEditor(int id, int col, StreamController<CommanderMessage> cs) : super(id, col, className, cs) {
-    TabView.createTabView(id, col, className, shortName, _getMenuConfig()).then((tabView) {
-      view = tabView;
-      setUpController();
-    });
+  UpDroidEditor(int id, int col, StreamController<CommanderMessage> cs) :
+  super(id, col, className, 'Editor', getMenuConfig(), cs) {
+
   }
 
   void setUpController() {
@@ -614,19 +624,4 @@ class UpDroidEditor extends TabController {
 
   /// Resets the save point based on the Editor's current text.
   String _resetSavePoint() => _originalContents = _aceEditor.value;
-
-  List _getMenuConfig() {
-    List menu = [
-      {'title': 'File', 'items': [
-        {'type': 'toggle', 'title': 'New'},
-        {'type': 'submenu', 'title': 'Templates'},
-        {'type': 'toggle', 'title': 'Save'},
-        {'type': 'toggle', 'title': 'Save As'},
-        {'type': 'toggle', 'title': 'Close Tab'}]},
-      {'title': 'Settings', 'items': [
-        {'type': 'toggle', 'title': 'Invert'},
-        {'type': 'input', 'title': 'Font Size'}]}
-    ];
-    return menu;
-  }
 }

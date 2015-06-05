@@ -7,15 +7,23 @@ import 'package:terminal/theme.dart';
 
 import '../mailbox.dart';
 import '../updroid_message.dart';
-import '../tab_view.dart';
 import '../tab_controller.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket] into an UpDroid Commander tab.
 class UpDroidConsole extends TabController {
   static const String className = 'UpDroidConsole';
-  // Only use where space is constrained, otherwise use className.
-  static const String shortName = 'Console';
+
+  static List getMenuConfig() {
+    List menu = [
+      {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'Close Tab'}]},
+      {'title': 'Settings', 'items': [
+        {'type': 'toggle', 'title': 'Invert'},
+        {'type': 'toggle', 'title': 'Cursor Blink'}]}
+    ];
+    return menu;
+  }
 
   WebSocket _ws;
   Terminal _term;
@@ -26,11 +34,9 @@ class UpDroidConsole extends TabController {
 
   Timer _resizeTimer;
 
-  UpDroidConsole(int id, int col, StreamController<CommanderMessage> cs) : super(id, col, className, cs) {
-    TabView.createTabView(id, col, className, shortName, _getMenuConfig()).then((tabView) {
-      view = tabView;
-      setUpController();
-    });
+  UpDroidConsole(int id, int col, StreamController<CommanderMessage> cs) :
+  super(id, col, className, 'Console', getMenuConfig(), cs) {
+
   }
 
   void setUpController() {
@@ -156,17 +162,6 @@ class UpDroidConsole extends TabController {
 
   void _consoleSpecificClose() {
     _ws.close();
-  }
-
-  List _getMenuConfig() {
-    List menu = [
-      {'title': 'File', 'items': [
-        {'type': 'toggle', 'title': 'Close Tab'}]},
-      {'title': 'Settings', 'items': [
-        {'type': 'toggle', 'title': 'Invert'},
-        {'type': 'toggle', 'title': 'Cursor Blink'}]}
-    ];
-    return menu;
   }
 }
 

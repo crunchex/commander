@@ -7,7 +7,7 @@ import 'updroid_message.dart';
 enum EventType { ON_OPEN, ON_MESSAGE, ON_CLOSE }
 
 /// A class to initialize its owning class' main [WebSocket] connection to the
-/// server side. It also manages all incoming messages over [WebSocket] and
+/// server side. It also manages all incoming messages over [WebSocket] and, if enabled,
 /// [CommanderMessage] stream.
 class Mailbox {
   String _name;
@@ -18,24 +18,28 @@ class Mailbox {
   Map _wsRegistry;
   Map _csRegistry;
 
-  Mailbox(String name, int num, StreamController<CommanderMessage> cs) {
+  Mailbox(String name, int num, [StreamController<CommanderMessage> cs]) {
     _name = name;
     _id = num;
-    _cs = cs;
+
+    if (cs != null) {
+      _cs = cs;
+
+      _csRegistry = {};
+
+      // Call the function registered to m.type.
+      _cs.stream.where((m) => m.dest == _name.toUpperCase()).listen((CommanderMessage m) {
+        //print('[${_name}\'s Mailbox] Commander Message received of type: ${m.type}');
+        _csRegistry[m.type](m);
+      });
+    }
 
     _wsRegistry = { EventType.ON_OPEN: [], EventType.ON_MESSAGE: {}, EventType.ON_CLOSE: [] };
-    _csRegistry = {};
 
     // Create the server <-> client [WebSocket].
     // Port 12060 is the default port that UpDroid uses.
     String url = window.location.host.split(':')[0];
     _initWebSocket(url);
-
-    // Call the function registered to m.type.
-    _cs.stream.where((m) => m.dest == _name.toUpperCase()).listen((CommanderMessage m) {
-      //print('[${_name}\'s Mailbox] Commander Message received of type: ${m.type}');
-      _csRegistry[m.type](m);
-    });
   }
 
   /// Registers a [function] to be called on one of the [WebSocket] events.
@@ -52,6 +56,7 @@ class Mailbox {
   /// Registers a [function] to be called on a received [CommanderMessage] with [msg]
   /// as the type.
   void registerCommanderEvent(String msg, function(CommanderMessage m)) {
+    if (_cs == null) return;
     _csRegistry[msg] = function;
   }
 
@@ -72,7 +77,8 @@ class Mailbox {
     //TODO: Should only alert if everything is disconnected (in case only console isnt connected)
     ws.onClose.listen((e) {
       _wsRegistry[EventType.ON_CLOSE].forEach((f(e)) => f(e));
-      _cs.add(new CommanderMessage('UPDROIDCLIENT', 'SERVER_DISCONNECT'));
+
+      if (_cs != null) _cs.add(new CommanderMessage('UPDROIDCLIENT', 'SERVER_DISCONNECT'));
 
 //      print('$_name-$_id disconnected. Retrying...');
       if (!encounteredError) {

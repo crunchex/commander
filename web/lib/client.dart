@@ -163,7 +163,6 @@ class UpDroidClient {
   }
 
   void _openTab (int column, int id, String className) {
-    print('$column $id $className');
     if (_tabs[column].length >= 4) return;
 
     if (_tabs[column].isNotEmpty) {

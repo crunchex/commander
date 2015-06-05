@@ -24,7 +24,6 @@ class Mailbox {
 
     if (cs != null) {
       _cs = cs;
-
       _csRegistry = {};
 
       // Call the function registered to m.type.
@@ -80,7 +79,7 @@ class Mailbox {
 
       if (_cs != null) _cs.add(new CommanderMessage('UPDROIDCLIENT', 'SERVER_DISCONNECT'));
 
-//      print('$_name-$_id disconnected. Retrying...');
+      //print('$_name-$_id disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }
@@ -88,7 +87,7 @@ class Mailbox {
     });
 
     ws.onError.listen((e) {
-//      print('$_name-$_id disconnected. Retrying...');
+      //print('$_name-$_id disconnected. Retrying...');
       if (!encounteredError) {
         new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
       }

@@ -24,7 +24,6 @@ class UpDroidCamera extends TabController {
   }
 
   CanvasElement _canvas;
-  AnchorElement _closeTabButton;
 
   UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs) :
   super(id, col, className, 'Camera', getMenuConfig(), cs) {
@@ -32,8 +31,6 @@ class UpDroidCamera extends TabController {
   }
 
   void setUpController() {
-    _closeTabButton = view.refMap['close-tab'];
-
     _registerMailbox();
     
     _canvas = new CanvasElement();
@@ -107,21 +104,7 @@ class UpDroidCamera extends TabController {
     window.onResize.listen((e) {
       resizeCanvas();
     });
-
-    view.cloneControlHitbox.onClick.listen((e) {
-      e.preventDefault();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${className}'));
-    });
-
-    // TODO: this should be in tab_controller somehow.
-    view.closeControlHitbox.onClick.listen((e) {
-      view.destroy();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
-    });
-
-    _closeTabButton.onClick.listen((e) {
-      view.destroy();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
-    });
   }
+
+  void cleanUp() {}
 }

@@ -28,7 +28,6 @@ class UpDroidConsole extends TabController {
   WebSocket _ws;
   Terminal _term;
 
-  AnchorElement _closeTabButton;
   AnchorElement _themeButton;
   AnchorElement _blinkButton;
 
@@ -40,7 +39,6 @@ class UpDroidConsole extends TabController {
   }
 
   void setUpController() {
-    _closeTabButton = view.refMap['close-tab'];
     _themeButton = view.refMap['invert'];
     _blinkButton = view.refMap['cursor-blink'];
 
@@ -117,27 +115,6 @@ class UpDroidConsole extends TabController {
       _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
     });
 
-    view.cloneControlHitbox.onClick.listen((e) {
-      e.preventDefault();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${className}'));
-    });
-
-    // TODO: this should be in tab_controller somehow.
-    view.closeControlHitbox.onClick.listen((e) {
-      view.destroy();
-
-      // This is specific to Console class.
-      _ws.close();
-
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
-    });
-
-    _closeTabButton.onClick.listen((e) {
-      view.destroy();
-      _ws.close();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
-    });
-
     _themeButton.onClick.listen((e) {
       _toggleTheme();
       e.preventDefault();
@@ -160,7 +137,7 @@ class UpDroidConsole extends TabController {
     });
   }
 
-  void _consoleSpecificClose() {
+  void cleanUp() {
     _ws.close();
   }
 }

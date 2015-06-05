@@ -48,7 +48,6 @@ class UpDroidEditor extends TabController {
   AnchorElement _subButton;
   AnchorElement _saveButton;
   AnchorElement _saveAsButton;
-  AnchorElement _closeTabButton;
   AnchorElement _themeButton;
   InputElement _fontSizeInput;
 
@@ -104,7 +103,6 @@ class UpDroidEditor extends TabController {
     _launchButton = view.refMap['basic-launch-file-button'];
     _saveButton = view.refMap['save'];
     _saveAsButton = view.refMap['save-as'];
-    _closeTabButton = view.refMap['close-tab'];
     _themeButton = view.refMap['invert'];
     _fontSizeInput = view.refMap['font-size'];
     _content = view.refMap['content'];
@@ -230,22 +228,6 @@ class UpDroidEditor extends TabController {
           }
         }
       });
-    });
-
-    view.cloneControlHitbox.onClick.listen((e) {
-      e.preventDefault();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${className}'));
-    });
-
-    // TODO: this should be in tab_controller somehow.
-    view.closeControlHitbox.onClick.listen((e) {
-      view.destroy();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
-    });
-
-    _closeTabButton.onClick.listen((e) {
-      view.destroy();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });
 
     _newButton.onClick.listen((e) {
@@ -624,4 +606,6 @@ class UpDroidEditor extends TabController {
 
   /// Resets the save point based on the Editor's current text.
   String _resetSavePoint() => _originalContents = _aceEditor.value;
+
+  void cleanUp() {}
 }

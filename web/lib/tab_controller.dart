@@ -1,5 +1,6 @@
 library tab_controller;
 
+import 'dart:html';
 import 'dart:async';
 
 import 'mailbox.dart';
@@ -15,6 +16,8 @@ abstract class TabController {
   TabView view;
   Mailbox mailbox;
 
+  AnchorElement _closeTabButton;
+
   TabController(this.id, this.col, this.tabType, this.shortName, List menuConfig, [StreamController<CommanderMessage> cs]) {
     if (cs == null) {
       mailbox = new Mailbox(tabType, id);
@@ -25,6 +28,12 @@ abstract class TabController {
 
     TabView.createTabView(id, col, tabType, shortName, menuConfig).then((tabView) {
       view = tabView;
+
+      _closeTabButton = view.refMap['close-tab'];
+      _closeTabButton.onClick.listen((e) => _closeTab());
+      view.closeControlHitbox.onClick.listen((e) => _closeTab());
+      view.cloneControlHitbox.onClick.listen((e) => _cloneTab(e));
+
       setUpController();
     });
   }
@@ -33,4 +42,16 @@ abstract class TabController {
   void makeInactive() => view.makeInactive();
 
   void setUpController();
+  void cleanUp();
+
+  void _closeTab() {
+    view.destroy();
+    cleanUp();
+    cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${tabType}_$id'));
+  }
+
+  void _cloneTab(Event e) {
+    e.preventDefault();
+    cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${tabType}'));
+  }
 }

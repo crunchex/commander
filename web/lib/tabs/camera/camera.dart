@@ -1,5 +1,6 @@
 library updroid_camera;
 
+import 'dart:async';
 import 'dart:html';
 import 'dart:convert';
 import 'dart:js' as js;
@@ -65,6 +66,7 @@ class UpDroidCamera extends TabController {
 
   void _setDevices(String devices) {
     List<int> deviceIds = JSON.decode(devices);
+    deviceIds.sort((a, b) => a.compareTo(b));
     deviceIds.forEach((int i) {
       view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': [i]});
     });
@@ -72,8 +74,8 @@ class UpDroidCamera extends TabController {
     _startPlayer(deviceIds);
   }
 
-  void _startPlayer(List args) {
-    String deviceId = '${args[0]}';
+  void _startPlayer(List<int> args) {
+    String deviceId = args[0].toString();
     String url = window.location.host;
     url = url.split(':')[0];
     js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/${className.toLowerCase()}/$id/input/$deviceId']);

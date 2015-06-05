@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
+import 'tab_controller.dart';
 import 'explorer/explorer.dart';
 import 'tabs/editor/editor.dart';
 import 'tabs/console.dart';
@@ -15,7 +16,8 @@ import 'mailbox.dart';
 class UpDroidClient {
   StreamController<CommanderMessage> _cs;
 
-  List<List> _tabs;
+  List<UpDroidExplorer> _explorers;
+  List<List<TabController>> _tabs;
   String _config;
 
   AnchorElement _addWorkspace;
@@ -37,13 +39,14 @@ class UpDroidClient {
   UpDroidClient() {
     _config = _getConfig();
 
-    _tabs = [[], [], []];
+    _explorers = [];
+    _tabs = [[], []];
 
     _explorersDiv = querySelector('#exp-container');
     _addWorkspace = querySelector('#add-ws');
     _deleteWorkspace = querySelector('#delete-ws');
-    _newButtonLeft = querySelector('#column-1-new');
-    _newButtonRight = querySelector('#column-2-new');
+    _newButtonLeft = querySelector('#column-0-new');
+    _newButtonRight = querySelector('#column-1-new');
     _cleanButton = querySelector('#clean-button');
     _controlButton = querySelector('#control-toggle');
     _buildButton = querySelector('#build-button');
@@ -95,6 +98,8 @@ class UpDroidClient {
       [{'id': 1, 'class': 'UpDroidConsole'}]
     ];
 
+//    List listConfig = [[],[]];
+
     return JSON.encode(listConfig);
   }
 
@@ -102,7 +107,7 @@ class UpDroidClient {
     List ids = [];
 
     // Add all used ids for [className] to ids.
-    for (int i = 1; i <= 2; i++) {
+    for (int i = 0; i <= 1; i++) {
       _tabs[i].forEach((tab) {
 
         if (tab.tabType == className) ids.add(tab.id);
@@ -136,7 +141,7 @@ class UpDroidClient {
 
     for (int i = 0; i < config.length; i++) {
       for (Map tab in config[i]) {
-        _openTab(i + 1, tab['id'], tab['class']);
+        _openTab(i, tab['id'], tab['class']);
       }
     }
   }
@@ -149,15 +154,16 @@ class UpDroidClient {
   }
 
   void _openExplorer(int id, name) {
-    if (_tabs[0].isNotEmpty) {
-      for (var explorer in _tabs[0]) {
+    if (_explorers.isNotEmpty) {
+      for (var explorer in _explorers) {
         explorer.hideExplorer();
       }
     }
-    _tabs[0].add(new UpDroidExplorer(_cs, id, name));
+    _explorers.add(new UpDroidExplorer(_cs, id, name));
   }
 
   void _openTab (int column, int id, String className) {
+    print('$column $id $className');
     if (_tabs[column].length >= 4) return;
 
     if (_tabs[column].isNotEmpty) {
@@ -191,7 +197,7 @@ class UpDroidClient {
     // Find the tab to remove and remove it.
     // Also take note of the column it was found in.
     int col;
-    for (int i = 1; i <= 2; i++) {
+    for (int i = 0; i <= 1; i++) {
       for (int j = 0; j < _tabs[i].length; j++) {
         if (_tabs[i][j].tabType == type && _tabs[i][j].id == num) {
           _tabs[i].removeAt(j);
@@ -219,7 +225,7 @@ class UpDroidClient {
   }
 
   void _gitPassword(CommanderMessage m) {
-    _mailbox.ws.send('[[GIT_PUSH]]' + '${_tabs[0].first.currentSelectedPath}++${m.body}');
+    _mailbox.ws.send('[[GIT_PUSH]]' + '${_explorers.first.currentSelectedPath}++${m.body}');
   }
 
   void _workspaceClean(CommanderMessage m) {
@@ -267,7 +273,7 @@ class UpDroidClient {
         var newNum = 1;
         var nums = [];
         var names = [];
-        for (var explorer in _tabs[0]) {
+        for (var explorer in _explorers) {
           nums.add(explorer.expNum);
           names.add(explorer.name);
         }
@@ -339,12 +345,12 @@ class UpDroidClient {
               querySelector("#exp-li-$activeNum").remove();
               // remove from list of updroid explorers
               var toRemove;
-              for(var upExp in _tabs[0]) {
+              for(var upExp in _explorers) {
                 if (int.parse(activeNum) == upExp.expNum) {
                   toRemove = upExp;
                 }
               }
-              _tabs[0].remove(toRemove);
+              _explorers.remove(toRemove);
               toRemove.destroyRecycleListeners();
               toRemove.destroyEditorListeners();
               // Destroy UpDroid Explorer
@@ -367,16 +373,16 @@ class UpDroidClient {
 
     _newButtonLeft.onClick.listen((e) {
       e.preventDefault();
-      if (_tabs[1].length >= 4) return;
+      if (_tabs[0].length >= 4) return;
 
-      new UpDroidOpenTabModal(1, _cs);
+      new UpDroidOpenTabModal(0, _cs);
     });
 
     _newButtonRight.onClick.listen((e) {
       e.preventDefault();
-      if (_tabs[2].length >= 4) return;
+      if (_tabs[1].length >= 4) return;
 
-      new UpDroidOpenTabModal(2, _cs);
+      new UpDroidOpenTabModal(1, _cs);
     });
 
     _cleanButton.onClick.listen((e) {

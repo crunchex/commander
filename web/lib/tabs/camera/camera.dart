@@ -60,8 +60,8 @@ class UpDroidCamera extends TabController {
 
   void _drawLoading() {
     CanvasRenderingContext2D context = _canvas.context2D;
-    context.fillStyle = 444;
-    context.fillText('Loading...', _canvas.width/2-30, _canvas.height/3);
+    context.fillStyle = '#ffffff';
+    context.fillText('Loading...', _canvas.width / 2 - 30, _canvas.height / 2);
   }
 
   void _setDevices(String devices) {

@@ -7,7 +7,7 @@ import 'updroid_message.dart';
 enum EventType { ON_OPEN, ON_MESSAGE, ON_CLOSE }
 
 /// A class to initialize its owning class' main [WebSocket] connection to the
-/// server side. It also manages all incoming messages over [WebSocket] and, if enabled,
+/// server side. It also manages all incoming messages over [WebSocket] and, if provided,
 /// [CommanderMessage] stream.
 class Mailbox {
   String _name;
@@ -43,10 +43,18 @@ class Mailbox {
     _initWebSocket(url);
   }
 
+  /// Returns a [Future] [UpDroidMessage] as a response from the server when given a
+  /// request [UpDroidMessage]. Useful for simple HTTP GET-type requests over having to
+  /// register a whole event handler.
+  ///
+  /// Note: an [UpDroidMessage] header given to the waitFor registry takes precedence
+  /// over any equivalent header registered as an on-message event handler. Also, waitFor
+  /// will not allow duplicate headers registered at any one time.
   Future<UpDroidMessage> waitFor(UpDroidMessage out) async {
     _waitForRegistry.add(out.header);
     ws.send(out.s);
 
+    // Execution pauses here until an UpDroid Message with a matching header is received.
     UpDroidMessage received = await ws.onMessage.transform(toUpDroidMessage).firstWhere((UpDroidMessage um) => um.header == out.header);
     _waitForRegistry.remove(out.header);
     return received;

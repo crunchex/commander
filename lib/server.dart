@@ -130,10 +130,6 @@ class CmdrServer {
       help.debug('Server incoming: ' + s, 0);
 
       switch (um.header) {
-        case 'TEST':
-          socket.add('[[TEST]]hello');
-          break;
-
         case 'CLIENT_CONFIG':
           _initBackendClasses(dir).then((value) {
             socket.add('[[CLIENT_SERVER_READY]]' + JSON.encode(value));

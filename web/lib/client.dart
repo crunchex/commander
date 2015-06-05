@@ -370,13 +370,11 @@ class UpDroidClient {
       });
     });
 
-    _newButtonLeft.onClick.listen((e) async {
+    _newButtonLeft.onClick.listen((e) {
       e.preventDefault();
-//      if (_tabs[0].length >= 4) return;
-//
-//      new UpDroidOpenTabModal(0, _cs);
-      UpDroidMessage bleh = await _mailbox.waitFor(new UpDroidMessage('TEST', 'blah'));
-      print(bleh.body);
+      if (_tabs[0].length >= 4) return;
+
+      new UpDroidOpenTabModal(0, _cs);
     });
 
     _newButtonRight.onClick.listen((e) {

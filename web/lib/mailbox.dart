@@ -35,7 +35,7 @@ class Mailbox {
     }
 
     _wsRegistry = { EventType.ON_OPEN: [], EventType.ON_MESSAGE: {}, EventType.ON_CLOSE: [] };
-    _waitForRegistry = [];
+    _waitForRegistry = new Set();
 
     // Create the server <-> client [WebSocket].
     // Port 12060 is the default port that UpDroid uses.

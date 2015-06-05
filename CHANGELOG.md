@@ -1,5 +1,24 @@
 # Change Log
 
+## 0.4.8 - 2015-6-4
+
+### New
+	
+	- Close button added to the corner of tab handles.
+	- Added support for Dart 1.10.0 (x86_64 only).
+
+### Changed
+
+	- Set max number of open tabs per column to 4 (temporary).
+	- Double-clicking a tab no longer replicates tabs.
+	- When a new Camera tab is opened, an available device is automatically selected.
+
+### Fixed
+
+	- Fixed some graphical glitches when closing and switching tabs.
+	- Fixed text colors in certain areas changing when they're not supposed to.
+	- Fixed Ctrl-S on a file loaded into Editor crashing cmdr.
+
 ## 0.4.7 - 2015-5-28
 
 ### New

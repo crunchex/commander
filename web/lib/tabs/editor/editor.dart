@@ -82,7 +82,7 @@ class UpDroidEditor extends TabController {
     _setUpEditor();
     _registerEditorEventHandlers();
 
-    cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [id, view.content]));
+    cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
   }
 
   void setUpUI() {
@@ -120,6 +120,7 @@ class UpDroidEditor extends TabController {
     _resetSavePoint();
 
     // Create listener to indicate that there are unsaved changes when file is altered
+    // TODO: should this listener be cancelled at some point? If not, remove var.
     _fileChangesListener = _aceEditor.onChange.listen((e) {
       if (_openFilePath != null && _noUnsavedChanges() == false) view.extra.text = pathLib.basename(_openFilePath) + '*';
     });
@@ -138,7 +139,14 @@ class UpDroidEditor extends TabController {
   void _openFileHandler(CommanderMessage m) {
     if (id != m.body[0]) return;
     mailbox.ws.send('[[EDITOR_OPEN]]' + m.body[1]);
-    view.extra.text = pathLib.basename(m.body[1]);
+    if (pathLib.basename(m.body[1]) == 'CMakeLists.txt'){
+      view.extra.text = pathLib.basename(m.body[1]) + ' (Read Only)';
+      _aceEditor.setOptions({'readOnly': true});
+    }
+    else {
+      view.extra.text = pathLib.basename(m.body[1]);
+      _aceEditor.setOptions({'readOnly': false});
+    }
   }
 
   void _passEditorHandler(CommanderMessage m) {
@@ -214,9 +222,15 @@ class UpDroidEditor extends TabController {
       });
     });
 
-    view.tabHandleButton.onDoubleClick.listen((e) {
+    view.cloneControlHitbox.onClick.listen((e) {
       e.preventDefault();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_UpDroidEditor'));
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${className}'));
+    });
+
+    // TODO: this should be in tab_controller somehow.
+    view.closeControlHitbox.onClick.listen((e) {
+      view.destroy();
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
     });
 
     _closeTabButton.onClick.listen((e) {
@@ -225,6 +239,7 @@ class UpDroidEditor extends TabController {
     });
 
     _newButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue('', 1);
@@ -256,6 +271,7 @@ class UpDroidEditor extends TabController {
     });
 
     _talkerButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.talkerTemplate, 1);
@@ -287,6 +303,7 @@ class UpDroidEditor extends TabController {
     });
 
     _listenerButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.listenerTemplate, 1);
@@ -318,6 +335,7 @@ class UpDroidEditor extends TabController {
     });
 
     _launchButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.launchTemplate, 1);
@@ -349,6 +367,7 @@ class UpDroidEditor extends TabController {
     });
 
     _pubButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.pubTemplate, 1);
@@ -380,6 +399,7 @@ class UpDroidEditor extends TabController {
     });
 
     _subButton.onClick.listen((e) {
+      _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {
         _aceEditor.setValue(RosTemplates.subTemplate, 1);
@@ -465,7 +485,10 @@ class UpDroidEditor extends TabController {
           }
         }
         else {
-          saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
+          if(_currentParPath == null) saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
+          else {
+            saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
+          }
         }
 
         // Filename already exists on system
@@ -569,7 +592,7 @@ class UpDroidEditor extends TabController {
     if (_openFilePath == null) {
       _saveAsButton.click();
     }
-    else {
+    else if (pathLib.basename(_openFilePath) != 'CMakeLists.txt') {
       mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, _openFilePath, false]));
       _resetSavePoint();
       view.extra.text = pathLib.basename(_openFilePath);

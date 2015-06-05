@@ -48,11 +48,11 @@ cd $TOPDIR
 ### package ###
 echo -n "Packaging......................."
 mkdir -p $TOPDIR/deploy
-if [ -e "$TOPDIR/deploy/cmdr"* ]; then
+if ls $TOPDIR/deploy/cmdr* 1> /dev/null 2>&1; then
 	rm deploy/cmdr*
 fi
 
-fpm -s dir -t deb -n cmdr -v 0.4.7 -p $TOPDIR/deploy/ \
+fpm -s dir -t deb -n cmdr -v 0.4.8 -p $TOPDIR/deploy/ \
     --vendor "UpDroid, Inc." \
     --provides cmdr \
     --description "A browser-based IDE and omni-tool for robots." \

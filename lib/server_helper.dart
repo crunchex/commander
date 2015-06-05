@@ -86,7 +86,7 @@ void formattedFsUpdate(WebSocket socket, WatchEvent e) {
   var header = split[0].toUpperCase();
   var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
   debug('Outgoing: ' + formatted, 0);
-  socket.add(formatted);
+  if(header != 'MODIFY') socket.add(formatted);
 }
 
 /// Recursively traverses the given directory path and asynchronously

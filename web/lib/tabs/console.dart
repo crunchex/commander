@@ -111,6 +111,21 @@ class UpDroidConsole extends TabController {
       _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
     });
 
+    view.cloneControlHitbox.onClick.listen((e) {
+      e.preventDefault();
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${className}'));
+    });
+
+    // TODO: this should be in tab_controller somehow.
+    view.closeControlHitbox.onClick.listen((e) {
+      view.destroy();
+
+      // This is specific to Console class.
+      _ws.close();
+
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
+    });
+
     _closeTabButton.onClick.listen((e) {
       view.destroy();
       _ws.close();
@@ -127,11 +142,6 @@ class UpDroidConsole extends TabController {
       e.preventDefault();
     });
 
-    view.tabHandleButton.onDoubleClick.listen((e) {
-      e.preventDefault();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_UpDroidConsole'));
-    });
-
     window.onResize.listen((e) {
       if (view.content.parent.classes.contains('active')) {
         // Timer prevents a flood of resize events slowing down the system and allows the window to settle.
@@ -142,6 +152,10 @@ class UpDroidConsole extends TabController {
         });
       }
     });
+  }
+
+  void _consoleSpecificClose() {
+    _ws.close();
   }
 
   List _getMenuConfig() {

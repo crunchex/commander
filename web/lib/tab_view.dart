@@ -23,6 +23,8 @@ class TabView {
   Map refMap;
 
   AnchorElement tabHandleButton;
+  DivElement closeControlHitbox;
+  DivElement cloneControlHitbox;
   DivElement content;
   LIElement extra;
 
@@ -73,15 +75,38 @@ class TabView {
 
     String id = title.toLowerCase().replaceAll(' ', '-');
 
+    closeControlHitbox = new DivElement()
+      ..title = 'Close'
+      ..classes.add('close-control-hitbox');
+    _tabHandle.children.add(closeControlHitbox);
+
+    DivElement closeControl = new DivElement()
+      ..classes.add('close-control');
+    closeControlHitbox.children.add(closeControl);
+
+//    SpanElement closeSymbol = new SpanElement()
+//      ..classes.add('close-control-symbol')
+//      ..text = 'X';
+//    closeControl.children.add(closeSymbol);
+
+    cloneControlHitbox = new DivElement()
+      ..title = 'Clone'
+      ..classes.add('clone-control-hitbox');
+    _tabHandle.children.add(cloneControlHitbox);
+
+    DivElement cloneControl = new DivElement()
+      ..classes.add('clone-control');
+    cloneControlHitbox.children.add(cloneControl);
+
     tabHandleButton = new AnchorElement()
         ..id = 'button-$id-$num'
         ..href = '#tab-$id-$num-container'
         ..dataset['toggle'] = 'tab'
         ..text = '$shortName-$num';
     tabHandleButton.onClick.listen((e) {
-      //e.preventDefault();
+      e.preventDefault();
       //e.stopImmediatePropagation();
-      _renameEventHandler();
+      //_renameEventHandler();
     });
     _tabHandle.children.add(tabHandleButton);
 

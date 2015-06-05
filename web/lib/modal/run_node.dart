@@ -2,12 +2,10 @@ part of updroid_modal;
 
 class UpDroidRunNodeModal extends UpDroidModal {
   List<Map> _nodeList;
-  WebSocket _ws;
   StreamController<CommanderMessage> _cs;
 
-  UpDroidRunNodeModal(List<Map> nodeList, WebSocket ws, StreamController<CommanderMessage> cs) {
+  UpDroidRunNodeModal(List<Map> nodeList, StreamController<CommanderMessage> cs) {
     _nodeList = nodeList;
-    _ws = ws;
     _cs = cs;
 
     _setupHead('Available Nodes');

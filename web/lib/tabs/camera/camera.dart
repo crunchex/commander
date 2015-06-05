@@ -69,7 +69,7 @@ class UpDroidCamera extends TabController {
       view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': [i]});
     });
     view.refreshMenus();
-//    _startPlayer(deviceIds);
+    _startPlayer(deviceIds);
   }
 
   void _startPlayer(List args) {
@@ -84,16 +84,13 @@ class UpDroidCamera extends TabController {
   }
 
   void _signalReady(UpDroidMessage um) {
-    print('cam ready');
     mailbox.ws.send('[[SIGNAL_READY]]');
   }
 
   //\/\/ Mailbox Handlers /\/\//
 
   void _postReadySetup(UpDroidMessage um) {
-    print('post ready');
     _setDevices(um.body);
-//    _startPlayer();
   }
 
   void registerMailbox() {

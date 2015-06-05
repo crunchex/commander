@@ -10,14 +10,15 @@ class CmdrPty {
   static const String guiName = 'UpDroidConsole';
 
   int ptyNum = 1;
+  CmdrMailbox mailbox;
 
   Process _shell;
 
   CmdrPty(this.ptyNum, String workspacePath, String numRows, String numCols) {
-    // TODO: this should be dynamically assigned when
-    // multiple consoles are spawned.
-
     help.debug('Spawning UpDroidPty ($ptyNum)', 0);
+
+    mailbox = new CmdrMailbox(guiName);
+    _registerMailbox();
 
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
     // See http://bitbucket.org/updroid/cmdr-pty
@@ -32,31 +33,15 @@ class CmdrPty {
     });
   }
 
-  /// Handler for the [WebSocket]. Performs various actions depending on requests
-  /// it receives or local events that it detects.
-  void handleWebSocket(WebSocket ws) {
-    help.debug('Console client connected.', 0);
-
-    ws.listen((String s) {
-      UpDroidMessage um = new UpDroidMessage.fromString(s);
-      help.debug('Console incoming: ' + um.header, 0);
-
-      switch (um.header) {
-        case 'RESIZE':
-          _resize(um.body);
-          break;
-
-        default:
-          help.debug('Console: message received without updroid header.', 1);
-      }
-    });
-  }
-
-  void _resize(String newSize) {
-    _shell.stdin.writeln(newSize);
+  void _resize(UpDroidMessage um) {
+    _shell.stdin.writeln(um.body);
   }
 
   void cleanup() {
     _shell.kill();
+  }
+
+  void _registerMailbox() {
+    mailbox.registerWebSocketEvent('RESIZE', _resize);
   }
 }

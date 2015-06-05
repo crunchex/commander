@@ -10,62 +10,37 @@ class CmdrEditor {
   static const String guiName = 'UpDroidEditor';
 
   int editorNum = 1;
+  CmdrMailbox mailbox;
   Directory _dir;
 
   CmdrEditor(Directory dir) {
+    help.debug('Spawning $guiName ($editorNum)', 0);
+
+    mailbox = new CmdrMailbox(guiName);
+    _registerMailbox();
+
     _dir = dir;
   }
 
-  /// Handler for the [WebSocket]. Performs various actions depending on requests
-  /// it receives or local events that it detects.
-  void handleWebSocket(WebSocket ws) {
-    help.debug('Editor client connected.', 0);
-
-    ws.listen((String s) {
-      UpDroidMessage um = new UpDroidMessage.fromString(s);
-      help.debug('Editor incoming: ' + s, 0);
-
-      switch (um.header) {
-        case 'EDITOR_DIRECTORY_PATH':
-          _sendPath(ws);
-          break;
-
-        case 'EDITOR_REQUEST_LIST':
-          _sendEditorList(ws);
-          break;
-
-        case 'EDITOR_OPEN':
-          _sendFileContents(ws, um.body);
-          break;
-
-        case 'EDITOR_SAVE':
-          _saveFile(JSON.decode(um.body));
-          break;
-
-        default:
-          help.debug('Editor: message received without updroid header.', 1);
-      }
-    });
+  void _sendPath(UpDroidMessage um) {
+    help.formattedMessage(mailbox.ws, 'EDITOR_DIRECTORY_PATH', _dir.path);
   }
 
-  void _sendPath(WebSocket s) {
-    help.formattedMessage(s, 'EDITOR_DIRECTORY_PATH', _dir.path);
-  }
-
-  void _sendFileContents(WebSocket ws, String path) {
-    var fileToOpen = new File(path);
+  void _sendFileContents(UpDroidMessage um) {
+    var fileToOpen = new File(um.body);
     fileToOpen.readAsString().then((String contents) {
-      ws.add('[[EDITOR_FILE_TEXT]]' + path + '[[CONTENTS]]' + contents);
+      mailbox.ws.add('[[EDITOR_FILE_TEXT]]' + um.body + '[[CONTENTS]]' + contents);
     });
   }
 
-  void _sendEditorList(WebSocket ws) {
+  void _sendEditorList(UpDroidMessage um) {
     help.getDirectory(_dir).then((files) {
-      ws.add('[[PATH_LIST]]' + files.toString());
+      mailbox.ws.add('[[PATH_LIST]]' + files.toString());
     });
   }
 
-  void _saveFile(List args) {
+  void _saveFile(UpDroidMessage um) {
+    List args = JSON.decode(um.body);
     // args[0] = data, args[1] = path. args[2] = executable option
 
     var fileToSave = new File(args[1]);
@@ -81,5 +56,12 @@ class CmdrEditor {
 
   void cleanup() {
 
+  }
+
+  void _registerMailbox() {
+    mailbox.registerWebSocketEvent('EDITOR_DIRECTORY_PATH', _sendPath);
+    mailbox.registerWebSocketEvent('EDITOR_REQUEST_LIST', _sendEditorList);
+    mailbox.registerWebSocketEvent('EDITOR_OPEN', _sendFileContents);
+    mailbox.registerWebSocketEvent('EDITOR_SAVE', _saveFile);
   }
 }

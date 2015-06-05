@@ -83,7 +83,7 @@ class CmdrServer {
       case 'updroideditor':
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _editors[objectID].handleWebSocket(ws));
+          .then((WebSocket ws) => _editors[objectID].mailbox.handleWebSocket(ws, request));
         break;
 
       case 'updroidexplorer':
@@ -101,7 +101,7 @@ class CmdrServer {
       case 'updroidconsole':
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _ptys[objectID].handleWebSocket(ws));
+          .then((WebSocket ws) => _ptys[objectID].mailbox.handleWebSocket(ws, request));
         break;
 
       default:

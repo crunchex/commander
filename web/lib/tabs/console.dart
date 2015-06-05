@@ -42,8 +42,6 @@ class UpDroidConsole extends TabController {
     _themeButton = view.refMap['invert'];
     _blinkButton = view.refMap['cursor-blink'];
 
-    _registerMailbox();
-
     _term = new Terminal(view.content)
       ..scrollSpeed = 3
       ..cursorBlink = true
@@ -54,8 +52,6 @@ class UpDroidConsole extends TabController {
     // window.location.host returns whatever is in the URL bar (including port).
     // Since the port here needs to be dynamic, the default needs to be replaced.
     _initWebSocket('ws://' + url + ':1206$id/pty');
-
-    _registerConsoleEventHandlers();
   }
 
   /// Toggles between a Solarized dark and light theme.
@@ -99,13 +95,13 @@ class UpDroidConsole extends TabController {
 
   //\/\/ Mailbox Handlers /\/\//
 
-  void _registerMailbox() {
+  void registerMailbox() {
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'FIRST_RESIZE', _initialResize);
     mailbox.registerCommanderEvent('RESIZE', _resizeEvent);
   }
 
   /// Sets up the event handlers for the console.
-  void _registerConsoleEventHandlers() {
+  void registerEventHandlers() {
     _ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;
       _term.stdout.add(buf.asUint8List());

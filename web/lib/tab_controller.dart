@@ -25,6 +25,7 @@ abstract class TabController {
       this.cs = cs;
       mailbox = new Mailbox(tabType, id, this.cs);
     }
+    registerMailbox();
 
     TabView.createTabView(id, col, tabType, shortName, menuConfig).then((tabView) {
       view = tabView;
@@ -35,13 +36,16 @@ abstract class TabController {
       view.cloneControlHitbox.onClick.listen((e) => _cloneTab(e));
 
       setUpController();
+      registerEventHandlers();
     });
   }
 
   void makeActive() => view.makeActive();
   void makeInactive() => view.makeInactive();
 
+  void registerMailbox();
   void setUpController();
+  void registerEventHandlers();
   void cleanUp();
 
   void _closeTab() {

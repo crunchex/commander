@@ -86,11 +86,7 @@ class UpDroidEditor extends TabController {
 
     _fontSizeInput.placeholder = _fontSize.toString();
 
-    _registerMailbox();
-
     _setUpEditor();
-    _registerEditorEventHandlers();
-
     cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
   }
 
@@ -187,7 +183,7 @@ class UpDroidEditor extends TabController {
     cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [id, view.content]));
   }
 
-  _registerMailbox() {
+  void registerMailbox() {
     mailbox.registerCommanderEvent('CLASS_ADD', _classAddHandler);
     mailbox.registerCommanderEvent('CLASS_REMOVE', _classRemoveHandler);
     mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
@@ -203,7 +199,7 @@ class UpDroidEditor extends TabController {
   }
 
   /// Sets up event handlers for the editor's menu buttons.
-  void _registerEditorEventHandlers() {
+  void registerEventHandlers() {
     _fontSizeInput.onClick.listen((e) {
       // Keeps bootjack dropdown from closing
       e.stopPropagation();

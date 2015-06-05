@@ -31,16 +31,12 @@ class UpDroidCamera extends TabController {
   }
 
   void setUpController() {
-    _registerMailbox();
-    
     _canvas = new CanvasElement();
     _canvas.classes.add('video-canvas');
     setDimensions();
     view.content.children.add(_canvas);
 
     _drawLoading();
-
-    _registerEventHandlers();
   }
 
   void setDimensions() {
@@ -96,11 +92,11 @@ class UpDroidCamera extends TabController {
     //_startPlayer();
   }
 
-  void _registerMailbox() {
+  void registerMailbox() {
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CAMERA_READY', _postReadySetup);
   }
 
-  void _registerEventHandlers() {
+  void registerEventHandlers() {
     window.onResize.listen((e) {
       resizeCanvas();
     });

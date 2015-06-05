@@ -48,7 +48,7 @@ cd $TOPDIR
 ### package ###
 echo -n "Packaging......................."
 mkdir -p $TOPDIR/deploy
-if [ -e "$TOPDIR/deploy/cmdr"* ]; then
+if ls $TOPDIR/deploy/cmdr* 1> /dev/null 2>&1; then
 	rm deploy/cmdr*
 fi
 

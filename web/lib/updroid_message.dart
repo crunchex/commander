@@ -1,6 +1,4 @@
-library updroid_message;
-
-import 'dart:async';
+part of mailbox;
 
 /// Container class that extracts the header (denoted with double brackets)
 /// and body from the raw text of a formatted [WebSocket] message received

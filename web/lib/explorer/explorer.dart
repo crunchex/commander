@@ -7,7 +7,6 @@ import 'dart:convert';
 import 'package:dnd/dnd.dart';
 import 'package:path/path.dart' as pathLib;
 
-import '../updroid_message.dart';
 import '../mailbox.dart';
 import 'explorer_helper.dart';
 

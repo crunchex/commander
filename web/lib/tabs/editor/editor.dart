@@ -10,8 +10,7 @@ import 'package:ace/proxy.dart';
 import "package:path/path.dart" as pathLib;
 
 import '../../mailbox.dart';
-import '../../updroid_message.dart';
-import '../../tab_controller.dart';
+import '../tab_controller.dart';
 import '../../modal/modal.dart';
 
 part 'templates.dart';

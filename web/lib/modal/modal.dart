@@ -6,7 +6,7 @@ import 'dart:convert';
 
 import 'package:bootjack/bootjack.dart';
 
-import '../updroid_message.dart';
+import '../mailbox.dart';
 
 part 'unsaved.dart';
 part 'saved.dart';

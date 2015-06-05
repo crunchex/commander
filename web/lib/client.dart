@@ -4,13 +4,12 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
-import 'tab_controller.dart';
+import 'tabs/tab_controller.dart';
 import 'explorer/explorer.dart';
 import 'tabs/editor/editor.dart';
 import 'tabs/console.dart';
 import 'tabs/camera/camera.dart';
 import 'modal/modal.dart';
-import 'updroid_message.dart';
 import 'mailbox.dart';
 
 class UpDroidClient {

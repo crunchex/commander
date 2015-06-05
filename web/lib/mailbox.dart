@@ -2,7 +2,8 @@ library mailbox;
 
 import 'dart:html';
 import 'dart:async';
-import 'updroid_message.dart';
+
+part 'updroid_message.dart';
 
 enum EventType { ON_OPEN, ON_MESSAGE, ON_CLOSE }
 

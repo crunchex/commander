@@ -3,8 +3,7 @@ library tab_controller;
 import 'dart:html';
 import 'dart:async';
 
-import 'mailbox.dart';
-import 'updroid_message.dart';
+import '../mailbox.dart';
 import 'tab_view.dart';
 
 abstract class TabController {

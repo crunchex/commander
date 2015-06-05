@@ -5,6 +5,7 @@ import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as pathLib;
 
 import '../ros/ros.dart';
+import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 
 class CmdrExplorer {
@@ -36,7 +37,7 @@ class CmdrExplorer {
     help.debug('Explorer client connected.', 0);
 
     ws.listen((String s) {
-      help.UpDroidMessage um = new help.UpDroidMessage(s);
+      UpDroidMessage um = new UpDroidMessage.fromString(s);
       help.debug('Explorer incoming: ' + s, 0);
 
       switch (um.header) {

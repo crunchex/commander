@@ -14,6 +14,7 @@ import 'tab/camera/camera.dart';
 import 'tab/editor.dart';
 import 'tab/explorer.dart';
 import 'git.dart';
+import 'server_mailbox.dart';
 import 'server_helper.dart' as help;
 
 part 'commands.dart';
@@ -94,7 +95,7 @@ class CmdrServer {
       case 'updroidcamera':
         WebSocketTransformer
           .upgrade(request)
-          .then((WebSocket ws) => _cameras[objectID].handleWebSocket(ws, request));
+          .then((WebSocket ws) => _cameras[objectID].mailbox.handleWebSocket(ws, request));
         break;
 
       case 'updroidconsole':
@@ -126,7 +127,7 @@ class CmdrServer {
     help.debug('Commander client connected.', 0);
 
     socket.listen((String s) {
-      help.UpDroidMessage um = new help.UpDroidMessage(s);
+      UpDroidMessage um = new UpDroidMessage.fromString(s);
       help.debug('Server incoming: ' + s, 0);
 
       switch (um.header) {

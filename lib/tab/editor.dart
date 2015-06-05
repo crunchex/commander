@@ -3,6 +3,7 @@ library cmdr_editor;
 import 'dart:io';
 import 'dart:convert';
 
+import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 
 class CmdrEditor {
@@ -21,7 +22,7 @@ class CmdrEditor {
     help.debug('Editor client connected.', 0);
 
     ws.listen((String s) {
-      help.UpDroidMessage um = new help.UpDroidMessage(s);
+      UpDroidMessage um = new UpDroidMessage.fromString(s);
       help.debug('Editor incoming: ' + s, 0);
 
       switch (um.header) {

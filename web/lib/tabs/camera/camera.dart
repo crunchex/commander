@@ -1,7 +1,6 @@
 library updroid_camera;
 
 import 'dart:html';
-import 'dart:async';
 import 'dart:convert';
 import 'dart:js' as js;
 
@@ -24,8 +23,8 @@ class UpDroidCamera extends TabController {
 
   CanvasElement _canvas;
 
-  UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs) :
-  super(id, col, className, 'Camera', getMenuConfig(), cs) {
+  UpDroidCamera(int id, int col) :
+  super(id, col, className, 'Camera', getMenuConfig()) {
 
   }
 
@@ -70,7 +69,7 @@ class UpDroidCamera extends TabController {
       view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': [i]});
     });
     view.refreshMenus();
-    _startPlayer(deviceIds);
+//    _startPlayer(deviceIds);
   }
 
   void _startPlayer(List args) {
@@ -84,14 +83,21 @@ class UpDroidCamera extends TabController {
     new js.JsObject(js.context['jsmpeg'], [client, options]);
   }
 
+  void _signalReady(UpDroidMessage um) {
+    print('cam ready');
+    mailbox.ws.send('[[SIGNAL_READY]]');
+  }
+
   //\/\/ Mailbox Handlers /\/\//
 
   void _postReadySetup(UpDroidMessage um) {
+    print('post ready');
     _setDevices(um.body);
-    //_startPlayer();
+//    _startPlayer();
   }
 
   void registerMailbox() {
+    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SIGNAL_READY', _signalReady);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CAMERA_READY', _postReadySetup);
   }
 

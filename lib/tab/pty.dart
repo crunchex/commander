@@ -3,6 +3,7 @@ library cmdr_console;
 import 'dart:io';
 import 'dart:convert';
 
+import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 
 class CmdrPty {
@@ -37,7 +38,7 @@ class CmdrPty {
     help.debug('Console client connected.', 0);
 
     ws.listen((String s) {
-      help.UpDroidMessage um = new help.UpDroidMessage(s);
+      UpDroidMessage um = new UpDroidMessage.fromString(s);
       help.debug('Console incoming: ' + um.header, 0);
 
       switch (um.header) {

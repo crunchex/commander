@@ -175,7 +175,7 @@ class UpDroidClient {
       _tabs[column].add(new UpDroidEditor(id, column, _cs));
     } else if (className == 'UpDroidCamera') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _tabs[column].add(new UpDroidCamera(id, column, _cs));
+      _tabs[column].add(new UpDroidCamera(id, column));
     } else if (className == 'UpDroidConsole') {
       // TODO: initial size should not be hardcoded.
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className-25-80');

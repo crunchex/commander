@@ -26,9 +26,7 @@ class CmdrServer {
   static const bool defaultDebugFlag = false;
 
   Map _explorers = {};
-  Map<int, CmdrEditor> _editors = {};
-  Map<int, CmdrPty> _ptys = {};
-  Map<int, CmdrCamera> _cameras = {};
+  Map _tabs = {};
   Map<int, CameraServer> _camServers = {};
 
   CmdrServer (ArgResults results) {
@@ -79,36 +77,20 @@ class CmdrServer {
 
     // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
     int objectID = int.parse(request.uri.pathSegments[1]);
-    switch (request.uri.pathSegments[0]) {
-      case 'updroideditor':
-        WebSocketTransformer
-          .upgrade(request)
-          .then((WebSocket ws) => _editors[objectID].mailbox.handleWebSocket(ws, request));
-        break;
+    String type = request.uri.pathSegments[0];
 
-      case 'updroidexplorer':
-        WebSocketTransformer
-          .upgrade(request)
-          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
-        break;
-
-      case 'updroidcamera':
-        WebSocketTransformer
-          .upgrade(request)
-          .then((WebSocket ws) => _cameras[objectID].mailbox.handleWebSocket(ws, request));
-        break;
-
-      case 'updroidconsole':
-        WebSocketTransformer
-          .upgrade(request)
-          .then((WebSocket ws) => _ptys[objectID].mailbox.handleWebSocket(ws, request));
-        break;
-
-      default:
-        WebSocketTransformer
-          .upgrade(request)
-          .then((WebSocket ws) => _handleWebSocket(ws, dir));
+    if (type == 'updroidexplorer') {
+      WebSocketTransformer.upgrade(request)
+      .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
+      return;
+    } else if (type == 'updroidclient') {
+      WebSocketTransformer.upgrade(request)
+      .then((WebSocket ws) => _handleWebSocket(ws, dir));
+      return;
     }
+
+    WebSocketTransformer.upgrade(request)
+    .then((WebSocket ws) => _tabs[type][objectID].mailbox.handleWebSocket(ws, request));
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
@@ -228,57 +210,42 @@ class CmdrServer {
     List idList = id.split('-');
     //int col = int.parse(idList[0]);
     int num = int.parse(idList[1]);
-    String type = idList[2];
+    String type = idList[2].toLowerCase();
 
     help.debug('Open tab request received: $id', 0);
 
+    if (!_tabs.containsKey(type)) _tabs[type] = {};
+
     switch (type) {
-      case 'UpDroidEditor':
-        _editors[num] = new CmdrEditor(dir);
+      case 'updroideditor':
+        _tabs[type][num] = new CmdrEditor(dir);
         break;
-      case 'UpDroidCamera':
-        _cameras[num] = new CmdrCamera(num, _camServers);
+      case 'updroidcamera':
+        _tabs[type][num] = new CmdrCamera(num, _camServers);
         break;
 
-      case 'UpDroidConsole':
+      case 'updroidconsole':
         String numRows = idList[3];
         String numCols = idList[4];
-        _ptys[num] = new CmdrPty(num, dir.path, numRows, numCols);
+        _tabs[type][num] = new CmdrPty(num, dir.path, numRows, numCols);
         break;
     }
   }
 
   void _closeTab(String id) {
     List idList = id.split('_');
-    String type = idList[0];
+    String type = idList[0].toLowerCase();
     int num = int.parse(idList[1]);
 
     help.debug('Close tab request received: $id', 0);
 
-    switch (type) {
-      case 'UpDroidEditor':
-        _editors[num].cleanup();
-        _editors[num] = null;
-        break;
-
-      case 'UpDroidCamera':
-        // TODO: figure out what should happen here now with the camera server.
-        //_cameras[num - 1].cleanup();
-        _cameras[num] = null;
-        break;
-
-      case 'UpDroidConsole':
-        _ptys[num].cleanup();
-        _ptys[num] = null;
-        break;
-    }
+    _tabs[type][num].cleanup();
+    _tabs[type][num] = null;
   }
 
   void _cleanUpBackend() {
     _explorers = {};
-    _editors = {};
-    _ptys = {};
-    _cameras = {};
+    _tabs = {};
     _camServers = {};
   }
 }

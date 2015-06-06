@@ -28,11 +28,16 @@ class CmdrServer {
   Map _explorers = {};
   Map _tabs = {};
   Map<int, CameraServer> _camServers = {};
+  CmdrMailbox _mailbox;
+  Directory dir;
 
   CmdrServer (ArgResults results) {
-    Directory dir = new Directory(results['workspace']);
+    dir = new Directory(results['workspace']);
     dir.create();
-    _initServer(dir, _getVirDir(results));
+    _initServer(_getVirDir(results));
+
+    _mailbox = new CmdrMailbox('UpDroidClient');
+    _registerMailbox();
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -52,7 +57,7 @@ class CmdrServer {
   }
 
   /// Initializes and HTTP server to serve the gui and handle [WebSocket] requests.
-  void _initServer(Directory dir, VirtualDirectory virDir) {
+  void _initServer(VirtualDirectory virDir) {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
@@ -60,13 +65,13 @@ class CmdrServer {
       print('You can now enter "localhost:12060" in your browser.\nCtrl-C to exit.');
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
-          .listen((HttpRequest request) => _routeRequest(request, dir, virDir))
+          .listen((HttpRequest request) => _routeRequest(request, virDir))
           .asFuture()  // Automatically cancels on error.
           .catchError((_) => help.debug("caught error", 1));
     });
   }
 
-  void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir) {
+  void _routeRequest(HttpRequest request, VirtualDirectory virDir) {
     // WebSocket requests are considered "upgraded" HTTP requests.
     if (!WebSocketTransformer.isUpgradeRequest(request)) {
       _handleStandardRequest(request, virDir);
@@ -85,7 +90,7 @@ class CmdrServer {
       return;
     } else if (type == 'updroidclient') {
       WebSocketTransformer.upgrade(request)
-      .then((WebSocket ws) => _handleWebSocket(ws, dir));
+      .then((WebSocket ws) => _mailbox.handleWebSocket(ws, request));
       return;
     }
 
@@ -103,52 +108,27 @@ class CmdrServer {
     }
   }
 
-  /// Handler for the [WebSocket]. Performs various actions depending on requests
-  /// it receives or local events that it detects.
-  void _handleWebSocket(WebSocket socket, Directory dir) {
-    help.debug('Commander client connected.', 0);
+  void _registerMailbox() {
+    _mailbox.registerWebSocketEvent('CLIENT_CONFIG', _clientConfig);
+    _mailbox.registerWebSocketEvent('GIT_PUSH', _gitPush);
+    _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
+    _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
+    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
+    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
+  }
 
-    socket.listen((String s) {
-      UpDroidMessage um = new UpDroidMessage.fromString(s);
-      help.debug('Server incoming: ' + s, 0);
+  void _clientConfig(UpDroidMessage um) {
+    _initBackendClasses(dir).then((value) {
+      _mailbox.ws.add('[[CLIENT_SERVER_READY]]' + JSON.encode(value));
+    });
+  }
 
-      switch (um.header) {
-        case 'CLIENT_CONFIG':
-          _initBackendClasses(dir).then((value) {
-            socket.add('[[CLIENT_SERVER_READY]]' + JSON.encode(value));
-          });
-          break;
-
-		//TODO: Need to change to grab all directories
-
-        case 'GIT_PUSH':
-          List runArgs = um.body.split('++');
-          String dirPath = runArgs[0];
-          String password = runArgs[1];
-          //help.debug('dirPath: $dirPath, password: $password', 0);
-          Git.push(dirPath, password);
-          break;
-
-        case 'CLOSE_TAB':
-          _closeTab(um.body);
-          break;
-
-        case 'OPEN_TAB':
-          _openTab(um.body, dir);
-          break;
-
-        case 'ADD_EXPLORER':
-          _newExplorerCmdr(JSON.decode(um.body), dir);
-          break;
-
-        case 'CLOSE_EXPLORER':
-          _closeExplorerCmdr(int.parse(um.body));
-          break;
-
-        default:
-          help.debug('Message received without updroid header.', 1);
-      }
-    }).onDone(() => _cleanUpBackend());
+  void _gitPush(UpDroidMessage um) {
+    List runArgs = um.body.split('++');
+    String dirPath = runArgs[0];
+    String password = runArgs[1];
+    //help.debug('dirPath: $dirPath, password: $password', 0);
+    Git.push(dirPath, password);
   }
 
   // TODO: foldername passed but not used
@@ -185,7 +165,8 @@ class CmdrServer {
     return completer.future;
   }
 
-  void _newExplorerCmdr(List explorerInfo, Directory dir) {
+  void _newExplorerCmdr(UpDroidMessage um) {
+    List explorerInfo = JSON.decode(um.body);
     int expNum = int.parse(explorerInfo[0]);
     String name = explorerInfo[1];
     Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + name));
@@ -196,7 +177,8 @@ class CmdrServer {
 
   }
 
-  void _closeExplorerCmdr(int expNum) {
+  void _closeExplorerCmdr(UpDroidMessage um) {
+    int expNum = int.parse(um.body);
     var toRemove;
 
     toRemove = _explorers[expNum];
@@ -206,7 +188,8 @@ class CmdrServer {
     toRemove.killExplorer();
   }
 
-  void _openTab(String id, Directory dir) {
+  void _openTab(UpDroidMessage um) {
+    String id = um.body;
     List idList = id.split('-');
     //int col = int.parse(idList[0]);
     int num = int.parse(idList[1]);
@@ -232,7 +215,8 @@ class CmdrServer {
     }
   }
 
-  void _closeTab(String id) {
+  void _closeTab(UpDroidMessage um) {
+    String id = um.body;
     List idList = id.split('_');
     String type = idList[0].toLowerCase();
     int num = int.parse(idList[1]);
@@ -243,9 +227,10 @@ class CmdrServer {
     _tabs[type][num] = null;
   }
 
-  void _cleanUpBackend() {
-    _explorers = {};
-    _tabs = {};
-    _camServers = {};
-  }
+  // TODO: fix this!
+//  void _cleanUpBackend() {
+//    _explorers = {};
+//    _tabs = {};
+//    _camServers = {};
+//  }
 }

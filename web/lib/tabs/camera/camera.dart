@@ -1,6 +1,5 @@
 library updroid_camera;
 
-import 'dart:async';
 import 'dart:html';
 import 'dart:convert';
 import 'dart:js' as js;

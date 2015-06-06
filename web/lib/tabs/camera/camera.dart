@@ -64,21 +64,23 @@ class UpDroidCamera extends TabController {
     context.fillText('Loading...', _canvas.width / 2 - 30, _canvas.height / 2);
   }
 
-  void _setDevices(String devices) {
+  List<int> _setDevices(String devices) {
     List<int> deviceIds = JSON.decode(devices);
     deviceIds.sort((a, b) => a.compareTo(b));
     deviceIds.forEach((int i) {
-      view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': [i]});
+      view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': i});
     });
     view.refreshMenus();
-    _startPlayer(deviceIds);
+
+    // Returns the sorted list.
+    return deviceIds;
   }
 
-  void _startPlayer(List<int> args) {
-    String deviceId = args[0].toString();
+  void _startPlayer(int deviceId) {
+    String deviceIdString = deviceId.toString();
     String url = window.location.host;
     url = url.split(':')[0];
-    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/${className.toLowerCase()}/$id/input/$deviceId']);
+    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/${className.toLowerCase()}/$id/input/$deviceIdString']);
 
     var options = new js.JsObject.jsify({'canvas': _canvas});
 
@@ -92,7 +94,8 @@ class UpDroidCamera extends TabController {
   //\/\/ Mailbox Handlers /\/\//
 
   void _postReadySetup(UpDroidMessage um) {
-    _setDevices(um.body);
+    List<int> sortedIds = _setDevices(um.body);
+    _startPlayer(sortedIds[0]);
   }
 
   void registerMailbox() {

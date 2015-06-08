@@ -92,6 +92,8 @@ class CmdrServer {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _mailbox.handleWebSocket(ws, request));
       return;
+    } else if (type == 'updroidteleop') {
+      return;
     }
 
     WebSocketTransformer.upgrade(request)
@@ -223,8 +225,10 @@ class CmdrServer {
 
     help.debug('Close tab request received: $id', 0);
 
-    _tabs[type][num].cleanup();
-    _tabs[type][num] = null;
+    if (_tabs[type][num] != null) {
+      _tabs[type][num].cleanup();
+      _tabs[type][num] = null;
+    }
   }
 
   // TODO: fix this!

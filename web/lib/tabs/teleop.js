@@ -67,9 +67,11 @@ function scangamepads() {
     }
 }
 
-if (haveEvents) {
-    window.addEventListener("gamepadconnected", connecthandler);
-    window.addEventListener("gamepaddisconnected", disconnecthandler);
-} else {
-    setInterval(scangamepads, 500);
+function startScanning() {
+    if (haveEvents) {
+        window.addEventListener("gamepadconnected", connecthandler);
+        window.addEventListener("gamepaddisconnected", disconnecthandler);
+    } else {
+        setInterval(scangamepads, 500);
+    }
 }

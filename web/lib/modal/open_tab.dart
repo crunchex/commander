@@ -32,7 +32,11 @@ class UpDroidOpenTabModal extends UpDroidModal {
       _cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${_side}_UpDroidCamera'));
     });
 
-    selectorWrap.children.addAll([sEditor, sConsole, sCamera]);
+    ButtonElement sTeleop = _createButton('default', 'Teleop', method: () {
+      _cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${_side}_UpDroidTeleop'));
+    });
+
+    selectorWrap.children.addAll([sEditor, sConsole, sCamera, sTeleop]);
   }
 
   void _setupFooter() {

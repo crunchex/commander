@@ -1,6 +1,7 @@
 library updroid_teleop;
 
 import 'dart:html';
+import 'dart:async';
 import 'dart:js' as js;
 
 import '../tab_controller.dart';
@@ -30,34 +31,40 @@ class UpDroidTeleop extends TabController {
       ..style.position = 'absolute'
       ..style.top = '50%'
       ..style.left = '50%'
-      ..style.transform = 'translate(-50%, -200px)';
+      ..style.transform = 'translate(-50%, -160px)';
     view.content.children.add(image);
 
     for (int i = 0; i < 4; i++) {
       ParagraphElement axis = new ParagraphElement()
+        ..id = '${className.toLowerCase()}-$id-axis-$i'
         ..style.position = 'absolute'
         ..style.color = '#ffffff'
-        ..style.fontSize = '24px'
+        ..style.fontSize = '16px'
         ..style.top = '50%'
         ..style.left = '50%'
-        ..style.transform = 'translate(-50%, -${i * 30}px)'
+        ..style.transform = 'translate(-50%, -${i * 20}px)'
         ..text = 'Axis $i: [disconnected]';
 
       view.content.children.add(axis);
     }
 
     ParagraphElement buttons = new ParagraphElement()
+      ..id = '${className.toLowerCase()}-$id-buttons'
       ..style.position = 'absolute'
       ..style.color = '#ffffff'
-      ..style.fontSize = '22px'
+      ..style.fontSize = '18px'
       ..style.top = '50%'
       ..style.left = '50%'
-      ..style.transform = 'translate(-50%, 60px)'
+      ..style.transform = 'translate(-50%, 30px)'
       ..text = '[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]';
 
     view.content.children.add(buttons);
 
-    new js.JsObject(js.context['startScanning'], []);
+    new js.JsObject(js.context['startScanning'], [id]);
+
+    new Timer.periodic(new Duration(milliseconds: 100), (_) {
+      var updateStatus = new js.JsObject(js.context['updateStatus'], []);
+    });
 
     //_setGamepads();
   }

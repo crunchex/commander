@@ -30,8 +30,32 @@ class UpDroidTeleop extends TabController {
       ..style.position = 'absolute'
       ..style.top = '50%'
       ..style.left = '50%'
-      ..style.transform = 'translate(-50%, -100px)';
+      ..style.transform = 'translate(-50%, -200px)';
     view.content.children.add(image);
+
+    for (int i = 0; i < 4; i++) {
+      ParagraphElement axis = new ParagraphElement()
+        ..style.position = 'absolute'
+        ..style.color = '#ffffff'
+        ..style.fontSize = '24px'
+        ..style.top = '50%'
+        ..style.left = '50%'
+        ..style.transform = 'translate(-50%, -${i * 30}px)'
+        ..text = 'Axis $i: [disconnected]';
+
+      view.content.children.add(axis);
+    }
+
+    ParagraphElement buttons = new ParagraphElement()
+      ..style.position = 'absolute'
+      ..style.color = '#ffffff'
+      ..style.fontSize = '22px'
+      ..style.top = '50%'
+      ..style.left = '50%'
+      ..style.transform = 'translate(-50%, 60px)'
+      ..text = '[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]';
+
+    view.content.children.add(buttons);
 
     new js.JsObject(js.context['startScanning'], []);
 

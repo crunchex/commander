@@ -17,7 +17,7 @@ function connecthandler(e) {
 }
 function addgamepad(gamepad) {
     controllers[gamepad.index] = gamepad;
-    rAF(updateStatus);
+    updateStatus();
 }
 
 function disconnecthandler(e) {
@@ -30,25 +30,23 @@ function removegamepad(gamepad) {
 
 function updateStatus() {
     scangamepads();
-    for (j in controllers) {
-        var controller = controllers[j];
-        for (var i=0; i<controller.buttons.length; i++) {
-            var val = controller.buttons[i];
-            var pressed = val == 1.0;
-            if (typeof(val) == "object") {
-                pressed = val.pressed;
-                val = val.value;
-            }
-            if (pressed) {
-                //b.className = "button pressed";
-                console.log("button " + i + "pressed!")
-            } else {
-                //b.className = "button";
-            }
+    var controller = controllers[0];
+    for (var i=0; i<controller.buttons.length; i++) {
+        var val = controller.buttons[i];
+        var pressed = val == 1.0;
+        if (typeof(val) == "object") {
+            pressed = val.pressed;
+            val = val.value;
         }
+        if (pressed) {
+            console.log("button " + i + " pressed!")
+        } else {
+        }
+    }
 
-        for (var i=0; i<controller.axes.length; i++) {
-            console.log("axis value: " + controller.axes[i].toFixed(4));
+    for (var i=0; i<controller.axes.length; i++) {
+        if (controller.axes[i].toFixed(4) > 0.1000) {
+            console.log("axis " + i + " value: " + controller.axes[i].toFixed(4));
         }
     }
     rAF(updateStatus);

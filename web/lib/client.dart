@@ -5,7 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'tabs/tab_controller.dart';
-import 'tabs/teleop.dart';
+import 'tabs/teleop/teleop.dart';
 import 'explorer/explorer.dart';
 import 'tabs/editor/editor.dart';
 import 'tabs/console.dart';

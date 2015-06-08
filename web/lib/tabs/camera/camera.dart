@@ -40,10 +40,8 @@ class UpDroidCamera extends TabController {
   }
 
   void setDimensions() {
-    // TODO: fix this fixed query selector.
-    var con = querySelector('#col-1-tab-content');
-    var width = (con.contentEdge.width - 13);
-    var height = (con.contentEdge.height - 13);
+    var width = (view.content.contentEdge.width - 13);
+    var height = (view.content.contentEdge.height - 13);
 
     _canvas.width = width <= _width ? width : _width;
     _canvas.height = height <= _height ? height : _height;

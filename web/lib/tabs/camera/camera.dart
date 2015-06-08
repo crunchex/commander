@@ -22,6 +22,8 @@ class UpDroidCamera extends TabController {
   }
 
   CanvasElement _canvas;
+  int _width = 640;
+  int _height = 480;
 
   UpDroidCamera(int id, int col) :
   super(id, col, className, 'Camera', getMenuConfig()) {
@@ -43,18 +45,8 @@ class UpDroidCamera extends TabController {
     var width = (con.contentEdge.width - 13);
     var height = (con.contentEdge.height - 13);
 
-    width <= 640 ? _canvas.width = width : _canvas.width = 640;
-    height <= 480 ? _canvas.height = height : _canvas.height = 482;
-  }
-
-  void resizeCanvas() {
-    // TODO: fix this fixed query selector.
-    var con = querySelector('#col-1-tab-content');
-    var width = (con.contentEdge.width - 13);
-    var height = (con.contentEdge.height - 13);
-
-    width <= 640 ? _canvas.width = width : _canvas.width = 640;
-    height <= 480 ? _canvas.height = height : _canvas.height = 482;
+    _canvas.width = width <= _width ? width : _width;
+    _canvas.height = height <= _height ? height : _height;
   }
 
   void _drawLoading() {
@@ -104,7 +96,7 @@ class UpDroidCamera extends TabController {
 
   void registerEventHandlers() {
     window.onResize.listen((e) {
-      resizeCanvas();
+      setDimensions();
     });
   }
 

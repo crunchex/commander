@@ -212,7 +212,8 @@ class UpDroidClient {
     for (int j = 0; j < _tabs[col].length; j++) {
       _tabs[col][j].makeInactive();
     }
-    _tabs[col].last.makeActive();
+
+    if (_tabs[col].length > 0) _tabs[col].last.makeActive();
 
     _mailbox.ws.send('[[CLOSE_TAB]]' + id);
   }

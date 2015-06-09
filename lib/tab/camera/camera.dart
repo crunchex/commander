@@ -62,4 +62,8 @@ class CmdrCamera {
       mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$cameraNum/input/$key', _handleInputStream);
     });
   }
+
+  void cleanup() {
+
+  }
 }

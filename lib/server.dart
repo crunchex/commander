@@ -11,6 +11,7 @@ import 'package:path/path.dart' as pathLib;
 
 import 'tab/pty.dart';
 import 'tab/camera/camera.dart';
+import 'tab/teleop.dart';
 import 'tab/editor.dart';
 import 'tab/explorer.dart';
 import 'git.dart';
@@ -91,8 +92,6 @@ class CmdrServer {
     } else if (type == 'updroidclient') {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _mailbox.handleWebSocket(ws, request));
-      return;
-    } else if (type == 'updroidteleop') {
       return;
     }
 
@@ -208,7 +207,9 @@ class CmdrServer {
       case 'updroidcamera':
         _tabs[type][num] = new CmdrCamera(num, _camServers);
         break;
-
+      case 'updroidteleop':
+        _tabs[type][num] = new CmdrTeleop(num, dir.path);
+        break;
       case 'updroidconsole':
         String numRows = idList[3];
         String numCols = idList[4];

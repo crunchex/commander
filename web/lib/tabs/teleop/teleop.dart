@@ -36,14 +36,14 @@ class UpDroidTeleop extends TabController {
       ..style.top = '50%'
       ..style.left = '50%'
       ..style.transform = 'translate(-50%, -160px)';
-//    view.content.children.add(image);
+    view.content.children.add(image);
 
     for (int i = 0; i < 4; i++) {
       SpanElement span = new SpanElement()
         ..style.position = 'absolute'
         ..style.top = '50%'
         ..style.left = '50%'
-        ..style.transform = 'translate(-50%, -${i * 20}px)';
+        ..style.transform = 'translate(-50%, -${i * 20 + 10}px)';
       view.content.children.add(span);
 
       ParagraphElement axisLabel = new ParagraphElement()
@@ -68,7 +68,7 @@ class UpDroidTeleop extends TabController {
         ..style.position = 'absolute'
         ..style.top = '50%'
         ..style.left = '50%'
-        ..style.transform = 'translate(-50%, ${i * 20}px)';
+        ..style.transform = 'translate(-50%, ${i * 20 + 10}px)';
       view.content.children.add(span);
 
       ParagraphElement buttonLabel = new ParagraphElement()

@@ -59,11 +59,30 @@ class TabView {
     _tabContainer.remove();
   }
 
-  refreshMenus() {
-    _menus.children = new List<Element>();
-    for (Map configItem in config) {
-      _menus.children.add(_createDropdownMenu(configItem));
+  LIElement addMenuItem(Map itemConfig, [String dropdownMenuSelector]) {
+    LIElement itemElement;
+    if (itemConfig['type'] == 'toggle') {
+      if (itemConfig.containsKey('handler')) {
+        if (itemConfig.containsKey('args')) {
+          itemElement = _createToggleItem(itemConfig['title'], itemConfig['handler'], itemConfig['args']);
+        } else {
+          itemElement = _createToggleItem(itemConfig['title'], itemConfig['handler']);
+        }
+      } else {
+        itemElement = _createToggleItem(itemConfig['title']);
+      }
+    } else if (itemConfig['type'] == 'input') {
+      itemElement = _createInputItem(itemConfig['title']);
+    } else if (itemConfig['type'] == 'submenu') {
+      itemElement = _createSubMenu("Templates", ['Publisher', 'Subscriber', 'Hello World Talker', 'Hello World Listener', 'Basic Launch File']);
     }
+
+    if (dropdownMenuSelector != null) {
+      UListElement dropdownMenu = querySelector(dropdownMenuSelector);
+      dropdownMenu.children.add(itemElement);
+    }
+
+    return itemElement;
   }
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
@@ -130,7 +149,10 @@ class TabView {
         ..attributes['role'] = 'tablist';
     _tabContainer.children.add(_menus);
 
-    refreshMenus();
+    _menus.children = new List<Element>();
+    for (Map configItem in config) {
+      _menus.children.add(_createDropdownMenu(configItem));
+    }
 
     extra = new LIElement();
     extra.id = 'extra-$num';
@@ -167,27 +189,14 @@ class TabView {
     dropdown.children.add(dropdownToggle);
 
     UListElement dropdownMenu = new UListElement()
+        ..id = '${shortName.toLowerCase()}-$num-${title.toLowerCase().replaceAll(' ', '-')}'
         ..classes.add('dropdown-menu')
         ..attributes['role'] = 'menu';
     dropdown.children.add(dropdownMenu);
 
     LIElement item;
     for (Map i in items) {
-      if (i['type'] == 'toggle') {
-        if (i.containsKey('handler')) {
-          if (i.containsKey('args')) {
-            item = _createToggleItem(i['title'], i['handler'], i['args']);
-          } else {
-            item = _createToggleItem(i['title'], i['handler']);
-          }
-        } else {
-          item = _createToggleItem(i['title']);
-        }
-      } else if (i['type'] == 'input') {
-        item = _createInputItem(i['title']);
-      } else if (i['type'] == 'submenu') {
-        item = _createSubMenu("Templates", ['Publisher', 'Subscriber', 'Hello World Talker', 'Hello World Listener', 'Basic Launch File']);
-      }
+      item = addMenuItem(i);
       dropdownMenu.children.add(item);
     }
 

@@ -212,9 +212,36 @@ class UpDroidClient {
     for (int j = 0; j < _tabs[col].length; j++) {
       _tabs[col][j].makeInactive();
     }
-    _tabs[col].last.makeActive();
+
+    if (_tabs[col].length > 0) _tabs[col].last.makeActive();
 
     _mailbox.ws.send('[[CLOSE_TAB]]' + id);
+  }
+
+  void _closeTabFromServer(UpDroidMessage um) {
+    String id = um.body;
+    List idList = id.split('_');
+    String type = idList[0];
+    int num = int.parse(idList[1]);
+
+    // Find the tab to remove and remove it.
+    // Also take note of the column it was found in.
+    int col;
+    for (int i = 0; i <= 1; i++) {
+      for (int j = 0; j < _tabs[i].length; j++) {
+        if (_tabs[i][j].tabType == type && _tabs[i][j].id == num) {
+          _tabs[i].removeAt(j);
+          col = i;
+        }
+      }
+    }
+
+    // Make all tabs in that column inactive except the last.
+    for (int j = 0; j < _tabs[col].length; j++) {
+      _tabs[col][j].makeInactive();
+    }
+
+    if (_tabs[col].length > 0) _tabs[col].last.makeActive();
   }
 
   void _openTabFromButton(CommanderMessage m) {
@@ -262,6 +289,7 @@ class UpDroidClient {
 
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'CLIENT_CONFIG', _sendClientConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLIENT_SERVER_READY', _serverReady);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
   }
 
   /// Sets up external event handlers for the various Commander classes. These

@@ -9,11 +9,13 @@ class CmdrMailbox {
   WebSocket ws;
 
   Map _wsRegistry;
+  List<Function> _wsCloseRegistry;
   Map _endpointRegistry;
 
   CmdrMailbox(String className) {
     this.className = className;
     _wsRegistry = {};
+    _wsCloseRegistry = [];
     _endpointRegistry = {};
   }
 
@@ -25,7 +27,7 @@ class CmdrMailbox {
         help.debug('$className incoming: ' + um.header, 0);
 
         _wsRegistry[um.header](um);
-      });
+      }).onDone(() => _wsCloseRegistry.forEach((f()) => f()));
     } else {
       _endpointRegistry[request.uri.path](request);
     }
@@ -35,6 +37,12 @@ class CmdrMailbox {
   /// [msg] is required to know which function to call.
   void registerWebSocketEvent(String msg, function(UpDroidMessage um)) {
     _wsRegistry[msg] = function;
+  }
+
+  /// Registers a [function] to be called at the end of the [WebSocket] request - onDone().
+  /// The method will be executed in no particular order.
+  void registerWebSocketCloseEvent(function(UpDroidMessage um)) {
+    _wsCloseRegistry.add(function);
   }
 
   /// Registers a [function] to be called when a request is received at

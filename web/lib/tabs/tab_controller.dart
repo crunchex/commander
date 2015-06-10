@@ -54,7 +54,8 @@ abstract class TabController {
     if (cs != null) {
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${tabType}_$id'));
     } else {
-      mailbox.ws.send(new UpDroidMessage('CLOSE_TAB', '${tabType}_$id'));
+      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${tabType}_$id');
+      mailbox.ws.send(um.s);
     }
   }
 
@@ -63,7 +64,8 @@ abstract class TabController {
     if (cs != null) {
       cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${tabType}'));
     } else {
-      mailbox.ws.send(new UpDroidMessage('OPEN_TAB', '${col}_${tabType}'));
+      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${tabType}_$id');
+      mailbox.ws.send(um.s);
     }
   }
 }

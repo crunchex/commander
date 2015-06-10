@@ -29,6 +29,7 @@ class CmdrServer {
   Map _explorers = {};
   Map _tabs = {};
   Map<int, CameraServer> _camServers = {};
+  StreamController<UpDroidMessage> _serverStream;
   CmdrMailbox _mailbox;
   Directory dir;
 
@@ -39,6 +40,13 @@ class CmdrServer {
 
     _mailbox = new CmdrMailbox('UpDroidClient');
     _registerMailbox();
+
+    // A stream that pushes anything it receives onto the main websocket to the client.
+    _serverStream = new StreamController<UpDroidMessage>.broadcast();
+    _serverStream.stream.listen((UpDroidMessage um) {
+      //print('received message: ${um.header} ${um.body}');
+      _mailbox.ws.add(um.s);
+    });
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -116,6 +124,8 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
     _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
     _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
+
+    _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
   }
 
   void _clientConfig(UpDroidMessage um) {
@@ -205,7 +215,7 @@ class CmdrServer {
         _tabs[type][num] = new CmdrEditor(dir);
         break;
       case 'updroidcamera':
-        _tabs[type][num] = new CmdrCamera(num, _camServers);
+        _tabs[type][num] = new CmdrCamera(num, _camServers, _serverStream);
         break;
       case 'updroidteleop':
         _tabs[type][num] = new CmdrTeleop(num, dir.path);
@@ -232,10 +242,21 @@ class CmdrServer {
     }
   }
 
-  // TODO: fix this!
-//  void _cleanUpBackend() {
-//    _explorers = {};
-//    _tabs = {};
-//    _camServers = {};
-//  }
+  void _cleanUpBackend() {
+    help.debug('Client disconnected, cleaning up...', 0);
+
+    _explorers = {};
+    _tabs.keys.forEach((String type) {
+      _tabs[type].keys.forEach((int id) {
+        _tabs[type][id].cleanup();
+      });
+    });
+    _tabs = {};
+    _camServers.keys.forEach((int id) {
+      _camServers[id].cleanup();
+    });
+    _camServers = {};
+
+    help.debug('Clean up done.', 0);
+  }
 }

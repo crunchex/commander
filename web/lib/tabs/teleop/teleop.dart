@@ -130,9 +130,8 @@ class UpDroidTeleop extends TabController {
     Map deviceIds = js.context['controllers'];
     //deviceIds.sort((a, b) => a.compareTo(b));
     for (int i = 0; i < deviceIds.keys.length; i++) {
-      view.config.last['items'].add({'type': 'toggle', 'title': 'Gamepad$i'});
+      view.addMenuItem({'type': 'toggle', 'title': 'Gamepad$i'}, '#${shortName.toLowerCase()}-$id-controllers');
     }
-    view.refreshMenus();
   }
 
   //\/\/ Mailbox Handlers /\/\//

@@ -125,6 +125,8 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
     _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
     _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
+
+    _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
   }
 
   void _clientConfig(UpDroidMessage um) {
@@ -239,10 +241,21 @@ class CmdrServer {
     }
   }
 
-  // TODO: fix this!
-//  void _cleanUpBackend() {
-//    _explorers = {};
-//    _tabs = {};
-//    _camServers = {};
-//  }
+  void _cleanUpBackend() {
+    help.debug('Client disconnected, cleaning up...', 0);
+
+    _explorers = {};
+    _tabs.keys.forEach((String type) {
+      _tabs[type].keys.forEach((int id) {
+        _tabs[type][id].cleanup();
+      });
+    });
+    _tabs = {};
+    _camServers.keys.forEach((int id) {
+      _camServers[id].cleanup();
+    });
+    _camServers = {};
+
+    help.debug('Clean up done.', 0);
+  }
 }

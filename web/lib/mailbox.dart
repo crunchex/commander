@@ -92,7 +92,11 @@ class Mailbox {
     .where((UpDroidMessage um) => !_waitForRegistry.contains(um.header))
     .listen((UpDroidMessage um) {
       //print('[${_name}\'s Mailbox] UpDroidMessage received of type: ${um.header}');
-      _wsRegistry[EventType.ON_MESSAGE][um.header](um);
+      if (_wsRegistry[EventType.ON_MESSAGE].containsKey(um.header)) {
+        _wsRegistry[EventType.ON_MESSAGE][um.header](um);
+      } else {
+        //print('[${_name}\'s Mailbox] UpDroidMessage received of type: ${um.header}, but no handler registered.');
+      }
     });
 
     //TODO: Should only alert if everything is disconnected (in case only console isnt connected)

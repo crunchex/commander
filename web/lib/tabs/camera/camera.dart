@@ -30,8 +30,8 @@ class UpDroidCamera extends TabController {
   AnchorElement _fullStretchedButton;
 
   CanvasElement _canvas;
-  int _width = 640;
-  int _height = 480;
+  int _width = 320;
+  int _height = 240;
   AspectType _aspect;
 
   UpDroidCamera(int id, int col) :

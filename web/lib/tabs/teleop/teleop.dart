@@ -120,8 +120,10 @@ class UpDroidTeleop extends TabController {
           payloadString += i == 4 ? ';' : ',';
         }
         payloadString += ']';
-        print(payloadString);
-        _ws.send(payloadString);
+
+        if (view.content.children[1].children[1].text != 'disconnected') {
+          _ws.send(payloadString);
+        };
       });
     });
 

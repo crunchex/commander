@@ -1,6 +1,7 @@
 library cmdr_teleop;
 
 import 'dart:io';
+import 'dart:convert';
 
 import '../ros/ros.dart';
 import '../server_mailbox.dart';
@@ -20,14 +21,20 @@ class CmdrTeleop {
     mailbox = new CmdrMailbox(guiName);
     _registerMailbox();
 
-//    Workspace workspace = new Workspace(workspacePath);
-//    Ros.runNode(workspace, 'updroid_teleop updroid_teleop.launch');
+    Workspace workspace = new Workspace(workspacePath);
+//    Ros.runNode(workspace, 'ros_arduino_python joy_cmdr.launch');
+
+    Process.start('bash', ['-c', '. ${workspace.path}/catkin_ws/devel/setup.bash && roslaunch ros_arduino_python joy_cmdr.launch'], runInShell: true).then((process) {
+      _shell = process;
+      stdout.addStream(process.stdout);
+      stderr.addStream(process.stderr);
+    });
   }
 
   void _handleGamepadInput(HttpRequest request) {
     mailbox.ws.where((e) => request.uri.path == '/${guiName.toLowerCase()}/$id/controller/0')
-    .listen((e) {
-      print('controller data: ${e.data}');
+    .listen((String s) {
+      _shell.stdin.add(UTF8.encode(s));
     });
   }
 

@@ -7,6 +7,8 @@ import 'dart:js' as js;
 import '../../mailbox.dart';
 import '../tab_controller.dart';
 
+enum AspectType { FIXED, FULL }
+
 /// [UpDroidCamera] is a client-side class that uses the jsmpeg library
 /// to render a video stream from a [WebSocket] onto a [_canvasElement].
 class UpDroidCamera extends TabController {
@@ -16,14 +18,21 @@ class UpDroidCamera extends TabController {
     List menu = [
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'Close Tab'}]},
-      {'title': 'Devices', 'items': []}
+      {'title': 'Devices', 'items': []},
+      {'title': 'Aspect', 'items': [
+        {'type': 'toggle', 'title': 'Fixed'},
+        {'type': 'toggle', 'title': 'Full-Stretched'}]}
     ];
     return menu;
   }
 
+  AnchorElement _fixedButton;
+  AnchorElement _fullStretchedButton;
+
   CanvasElement _canvas;
   int _width = 640;
   int _height = 480;
+  AspectType _aspect;
 
   UpDroidCamera(int id, int col) :
   super(id, col, className, 'Camera', getMenuConfig()) {
@@ -31,12 +40,17 @@ class UpDroidCamera extends TabController {
   }
 
   void setUpController() {
+    _aspect = AspectType.FULL;
+
     _canvas = new CanvasElement();
     _canvas.classes.add('video-canvas');
     setDimensions();
     view.content.children.add(_canvas);
 
     _drawLoading();
+
+    _fixedButton = view.refMap['fixed'];
+    _fullStretchedButton = view.refMap['full-stretched'];
   }
 
   void setDimensions() {
@@ -45,6 +59,14 @@ class UpDroidCamera extends TabController {
 
     _canvas.width = width <= _width ? width : _width;
     _canvas.height = height <= _height ? height : _height;
+
+    if (_aspect == AspectType.FIXED) {
+      _canvas.style.width = null;
+      _canvas.style.height = null;
+    } else if (_aspect == AspectType.FULL) {
+      _canvas.style.width = '100%';
+      _canvas.style.height = '100%';
+    }
   }
 
   void _drawLoading() {
@@ -57,9 +79,8 @@ class UpDroidCamera extends TabController {
     List<int> deviceIds = JSON.decode(devices);
     deviceIds.sort((a, b) => a.compareTo(b));
     deviceIds.forEach((int i) {
-      view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': i});
+      view.addMenuItem({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': i}, '#${shortName.toLowerCase()}-$id-devices');
     });
-    view.refreshMenus();
 
     // Returns the sorted list.
     return deviceIds;
@@ -93,6 +114,18 @@ class UpDroidCamera extends TabController {
   }
 
   void registerEventHandlers() {
+    _fixedButton.onClick.listen((e) {
+      _aspect = AspectType.FIXED;
+      setDimensions();
+      e.preventDefault();
+    });
+
+    _fullStretchedButton.onClick.listen((e) {
+      _aspect = AspectType.FULL;
+      setDimensions();
+      e.preventDefault();
+    });
+
     window.onResize.listen((e) {
       setDimensions();
     });

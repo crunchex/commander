@@ -20,7 +20,6 @@ class UpDroidTeleop extends TabController {
   }
 
   WebSocket _ws;
-  ParagraphElement _buttons;
 
   UpDroidTeleop(int id, int col) :
   super(id, col, className, 'Teleop', getMenuConfig()) {
@@ -35,7 +34,7 @@ class UpDroidTeleop extends TabController {
       ..style.position = 'absolute'
       ..style.top = '50%'
       ..style.left = '50%'
-      ..style.transform = 'translate(-50%, -160px)';
+      ..style.transform = 'translate(-50%, -200px)';
     view.content.children.add(image);
 
     for (int i = 0; i < 4; i++) {
@@ -43,7 +42,7 @@ class UpDroidTeleop extends TabController {
         ..style.position = 'absolute'
         ..style.top = '50%'
         ..style.left = '50%'
-        ..style.transform = 'translate(-50%, -${i * 20 + 10}px)';
+        ..style.transform = 'translate(-50%, -${i * 20 + 50}px)';
       view.content.children.add(span);
 
       ParagraphElement axisLabel = new ParagraphElement()
@@ -63,12 +62,12 @@ class UpDroidTeleop extends TabController {
       span.children.add(axisData);
     }
 
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 17; i++) {
       SpanElement span = new SpanElement()
         ..style.position = 'absolute'
         ..style.top = '50%'
         ..style.left = '50%'
-        ..style.transform = 'translate(-50%, ${i * 20 + 10}px)';
+        ..style.transform = 'translate(-50%, ${i * 20 - 30}px)';
       view.content.children.add(span);
 
       ParagraphElement buttonLabel = new ParagraphElement()
@@ -105,15 +104,24 @@ class UpDroidTeleop extends TabController {
     _ws = new WebSocket(url);
 
     _ws.onOpen.listen((e) {
-      new Timer.periodic(new Duration(milliseconds: 1000), (_) {
+      new Timer.periodic(new Duration(milliseconds: 200), (_) {
         var updateStatus = new js.JsObject(js.context['updateStatus'], []);
-        String payloadString = '';
-        for (int i = 1; i < 5; i++) {
-          payloadString += view.content.children[i].text.replaceFirst(new RegExp(r'^Axis\ [0-9]+:'), '');
+        String payloadString = '[';
+        for (int i = 1; i <= 21; i++) {
+          payloadString += view.content.children[i].children[1].text;
+
+          if (i == 21) {
+            break;
+          } else if (i == 4) {
+            // Dummy values for extra axes that ROS joy expects.
+            payloadString += ',0.0,0.0,0.0,0.0';
+          }
+
+          payloadString += i == 4 ? ';' : ',';
         }
-        payloadString += _buttons.text;
-//        print(payloadString);
-//        _ws.send(payloadString);
+        payloadString += ']';
+        print(payloadString);
+        _ws.send(payloadString);
       });
     });
 

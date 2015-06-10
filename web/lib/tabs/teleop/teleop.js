@@ -8,11 +8,13 @@
  */
 var haveEvents = 'GamepadEvent' in window;
 var controllers = {};
-var axis0, axis1, axis2, axis3, buttons;
+var axes = [];
+var buttons = [];
 
 function connecthandler(e) {
     addgamepad(e.gamepad);
 }
+
 function addgamepad(gamepad) {
     controllers[gamepad.index] = gamepad;
     updateStatus();
@@ -28,23 +30,15 @@ function removegamepad(gamepad) {
 
 function updateStatus() {
     scangamepads();
+
     var controller = controllers[0];
-
-    var status = [];
-
     if (controller != null) {
-        for (var i = 0; i < controller.axes.length; i++) {
-            status[i] = controller.axes[i];
+        for (var k = 0; k < controller.axes.length; k++) {
+            axes[k].innerHTML = controller.axes[k];
         }
 
-        axis0.innerHTML = "Axis 0: " + status[0];
-        axis1.innerHTML = "Axis 1: " + status[1];
-        axis2.innerHTML = "Axis 2: " + status[2];
-        axis3.innerHTML = "Axis 3: " + status[3];
-
-        var buttonsString = "[";
-        for (var j = 0; i < controller.buttons.length; i++) {
-            var val = controller.buttons[i];
+        for (var l = 0; l < controller.buttons.length; l++) {
+            var val = controller.buttons[l];
             var pressed = val == 1.0;
             if (typeof(val) == "object") {
                 pressed = val.pressed;
@@ -52,15 +46,11 @@ function updateStatus() {
             }
 
             if (pressed) {
-                status[i+controller.axes.length] = 1;
+                buttons[l].innerHTML = 1;
             } else {
-                status[i+controller.axes.length] = 0;
+                buttons[l].innerHTML = 0;
             }
-
-            buttonsString += " " + status[i+controller.axes.length];
         }
-        buttonsString += " ]";
-        buttons.innerHTML = buttonsString;
     }
 }
 
@@ -78,12 +68,13 @@ function scangamepads() {
 }
 
 function startScanning(idNum) {
-    axis0 = document.getElementById('updroidteleop-' + idNum + '-axis-0');
-    axis1 = document.getElementById('updroidteleop-' + idNum + '-axis-1');
-    axis2 = document.getElementById('updroidteleop-' + idNum + '-axis-2');
-    axis3 = document.getElementById('updroidteleop-' + idNum + '-axis-3');
+    for (var i = 0; i < 4; i++) {
+        axes[i] = document.getElementById('updroidteleop-' + idNum + '-axis-data-' + i);
+    }
 
-    buttons = document.getElementById('updroidteleop-' + idNum + '-buttons');
+    for (var j = 0; j < 17; j++) {
+        buttons[j] = document.getElementById('updroidteleop-' + idNum + '-button-data-' + j);
+    }
 
     if (haveEvents) {
         window.addEventListener("gamepadconnected", connecthandler);

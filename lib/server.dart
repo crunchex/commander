@@ -28,6 +28,7 @@ class CmdrServer {
   Map _explorers = {};
   Map _tabs = {};
   Map<int, CameraServer> _camServers = {};
+  StreamController<UpDroidMessage> _serverStream;
   CmdrMailbox _mailbox;
   Directory dir;
 
@@ -38,6 +39,13 @@ class CmdrServer {
 
     _mailbox = new CmdrMailbox('UpDroidClient');
     _registerMailbox();
+
+    // A stream that pushes anything it receives onto the main websocket to the client.
+    _serverStream = new StreamController<UpDroidMessage>.broadcast();
+    _serverStream.stream.listen((UpDroidMessage um) {
+      //print('received message: ${um.header} ${um.body}');
+      _mailbox.ws.add(um.s);
+    });
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -206,7 +214,7 @@ class CmdrServer {
         _tabs[type][num] = new CmdrEditor(dir);
         break;
       case 'updroidcamera':
-        _tabs[type][num] = new CmdrCamera(num, _camServers);
+        _tabs[type][num] = new CmdrCamera(num, _camServers, _serverStream);
         break;
 
       case 'updroidconsole':

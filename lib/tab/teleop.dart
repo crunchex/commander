@@ -1,5 +1,6 @@
 library cmdr_teleop;
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
@@ -13,10 +14,13 @@ class CmdrTeleop {
   int id;
   CmdrMailbox mailbox;
 
+  StreamController<UpDroidMessage> _serverStream;
   Process _shell;
 
-  CmdrTeleop(this.id, String workspacePath) {
+  CmdrTeleop(this.id, String workspacePath, StreamController<UpDroidMessage> serverStream) {
     help.debug('Spawning UpDroidTeleop ($id)', 0);
+
+    _serverStream = serverStream;
 
     mailbox = new CmdrMailbox(guiName);
     _registerMailbox();
@@ -31,6 +35,10 @@ class CmdrTeleop {
     });
   }
 
+  void _closeTab(UpDroidMessage um) {
+    _serverStream.add(um);
+  }
+
   void _handleGamepadInput(HttpRequest request) {
     mailbox.ws.where((e) => request.uri.path == '/${guiName.toLowerCase()}/$id/controller/0')
     .listen((String s) {
@@ -39,10 +47,12 @@ class CmdrTeleop {
   }
 
   void cleanup() {
-
+    _shell.kill();
   }
 
   void _registerMailbox() {
+    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
+
     mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/controller/0', _handleGamepadInput);
   }
 }

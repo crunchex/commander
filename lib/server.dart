@@ -218,7 +218,7 @@ class CmdrServer {
         _tabs[type][num] = new CmdrCamera(num, _camServers, _serverStream);
         break;
       case 'updroidteleop':
-        _tabs[type][num] = new CmdrTeleop(num, dir.path);
+        _tabs[type][num] = new CmdrTeleop(num, dir.path, _serverStream);
         break;
       case 'updroidconsole':
         String numRows = idList[3];

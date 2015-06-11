@@ -34,7 +34,7 @@ function updateStatus() {
     var controller = controllers[0];
     if (controller != null) {
         for (var k = 0; k < controller.axes.length; k++) {
-            axes[k].innerHTML = controller.axes[k];
+            axes[k].innerHTML = -controller.axes[k];
         }
 
         for (var l = 0; l < controller.buttons.length; l++) {

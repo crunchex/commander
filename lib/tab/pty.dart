@@ -1,5 +1,6 @@
 library cmdr_console;
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
@@ -22,9 +23,25 @@ class CmdrPty {
 
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
     // See http://bitbucket.org/updroid/cmdr-pty
-    Process.start('cmdr-pty', ['-addr', ':1206$ptyNum', '-size', '${numRows}x${numCols}'], environment: {'TERM':'vt100'}, workingDirectory: workspacePath).then((Process shell) {
+    Process.start('cmdr-pty', ['-size', '${numRows}x${numCols}'], environment: {'TERM':'vt100'}, workingDirectory: workspacePath).then((Process shell) {
       _shell = shell;
-      shell.stdout.listen((data) => help.debug('pty[$ptyNum] stdout: ${UTF8.decode(data)}', 0));
+
+      Stream stdoutBroadcast = shell.stdout.asBroadcastStream();
+
+      // Get the port returned by cmdr-pty and then close.
+      StreamSubscription portListener;
+      portListener = stdoutBroadcast.listen((data) {
+        String dataString = UTF8.decode(data);
+        if (dataString.contains('now listening on:  [::]:')) {
+          String port = dataString.replaceFirst('now listening on:  [::]:', '');
+          UpDroidMessage portMessage = new UpDroidMessage('PTY_READY', port);
+          mailbox.ws.add(portMessage.s);
+          portListener.cancel();
+        }
+      });
+
+      // Log the rest of stdout/err for debug.
+      stdoutBroadcast.listen((data) => help.debug('pty[$ptyNum] stdout: ${UTF8.decode(data)}', 0));
       shell.stderr.listen((data) => help.debug('pty[$ptyNum] stderr: ${UTF8.decode(data)}', 0));
     }).catchError((error) {
       if (error is! ProcessException) throw error;

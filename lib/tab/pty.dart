@@ -15,6 +15,9 @@ class CmdrPty {
 
   Process _shell;
   String _workspacePath;
+  Socket _ptySocket;
+  String _port;
+  StreamController<List<int>> _clientServerInterface;
 
   CmdrPty(this.ptyNum, String workspacePath, String numRows, String numCols) {
     help.debug('Spawning UpDroidPty ($ptyNum)', 0);
@@ -26,6 +29,8 @@ class CmdrPty {
   }
 
   void _startPty(UpDroidMessage um) {
+    _clientServerInterface = new StreamController<List<int>>();
+
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
     // See http://bitbucket.org/updroid/cmdr-pty
     Process.start('cmdr-pty', ['-size', '${um.body}'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
@@ -38,10 +43,21 @@ class CmdrPty {
       portListener = stdoutBroadcast.listen((data) {
         String dataString = UTF8.decode(data);
         if (dataString.contains('now listening on:  [::]:')) {
-          String port = dataString.replaceFirst('now listening on:  [::]:', '');
-          UpDroidMessage portMessage = new UpDroidMessage('PTY_READY', port);
+          String _port = dataString.replaceFirst('now listening on:  [::]:', '');
+          print(_port);
+          UpDroidMessage portMessage = new UpDroidMessage('PTY_READY', _port);
           mailbox.ws.add(portMessage.s);
           portListener.cancel();
+
+          Socket.connect('127.0.0.1', int.parse(_port)).then((socket) {
+            _ptySocket = socket;
+            print('Connected to: ${socket.remoteAddress.address}:${socket.remotePort}');
+            socket.listen((data) {
+              print(data);
+              print(UTF8.decode(data));
+              _clientServerInterface.sink.add(data);
+            });
+          });
         }
       });
 
@@ -55,16 +71,23 @@ class CmdrPty {
     });
   }
 
+  void _handleIOStream(UpDroidMessage um) {
+    _clientServerInterface.stream.listen((data) => _ptySocket.add(data));
+  }
+
   void _resize(UpDroidMessage um) {
     _shell.stdin.writeln(um.body);
   }
 
   void cleanup() {
+    _ptySocket.destroy();
     _shell.kill();
   }
 
   void _registerMailbox() {
     mailbox.registerWebSocketEvent('START_PTY', _startPty);
     mailbox.registerWebSocketEvent('RESIZE', _resize);
+
+    mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$ptyNum/cmdr-pty', _handleIOStream);
   }
 }

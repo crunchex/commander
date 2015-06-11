@@ -56,6 +56,7 @@ class CmdrServer {
     virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
         ..allowDirectoryListing = true
         ..followLinks = true
+        ..jailRoot = false
         ..directoryHandler = (dir, request) {
           // Redirects '/' to 'index.html'
           var indexUri = new Uri.file(dir.path).resolve('index.html');

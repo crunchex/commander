@@ -34,7 +34,7 @@ function updateStatus() {
     var controller = controllers[0];
     if (controller != null) {
         for (var k = 0; k < controller.axes.length; k++) {
-            if (controller.axes[k] < 0.01 && controller.axes[k] > -0.01) {
+            if (k == 0 && (controller.axes[1] == 1 || controller.axes[1] == -1)) {
                 axes[k].innerHTML = 0.0;
             } else {
                 axes[k].innerHTML = -controller.axes[k];

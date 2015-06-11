@@ -79,8 +79,6 @@ class UpDroidConsole extends TabController {
     _ws = new WebSocket(url);
     _ws.binaryType = "arraybuffer";
 
-    _ws.onOpen.listen((e) => _initialResize());
-
     _ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;
       _term.stdout.add(buf.asUint8List());

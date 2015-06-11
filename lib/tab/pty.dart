@@ -14,16 +14,21 @@ class CmdrPty {
   CmdrMailbox mailbox;
 
   Process _shell;
+  String _workspacePath;
 
   CmdrPty(this.ptyNum, String workspacePath, String numRows, String numCols) {
     help.debug('Spawning UpDroidPty ($ptyNum)', 0);
 
+    _workspacePath = workspacePath;
+
     mailbox = new CmdrMailbox(guiName);
     _registerMailbox();
+  }
 
+  void _startPty(UpDroidMessage um) {
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
     // See http://bitbucket.org/updroid/cmdr-pty
-    Process.start('cmdr-pty', ['-size', '${numRows}x${numCols}'], environment: {'TERM':'vt100'}, workingDirectory: workspacePath).then((Process shell) {
+    Process.start('cmdr-pty', ['-size', '${um.body}'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
       _shell = shell;
 
       Stream stdoutBroadcast = shell.stdout.asBroadcastStream();
@@ -59,6 +64,7 @@ class CmdrPty {
   }
 
   void _registerMailbox() {
+    mailbox.registerWebSocketEvent('START_PTY', _startPty);
     mailbox.registerWebSocketEvent('RESIZE', _resize);
   }
 }

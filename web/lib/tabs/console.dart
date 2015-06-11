@@ -45,6 +45,8 @@ class UpDroidConsole extends TabController {
       ..scrollSpeed = 3
       ..cursorBlink = true
       ..theme = new Theme.SolarizedDark();
+
+
   }
 
   /// Toggles between a Solarized dark and light theme.
@@ -55,6 +57,11 @@ class UpDroidConsole extends TabController {
   /// Toggles cursor blink on/off.
   void _toggleBlink() {
     _term.cursorBlink = _term.cursorBlink ? false : true;
+  }
+
+  void _startPty(UpDroidMessage um) {
+    List<int> size = _term.currentSize();
+    mailbox.ws.send('[[START_PTY]]${size[0]}x${size[1] - 1}');
   }
 
   /// Starts a secondary WebSocket with direct access to the pty spawned by CmdrPty.
@@ -72,6 +79,8 @@ class UpDroidConsole extends TabController {
     _ws = new WebSocket(url);
     _ws.binaryType = "arraybuffer";
 
+    _ws.onOpen.listen((e) => _initialResize());
+
     _ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;
       _term.stdout.add(buf.asUint8List());
@@ -84,11 +93,6 @@ class UpDroidConsole extends TabController {
       }
       encounteredError = true;
     });
-  }
-
-  void _initialResize(UpDroidMessage um) {
-    List<int> size = _term.currentSize();
-    mailbox.ws.send('[[RESIZE]]' + '${size[0]}x${size[1] - 1}');
   }
 
   void _resizeEvent(CommanderMessage m) {
@@ -105,7 +109,7 @@ class UpDroidConsole extends TabController {
   void registerMailbox() {
     mailbox.registerCommanderEvent('RESIZE', _resizeEvent);
 
-    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'FIRST_RESIZE', _initialResize);
+    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'START_PTY', _startPty);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PTY_READY', _initWebSocket);
   }
 

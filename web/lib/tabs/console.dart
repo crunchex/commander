@@ -46,11 +46,8 @@ class UpDroidConsole extends TabController {
       ..cursorBlink = true
       ..theme = new Theme.SolarizedDark();
 
-    String url = window.location.host;
-    url = url.split(':')[0];
-    // window.location.host returns whatever is in the URL bar (including port).
-    // Since the port here needs to be dynamic, the default needs to be replaced.
-    _initWebSocket('ws://' + url + ':1206$id/pty');
+    // Secondary WebSocket with direct access to the pty spawned by CmdrPty.
+    _initWebSocket();
   }
 
   /// Toggles between a Solarized dark and light theme.
@@ -63,7 +60,15 @@ class UpDroidConsole extends TabController {
     _term.cursorBlink = _term.cursorBlink ? false : true;
   }
 
-  void _initWebSocket(String url, [int retrySeconds = 2]) {
+  void _initWebSocket() {
+    String url = window.location.host;
+    url = url.split(':')[0];
+    // window.location.host returns whatever is in the URL bar (including port).
+    // Since the port here needs to be dynamic, the default needs to be replaced.
+    _resetWebSocket('ws://' + url + ':1206$id/pty');
+  }
+
+  void _resetWebSocket(String url, [int retrySeconds = 2]) {
     bool encounteredError = false;
 
     _ws = new WebSocket(url);
@@ -72,7 +77,7 @@ class UpDroidConsole extends TabController {
     _ws.onError.listen((e) {
       print('Console-$id disconnected. Retrying...');
       if (!encounteredError) {
-        new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
+        new Timer(new Duration(seconds:retrySeconds), () => _resetWebSocket(url, retrySeconds * 2));
       }
       encounteredError = true;
     });

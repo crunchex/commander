@@ -29,6 +29,7 @@ class CmdrPty {
   }
 
   void _startPty(UpDroidMessage um) {
+    print('starting up');
     _clientServerInterface = new StreamController<List<int>>();
 
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
@@ -53,9 +54,9 @@ class CmdrPty {
             _ptySocket = socket;
             print('Connected to: ${socket.remoteAddress.address}:${socket.remotePort}');
             socket.listen((data) {
-//              print(data);
+              print(data);
 //              print(UTF8.decode(data));
-              _clientServerInterface.sink.add(data);
+              _clientServerInterface.sink.add((data));
             });
           });
         }
@@ -71,9 +72,14 @@ class CmdrPty {
     });
   }
 
-  void _handleIOStream(UpDroidMessage um) {
+  void _handleIOStream(HttpRequest request) {
     print('in handle');
-    _clientServerInterface.stream.listen((data) => _ptySocket.add(data));
+    mailbox.ws.where((e) => request.uri.path == '/${guiName.toLowerCase()}/$ptyNum/cmdr-pty').listen((data) {
+//      print(UTF8.decode(data));
+      _ptySocket.add(data);
+    });
+
+    _clientServerInterface.stream.listen((data) => mailbox.ws.add((data)));
   }
 
   void _resize(UpDroidMessage um) {

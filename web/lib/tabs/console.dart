@@ -1,6 +1,6 @@
 import 'dart:html';
 import 'dart:async';
-import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:terminal/terminal.dart';
 import 'package:terminal/theme.dart';
@@ -78,11 +78,10 @@ class UpDroidConsole extends TabController {
     bool encounteredError = false;
 
     _ws = new WebSocket(url);
-    _ws.binaryType = "arraybuffer";
 
     _ws.onMessage.listen((e) {
-      ByteBuffer buf = e.data;
-      _term.stdout.add(buf.asUint8List());
+      print(e.data);
+//      _term.stdout.add(UTF8.de);
     });
 
     _ws.onError.listen((e) {

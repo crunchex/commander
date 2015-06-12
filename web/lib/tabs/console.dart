@@ -1,6 +1,5 @@
 import 'dart:html';
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:terminal/terminal.dart';
@@ -46,8 +45,6 @@ class UpDroidConsole extends TabController {
       ..scrollSpeed = 3
       ..cursorBlink = true
       ..theme = new Theme.SolarizedDark();
-
-
   }
 
   /// Toggles between a Solarized dark and light theme.
@@ -82,7 +79,6 @@ class UpDroidConsole extends TabController {
 
     _ws.onMessage.listen((e) {
       ByteBuffer buf = e.data;
-//      print(buf.asUint8List().toString());
       _term.stdout.add(buf.asUint8List());
     });
 

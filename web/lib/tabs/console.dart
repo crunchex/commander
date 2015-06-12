@@ -1,6 +1,7 @@
 import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:terminal/terminal.dart';
 import 'package:terminal/theme.dart';
@@ -71,17 +72,18 @@ class UpDroidConsole extends TabController {
     // window.location.host returns whatever is in the URL bar (including port).
     // Since the port here needs to be dynamic, the default needs to be replaced.
     _resetWebSocket('ws://' + url + ':12060/${className.toLowerCase()}/$id/cmdr-pty');
-//    _resetWebSocket('ws://' + url + ':1206$id/pty');
   }
 
   void _resetWebSocket(String url, [int retrySeconds = 2]) {
     bool encounteredError = false;
 
     _ws = new WebSocket(url);
+    _ws.binaryType = "arraybuffer";
 
     _ws.onMessage.listen((e) {
-      print(e.data);
-//      _term.stdout.add(UTF8.de);
+      ByteBuffer buf = e.data;
+//      print(buf.asUint8List().toString());
+      _term.stdout.add(buf.asUint8List());
     });
 
     _ws.onError.listen((e) {

@@ -249,7 +249,7 @@ class CmdrServer {
     }
   }
 
-  void _cleanUpBackend(UpDroidMessage um) {
+  void _cleanUpBackend() {
     help.debug('Client disconnected, cleaning up...', 0);
 
     _explorers = {};

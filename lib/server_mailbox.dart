@@ -41,7 +41,7 @@ class CmdrMailbox {
 
   /// Registers a [function] to be called at the end of the [WebSocket] request - onDone().
   /// The method will be executed in no particular order.
-  void registerWebSocketCloseEvent(function(UpDroidMessage um)) {
+  void registerWebSocketCloseEvent(function()) {
     _wsCloseRegistry.add(function);
   }
 

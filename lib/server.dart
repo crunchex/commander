@@ -25,6 +25,9 @@ class CmdrServer {
   static String defaultUprootPath = '/home/${Platform.environment['USER']}/uproot';
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
+  static const bool defaultQuiet = false;
+
+  ArgResults _args;
 
   Map _explorers = {};
   Map _tabs = {};
@@ -34,9 +37,11 @@ class CmdrServer {
   Directory dir;
 
   CmdrServer (ArgResults results) {
-    dir = new Directory(results['workspace']);
+    _args = results;
+
+    dir = new Directory(_args['workspace']);
     dir.create();
-    _initServer(_getVirDir(results));
+    _initServer(_getVirDir());
 
     _mailbox = new CmdrMailbox('UpDroidClient');
     _registerMailbox();
@@ -50,8 +55,8 @@ class CmdrServer {
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
-  VirtualDirectory _getVirDir (ArgResults results) {
-    String guiPath = results['path'];
+  VirtualDirectory _getVirDir() {
+    String guiPath = _args['path'];
     VirtualDirectory virDir;
     virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
         ..allowDirectoryListing = true
@@ -263,6 +268,8 @@ class CmdrServer {
   }
 
   void _printStartMessage() {
+    if (_args['quiet'] != defaultQuiet) return;
+
     print('[UpDroid Commander serving on port 12060]');
     print('You can now enter "localhost:12060" in your browser on this machine,');
     print('  or "<this machine\'s IP>:12060" on another machine in the same network.');

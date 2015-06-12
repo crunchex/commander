@@ -2,7 +2,6 @@ library updroid_teleop;
 
 import 'dart:html';
 import 'dart:async';
-import 'dart:convert';
 import 'dart:js' as js;
 
 import '../tab_controller.dart';

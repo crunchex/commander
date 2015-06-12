@@ -72,8 +72,8 @@ class CmdrServer {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
-      print('[UpDroid Commander serving on port 12060]');
-      print('You can now enter "localhost:12060" in your browser.\nCtrl-C to exit.');
+      _printStartMessage();
+
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
           .listen((HttpRequest request) => _routeRequest(request, virDir))
@@ -260,5 +260,18 @@ class CmdrServer {
     _camServers = {};
 
     help.debug('Clean up done.', 0);
+  }
+
+  void _printStartMessage() {
+    print('[UpDroid Commander serving on port 12060]');
+    print('You can now enter "localhost:12060" in your browser on this machine,');
+    print('  or "<this machine\'s IP>:12060" on another machine in the same network.');
+
+    ProcessResult pkgStatus = Process.runSync('dpkg' , ['-s', 'libnss-mdns', '|', 'grep', 'Status']);
+    if (pkgStatus.stdout.contains('install ok installed')) {
+      print('  or "${Platform.localHostname}.local:12060" on another Bonjour/libnss-mdns equipped machine.');
+    }
+
+    print('Ctrl-C to exit.');
   }
 }

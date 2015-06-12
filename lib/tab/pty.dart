@@ -38,8 +38,8 @@ class CmdrPty {
       StreamSubscription portListener;
       portListener = stdoutBroadcast.listen((data) {
         String dataString = UTF8.decode(data);
-        if (dataString.contains('now listening on:  [::]:')) {
-          String port = dataString.replaceFirst('now listening on:  [::]:', '');
+        if (dataString.contains('listening on port: ')) {
+          String port = dataString.replaceFirst('listening on port: ', '');
           UpDroidMessage portMessage = new UpDroidMessage('PTY_READY', '');
           mailbox.ws.add(portMessage.s);
           portListener.cancel();

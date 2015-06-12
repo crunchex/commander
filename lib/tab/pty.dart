@@ -33,7 +33,7 @@ class CmdrPty {
 
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
     // See http://bitbucket.org/updroid/cmdr-pty
-    Process.start('cmdr-pty', ['-size', '${um.body}'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
+    Process.start('cmdr-pty', ['-protocol', 'tcp', '-size', '${um.body}'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
       _shell = shell;
 
       Stream stdoutBroadcast = shell.stdout.asBroadcastStream();
@@ -53,8 +53,8 @@ class CmdrPty {
             _ptySocket = socket;
             print('Connected to: ${socket.remoteAddress.address}:${socket.remotePort}');
             socket.listen((data) {
-              print(data);
-              print(UTF8.decode(data));
+//              print(data);
+//              print(UTF8.decode(data));
               _clientServerInterface.sink.add(data);
             });
           });
@@ -72,6 +72,7 @@ class CmdrPty {
   }
 
   void _handleIOStream(UpDroidMessage um) {
+    print('in handle');
     _clientServerInterface.stream.listen((data) => _ptySocket.add(data));
   }
 
@@ -80,6 +81,7 @@ class CmdrPty {
   }
 
   void cleanup() {
+    _clientServerInterface.close();
     _ptySocket.destroy();
     _shell.kill();
   }

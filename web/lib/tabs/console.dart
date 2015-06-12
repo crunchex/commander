@@ -70,7 +70,8 @@ class UpDroidConsole extends TabController {
     url = url.split(':')[0];
     // window.location.host returns whatever is in the URL bar (including port).
     // Since the port here needs to be dynamic, the default needs to be replaced.
-    _resetWebSocket('ws://' + url + ':${um.body}/${className.toLowerCase()}/$id/cmdr-pty');
+    _resetWebSocket('ws://' + url + ':12060/${className.toLowerCase()}/$id/cmdr-pty');
+//    _resetWebSocket('ws://' + url + ':1206$id/pty');
   }
 
   void _resetWebSocket(String url, [int retrySeconds = 2]) {

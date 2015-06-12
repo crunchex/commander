@@ -94,8 +94,9 @@ class UpDroidClient {
     if (strConfig != '') return strConfig;
 
     List listConfig = [
-      [{'id': 1, 'class': 'UpDroidEditor'}],
-      [{'id': 1, 'class': 'UpDroidConsole'}]
+      [], []
+//      [{'id': 1, 'class': 'UpDroidEditor'}],
+//      [{'id': 1, 'class': 'UpDroidConsole'}]
     ];
 
 //    List listConfig = [[],[]];

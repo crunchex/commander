@@ -15,6 +15,7 @@ class CmdrPty {
 
   Process _shell;
   String _workspacePath;
+  Socket _ptySocket;
 
   CmdrPty(this.ptyNum, String workspacePath, String numRows, String numCols) {
     help.debug('Spawning UpDroidPty ($ptyNum)', 0);
@@ -28,7 +29,7 @@ class CmdrPty {
   void _startPty(UpDroidMessage um) {
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
     // See http://bitbucket.org/updroid/cmdr-pty
-    Process.start('cmdr-pty', ['-size', '${um.body}'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
+    Process.start('cmdr-pty', ['-protocol', 'tcp', '-size', '${um.body}'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
       _shell = shell;
 
       Stream stdoutBroadcast = shell.stdout.asBroadcastStream();
@@ -37,11 +38,17 @@ class CmdrPty {
       StreamSubscription portListener;
       portListener = stdoutBroadcast.listen((data) {
         String dataString = UTF8.decode(data);
-        if (dataString.contains('now listening on:  [::]:')) {
-          String port = dataString.replaceFirst('now listening on:  [::]:', '');
-          UpDroidMessage portMessage = new UpDroidMessage('PTY_READY', port);
+        if (dataString.contains('listening on port: ')) {
+          String port = dataString.replaceFirst('listening on port: ', '');
+          UpDroidMessage portMessage = new UpDroidMessage('PTY_READY', '');
           mailbox.ws.add(portMessage.s);
           portListener.cancel();
+
+          Socket.connect('127.0.0.1', int.parse(port)).then((socket) {
+            _ptySocket = socket;
+            help.debug('CmdrPty-$ptyNum connected to: ${socket.remoteAddress.address}:${socket.remotePort}', 0);
+            socket.listen((data) => mailbox.ws.add((data)));
+          });
         }
       });
 
@@ -55,16 +62,25 @@ class CmdrPty {
     });
   }
 
+  void _handleIOStream(HttpRequest request) {
+    mailbox.ws
+      .where((e) => request.uri.path == '/${guiName.toLowerCase()}/$ptyNum/cmdr-pty')
+      .listen((data) => _ptySocket.add(data));
+  }
+
   void _resize(UpDroidMessage um) {
     _shell.stdin.writeln(um.body);
   }
 
   void cleanup() {
-    _shell.kill();
+    if (_ptySocket != null) _ptySocket.destroy();
+    if (_shell != null) _shell.kill();
   }
 
   void _registerMailbox() {
     mailbox.registerWebSocketEvent('START_PTY', _startPty);
     mailbox.registerWebSocketEvent('RESIZE', _resize);
+
+    mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$ptyNum/cmdr-pty', _handleIOStream);
   }
 }

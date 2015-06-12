@@ -45,8 +45,6 @@ class UpDroidConsole extends TabController {
       ..scrollSpeed = 3
       ..cursorBlink = true
       ..theme = new Theme.SolarizedDark();
-
-
   }
 
   /// Toggles between a Solarized dark and light theme.
@@ -70,7 +68,7 @@ class UpDroidConsole extends TabController {
     url = url.split(':')[0];
     // window.location.host returns whatever is in the URL bar (including port).
     // Since the port here needs to be dynamic, the default needs to be replaced.
-    _resetWebSocket('ws://' + url + ':${um.body}/pty');
+    _resetWebSocket('ws://' + url + ':12060/${className.toLowerCase()}/$id/cmdr-pty');
   }
 
   void _resetWebSocket(String url, [int retrySeconds = 2]) {

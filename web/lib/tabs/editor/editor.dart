@@ -76,7 +76,7 @@ class UpDroidEditor extends TabController {
   String _currentParPath;
 
   UpDroidEditor(int id, int col, StreamController<CommanderMessage> cs) :
-  super(id, col, className, 'Editor', getMenuConfig(), cs) {
+  super(id, col, className, 'Editor', getMenuConfig(), cs, true) {
 
   }
 

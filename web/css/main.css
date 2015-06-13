@@ -765,25 +765,6 @@ li div input {
   background-color: transparent;
 }
 
-.ace_editor.ace-solarized-dark.updroid_editor,
-.ace_editor.ace-solarized-light.updroid_editor {
-  font-family: "Monosten A", "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;
-}
-
-.updroideditor {
-  width: 100%;
-  /*min-height: 100px;*/
-  height: 100%;
-}
-
-.updroideditor.updroideditor-ondrag {
-  border: 10px solid #ff2919;
-}
-
-.updroideditor.updroideditor-entered {
-  border: 10px solid #ffffff;
-}
-
 .editing{
   width: 200%;
 }

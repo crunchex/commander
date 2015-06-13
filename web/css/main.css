@@ -814,22 +814,6 @@ li div input {
   /*border-bottom: none;*/
 }
 
-.updroidcamera {
-  height: 100%;
-  border: none;
-  background-color: #0c0c0c;
-}
-
-.video-canvas {
-  display: table;
-  margin: 0 auto;
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  text-align: center;
-  padding: 5px;
-}
-
 .nav-tabs>li>a.new-tab-button {
   padding-left: 5px;
   padding-right: 5px;

@@ -33,7 +33,7 @@ class UpDroidConsole extends TabController {
   Timer _resizeTimer;
 
   UpDroidConsole(int id, int col, StreamController<CommanderMessage> cs) :
-  super(id, col, className, 'Console', getMenuConfig(), cs) {
+  super(id, col, className, 'Console', getMenuConfig(), cs, true) {
 
   }
 

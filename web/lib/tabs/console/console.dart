@@ -5,8 +5,8 @@ import 'dart:typed_data';
 import 'package:terminal/terminal.dart';
 import 'package:terminal/theme.dart';
 
-import '../mailbox.dart';
-import 'tab_controller.dart';
+import '../../mailbox.dart';
+import '../tab_controller.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket] into an UpDroid Commander tab.

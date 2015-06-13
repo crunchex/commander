@@ -8,7 +8,7 @@ import 'panels/explorer/explorer.dart';
 import 'tabs/tab_controller.dart';
 import 'tabs/teleop/teleop.dart';
 import 'tabs/editor/editor.dart';
-import 'tabs/console.dart';
+import 'tabs/console/console.dart';
 import 'tabs/camera/camera.dart';
 import 'modal/modal.dart';
 import 'mailbox.dart';

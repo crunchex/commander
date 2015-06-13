@@ -4,9 +4,9 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
+import 'panels/explorer.dart';
 import 'tabs/tab_controller.dart';
 import 'tabs/teleop/teleop.dart';
-import 'explorer/explorer.dart';
 import 'tabs/editor/editor.dart';
 import 'tabs/console.dart';
 import 'tabs/camera/camera.dart';

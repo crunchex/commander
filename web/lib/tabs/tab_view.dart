@@ -68,7 +68,7 @@ class TabView {
   void destroy() {
     _tabHandle.remove();
     _tabContainer.remove();
-    styleLink.remove();
+    if (styleLink != null) styleLink.remove();
   }
 
   LIElement addMenuItem(Map itemConfig, [String dropdownMenuSelector]) {

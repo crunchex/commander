@@ -4,8 +4,8 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
-import '../../../../packages/dnd/dnd.dart';
-import '../../../../packages/path/path.dart' as pathLib;
+import 'package:dnd/dnd.dart';
+import 'package:path/path.dart' as pathLib;
 
 import '../../mailbox.dart';
 import 'explorer_helper.dart';

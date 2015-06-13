@@ -1,6 +1,4 @@
-library explorer_helpers;
-
-import 'dart:html';
+part of updroid_explorer;
 
 /// Helper function removes spaces from path and file name
 String removeSpaces(String raw) {

@@ -8,9 +8,9 @@ import 'package:dnd/dnd.dart';
 import 'package:path/path.dart' as pathLib;
 
 import '../../mailbox.dart';
-import 'explorer_helper.dart';
 
 part 'explorer_view.dart';
+part 'explorer_helper.dart';
 
 /// [UpDroidExplorer] manages the data for the file explorer on the client
 /// side and all associated views. It also facilitates file operation requests

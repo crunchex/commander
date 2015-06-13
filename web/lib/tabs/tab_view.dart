@@ -10,9 +10,9 @@ class TabView {
   /// Returns an initialized [TabView] as a [Future] given all normal constructors.
   ///
   /// Use this instead of calling the constructor directly.
-  static Future<TabView> createTabView(int num, int col, String title, String shortName, List config) {
+  static Future<TabView> createTabView(int num, int col, String title, String shortName, List config, [bool externalCss=false]) {
     Completer c = new Completer();
-    c.complete(new TabView(num, col, title, shortName, config));
+    c.complete(new TabView(num, col, title, shortName, config, externalCss));
     return c.future;
   }
 
@@ -21,6 +21,7 @@ class TabView {
   String shortName;
   Map refMap;
 
+  LinkElement styleLink;
   AnchorElement tabHandleButton;
   DivElement closeControlHitbox;
   DivElement cloneControlHitbox;
@@ -32,8 +33,18 @@ class TabView {
   DivElement _tabContainer,_tabContent;
   List config;
 
-  TabView(this.num, this.col, this.title, this.shortName, this.config) {
+  TabView(this.num, this.col, this.title, this.shortName, this.config, [bool externalCss=false]) {
     refMap = {};
+
+    // Inject the associated stylesheet if one exists.
+    // TODO: somehow detect if it exists at runtime.
+    if (externalCss) {
+      String cssPath = 'lib/tabs/${shortName.toLowerCase()}/${shortName.toLowerCase()}.css';
+      styleLink = new LinkElement();
+      styleLink.rel = 'stylesheet';
+      styleLink.href = cssPath;
+      document.head.append(styleLink);
+    }
 
     _setUpTabHandle();
     _setUpTabContainer();
@@ -57,6 +68,7 @@ class TabView {
   void destroy() {
     _tabHandle.remove();
     _tabContainer.remove();
+    styleLink.remove();
   }
 
   LIElement addMenuItem(Map itemConfig, [String dropdownMenuSelector]) {

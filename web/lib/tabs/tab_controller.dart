@@ -17,7 +17,7 @@ abstract class TabController {
 
   AnchorElement _closeTabButton;
 
-  TabController(this.id, this.col, this.tabType, this.shortName, List menuConfig, [StreamController<CommanderMessage> cs]) {
+  TabController(this.id, this.col, this.tabType, this.shortName, List menuConfig, [StreamController<CommanderMessage> cs, bool externalCss=false]) {
     if (cs == null) {
       mailbox = new Mailbox(tabType, id);
     } else {
@@ -26,7 +26,7 @@ abstract class TabController {
     }
     registerMailbox();
 
-    TabView.createTabView(id, col, tabType, shortName, menuConfig).then((tabView) {
+    TabView.createTabView(id, col, tabType, shortName, menuConfig, externalCss).then((tabView) {
       view = tabView;
 
       _closeTabButton = view.refMap['close-tab'];

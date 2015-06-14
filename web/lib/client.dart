@@ -53,6 +53,10 @@ class UpDroidClient {
 
     _controlButtonEnabled = true;
 
+    // Removes all the old explorer stuff.
+    DivElement columnZero = querySelector('#column-0');
+    columnZero.innerHtml = '';
+
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.
     _cs = new StreamController<CommanderMessage>.broadcast();
@@ -128,16 +132,18 @@ class UpDroidClient {
   /// TODO: call a generic UpDroidTab constructor instead of ifs or switches.
   void _initializeTabs(String strConfig, List explorerPaths) {
     List config = JSON.decode(strConfig);
-    int i = 1;
-    if(explorerPaths.isEmpty) {
-      _addWorkspace.click();
-    }
-    for (var name in explorerPaths) {
-      _openExplorer(i, name);
-      i += 1;
-    }
 
-    for (int i = 0; i < config.length; i++) {
+    // Uncomment to load old explorer stuff.
+//    int i = 1;
+//    if(explorerPaths.isEmpty) {
+//      _addWorkspace.click();
+//    }
+//    for (var name in explorerPaths) {
+//      _openExplorer(i, name);
+//      i += 1;
+//    }
+
+    for (int i = 1; i < config.length; i++) {
       for (Map tab in config[i]) {
         _openTab(i, tab['id'], tab['class']);
       }

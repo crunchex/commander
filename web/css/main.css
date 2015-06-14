@@ -53,7 +53,6 @@ html, body {
   opacity: 0;
   -webkit-transition: all 0.8s ease;
   -moz-transition: all 0.8s ease;
-  -ms-transition: all 0.8s ease;
   -o-transition: all 0.8s ease;
   transition: all 0.8s ease;
 }
@@ -83,7 +82,6 @@ html, body {
 .animate-end {
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
-  -ms-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
 }
@@ -105,7 +103,7 @@ html, body {
   border: 5px solid #ffffff;
   background-color: #ff2919;
   padding: 2px;
-  font-family: "Monosten A";
+  font-family: "Monosten A", monospace;
   color: #ffffff;
 }
 
@@ -128,7 +126,6 @@ html, body {
   opacity: 100;
   -webkit-transition: all 0.8s ease;
   -moz-transition: all 0.8s ease;
-  -ms-transition: all 0.8s ease;
   -o-transition: all 0.8s ease;
   transition: all 0.8s ease;
 }
@@ -183,7 +180,6 @@ body>.navbar.navbar-inverse {
   border-width: 1px;
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
-  -ms-transition: all 0.25s ease;
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
 }
@@ -202,7 +198,6 @@ body>.navbar.navbar-inverse {
   background-color: #ffd000;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
-  -ms-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
 }
@@ -210,7 +205,6 @@ body>.navbar.navbar-inverse {
 #feedback-button {
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
-  -ms-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
 }
@@ -238,7 +232,7 @@ body>.navbar.navbar-inverse {
 }
 
 .nav-tabs>li>a.inner-tabs {
-  border-bottom: 0px;
+  border-bottom: 0;
 }
 
 .nav-tabs.inner-tabs {
@@ -277,7 +271,7 @@ body>.navbar.navbar-inverse {
 
 .nav-tabs>.tab-handle>.close-control-hitbox>.close-control {
   float: right;
-  right: 0px;
+  right: 0;
   /*background-color: #ff948c;*/
   background-color: #e3e3e3;
 }
@@ -355,7 +349,7 @@ li div input {
 
 .navbar-nav.navbar-right:last-child {
   margin-right: 10px !important;
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 
 .navbar-right {
@@ -451,7 +445,7 @@ li div input {
   display: inline-block;
   float: left;
   clear: both;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .explorer-body .btn:hover {
@@ -634,7 +628,6 @@ li div input {
   margin-top: 5px;
   -webkit-transition: all 0.25s ease-in;
   -moz-transition: all 0.25s ease-in;
-  -ms-transition: all 0.25s ease-in;
   -o-transition: all 0.25s ease-in;
   transition: all 0.25s ease-in;
 }
@@ -688,10 +681,9 @@ li div input {
   text-align: center;
   font-family: "Avenir Next LT Pro Bold";
   margin-top: 5px;
-  margin-left: 0px;
+  margin-left: 0;
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
-  -ms-transition: all 0.25s ease;
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
 }
@@ -713,7 +705,7 @@ li div input {
 }
 
 .col-xs-2>div>.control-buttons>.btn.btn-sm.control-button-disabled,
-.col-xs-2>div>.control-buttons>.btn.btn-sm.control-button-disabled:hover
+.col-xs-2>div>.control-buttons>.btn.btn-sm.control-button-disabled:hover,
 .col-xs-2>div>div>.control-buttons>.btn.btn-sm.control-button-disabled,
 .col-xs-2>div>div>.control-buttons>.btn.btn-sm.control-button-disabled:hover {
   color: #e3e3e3;
@@ -737,11 +729,11 @@ li div input {
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
 .column-content .nav-tabs {
-  border-bottom-width: 0px;
+  border-bottom-width: 0;
 }
 
 .inner-tabs .dropdown-toggle {
-  border-width: 0px 0px 1px 0px;
+  border-width: 0 0 1px 0;
   padding: 5px 10px 5px 10px;
 }
 
@@ -760,7 +752,7 @@ li div input {
 .nav .open>a,
 .nav .open>a:hover,
 .nav .open>a:focus {
-  border-width: 0px 0px 1px 0px;
+  border-width: 0 0 1px 0;
   border-color: #e3e3e3;
   background-color: transparent;
 }
@@ -776,7 +768,7 @@ li div input {
 }
 
 .extra-menubar {
-  font-family: "Monosten A";
+  font-family: "Monosten A", monospace;
   font-size: 13px;
   padding: 7px 20px 0 0;
   float: right !important;
@@ -786,7 +778,7 @@ li div input {
   padding-left: 5px;
   padding-right: 5px;
   background-color: transparent;
-  border-bottom-width: 0px;
+  border-bottom-width: 0;
   font-family: "Avenir Next LT Pro Demi";
 }
 
@@ -870,7 +862,7 @@ li div input {
 }*/
 
 code, kbd, pre, samp {
-  font-family: "Monosten A";
+  font-family: "Monosten A", monospace;
 }
 
 #warning{
@@ -912,7 +904,6 @@ code, kbd, pre, samp {
   background-color: #eaecec;
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
-  -ms-transition: all 0.25s ease;
   -o-transition: all 0.25s ease;
   transition: all 0.25s ease;
 }
@@ -996,7 +987,7 @@ code, kbd, pre, samp {
 .text-muted {
   float: right;
   position: relative;
-  bottom: 0px;
+  bottom: 0;
   right: 10px;
   font-size: 10px;
 }
@@ -1007,7 +998,7 @@ code, kbd, pre, samp {
   /*min-height: 300px;*/
   /*max-height: 400px;*/
   overflow: auto;
-  padding: 0px;
+  padding: 0;
   height: calc(100% - 104px);
 }
 

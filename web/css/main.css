@@ -145,7 +145,7 @@ html, body {
   /*height: 100%;*/
 }
 
-#panel, #column-0, #column-1 {
+#column-0, #column-1, #column-2 {
   list-style: none;
   height: 100%;
 }
@@ -888,7 +888,7 @@ code, kbd, pre, samp {
   display: inline-block;;
 }
 
-#panel > div {
+#column-0 > div {
   background-color: #eaecec;
 }
 

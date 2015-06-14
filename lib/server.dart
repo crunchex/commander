@@ -236,16 +236,15 @@ class CmdrServer {
   }
 
   void _closeTab(UpDroidMessage um) {
-    String id = um.body;
-    List idList = id.split('_');
+    List idList = um.body.split('_');
     String type = idList[0].toLowerCase();
-    int num = int.parse(idList[1]);
+    int id = int.parse(idList[1]);
 
     help.debug('Close tab request received: $id', 0);
 
-    if (_tabs[type][num] != null) {
-      _tabs[type][num].cleanup();
-      _tabs[type][num] = null;
+    if (_tabs[type][id] != null) {
+      _tabs[type][id].cleanup();
+      _tabs[type].remove(id);
     }
   }
 
@@ -256,11 +255,13 @@ class CmdrServer {
     _tabs.keys.forEach((String type) {
       _tabs[type].keys.forEach((int id) {
         _tabs[type][id].cleanup();
+        _tabs[type].remove(id);
       });
     });
     _tabs = {};
     _camServers.keys.forEach((int id) {
       _camServers[id].cleanup();
+      _camServers.remove(id);
     });
     _camServers = {};
 

@@ -15,7 +15,7 @@ import 'mailbox.dart';
 
 class UpDroidClient {
   // Toggle use of old explorer classes.
-  final bool useOldExplorer = true;
+  final bool useOldExplorer = false;
 
   StreamController<CommanderMessage> _cs;
 

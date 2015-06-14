@@ -252,16 +252,16 @@ class CmdrServer {
     help.debug('Client disconnected, cleaning up...', 0);
 
     _explorers = {};
-    _tabs.keys.forEach((String type) {
-      _tabs[type].keys.forEach((int id) {
-        _tabs[type][id].cleanup();
-        _tabs[type].remove(id);
+
+    _tabs.values.forEach((Map<int, dynamic> tabMap) {
+      tabMap.values.forEach((dynamic tab) {
+        tab.cleanup();
       });
     });
     _tabs = {};
-    _camServers.keys.forEach((int id) {
-      _camServers[id].cleanup();
-      _camServers.remove(id);
+
+    _camServers.values.forEach((CameraServer server) {
+      server.cleanup();
     });
     _camServers = {};
 

@@ -4,7 +4,7 @@ part of ros;
 ///
 /// Implements [Directory] and exposes wrappers for functions that are
 /// exclusive to ROS catkin workspaces.
-class Workspace implements Directory {
+class Workspace {
   /// Creates a directory object pointing to the current working directory.
   static Directory get current => Directory.current;
 

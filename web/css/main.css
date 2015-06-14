@@ -520,6 +520,32 @@ li div input {
   padding: 30px;
 }
 
+.btn-primary,
+.btn-warning {
+  box-shadow: none;
+  width: 100%;
+  background-color: #eaecec;
+  color: #0c0c0c;
+  border-width: 1px;
+  border-color: #e3e3e3;
+  text-align: center;
+  font-family: "Avenir Next LT Pro Bold";
+  margin-top: 5px;
+  margin-left: 0;
+  -webkit-transition: all 0.25s ease;
+  -moz-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+}
+
+.btn-primary:hover,
+.btn-warning:hover {
+  background-color: #ff2919;
+  color: #ffffff;
+  border-width: 1px;
+  border-color: #ff2919;
+}
+
 /*.modal-body p {
   padding-left: 20px;
 }*/
@@ -528,7 +554,7 @@ code, kbd, pre, samp {
   font-family: "Monosten A", monospace;
 }
 
-#warning{
+#warning {
   margin-left: 52px;
 }
 

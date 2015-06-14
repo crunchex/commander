@@ -306,9 +306,7 @@
 .col-xs-2>div>.control-buttons>.btn.btn-sm,
 .col-xs-2>div>div>.control-buttons>.btn.btn-sm,
 .col-xs-2>div>.control-buttons>.btn.btn-sm.active,
-.col-xs-2>div>div>.control-buttons>.btn.btn-sm.active,
-.btn-primary,
-.btn-warning {
+.col-xs-2>div>div>.control-buttons>.btn.btn-sm.active {
     box-shadow: none;
     width: 100%;
     background-color: #eaecec;
@@ -326,9 +324,7 @@
 }
 
 .col-xs-2>div>.control-buttons>.btn.btn-sm:hover,
-.col-xs-2>div>div>.control-buttons>.btn.btn-sm:hover,
-.btn-primary:hover,
-.btn-warning:hover {
+.col-xs-2>div>div>.control-buttons>.btn.btn-sm:hover {
     background-color: #ff2919;
     color: #ffffff;
     border-width: 1px;

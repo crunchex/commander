@@ -59,6 +59,12 @@ class UpDroidExplorer extends ExplorerView {
     this.cs = cs;
     this.closed = false;
 
+    String cssPath = 'lib/panels/explorer/explorer.css';
+    LinkElement styleLink = new LinkElement();
+    styleLink.rel = 'stylesheet';
+    styleLink.href = cssPath;
+    document.head.append(styleLink);
+
     createExplorer(num, folderName).then((d) {
       newFileDragSetup();
       newFolderDragSetup();

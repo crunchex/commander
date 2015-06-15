@@ -22,6 +22,8 @@ class UpDroidExplorer extends PanelController {
   static List getMenuConfig() {
     List menu = [
       {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'Add Workspace'},
+        {'type': 'toggle', 'title': 'Delete Workspace'},
         {'type': 'toggle', 'title': 'Close Panel'}]},
       {'title': 'Actions', 'items': [
         {'type': 'toggle', 'title': 'Build Workspace'},
@@ -44,10 +46,14 @@ class UpDroidExplorer extends PanelController {
   LIElement currentSelectedNode;
   String currentSelectedPath;
   InputElement nodeArgs;
-  ButtonElement _dropdown;
-  ButtonElement _cleanButton;
-  ButtonElement _buildButton;
-  ButtonElement _uploadButton;
+  AnchorElement _dropdown;
+  AnchorElement _addWorkspaceButton;
+  AnchorElement _deleteWorkspaceButton;
+  AnchorElement _cleanButton;
+  AnchorElement _buildButton;
+  AnchorElement _uploadButton;
+  AnchorElement _runButton;
+  AnchorElement _controlButton;
 
   DivElement editorDiv;
   LIElement fileName;
@@ -79,13 +85,13 @@ class UpDroidExplorer extends PanelController {
   }
 
   void setUpController() {
-    _addWorkspace = querySelector('#add-ws');
-    _deleteWorkspace = querySelector('#delete-ws');
-    _controlButton = querySelector('#control-toggle');
-    _runButton = querySelector('#run-button');
+    _addWorkspaceButton = view.refMap['add-workspace'];
+    _deleteWorkspaceButton = view.refMap['delete-workspace'];
     _cleanButton = view.refMap['clean'];
     _buildButton = view.refMap['build'];
     _uploadButton = view.refMap['upload'];
+    _runButton = view.refMap['run'];
+    _controlButton = view.refMap['nodes'];
 
     _explorerView = new ExplorerView();
 
@@ -121,6 +127,16 @@ class UpDroidExplorer extends PanelController {
 
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
+    _addWorkspaceButton.onClick.listen((e) {
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'ADD_WORKSPACE'));
+
+    });
+
+    // TODO: need to find better way for client to track active explorer
+    _deleteWorkspaceButton.onClick.listen((e) {
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE'));
+    });
+
     _cleanButton.onClick.listen((e) {
 //      _cleanButton.children.first.classes.remove('glyphicons-cleaning');
 //      _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
@@ -139,6 +155,17 @@ class UpDroidExplorer extends PanelController {
 //
 //      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_BUILD'));
       _workspaceBuild();
+    });
+
+    _controlButton.onClick.listen((e) {
+//      if (!_controlButtonEnabled) return;
+//      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'CATKIN_NODE_LIST'));
+
+    });
+
+    _runButton.onClick.listen((e) {
+//      if (!_controlButtonEnabled) return;
+//      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'RUN_NODE'));
     });
 
     _uploadButton.onClick.listen((e) {

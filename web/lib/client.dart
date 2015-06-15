@@ -14,9 +14,6 @@ import 'modal/modal.dart';
 import 'mailbox.dart';
 
 class UpDroidClient {
-  // Toggle use of old explorer classes.
-  final bool useOldExplorer = false;
-
   StreamController<CommanderMessage> _cs;
 
   List<List<dynamic>> _columns;
@@ -49,11 +46,6 @@ class UpDroidClient {
     _runButton = querySelector('#run-button');
 
     _controlButtonEnabled = true;
-
-    if (useOldExplorer == false) {
-      DivElement columnZero = querySelector('#column-0');
-      columnZero.innerHtml = '';
-    }
 
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.
@@ -132,18 +124,14 @@ class UpDroidClient {
   void _initializeTabs(String strConfig, List explorerPaths) {
     List config = JSON.decode(strConfig);
 
-    if (useOldExplorer) {
-      int i = 1;
-      if(explorerPaths.isEmpty) {
-        _addWorkspace.click();
-      }
-      for (var name in explorerPaths) {
-        _openExplorer(i, name);
-        i += 1;
-      }
+    int i = 1;
+    if(explorerPaths.isEmpty) {
+      _addWorkspace.click();
     }
-
-    _openFinder(1, 'UpDroidExplorer');
+    for (var name in explorerPaths) {
+      _openExplorer(i, name);
+      i += 1;
+    }
 
     for (int i = 1; i < config.length; i++) {
       for (Map tab in config[i]) {
@@ -160,7 +148,7 @@ class UpDroidClient {
   }
 
   void _openExplorer(int id, name) {
-    _columns[0].add(new UpDroidExplorer(id, 0, _cs));
+    _columns[0].add(new UpDroidExplorer(id, 0, _cs, name));
   }
 
   void _openTab (int column, int id, String className) {

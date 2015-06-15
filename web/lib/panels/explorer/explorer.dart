@@ -86,7 +86,7 @@ class UpDroidExplorer extends PanelController {
 
   }
 
-  void setUpController() {
+  Future setUpController() async {
     _addWorkspaceButton = view.refMap['add-workspace'];
     _deleteWorkspaceButton = view.refMap['delete-workspace'];
     _cleanButton = view.refMap['clean-workspace'];
@@ -96,7 +96,7 @@ class UpDroidExplorer extends PanelController {
     _workspacesButton = view.refMap['workspaces'];
     _nodesButton = view.refMap['nodes'];
 
-    ExplorerView.createExplorerView(id, folderName, view.content).then((explorerView) {
+    return await ExplorerView.createExplorerView(id, folderName, view.content).then((explorerView) {
       _explorerView = explorerView;
 
       dzTopLevel = new Dropzone(_explorerView._hrContainer);

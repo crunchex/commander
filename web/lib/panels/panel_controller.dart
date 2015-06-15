@@ -35,8 +35,9 @@ abstract class PanelController {
       view.closeControlHitbox.onClick.listen((e) => _closePanel());
       view.cloneControlHitbox.onClick.listen((e) => _clonePanel(e));
 
-      setUpController();
-      registerEventHandlers();
+      setUpController().then((_) {
+        registerEventHandlers();
+      });
     });
   }
 
@@ -44,7 +45,7 @@ abstract class PanelController {
   void makeInactive() => view.makeInactive();
 
   void registerMailbox();
-  void setUpController();
+  Future setUpController();
   void registerEventHandlers();
   void cleanUp();
 

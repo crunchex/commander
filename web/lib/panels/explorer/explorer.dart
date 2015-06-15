@@ -169,7 +169,7 @@ class UpDroidExplorer extends PanelController {
     });
 
     _workspacesButton.onClick.listen((e) {
-      for(var explorer in _explorerView._explorersDiv.children) {
+      for(var explorer in _explorerView.explorersDiv.children) {
         if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
           if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
             explorer.classes.add('hidden');
@@ -183,7 +183,7 @@ class UpDroidExplorer extends PanelController {
 
     _nodesButton.onClick.listen((e) => showControl());
 
-    _explorerView._drop.onClick.listen((e) {
+    _explorerView.drop.onClick.listen((e) {
       if (currentSelected != null) {
         currentSelected.classes.remove('highlighted');
       }
@@ -191,8 +191,8 @@ class UpDroidExplorer extends PanelController {
       currentSelectedPath = workspacePath;
     });
 
-    dzTopLevel.onDragEnter.listen((e) => _explorerView._drop.classes.add('file-drop-entered'));
-    dzTopLevel.onDragLeave.listen((e) => _explorerView._drop.classes.remove('file-drop-entered'));
+    dzTopLevel.onDragEnter.listen((e) => _explorerView.drop.classes.add('file-drop-entered'));
+    dzTopLevel.onDragLeave.listen((e) => _explorerView.drop.classes.remove('file-drop-entered'));
 
     dzTopLevel.onDrop.listen((e) {
       String dragType = e.draggableElement.className;
@@ -247,12 +247,12 @@ class UpDroidExplorer extends PanelController {
       }
     });
 
-    _explorerView._folder.onDoubleClick.listen((e) {
+    _explorerView.folder.onDoubleClick.listen((e) {
       String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
       mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled');
     });
 
-    _explorerView._file.onDoubleClick.listen((e) {
+    _explorerView.file.onDoubleClick.listen((e) {
       String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
       mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + path);
     });
@@ -399,7 +399,7 @@ class UpDroidExplorer extends PanelController {
 
   /// Shows control panel
   void showControl() {
-    if (_explorerView._explorersDiv != null) _explorerView._explorersDiv.classes.add('hidden');
+    if (_explorerView.explorersDiv != null) _explorerView.explorersDiv.classes.add('hidden');
     _explorerView._controlPanel.classes.remove('hidden');
     _explorerView._controlToggle.classes.remove('shadow');
     _dropdown.classes.remove('shadow');
@@ -415,7 +415,7 @@ class UpDroidExplorer extends PanelController {
 
   void hideControl() {
     _explorerView._controlPanel.classes.add('hidden');
-    _explorerView._explorersDiv.classes.remove('hidden');
+    _explorerView.explorersDiv.classes.remove('hidden');
   }
 
   /// Functions for updating tracked file info
@@ -752,11 +752,11 @@ class UpDroidExplorer extends PanelController {
   void newFileDragSetup() {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
-    Draggable d = new Draggable(_explorerView._file, avatarHandler: new AvatarHandler.clone());
+    Draggable d = new Draggable(_explorerView.file, avatarHandler: new AvatarHandler.clone());
 
     // Highlight valid dropzones: rootline, editor, any workspace folder.
     d.onDragStart.listen((event) {
-      _explorerView._drop.classes.add('file-drop-ondrag');
+      _explorerView.drop.classes.add('file-drop-ondrag');
       cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_ADD', body: 'updroideditor-ondrag'));
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
@@ -769,7 +769,7 @@ class UpDroidExplorer extends PanelController {
     });
 
     d.onDragEnd.listen((event) {
-      _explorerView._drop.classes.remove('file-drop-ondrag');
+      _explorerView.drop.classes.remove('file-drop-ondrag');
       cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-ondrag'));
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
@@ -786,11 +786,11 @@ class UpDroidExplorer extends PanelController {
   void newFolderDragSetup() {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
-    Draggable d = new Draggable(_explorerView._folder, avatarHandler: new AvatarHandler.clone());
+    Draggable d = new Draggable(_explorerView.folder, avatarHandler: new AvatarHandler.clone());
 
     // Highlight valid dropzones: rootline, any workspace folder.
     d.onDragStart.listen((event) {
-      _explorerView._drop.classes.add('file-drop-ondrag');
+      _explorerView.drop.classes.add('file-drop-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -802,7 +802,7 @@ class UpDroidExplorer extends PanelController {
     });
 
     d.onDragEnd.listen((event) {
-      _explorerView._drop.classes.remove('file-drop-ondrag');
+      _explorerView.drop.classes.remove('file-drop-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -823,7 +823,7 @@ class UpDroidExplorer extends PanelController {
     // Dragging through nested dropzones appears to be glitchy.
     d.onDragStart.listen((event) {
       d.avatarHandler.avatar.children.first.classes.remove('highlighted');
-      if (pathLib.dirname(li.dataset['path']) != workspacePath) _explorerView._drop.classes.add('file-drop-ondrag');
+      if (pathLib.dirname(li.dataset['path']) != workspacePath) _explorerView.drop.classes.add('file-drop-ondrag');
       _explorerView._recycle.classes.add('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
@@ -839,7 +839,7 @@ class UpDroidExplorer extends PanelController {
     });
 
     d.onDragEnd.listen((event) {
-      _explorerView._drop.classes.remove('file-drop-ondrag');
+      _explorerView.drop.classes.remove('file-drop-ondrag');
       _explorerView._recycle.classes.remove('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');

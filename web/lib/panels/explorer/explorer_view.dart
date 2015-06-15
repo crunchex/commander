@@ -11,8 +11,11 @@ class ExplorerView {
   }
 
   DivElement content;
+  DivElement explorersDiv;
+  SpanElement folder;
+  SpanElement file;
+  DivElement drop;
 
-  DivElement _explorersDiv;
   DivElement _titleWrap;
   UListElement _expList;
   DivElement _controlPanel;
@@ -21,9 +24,6 @@ class ExplorerView {
   ParagraphElement _recycle;
   DivElement _explorer;
   DivElement _hrContainer;
-  SpanElement _folder;
-  SpanElement _file;
-  DivElement _drop;
   UListElement _packageList;
   ButtonElement _dropdown;
 
@@ -32,7 +32,7 @@ class ExplorerView {
 
     _dropdown = querySelector('#exp-dropdown');
     _titleWrap = querySelector('#title-wrapper');
-    _explorersDiv = querySelector("#exp-container");
+    explorersDiv = querySelector("#exp-container");
     _expList = querySelector("#side-menu ul");
     _controlPanel = querySelector('#control');
     _packageList = querySelector('#packages');
@@ -40,21 +40,21 @@ class ExplorerView {
     _controlToggle = querySelector('#control-toggle');
     _recycle = querySelector('#recycle');
 
-    _explorersDiv = new DivElement()
+    explorersDiv = new DivElement()
       ..id = 'exp-container';
-    content.children.add(_explorersDiv);
+    content.children.add(explorersDiv);
 
     _explorer = new DivElement()
       ..id = "exp-$num"
       ..classes.add('exp')
       ..dataset['num'] = num.toString()
       ..dataset['name'] = name;
-    _explorersDiv.children.add(_explorer);
+    explorersDiv.children.add(_explorer);
 
     _recycle = new ParagraphElement()
       ..id = 'recycle'
       ..text = 'Recycle ';
-    _explorersDiv.children.add(_recycle);
+    explorersDiv.children.add(_recycle);
 
     SpanElement trash = new SpanElement()
       ..id = 'trash'
@@ -72,24 +72,24 @@ class ExplorerView {
       ..classes.add('new')
       ..text = "New";
     explorerHead.append(newDnd);
-    _folder = new SpanElement()
+    folder = new SpanElement()
       ..id = "folder-$num"
       ..classes.addAll(['glyphicons', 'glyphicons-folder-closed', 'folder']);
-    _file = new SpanElement()
+    file = new SpanElement()
       ..id = "file-$num"
       ..classes.addAll(['glyphicons', 'glyphicons-file', 'file']);
-    newDnd.append(_folder);
-    newDnd.append(_file);
+    newDnd.append(folder);
+    newDnd.append(file);
     _hrContainer = new DivElement()
       ..id = "file-explorer-hr-container-$num";
     explorerHead.append(_hrContainer);
-    _drop = new DivElement()
+    drop = new DivElement()
       ..classes.add("new-file-drop")
       ..id = "new-file-drop-$num";
-    _hrContainer.append(_drop);
+    _hrContainer.append(drop);
     ParagraphElement p = new ParagraphElement();
     p.text = "Top Level";
-    _drop.append(p);
+    drop.append(p);
     DivElement body = new DivElement()
       ..classes.addAll(['well', 'well-sm', 'explorer-container'])
       ..id = "explorer-$num";

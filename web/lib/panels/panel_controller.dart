@@ -1,38 +1,39 @@
-library tab_controller;
+library panel_controller;
 
 import 'dart:html';
 import 'dart:async';
 
 import '../mailbox.dart';
-import 'tab_view.dart';
 
-abstract class TabController {
+part 'panel_view.dart';
+
+abstract class PanelController {
   int id, col;
   StreamController<CommanderMessage> cs;
   bool active;
-  String tabType, shortName;
+  String panelType, shortName;
 
   TabView view;
   Mailbox mailbox;
 
-  AnchorElement _closeTabButton;
+  AnchorElement _closePanelButton;
 
-  TabController(this.id, this.col, this.tabType, this.shortName, List menuConfig, [StreamController<CommanderMessage> cs, bool externalCss=false]) {
+  PanelController(this.id, this.col, this.panelType, this.shortName, List menuConfig, [StreamController<CommanderMessage> cs, bool externalCss=false]) {
     if (cs == null) {
-      mailbox = new Mailbox(tabType, id);
+      mailbox = new Mailbox(panelType, id);
     } else {
       this.cs = cs;
-      mailbox = new Mailbox(tabType, id, this.cs);
+      mailbox = new Mailbox(panelType, id, this.cs);
     }
     registerMailbox();
 
-    TabView.createTabView(id, col, tabType, shortName, menuConfig, externalCss).then((tabView) {
+    PanelView.createPanelView(id, col, panelType, shortName, menuConfig, externalCss).then((tabView) {
       view = tabView;
 
-      _closeTabButton = view.refMap['close-tab'];
-      _closeTabButton.onClick.listen((e) => _closeTab());
-      view.closeControlHitbox.onClick.listen((e) => _closeTab());
-      view.cloneControlHitbox.onClick.listen((e) => _cloneTab(e));
+      _closePanelButton = view.refMap['close-panel'];
+      _closePanelButton.onClick.listen((e) => _closePanel());
+      view.closeControlHitbox.onClick.listen((e) => _closePanel());
+      view.cloneControlHitbox.onClick.listen((e) => _clonePanel(e));
 
       setUpController();
       registerEventHandlers();
@@ -47,24 +48,24 @@ abstract class TabController {
   void registerEventHandlers();
   void cleanUp();
 
-  void _closeTab() {
+  void _closePanel() {
     view.destroy();
     cleanUp();
 
     if (cs != null) {
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${tabType}_$id'));
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${panelType}_$id'));
     } else {
-      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${tabType}_$id');
+      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${panelType}_$id');
       mailbox.ws.send(um.s);
     }
   }
 
-  void _cloneTab(Event e) {
+  void _clonePanel(Event e) {
     e.preventDefault();
     if (cs != null) {
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${tabType}'));
+      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${panelType}'));
     } else {
-      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${tabType}_$id');
+      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${panelType}_$id');
       mailbox.ws.send(um.s);
     }
   }

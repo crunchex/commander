@@ -1,18 +1,15 @@
-library updroid_tab;
-
-import 'dart:html';
-import 'dart:async';
+part of panel_controller;
 
 /// [UpDroidTab] contains methods to generate [Element]s that make up a tab
 /// and menu bar in the UpDroid Commander GUI.
-class TabView {
+class PanelView {
 
   /// Returns an initialized [TabView] as a [Future] given all normal constructors.
   ///
   /// Use this instead of calling the constructor directly.
-  static Future<TabView> createTabView(int num, int col, String title, String shortName, List config, [bool externalCss=false]) {
+  static Future<PanelView> createPanelView(int num, int col, String title, String shortName, List config, [bool externalCss=false]) {
     Completer c = new Completer();
-    c.complete(new TabView(num, col, title, shortName, config, externalCss));
+    c.complete(new PanelView(num, col, title, shortName, config, externalCss));
     return c.future;
   }
 
@@ -33,18 +30,42 @@ class TabView {
   DivElement _tabContainer,_tabContent;
   List config;
 
-  TabView(this.num, this.col, this.title, this.shortName, this.config, [bool externalCss=false]) {
+  PanelView(this.num, this.col, this.title, this.shortName, this.config, [bool externalCss=false]) {
     refMap = {};
 
     // Inject the associated stylesheet if one exists.
     // TODO: somehow detect if it exists at runtime.
     if (externalCss) {
-      String cssPath = 'lib/tabs/${shortName.toLowerCase()}/${shortName.toLowerCase()}.css';
+      String cssPath = 'lib/panels/${shortName.toLowerCase()}/${shortName.toLowerCase()}.css';
       styleLink = new LinkElement();
       styleLink.rel = 'stylesheet';
       styleLink.href = cssPath;
       document.head.append(styleLink);
     }
+
+    DivElement topLevel = querySelector('#column-$col');
+
+    UListElement tabList = new UListElement()
+      ..classes.addAll(['nav', 'nav-tabs'])
+      ..setAttribute('role', 'tablist');
+    topLevel.children.add(tabList);
+
+//    LIElement newPanelLi = new LIElement();
+//    tabList.children.add(newPanelLi);
+//
+//    AnchorElement panelButton = new AnchorElement()
+//      ..id = 'column-$col-new'
+//      ..classes.add('new-tab-button');
+//    newPanelLi.children.add(panelButton);
+//
+//    SpanElement glyphiconNew = new SpanElement()
+//      ..classes.addAll(['glyphicons', 'glyphicons-chevron-down']);
+//    panelButton.children.add(glyphiconNew);
+
+    DivElement topTabContent = new DivElement()
+      ..id = 'col-$col-tab-content'
+      ..classes.add('tab-content');
+    topLevel.children.add(topTabContent);
 
     _setUpTabHandle();
     _setUpTabContainer();

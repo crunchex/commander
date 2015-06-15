@@ -8,35 +8,20 @@ import 'package:dnd/dnd.dart';
 import 'package:path/path.dart' as pathLib;
 
 import '../../mailbox.dart';
-import '../panel_controller.dart';
 
-part 'explorer_helper.dart';
-part 'explorer_view.dart';
+part 'finder_view.dart';
+part 'finder_helper.dart';
 
-/// [UpDroidConsole] is a client-side class that combines a [Terminal]
-/// and [WebSocket] into an UpDroid Commander tab.
-class UpDroidExplorer extends PanelController {
-  static const String className = 'UpDroidFinder';
-
-  static List getMenuConfig() {
-    List menu = [
-      {'title': 'File', 'items': [
-        {'type': 'toggle', 'title': 'Close Panel'}]},
-      {'title': 'Actions', 'items': [
-        {'type': 'toggle', 'title': 'Build Workspace'},
-        {'type': 'toggle', 'title': 'Clean Workspace'},
-        {'type': 'toggle', 'title': 'Upload with Git'}]},
-      {'title': 'View', 'items': [
-        {'type': 'toggle', 'title': 'Nodes'}]}
-    ];
-    return menu;
-  }
+/// [UpDroidExplorer] manages the data for the file explorer on the client
+/// side and all associated views. It also facilitates file operation requests
+/// to the server side.
+class UpDroidExplorer extends ExplorerView {
+  static const String className = 'UpDroidExplorer';
 
   // Make dynamic
   int expNum;
   String name;
   bool closed;
-  String folderName;
 
   Mailbox _mailbox;
   String workspacePath;
@@ -68,33 +53,33 @@ class UpDroidExplorer extends PanelController {
 
   StreamController<CommanderMessage> cs;
 
-  ExplorerView _explorerView;
+  UpDroidExplorer(StreamController<CommanderMessage> cs, num, folderName) {
+    this.name = folderName;
+    this.expNum = num;;
+    this.cs = cs;
+    this.closed = false;
 
-  UpDroidExplorer(int id, int col, StreamController<CommanderMessage> cs, this.folderName) :
-  super(id, col, className, 'Finder', getMenuConfig(), cs, true) {
+    String cssPath = 'lib/panels/explorer/explorer.css';
+    LinkElement styleLink = new LinkElement();
+    styleLink.rel = 'stylesheet';
+    styleLink.href = cssPath;
+    document.head.append(styleLink);
 
-  }
-
-  void setUpController() {
-//    _themeButton = view.refMap['invert'];
-
-    _explorerView = new ExplorerView();
-
-    _explorerView.createExplorer(id, folderName).then((d) {
+    createExplorer(num, folderName).then((d) {
       newFileDragSetup();
       newFolderDragSetup();
 
-      dzTopLevel = new Dropzone(_explorerView._hrContainer);
-      dzRecycle = new Dropzone(_explorerView._recycle);
+      dzTopLevel = new Dropzone(_hrContainer);
+      dzRecycle = new Dropzone(_recycle);
 
       _mailbox = new Mailbox(className, expNum, cs);
+
+      _registerMailbox();
+      registerExplorerEventHandlers();
     });
   }
 
-
-  //\/\/ Mailbox Handlers /\/\//
-
-  void registerMailbox() {
+  void _registerMailbox() {
     _mailbox.registerCommanderEvent('EDITOR_READY', _editorReady);
     _mailbox.registerCommanderEvent('REQUEST_PARENT_PATH', _requestParentPath);
     _mailbox.registerCommanderEvent('WORKSPACE_CLEAN', _workspaceClean);
@@ -116,11 +101,11 @@ class UpDroidExplorer extends PanelController {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CLEAN', _relayWorkspaceClean);
   }
 
-  /// Sets up the event handlers for the console.
-  void registerEventHandlers() {
-    _explorerView._controlToggle.onClick.listen((e) => showControl());
+  /// Sets up the event handlers for the file explorer. Mostly mouse events.
+  registerExplorerEventHandlers() {
+    _controlToggle.onClick.listen((e) => showControl());
 
-    _explorerView._drop.onClick.listen((e) {
+    _drop.onClick.listen((e) {
       if (currentSelected != null) {
         currentSelected.classes.remove('highlighted');
       }
@@ -128,8 +113,8 @@ class UpDroidExplorer extends PanelController {
       currentSelectedPath = workspacePath;
     });
 
-    dzTopLevel.onDragEnter.listen((e) => _explorerView._drop.classes.add('file-drop-entered'));
-    dzTopLevel.onDragLeave.listen((e) => _explorerView._drop.classes.remove('file-drop-entered'));
+    dzTopLevel.onDragEnter.listen((e) => _drop.classes.add('file-drop-entered'));
+    dzTopLevel.onDragLeave.listen((e) => _drop.classes.remove('file-drop-entered'));
 
     dzTopLevel.onDrop.listen((e) {
       String dragType = e.draggableElement.className;
@@ -184,23 +169,23 @@ class UpDroidExplorer extends PanelController {
       }
     });
 
-    _explorerView._folder.onDoubleClick.listen((e) {
+    _folder.onDoubleClick.listen((e) {
       String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
       _mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled');
     });
 
-    _explorerView._file.onDoubleClick.listen((e) {
+    _file.onDoubleClick.listen((e) {
       String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
       _mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + path);
     });
 
     // TODO: cancel when inactive
 
-    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _explorerView._recycle.classes.add('recycle-entered'));
-    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _explorerView._recycle.classes.remove('recycle-entered'));
+    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _recycle.classes.add('recycle-entered'));
+    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _recycle.classes.remove('recycle-entered'));
 
     var recycleDrop = dzRecycle.onDrop.listen((e) {
-      if (!_explorerView._explorer.classes.contains('hidden')) {
+      if (!_explorer.classes.contains('hidden')) {
         var path = getPath(e.draggableElement);
 
         // Draggable is an empty folder
@@ -219,6 +204,8 @@ class UpDroidExplorer extends PanelController {
     recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
   }
 
+  //\/\/ CommanderMessage Handlers /\/\//
+
   void _editorReady(CommanderMessage m) {
     var num = m.body[0];
     // Editor num
@@ -233,7 +220,7 @@ class UpDroidExplorer extends PanelController {
   }
 
   void _requestParentPath(CommanderMessage m) {
-    if (!_explorerView._explorer.classes.contains('hidden')) {
+    if (!_explorer.classes.contains('hidden')) {
       cs.add(new CommanderMessage('UPDROIDEDITOR', 'PARENT_PATH', body: currentSelectedPath));
     }
   }
@@ -295,7 +282,7 @@ class UpDroidExplorer extends PanelController {
     .listen((e) => cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-entered')));
 
     var drop = dzEditor.onDrop.listen((e) {
-      if (!_explorerView._explorer.classes.contains('hidden')) {
+      if (!_explorer.classes.contains('hidden')) {
         var isDir = e.draggableElement.dataset['isDir'];
         if (isDir == 'false') {
           var num = editors[dzEditor];
@@ -310,7 +297,7 @@ class UpDroidExplorer extends PanelController {
     bool active;
     if (closed == true) active = false;
     else {
-      if (!_explorerView._explorer.classes.contains('hidden')) active = true;
+      if (!_explorer.classes.contains('hidden')) active = true;
       else {
         active = false;
       }
@@ -336,23 +323,23 @@ class UpDroidExplorer extends PanelController {
 
   /// Shows control panel
   void showControl() {
-    if (_explorerView._explorersDiv != null) _explorerView._explorersDiv.classes.add('hidden');
-    _explorerView._controlPanel.classes.remove('hidden');
-    _explorerView._controlToggle.classes.remove('shadow');
+    if (_explorersDiv != null) _explorersDiv.classes.add('hidden');
+    _controlPanel.classes.remove('hidden');
+    _controlToggle.classes.remove('shadow');
     _dropdown.classes.remove('shadow');
-    _explorerView._titleWrap.classes.add('shadow');
-    controlLeave = _explorerView._title.onClick.listen((e) {
+    _titleWrap.classes.add('shadow');
+    controlLeave = _title.onClick.listen((e) {
       hideControl();
-      _explorerView._controlToggle.classes.add('shadow');
+      _controlToggle.classes.add('shadow');
       _dropdown.classes.add('shadow');
-      _explorerView._titleWrap.classes.remove('shadow');
+      _titleWrap.classes.remove('shadow');
       controlLeave.cancel();
     });
   }
 
   void hideControl() {
-    _explorerView._controlPanel.classes.add('hidden');
-    _explorerView._explorersDiv.classes.remove('hidden');
+    _controlPanel.classes.add('hidden');
+    _explorersDiv.classes.remove('hidden');
   }
 
   /// Functions for updating tracked file info
@@ -519,8 +506,8 @@ class UpDroidExplorer extends PanelController {
             }
           } else {
             if (currentPath != newPath &&
-            duplicate == false &&
-            !getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
+                duplicate == false &&
+                !getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
               _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
               cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
             }
@@ -559,18 +546,18 @@ class UpDroidExplorer extends PanelController {
       div.classes.add('highlighted');
       currentSelected = div;
       div.parent.dataset['isDir'] == 'true'
-      ? currentSelectedPath = getPath(div.parent)
-      : currentSelectedPath = pathLib.dirname(getPath(div.parent));
+          ? currentSelectedPath = getPath(div.parent)
+          : currentSelectedPath = pathLib.dirname(getPath(div.parent));
     });
   }
 
   void populateNodes(UpDroidMessage um) {
     List<Map> nodeList = JSON.decode(um.body);
-    Map packageMap = _explorerView.createPackageList(nodeList);
+    Map packageMap = createPackageList(nodeList);
 
     for (var packageNode in nodeList) {
       if(!packageNode['node'].contains('.xml')) {
-        var element = _explorerView.createNodeLi(cs, packageNode);
+        var element = createNodeLi(cs, packageNode);
         var listToAppend = packageMap[packageNode['package']];
         listToAppend.append(element);
         setupNodeHighlighter(element);
@@ -689,11 +676,11 @@ class UpDroidExplorer extends PanelController {
   void newFileDragSetup() {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
-    Draggable d = new Draggable(_explorerView._file, avatarHandler: new AvatarHandler.clone());
+    Draggable d = new Draggable(_file, avatarHandler: new AvatarHandler.clone());
 
     // Highlight valid dropzones: rootline, editor, any workspace folder.
     d.onDragStart.listen((event) {
-      _explorerView._drop.classes.add('file-drop-ondrag');
+      _drop.classes.add('file-drop-ondrag');
       cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_ADD', body: 'updroideditor-ondrag'));
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
@@ -706,7 +693,7 @@ class UpDroidExplorer extends PanelController {
     });
 
     d.onDragEnd.listen((event) {
-      _explorerView._drop.classes.remove('file-drop-ondrag');
+      _drop.classes.remove('file-drop-ondrag');
       cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-ondrag'));
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
@@ -723,11 +710,11 @@ class UpDroidExplorer extends PanelController {
   void newFolderDragSetup() {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
-    Draggable d = new Draggable(_explorerView._folder, avatarHandler: new AvatarHandler.clone());
+    Draggable d = new Draggable(_folder, avatarHandler: new AvatarHandler.clone());
 
     // Highlight valid dropzones: rootline, any workspace folder.
     d.onDragStart.listen((event) {
-      _explorerView._drop.classes.add('file-drop-ondrag');
+      _drop.classes.add('file-drop-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -739,7 +726,7 @@ class UpDroidExplorer extends PanelController {
     });
 
     d.onDragEnd.listen((event) {
-      _explorerView._drop.classes.remove('file-drop-ondrag');
+      _drop.classes.remove('file-drop-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -760,8 +747,8 @@ class UpDroidExplorer extends PanelController {
     // Dragging through nested dropzones appears to be glitchy.
     d.onDragStart.listen((event) {
       d.avatarHandler.avatar.children.first.classes.remove('highlighted');
-      if (pathLib.dirname(li.dataset['path']) != workspacePath) _explorerView._drop.classes.add('file-drop-ondrag');
-      _explorerView._recycle.classes.add('recycle-ondrag');
+      if (pathLib.dirname(li.dataset['path']) != workspacePath) _drop.classes.add('file-drop-ondrag');
+      _recycle.classes.add('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -776,8 +763,8 @@ class UpDroidExplorer extends PanelController {
     });
 
     d.onDragEnd.listen((event) {
-      _explorerView._drop.classes.remove('file-drop-ondrag');
-      _explorerView._recycle.classes.remove('recycle-ondrag');
+      _drop.classes.remove('file-drop-ondrag');
+      _recycle.classes.remove('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -808,7 +795,7 @@ class UpDroidExplorer extends PanelController {
       LIElement curLi = pathToFile['${pathLib.join(workspacePath, curPath)}'];
       if (curLi == null && pathLib.join(workspacePath, curPath) != workspacePath) {
         newElementFromFile(new SimpleFile.fromPath(pathLib.join(workspacePath, curPath), workspacePath, true))
-        .then((result) {});
+            .then((result) {});
       }
       if (i != split.length - 1) {
         curPath += '/';
@@ -917,50 +904,6 @@ class UpDroidExplorer extends PanelController {
       }
     }
   }
-
-  void cleanUp() {
-
-  }
 }
 
-/// Container class that extracts data from the raw file text passed in from
-/// the server over [WebSocket]. Primarily used for generating the HTML views
-/// in the file explorer that represent the filesystem.
-class SimpleFile {
-  String name;
-  String parentDir;
-  String path;
-  bool isDirectory;
 
-  SimpleFile.fromDirectoryList(String raw, String prefix) {
-    String workingString = stripFormatting(raw, prefix);
-    getData(workingString);
-  }
-
-  SimpleFile.fromPath(String raw, String prefix, bool isDir) {
-    path = raw.replaceAll(r'\', '');
-    isDirectory = isDir;
-    raw = raw.replaceFirst(prefix, '');
-    getData(raw);
-  }
-
-  String stripFormatting(String raw, String prefix) {
-    raw = raw.trim();
-    isDirectory = raw.startsWith('Directory: ') ? true : false;
-    raw = raw.replaceFirst(new RegExp(r'(Directory: |File: )'), '');
-
-    path = raw;
-    raw = raw.replaceFirst(prefix, '');
-    return raw;
-  }
-
-  void getData(String fullPath) {
-    List<String> pathList = fullPath.split('/');
-    name = pathList[pathList.length - 1];
-    if (pathList.length > 1) {
-      parentDir = pathList[pathList.length - 2];
-    } else {
-      parentDir = '';
-    }
-  }
-}

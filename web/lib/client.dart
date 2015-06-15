@@ -99,7 +99,8 @@ class UpDroidClient {
     //if (strConfig == null) strConfig = UpDroidClient.defaultConfig;
     if (strConfig != '') return strConfig;
 
-    List listConfig = [[],
+    List listConfig = [[
+      [{'id': 1, 'class': 'UpDroidExplorer'}]],
       [{'id': 1, 'class': 'UpDroidEditor'}],
       [{'id': 1, 'class': 'UpDroidConsole'}]
     ];
@@ -148,6 +149,8 @@ class UpDroidClient {
       }
     }
 
+    _openFinder(1, 'UpDroidExplorer');
+
     for (int i = 1; i < config.length; i++) {
       for (Map tab in config[i]) {
         _openTab(i, tab['id'], tab['class']);
@@ -163,12 +166,7 @@ class UpDroidClient {
   }
 
   void _openExplorer(int id, name) {
-    if (_columns[0].isNotEmpty) {
-      for (var explorer in _columns[0]) {
-        explorer.hideExplorer();
-      }
-    }
-    _columns[0].add(new UpDroidExplorer(_cs, id, name));
+    _columns[0].add(new UpDroidExplorer(id, 0, _cs));
   }
 
   void _openTab (int column, int id, String className) {

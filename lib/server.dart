@@ -100,7 +100,7 @@ class CmdrServer {
     int objectID = int.parse(request.uri.pathSegments[1]);
     String type = request.uri.pathSegments[0];
 
-    if (type == 'updroidexplorer') {
+    if (type == 'updroidfinder') {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
       return;

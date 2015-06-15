@@ -1,6 +1,6 @@
-part of updroid_explorer;
+part of updroid_finder;
 
-class ExplorerView {
+abstract class FinderView {
   Element separator = querySelector('#side-menu-separator');
 
   DivElement _explorersDiv;
@@ -84,7 +84,7 @@ class ExplorerView {
     return completer.future;
   }
 
-  makeExpButton(int num, String name) {
+  makeExpButton (int num, String name) {
     LIElement item = new LIElement()
       ..id = "exp-li-$num";
     AnchorElement link = new AnchorElement()
@@ -116,7 +116,7 @@ class ExplorerView {
 
   ///Create Node List
 
-  Map createPackageList(List<Map> nodeList) {
+  Map createPackageList (List<Map> nodeList) {
     List packages = [];
     Map packageList = {};
     for (var item in nodeList) {

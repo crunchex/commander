@@ -12,13 +12,11 @@ import '../server_helper.dart' as help;
 part 'workspace.dart';
 
 abstract class Ros {
-  static void nodeList(Directory workspace, WebSocket ws) {
+  static void nodeList(Workspace workspace, WebSocket ws) {
     List launchList = [];
     List nodeList = [];
 
-    Directory src = new Directory(pathLib.normalize(workspace.path + '/src'));
-
-    help.getDirectory(src).then((fsEntities) {
+    help.getWorkspace(workspace).then((fsEntities) {
       Directory package;
       fsEntities.forEach((f) {
         if (FileSystemEntity.isFileSync(f.path)) {

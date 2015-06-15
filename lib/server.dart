@@ -9,6 +9,7 @@ import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
+import 'ros/ros.dart';
 import 'tab/pty.dart';
 import 'tab/camera/camera.dart';
 import 'tab/teleop.dart';
@@ -187,12 +188,10 @@ class CmdrServer {
     List explorerInfo = JSON.decode(um.body);
     int expNum = int.parse(explorerInfo[0]);
     String name = explorerInfo[1];
-    Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + name));
-    Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
-    source.createSync(recursive: true);
-    Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: pathLib.normalize(newWorkspace.path + "/src"), runInShell: true);
-    _explorers[expNum] = (new CmdrExplorer(newWorkspace, expNum));
-
+    Workspace workspace = new Workspace(pathLib.normalize('${dir.path}/$name'));
+    workspace.create();
+    workspace.initSync();
+    _explorers[expNum] = new CmdrExplorer(workspace, expNum);
   }
 
   void _closeExplorerCmdr(UpDroidMessage um) {

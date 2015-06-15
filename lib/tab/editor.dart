@@ -34,7 +34,7 @@ class CmdrEditor {
   }
 
   void _sendEditorList(UpDroidMessage um) {
-    help.getDirectory(_dir).then((files) {
+    help.getWorkspace(_dir).then((files) {
       mailbox.ws.add('[[PATH_LIST]]' + files.toString());
     });
   }

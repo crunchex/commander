@@ -11,15 +11,13 @@ import '../server_helper.dart' as help;
 class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';
 
-  Directory _dir;
   DirectoryWatcher watcher;
-  Workspace workspace;
+  Workspace _dir;
   int expNum;
   String expPath;
 
   //TODO: make asynchroneous
-  CmdrExplorer(Directory dir, num) {
-    this.workspace = new Workspace(dir.path);
+  CmdrExplorer(Workspace dir, num) {
     this.expPath = dir.path;
     this.expNum = num;
 
@@ -107,26 +105,25 @@ class CmdrExplorer {
   }
 
   void killExplorer() {
-    this.workspace = null;
     this.expPath = null;
     this.expNum = null;
     this.watcher = null;
   }
 
   void _sendInitial(WebSocket s) {
-    help.getDirectory(_dir).then((files) {
+    help.getWorkspace(_dir).then((files) {
       s.add('[[INITIAL_DIRECTORY_LIST]]' + files.toString());
     });
   }
 
   void _sendDirectory(WebSocket s) {
-    help.getDirectory(_dir).then((files) {
+    help.getWorkspace(_dir).then((files) {
       s.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
     });
   }
 
   void _refreshDirectory(WebSocket s) {
-    help.getDirectory(_dir).then((files) {
+    help.getWorkspace(_dir).then((files) {
       s.add('[[EXPLORER_DIRECTORY_REFRESH]]' + files.toString());
     });
   }
@@ -191,23 +188,23 @@ class CmdrExplorer {
   }
 
   void _workspaceClean(WebSocket s) {
-    workspace.clean().then((result) {
+    _dir.clean().then((result) {
       s.add('[[WORKSPACE_CLEAN]]');
     });
   }
 
   void _workspaceBuild(WebSocket s) {
-    workspace.build().then((result) {
+    _dir.build().then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       s.add('[[WORKSPACE_BUILD]]' + resultString);
     });
   }
 
   void _nodeList(WebSocket s) {
-    Ros.nodeList(workspace, s);
+    Ros.nodeList(_dir, s);
   }
 
   void _runNode(String runCommand) {
-    Ros.runNode(workspace, runCommand);
+    Ros.runNode(_dir, runCommand);
   }
 }

@@ -6,6 +6,8 @@ import 'package:watcher/watcher.dart';
 import 'package:logging/logging.dart';
 import 'package:logging_handlers/server_logging_handlers.dart';
 
+import 'ros/ros.dart';
+
 Logger log;
 bool debugFlag;
 String logFileDir = '/var/log/updroid';
@@ -91,7 +93,7 @@ void formattedFsUpdate(WebSocket socket, WatchEvent e) {
 
 /// Recursively traverses the given directory path and asynchronously
 /// returns a list of filesystem entities.
-Future<List<FileSystemEntity>> getDirectory(Directory dir) {
+Future<List<FileSystemEntity>> getWorkspace(Workspace dir) {
 var files = <FileSystemEntity>[];
 var completer = new Completer();
 var lister = dir.list(recursive: true);

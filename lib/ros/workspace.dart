@@ -44,6 +44,14 @@ class Workspace {
     Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: src.path, runInShell: true);
   }
 
+  Stream<FileSystemEntity> list({bool recursive: false, bool followLinks: true}) {
+    return _delegate.list(recursive: recursive, followLinks: followLinks);
+  }
+
+  List<FileSystemEntity> listSync({bool recursive: false, bool followLinks: true}) {
+    return _delegate.listSync(recursive: recursive, followLinks: followLinks);
+  }
+
   /// Cleans the workspace by removing build, devel, and install directories.
   Future<ProcessResult> clean() => Process.run('rm', ['-rf', 'build', 'devel', 'install'], workingDirectory: path, runInShell: true);
 

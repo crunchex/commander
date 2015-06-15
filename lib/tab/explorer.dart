@@ -9,7 +9,7 @@ import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 
 class CmdrExplorer {
-  static const String guiName = 'UpDroidFinder';
+  static const String guiName = 'UpDroidExplorer';
 
   Directory _dir;
   DirectoryWatcher watcher;

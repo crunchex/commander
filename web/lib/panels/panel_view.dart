@@ -1,10 +1,10 @@
 part of panel_controller;
 
-/// [UpDroidTab] contains methods to generate [Element]s that make up a tab
-/// and menu bar in the UpDroid Commander GUI.
+/// [PanelView] contains generic methods and fields that make up the visual
+/// side of a Panel.
 class PanelView {
 
-  /// Returns an initialized [TabView] as a [Future] given all normal constructors.
+  /// Returns an initialized [PanelView] as a [Future] given all normal constructors.
   ///
   /// Use this instead of calling the constructor directly.
   static Future<PanelView> createPanelView(int num, int col, String title, String shortName, List config, [bool externalCss=false]) {

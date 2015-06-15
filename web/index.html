@@ -40,55 +40,61 @@
 
 <body>
 
-  <div id="login-overlay" class="login-overlay">
-    <img id="login-logo" class="login-logo" src="assets/commander_logo.png" alt="UpDroid Commander">
-    <h1 id="login-heading">Welcome.</h1>
-    <input id="login-username-input" placeholder="username">
-    <input id="login-password-input" placeholder="password" type="password">
-  </div>
+<div id="login-overlay" class="login-overlay">
+  <img id="login-logo" class="login-logo" src="assets/commander_logo.png" alt="UpDroid Commander">
+  <h1 id="login-heading">Welcome.</h1>
+  <input id="login-username-input" placeholder="username">
+  <input id="login-password-input" placeholder="password" type="password">
+</div>
 
-  <!-- Modal Template -->
+<!-- Modal Template -->
 
-  <div class="modal fade modal-base" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
+<div class="modal fade modal-base" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
 
-      <div class="modal-content">
-        <!-- insert content here -->
-      </div>
-
+    <div class="modal-content">
+      <!-- insert content here -->
     </div>
+
   </div>
+</div>
 
-  <!-- Top Nav -->
+<!-- Top Nav -->
 
-  <nav id="navbar" class="navbar navbar-inverse" role="navigation">
-    <a class="nav navbar-nav navbar-left" href="javascript: void(0)">
-      <img id="updroid" src="assets/commander_logo_black.png" alt="UpDroid Commander">
-    </a>
-    <ul class="nav navbar-nav navbar-right">
-      <li><a id="feedback-button" href="https://groups.google.com/forum/#!forum/updroid-commander" target="_blank">Community</a>
-      </li>
-      <li><a href="http://www.updroid.com" target="_blank">UpDroid.com</a>
-      </li>
-      <!--li><a href="javascript: void(0)">Tutorials</a></li>
-      <li><a href="javascript: void(0)">Forums</a></li-->
-    </ul>
-  </nav>
+<nav id="navbar" class="navbar navbar-inverse" role="navigation">
+  <a class="nav navbar-nav navbar-left" href="javascript: void(0)">
+    <img id="updroid" src="assets/commander_logo_black.png" alt="UpDroid Commander">
+  </a>
+  <ul class="nav navbar-nav navbar-right">
+    <li><a id="feedback-button" href="https://groups.google.com/forum/#!forum/updroid-commander" target="_blank">Community</a>
+    </li>
+    <li><a href="http://www.updroid.com" target="_blank">UpDroid.com</a>
+    </li>
+    <!--li><a href="javascript: void(0)">Tutorials</a></li>
+    <li><a href="javascript: void(0)">Forums</a></li-->
+  </ul>
+</nav>
 
-  <!-- Commander Body -->
+<!-- Commander Body -->
 
-  <div class="container-fluid fill">
-    <div id="row-main" class="row">
+<div class="container-fluid fill">
+  <div id="row-main" class="row">
 
-      <!-- Col 0 -->
+    <!-- Col 0 -->
 
-      <div id="column-0" class="col-xs-2 column-content">
-      <div>
-        <div id="title-wrapper">
-          <li id="file-explorer-title">UP-Root</li>
-        </div>
+    <div id="column-0" class="col-xs-2 column-content">
+      <ul class="nav nav-tabs" role="tablist">
+        <li><a id="column-0-new" class="new-tab-button"><span class="glyphicons glyphicons-plus"></span></a>
+        </li>
+      </ul>
 
-        <!-- Side Menu -->
+      <div id="col-0-tab-content" class="tab-content">
+        <div>
+          <div id="title-wrapper">
+            <li id="file-explorer-title">UP-Root</li>
+          </div>
+
+          <!-- Side Menu -->
 
           <div id="side-menu" class="btn-group">
             <button id="control-toggle" type="button" class="btn shadow">Control</button>
@@ -104,53 +110,54 @@
           </div>
         </div>
 
-      <!-- Explorers added here -->
-      <div id="exp-container">
+        <!-- Explorers added here -->
+        <div id="exp-container">
 
-        <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span></p>
-      </div>
+          <p id="recycle">Recycle <span id="trash" class="glyphicon glyphicon-trash"></span></p>
+        </div>
 
-      <!-- Control Div -->
-       <div id="control" class="hidden">
-        <div>
-          <h4>Nodes</h4>
-          <div id="packages">
-          </div>
-          <div class="control-buttons btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
-            <button id="run-button" type="button" class="btn btn-sm">Run <span class="glyphicons glyphicons-person-running"></span></button>
+        <!-- Control Div -->
+        <div id="control" class="hidden">
+          <div>
+            <h4>Nodes</h4>
+            <div id="packages">
+            </div>
+            <div class="control-buttons btn-group btn-group-sm" data-toggle="buttons" role="group" aria-label="...">
+              <button id="run-button" type="button" class="btn btn-sm">Run <span class="glyphicons glyphicons-person-running"></span></button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-      <!-- Col 1 -->
+    <!-- Col 1 -->
 
-      <div id="column-1" class="col-xs-5 column-content">
-        <ul class="nav nav-tabs" role="tablist">
-          <li><a id="column-1-new" class="new-tab-button"><span class="glyphicons glyphicons-plus"></span></a>
-          </li>
-        </ul>
+    <div id="column-1" class="col-xs-5 column-content">
+      <ul class="nav nav-tabs" role="tablist">
+        <li><a id="column-1-new" class="new-tab-button"><span class="glyphicons glyphicons-plus"></span></a>
+        </li>
+      </ul>
 
-        <div id="col-1-tab-content" class="tab-content"></div>
-      </div>
-
-      <!-- Col 2 -->
-
-      <div id="column-2" class="col-xs-5 column-content">
-        <ul class="nav nav-tabs" role="tablist">
-          <li><a id="column-2-new" class="new-tab-button"><span class="glyphicons glyphicons-plus"></span></a>
-          </li>
-        </ul>
-
-        <div id="col-2-tab-content" class="tab-content"></div>
-      </div>
-
+      <div id="col-1-tab-content" class="tab-content"></div>
     </div>
-  </div>
 
-  <div class="footer">
-    <p class="text-muted">Copyright 2015 UpDroid, Inc. All rights reserved.</p>
+    <!-- Col 2 -->
+
+    <div id="column-2" class="col-xs-5 column-content">
+      <ul class="nav nav-tabs" role="tablist">
+        <li><a id="column-2-new" class="new-tab-button"><span class="glyphicons glyphicons-plus"></span></a>
+        </li>
+      </ul>
+
+      <div id="col-2-tab-content" class="tab-content"></div>
+    </div>
+
   </div>
+</div>
+
+<div class="footer">
+  <p class="text-muted">Copyright 2015 UpDroid, Inc. All rights reserved.</p>
+</div>
 
 </body>
 

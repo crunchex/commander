@@ -28,8 +28,10 @@ class UpDroidExplorer extends PanelController {
       {'title': 'Actions', 'items': [
         {'type': 'toggle', 'title': 'Build Workspace'},
         {'type': 'toggle', 'title': 'Clean Workspace'},
-        {'type': 'toggle', 'title': 'Upload with Git'}]},
+        {'type': 'toggle', 'title': 'Upload with Git'},
+        {'type': 'toggle', 'title': 'Run Node'}]},
       {'title': 'View', 'items': [
+        {'type': 'toggle', 'title': 'Workspaces'},
         {'type': 'toggle', 'title': 'Nodes'}]}
     ];
     return menu;
@@ -53,7 +55,8 @@ class UpDroidExplorer extends PanelController {
   AnchorElement _buildButton;
   AnchorElement _uploadButton;
   AnchorElement _runButton;
-  AnchorElement _controlButton;
+  AnchorElement _workspacesButton;
+  AnchorElement _nodesButton;
 
   DivElement editorDiv;
   LIElement fileName;
@@ -87,11 +90,12 @@ class UpDroidExplorer extends PanelController {
   void setUpController() {
     _addWorkspaceButton = view.refMap['add-workspace'];
     _deleteWorkspaceButton = view.refMap['delete-workspace'];
-    _cleanButton = view.refMap['clean'];
-    _buildButton = view.refMap['build'];
-    _uploadButton = view.refMap['upload'];
-    _runButton = view.refMap['run'];
-    _controlButton = view.refMap['nodes'];
+    _cleanButton = view.refMap['clean-workspace'];
+    _buildButton = view.refMap['build-workspace'];
+    _uploadButton = view.refMap['upload-with-git'];
+    _runButton = view.refMap['run-node'];
+    _workspacesButton = view.refMap['workspaces'];
+    _nodesButton = view.refMap['nodes'];
 
     _explorerView = new ExplorerView();
 
@@ -156,10 +160,8 @@ class UpDroidExplorer extends PanelController {
       _workspaceBuild();
     });
 
-    _controlButton.onClick.listen((e) {
-//      if (!_controlButtonEnabled) return;
-//      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'CATKIN_NODE_LIST'));
-
+    _uploadButton.onClick.listen((e) {
+      new UpDroidGitPassModal(cs);
     });
 
     _runButton.onClick.listen((e) {
@@ -167,11 +169,7 @@ class UpDroidExplorer extends PanelController {
 //      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'RUN_NODE'));
     });
 
-    _uploadButton.onClick.listen((e) {
-      new UpDroidGitPassModal(cs);
-    });
-
-    _controlButton.onClick.listen((e) {
+    _workspacesButton.onClick.listen((e) {
       for(var explorer in _explorerView._explorersDiv.children) {
         if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
           if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
@@ -184,7 +182,7 @@ class UpDroidExplorer extends PanelController {
       }
     });
 
-    _explorerView._controlToggle.onClick.listen((e) => showControl());
+    _nodesButton.onClick.listen((e) => showControl());
 
     _explorerView._drop.onClick.listen((e) {
       if (currentSelected != null) {

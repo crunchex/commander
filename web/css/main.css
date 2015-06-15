@@ -577,10 +577,6 @@ code, kbd, pre, samp {
   display: inline-block;;
 }
 
-#column-0 > div {
-  background-color: #eaecec;
-}
-
 #title-wrapper {
   width: 50%;
   text-align: center;

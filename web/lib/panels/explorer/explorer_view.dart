@@ -1,7 +1,14 @@
 part of updroid_explorer;
 
 class ExplorerView {
-  Element separator = querySelector('#side-menu-separator');
+  /// Returns an initialized [PanelView] as a [Future] given all normal constructors.
+  ///
+  /// Use this instead of calling the constructor directly.
+  static Future<ExplorerView> createExplorerView(int num, String name, DivElement content) {
+    Completer c = new Completer();
+    c.complete(new ExplorerView(num, name, content));
+    return c.future;
+  }
 
   DivElement content;
 
@@ -20,12 +27,8 @@ class ExplorerView {
   UListElement _packageList;
   ButtonElement _dropdown;
 
-  Future createExplorer(int num, String name, DivElement content) {
-    Completer completer = new Completer();
-
+  ExplorerView(int num, String name, DivElement content) {
     this.content = content;
-
-    separator = querySelector('#side-menu-separator');
 
     _dropdown = querySelector('#exp-dropdown');
     _titleWrap = querySelector('#title-wrapper');
@@ -95,9 +98,6 @@ class ExplorerView {
       ..classes.add("explorer-body")
       ..id = "explorer-body-$num";
     body.append(guts);
-
-    completer.complete();
-    return completer.future;
   }
 
   ///Create Node List

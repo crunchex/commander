@@ -96,9 +96,7 @@ class UpDroidExplorer extends PanelController {
     _workspacesButton = view.refMap['workspaces'];
     _nodesButton = view.refMap['nodes'];
 
-    _explorerView = new ExplorerView();
-
-    _explorerView.createExplorer(id, folderName, view.content).then((d) {
+    ExplorerView.createExplorerView(id, folderName, view.content).then((d) {
       newFileDragSetup();
       newFolderDragSetup();
 

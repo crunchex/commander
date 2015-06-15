@@ -38,7 +38,6 @@ class UpDroidExplorer extends PanelController {
   }
 
   // Make dynamic
-  int expNum;
   String name;
   bool closed;
   String folderName;
@@ -465,7 +464,7 @@ class UpDroidExplorer extends PanelController {
     li
       ..dataset['name'] = file.name
       ..dataset['path'] = file.path
-      ..dataset['exp'] = expNum.toString()
+      ..dataset['exp'] = id.toString()
       ..dataset['isDir'] = file.isDirectory.toString()
       ..draggable = true
       ..classes.add('explorer-li');
@@ -916,7 +915,7 @@ class UpDroidExplorer extends PanelController {
 
     UListElement dirElement;
     if (file.parentDir == '' && !file.path.contains('/.')) {
-      dirElement = querySelector('#explorer-body-$expNum');
+      dirElement = querySelector('#explorer-body-$id');
       dirElement.append(li);
     } else if (!file.path.contains('/.')) {
       dirElement = ulInfo[pathLib.dirname(file.path)];
@@ -931,7 +930,7 @@ class UpDroidExplorer extends PanelController {
   void initialDirectoryList(UpDroidMessage um) {
     var files = fileList(um.body);
 
-    UListElement explorer = querySelector('#explorer-body-$expNum');
+    UListElement explorer = querySelector('#explorer-body-$id');
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {
@@ -958,7 +957,7 @@ class UpDroidExplorer extends PanelController {
     pathToFile.clear();
 
     // Set the explorer list to empty for a full refresh.
-    UListElement explorer = querySelector('#explorer-body-$expNum');
+    UListElement explorer = querySelector('#explorer-body-$id');
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {

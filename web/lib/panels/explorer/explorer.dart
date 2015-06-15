@@ -17,7 +17,7 @@ part 'explorer_view.dart';
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket] into an UpDroid Commander tab.
 class UpDroidExplorer extends PanelController {
-  static const String className = 'UpDroidFinder';
+  static const String className = 'UpDroidExplorer';
 
   static List getMenuConfig() {
     List menu = [

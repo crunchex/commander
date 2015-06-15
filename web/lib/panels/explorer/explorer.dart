@@ -39,7 +39,6 @@ class UpDroidExplorer extends PanelController {
   bool closed;
   String folderName;
 
-  Mailbox _mailbox;
   String workspacePath;
   DivElement currentSelected;
   LIElement currentSelectedNode;
@@ -92,8 +91,6 @@ class UpDroidExplorer extends PanelController {
 
       dzTopLevel = new Dropzone(_explorerView._hrContainer);
       dzRecycle = new Dropzone(_explorerView._recycle);
-
-      _mailbox = new Mailbox(className, expNum, cs);
     });
   }
 
@@ -101,21 +98,21 @@ class UpDroidExplorer extends PanelController {
   //\/\/ Mailbox Handlers /\/\//
 
   void registerMailbox() {
-    _mailbox.registerCommanderEvent('EDITOR_READY', _editorReady);
-    _mailbox.registerCommanderEvent('REQUEST_PARENT_PATH', _requestParentPath);
-    _mailbox.registerCommanderEvent('CATKIN_NODE_LIST', _catkinNodeList);
-    _mailbox.registerCommanderEvent('RUN_NODE', _runNode);
+    mailbox.registerCommanderEvent('EDITOR_READY', _editorReady);
+    mailbox.registerCommanderEvent('REQUEST_PARENT_PATH', _requestParentPath);
+    mailbox.registerCommanderEvent('CATKIN_NODE_LIST', _catkinNodeList);
+    mailbox.registerCommanderEvent('RUN_NODE', _runNode);
 
-    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SEND_DIRECTORY_PATH', _getDirPath);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_PATH', _explorerDirPath);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'INITIAL_DIRECTORY_LIST', initialDirectoryList);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_LIST', generateDirectoryList);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_REFRESH', refreshPage);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_ADD', addUpdate);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_REMOVE', removeUpdate);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CLEAN', _relayWorkspaceClean);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_BUILD', _relayWorkspaceBuild);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CATKIN_NODE_LIST', populateNodes);
+    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SEND_DIRECTORY_PATH', _getDirPath);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_PATH', _explorerDirPath);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'INITIAL_DIRECTORY_LIST', initialDirectoryList);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_LIST', generateDirectoryList);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_REFRESH', refreshPage);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_ADD', addUpdate);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_REMOVE', removeUpdate);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CLEAN', _relayWorkspaceClean);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_BUILD', _relayWorkspaceBuild);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CATKIN_NODE_LIST', populateNodes);
   }
 
   /// Sets up the event handlers for the console.
@@ -160,13 +157,13 @@ class UpDroidExplorer extends PanelController {
     dzTopLevel.onDrop.listen((e) {
       String dragType = e.draggableElement.className;
       if (!(dragType.contains('explorer-li') || dragType.contains('file'))) {
-        _mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
+        mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
         return;
       }
 
       // The draggable is a new file.
       if (dragType.contains('file')) {
-        _mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
+        mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
         return;
       }
 
@@ -188,7 +185,7 @@ class UpDroidExplorer extends PanelController {
         window.alert("Cannot move here, filename already exists");
       }
 
-      _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+      mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
       cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
       if (e.draggableElement.dataset['isDir'] == 'true') {
         // Avoid an exception thrown when the new name already exists or dragging to same folder.
@@ -201,7 +198,7 @@ class UpDroidExplorer extends PanelController {
           else if (checkContents(item) == true) {
             removeSubFolders(item);
             removeFileData(e.draggableElement, currentPath);
-            _mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
+            mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
           } else {
             removeFileData(e.draggableElement, currentPath);
           }
@@ -212,12 +209,12 @@ class UpDroidExplorer extends PanelController {
 
     _explorerView._folder.onDoubleClick.listen((e) {
       String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
-      _mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled');
+      mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled');
     });
 
     _explorerView._file.onDoubleClick.listen((e) {
       String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
-      _mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + path);
+      mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + path);
     });
 
     // TODO: cancel when inactive
@@ -239,7 +236,7 @@ class UpDroidExplorer extends PanelController {
           }
         }
 
-        _mailbox.ws.send('[[EXPLORER_DELETE]]' + path);
+        mailbox.ws.send('[[EXPLORER_DELETE]]' + path);
       }
     });
     recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
@@ -266,19 +263,19 @@ class UpDroidExplorer extends PanelController {
 
   void _workspaceClean() {
     if (isActive()) {
-      _mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
+      mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
     }
   }
 
   void _workspaceBuild() {
     if (isActive()) {
-      _mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
+      mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
     }
   }
 
   void _catkinNodeList(CommanderMessage m) {
     if (isActive()) {
-      _mailbox.ws.send('[[CATKIN_NODE_LIST]]');
+      mailbox.ws.send('[[CATKIN_NODE_LIST]]');
     }
   }
 
@@ -290,17 +287,17 @@ class UpDroidExplorer extends PanelController {
       } else {
         runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
       }
-      _mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
+      mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
     }
   }
 
   //\/\/ UpDroidMessage Handlers /\/\//
 
-  void _getDirPath(UpDroidMessage um) => _mailbox.ws.send('[[EXPLORER_DIRECTORY_PATH]]');
+  void _getDirPath(UpDroidMessage um) => mailbox.ws.send('[[EXPLORER_DIRECTORY_PATH]]');
 
   void _explorerDirPath(UpDroidMessage um) {
     workspacePath = um.body;
-    _mailbox.ws.send('[[INITIAL_DIRECTORY_LIST]]');
+    mailbox.ws.send('[[INITIAL_DIRECTORY_LIST]]');
   }
 
   void _relayWorkspaceClean(UpDroidMessage um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_CLEAN'));
@@ -523,21 +520,21 @@ class UpDroidExplorer extends PanelController {
 
             if (currentPath != newPath && duplicate == false && send == true) {
               if (item.lastChild.hasChildNodes() == false) {
-                _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 var name = getName(e.draggableElement);
                 removeFileData(e.draggableElement, currentPath);
                 newElementFromFile(
                     new SimpleFile.fromPath(getPath(span.parent.parent) + '/' + name, workspacePath, true));
                 item.remove();
               } else if (checkContents(item) == true) {
-                _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
                 removeSubFolders(item);
                 removeFileData(e.draggableElement, currentPath);
-                _mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
+                mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
                 item.remove();
               } else {
-                _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+                mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
                 cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
                 item.remove();
                 removeFileData(e.draggableElement, currentPath);
@@ -547,7 +544,7 @@ class UpDroidExplorer extends PanelController {
             if (currentPath != newPath &&
             duplicate == false &&
             !getPath(span.parent.parent).contains(getPath(e.draggableElement))) {
-              _mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
+              mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
               cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
             }
           }
@@ -556,9 +553,9 @@ class UpDroidExplorer extends PanelController {
             window.alert("Cannot move here, file name already exists");
           }
         } else if (e.draggableElement.classes.contains('file')) {
-          _mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + getPath(span.parent.parent));
+          mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + getPath(span.parent.parent));
         } else {
-          _mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + getPath(span.parent.parent) + '/untitled');
+          mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + getPath(span.parent.parent) + '/untitled');
         }
       });
     }
@@ -641,7 +638,7 @@ class UpDroidExplorer extends PanelController {
 
       outsideClickListener = outside.onClick.listen((e) {
         if (e.target != input && renameFinish == false) {
-          _mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+          mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
           outsideClickListener.cancel();
         }
       });
@@ -654,7 +651,7 @@ class UpDroidExplorer extends PanelController {
 
           bool duplicate = pathToFile.containsKey(newPath);
           if (duplicate == false) {
-            _mailbox.ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
+            mailbox.ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
             cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [file.path, newPath]));
             if (folder == true) {
               removeFileData(li, file.path);
@@ -665,10 +662,10 @@ class UpDroidExplorer extends PanelController {
 
           if (duplicate == true) {
             if (duplicate == li) {
-              _mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+              mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
             } else {
               window.alert("File name already exists");
-              _mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+              mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
             }
           }
 
@@ -683,13 +680,13 @@ class UpDroidExplorer extends PanelController {
           if (file.path == newPath) {
             li.remove();
             if (file.isDirectory == true) {
-              _mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
+              mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
             }
           }
 
           if (refresh == true) {
             removeSubFolders(li);
-            _mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
+            mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
           }
 
           // Create a folder icon if the item renamed was an empty folder

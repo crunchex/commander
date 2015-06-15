@@ -13,7 +13,7 @@ abstract class PanelController {
   bool active;
   String panelType, shortName;
 
-  TabView view;
+  PanelView view;
   Mailbox mailbox;
 
   AnchorElement _closePanelButton;

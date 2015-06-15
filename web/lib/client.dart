@@ -26,11 +26,8 @@ class UpDroidClient {
   AnchorElement _deleteWorkspace;
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
-  ButtonElement _cleanButton;
-  ButtonElement _buildButton;
   ButtonElement _controlButton;
   ButtonElement _runButton;
-  ButtonElement _uploadButton;
   DivElement _explorersDiv;
 
   bool disconnectAlert = false;
@@ -48,11 +45,8 @@ class UpDroidClient {
     _deleteWorkspace = querySelector('#delete-ws');
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
-    _cleanButton = querySelector('#clean-button');
     _controlButton = querySelector('#control-toggle');
-    _buildButton = querySelector('#build-button');
     _runButton = querySelector('#run-button');
-    _uploadButton = querySelector('#upload');
 
     _controlButtonEnabled = true;
 
@@ -264,25 +258,6 @@ class UpDroidClient {
     _mailbox.ws.send('[[GIT_PUSH]]' + '${_columns[0].first.currentSelectedPath}++${m.body}');
   }
 
-  void _workspaceClean(CommanderMessage m) {
-    _cleanButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
-    _cleanButton.children.first.classes.add('glyphicons-cleaning');
-  }
-
-  void _workspaceBuild(CommanderMessage m) {
-    // Success else failure.
-    if (m.body == '') {
-      _runButton.classes.remove('control-button-disabled');
-      _controlButton.classes.remove('control-button-disabled');
-      _controlButtonEnabled = true;
-    } else {
-      new UpDroidBuildResultsModal(m.body);
-    }
-
-    _buildButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
-    _buildButton.children.first.classes.add('glyphicons-classic-hammer');
-  }
-
   void _sendClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
   void _serverReady(UpDroidMessage um) => _initializeTabs(_config, JSON.decode(um.body));
 
@@ -290,8 +265,6 @@ class UpDroidClient {
     _mailbox.registerCommanderEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerCommanderEvent('OPEN_TAB', _openTabFromButton);
     _mailbox.registerCommanderEvent('GIT_PASSWORD', _gitPassword);
-    _mailbox.registerCommanderEvent('WORKSPACE_CLEAN', _workspaceClean);
-    _mailbox.registerCommanderEvent('WORKSPACE_BUILD', _workspaceBuild);
     _mailbox.registerCommanderEvent('SERVER_DISCONNECT', _alertDisconnect);
 
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'CLIENT_CONFIG', _sendClientConfig);
@@ -422,24 +395,6 @@ class UpDroidClient {
       new UpDroidOpenTabModal(2, _cs);
     });
 
-    _cleanButton.onClick.listen((e) {
-      _cleanButton.children.first.classes.remove('glyphicons-cleaning');
-      _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
-
-      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_CLEAN'));
-
-      _controlButton.classes.add('control-button-disabled');
-      _runButton.classes.add('control-button-disabled');
-      _controlButtonEnabled = false;
-    });
-
-    _buildButton.onClick.listen((e) {
-      _buildButton.children.first.classes.remove('glyphicons-classic-hammer');
-      _buildButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
-
-      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_BUILD'));
-    });
-
     _controlButton.onClick.listen((e) {
       if (!_controlButtonEnabled) return;
       _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'CATKIN_NODE_LIST'));
@@ -448,10 +403,6 @@ class UpDroidClient {
     _runButton.onClick.listen((e) {
       if (!_controlButtonEnabled) return;
       _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'RUN_NODE'));
-    });
-
-    _uploadButton.onClick.listen((e) {
-      new UpDroidGitPassModal(_cs);
     });
   }
 

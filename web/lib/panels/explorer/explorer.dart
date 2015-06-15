@@ -8,6 +8,7 @@ import 'package:dnd/dnd.dart';
 import 'package:path/path.dart' as pathLib;
 
 import '../../mailbox.dart';
+import '../../modal/modal.dart';
 import '../panel_controller.dart';
 
 part 'explorer_helper.dart';
@@ -45,6 +46,9 @@ class UpDroidExplorer extends PanelController {
   String currentSelectedPath;
   InputElement nodeArgs;
   ButtonElement _dropdown;
+  ButtonElement _cleanButton;
+  ButtonElement _buildButton;
+  ButtonElement _uploadButton;
 
   DivElement editorDiv;
   LIElement fileName;
@@ -76,7 +80,9 @@ class UpDroidExplorer extends PanelController {
   }
 
   void setUpController() {
-//    _themeButton = view.refMap['invert'];
+    _cleanButton = view.refMap['clean'];
+    _buildButton = view.refMap['build'];
+    _uploadButton = view.refMap['upload'];
 
     _explorerView = new ExplorerView();
 
@@ -97,8 +103,6 @@ class UpDroidExplorer extends PanelController {
   void registerMailbox() {
     _mailbox.registerCommanderEvent('EDITOR_READY', _editorReady);
     _mailbox.registerCommanderEvent('REQUEST_PARENT_PATH', _requestParentPath);
-    _mailbox.registerCommanderEvent('WORKSPACE_CLEAN', _workspaceClean);
-    _mailbox.registerCommanderEvent('WORKSPACE_BUILD', _workspaceBuild);
     _mailbox.registerCommanderEvent('CATKIN_NODE_LIST', _catkinNodeList);
     _mailbox.registerCommanderEvent('RUN_NODE', _runNode);
 
@@ -112,12 +116,34 @@ class UpDroidExplorer extends PanelController {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CLEAN', _relayWorkspaceClean);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_BUILD', _relayWorkspaceBuild);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CATKIN_NODE_LIST', populateNodes);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CLEAN', _relayWorkspaceClean);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CLEAN', _relayWorkspaceClean);
   }
 
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
+    _cleanButton.onClick.listen((e) {
+//      _cleanButton.children.first.classes.remove('glyphicons-cleaning');
+//      _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
+
+//      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_CLEAN'));
+      _workspaceClean();
+
+//      _controlButton.classes.add('control-button-disabled');
+//      _runButton.classes.add('control-button-disabled');
+//      _controlButtonEnabled = false;
+    });
+
+    _buildButton.onClick.listen((e) {
+//      _buildButton.children.first.classes.remove('glyphicons-classic-hammer');
+//      _buildButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
+//
+//      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_BUILD'));
+      _workspaceBuild();
+    });
+
+    _uploadButton.onClick.listen((e) {
+      new UpDroidGitPassModal(cs);
+    });
+
     _explorerView._controlToggle.onClick.listen((e) => showControl());
 
     _explorerView._drop.onClick.listen((e) {
@@ -238,13 +264,13 @@ class UpDroidExplorer extends PanelController {
     }
   }
 
-  void _workspaceClean(CommanderMessage m) {
+  void _workspaceClean() {
     if (isActive()) {
       _mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
     }
   }
 
-  void _workspaceBuild(CommanderMessage m) {
+  void _workspaceBuild() {
     if (isActive()) {
       _mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
     }

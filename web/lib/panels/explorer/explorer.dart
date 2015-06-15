@@ -79,13 +79,17 @@ class UpDroidExplorer extends PanelController {
   }
 
   void setUpController() {
+    _addWorkspace = querySelector('#add-ws');
+    _deleteWorkspace = querySelector('#delete-ws');
+    _controlButton = querySelector('#control-toggle');
+    _runButton = querySelector('#run-button');
     _cleanButton = view.refMap['clean'];
     _buildButton = view.refMap['build'];
     _uploadButton = view.refMap['upload'];
 
     _explorerView = new ExplorerView();
 
-    _explorerView.createExplorer(id, folderName).then((d) {
+    _explorerView.createExplorer(id, folderName, view.content).then((d) {
       newFileDragSetup();
       newFolderDragSetup();
 

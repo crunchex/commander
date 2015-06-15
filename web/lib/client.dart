@@ -38,12 +38,8 @@ class UpDroidClient {
     _columns = [[], [], []];
 
     _explorersDiv = querySelector('#exp-container');
-    _addWorkspace = querySelector('#add-ws');
-    _deleteWorkspace = querySelector('#delete-ws');
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
-    _controlButton = querySelector('#control-toggle');
-    _runButton = querySelector('#run-button');
 
     _controlButtonEnabled = true;
 

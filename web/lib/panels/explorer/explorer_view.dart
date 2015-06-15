@@ -3,6 +3,8 @@ part of updroid_explorer;
 class ExplorerView {
   Element separator = querySelector('#side-menu-separator');
 
+  DivElement content;
+
   DivElement _explorersDiv;
   DivElement _titleWrap;
   UListElement _expList;
@@ -18,8 +20,10 @@ class ExplorerView {
   UListElement _packageList;
   ButtonElement _dropdown;
 
-  Future createExplorer(int num, String name) {
+  Future createExplorer(int num, String name, DivElement content) {
     Completer completer = new Completer();
+
+    this.content = content;
 
     separator = querySelector('#side-menu-separator');
 
@@ -33,14 +37,27 @@ class ExplorerView {
     _controlToggle = querySelector('#control-toggle');
     _recycle = querySelector('#recycle');
 
-    ParagraphElement recycle = querySelector("#recycle");
+    _explorersDiv = new DivElement()
+      ..id = 'exp-container';
+    content.children.add(_explorersDiv);
+
     makeExpButton(num, name);
     _explorer = new DivElement()
       ..id = "exp-$num"
       ..classes.add('exp')
       ..dataset['num'] = num.toString()
       ..dataset['name'] = name;
-    _explorersDiv.insertBefore(_explorer, recycle);
+    _explorersDiv.children.add(_explorer);
+
+    _recycle = new ParagraphElement()
+      ..id = 'recycle'
+      ..text = 'Recycle ';
+    _explorersDiv.children.add(_recycle);
+
+    SpanElement trash = new SpanElement()
+      ..id = 'trash'
+      ..classes.addAll(['glyphicons', 'glyphicons-trash']);
+    _recycle.children.add(trash);
 
     DivElement explorerHead = new DivElement()
       ..classes.add('explorer-head');
@@ -84,7 +101,7 @@ class ExplorerView {
     return completer.future;
   }
 
-  makeExpButton(int num, String name) {
+  void makeExpButton(int num, String name) {
     LIElement item = new LIElement()
       ..id = "exp-li-$num";
     AnchorElement link = new AnchorElement()

@@ -43,30 +43,6 @@ class PanelView {
       document.head.append(styleLink);
     }
 
-    DivElement topLevel = querySelector('#column-$col');
-
-    UListElement tabList = new UListElement()
-      ..classes.addAll(['nav', 'nav-tabs'])
-      ..setAttribute('role', 'tablist');
-    topLevel.children.add(tabList);
-
-//    LIElement newPanelLi = new LIElement();
-//    tabList.children.add(newPanelLi);
-//
-//    AnchorElement panelButton = new AnchorElement()
-//      ..id = 'column-$col-new'
-//      ..classes.add('new-tab-button');
-//    newPanelLi.children.add(panelButton);
-//
-//    SpanElement glyphiconNew = new SpanElement()
-//      ..classes.addAll(['glyphicons', 'glyphicons-chevron-down']);
-//    panelButton.children.add(glyphiconNew);
-
-    DivElement topTabContent = new DivElement()
-      ..id = 'col-$col-tab-content'
-      ..classes.add('tab-content');
-    topLevel.children.add(topTabContent);
-
     _setUpTabHandle();
     _setUpTabContainer();
   }

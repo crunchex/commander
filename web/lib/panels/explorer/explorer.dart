@@ -75,7 +75,7 @@ class UpDroidExplorer extends PanelController {
   ExplorerView _explorerView;
 
   UpDroidExplorer(int id, int col, StreamController<CommanderMessage> cs, this.folderName) :
-  super(id, col, className, 'Finder', getMenuConfig(), cs, true) {
+  super(id, col, className, 'Explorer', getMenuConfig(), cs, true) {
 
   }
 

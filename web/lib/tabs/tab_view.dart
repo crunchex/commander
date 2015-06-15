@@ -1,7 +1,4 @@
-library updroid_tab;
-
-import 'dart:html';
-import 'dart:async';
+part of tab_controller;
 
 /// [UpDroidTab] contains methods to generate [Element]s that make up a tab
 /// and menu bar in the UpDroid Commander GUI.

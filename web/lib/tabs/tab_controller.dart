@@ -4,7 +4,8 @@ import 'dart:html';
 import 'dart:async';
 
 import '../mailbox.dart';
-import 'tab_view.dart';
+
+part 'tab_view.dart';
 
 abstract class TabController {
   int id, col;

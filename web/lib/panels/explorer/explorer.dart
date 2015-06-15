@@ -104,7 +104,6 @@ class UpDroidExplorer extends PanelController {
     });
   }
 
-
   //\/\/ Mailbox Handlers /\/\//
 
   void registerMailbox() {
@@ -170,6 +169,19 @@ class UpDroidExplorer extends PanelController {
 
     _uploadButton.onClick.listen((e) {
       new UpDroidGitPassModal(cs);
+    });
+
+    _controlButton.onClick.listen((e) {
+      for(var explorer in _explorerView._explorersDiv.children) {
+        if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
+          if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
+            explorer.classes.add('hidden');
+          }
+          if(int.parse(explorer.dataset['num']) == num) {
+            explorer.classes.remove('hidden');
+          }
+        }
+      }
     });
 
     _explorerView._controlToggle.onClick.listen((e) => showControl());

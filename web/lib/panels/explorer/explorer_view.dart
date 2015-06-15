@@ -41,7 +41,6 @@ class ExplorerView {
       ..id = 'exp-container';
     content.children.add(_explorersDiv);
 
-    makeExpButton(num, name);
     _explorer = new DivElement()
       ..id = "exp-$num"
       ..classes.add('exp')
@@ -99,36 +98,6 @@ class ExplorerView {
 
     completer.complete();
     return completer.future;
-  }
-
-  void makeExpButton(int num, String name) {
-    LIElement item = new LIElement()
-      ..id = "exp-li-$num";
-    AnchorElement link = new AnchorElement()
-      ..href = "#"
-      ..text = name
-      ..attributes['role'] = 'button';
-    item.append(link);
-    _expList.insertBefore(item, separator);
-    item.onClick.listen((e){
-      if(_explorersDiv.classes.contains('hidden')) {
-        _explorersDiv.classes.remove('hidden');
-        _controlPanel.classes.add('hidden');
-        _controlToggle.classes.add('shadow');
-        _dropdown.classes.add('shadow');
-        _titleWrap.classes.remove('shadow');
-      }
-      for(var explorer in _explorersDiv.children) {
-        if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
-          if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
-            explorer.classes.add('hidden');
-          }
-          if(int.parse(explorer.dataset['num']) == num) {
-            explorer.classes.remove('hidden');
-          }
-        }
-      }
-    });
   }
 
   ///Create Node List

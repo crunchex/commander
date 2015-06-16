@@ -115,7 +115,6 @@ class CmdrExplorer {
     }
 
     _currentWorkspace.getContents().then((files) {
-      print(files.toString());
       s.add('[[INITIAL_DIRECTORY_LIST]]' + files.toString());
     });
   }

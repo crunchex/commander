@@ -46,13 +46,12 @@ class Workspace {
     Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: src.path, runInShell: true);
   }
 
-  Future<List<FileSystemEntity>> getContents() {
+  Future<List<String>> getContents() async {
     Completer c = new Completer();
-    List files = new List<FileSystemEntity>();
+    List<String> files = [];
     _delegate.list(recursive: true).listen((file) {
-      files.add(file);
-    }).onDone(() => c.complete());
-
+      if (file.path.contains('$path/src')) files.add(file);
+    }).onDone(() => c.complete(files));
     return c.future;
   }
 

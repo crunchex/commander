@@ -64,10 +64,6 @@ class ExplorerView {
     DivElement explorerHead = new DivElement()
       ..classes.add('explorer-head');
     _explorer.append(explorerHead);
-    ParagraphElement folderName = new ParagraphElement()
-      ..classes.add('workspaceName')
-      ..text = name;
-    explorerHead.append(folderName);
     LIElement newDnd = new LIElement()
       ..classes.add('new')
       ..text = "New";

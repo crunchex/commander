@@ -30,7 +30,7 @@ class CmdrServer {
 
   ArgResults _args;
 
-  Map _explorers = {};
+  Map _panels = {};
   Map _tabs = {};
   Map<int, CameraServer> _camServers = {};
   StreamController<UpDroidMessage> _serverStream;
@@ -101,13 +101,15 @@ class CmdrServer {
     int objectID = int.parse(request.uri.pathSegments[1]);
     String type = request.uri.pathSegments[0];
 
-    if (type == 'updroidexplorer') {
-      WebSocketTransformer.upgrade(request)
-      .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
-      return;
-    } else if (type == 'updroidclient') {
+    if (type == 'updroidclient') {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _mailbox.handleWebSocket(ws, request));
+      return;
+    }
+
+    if (type == 'updroidexplorer') {
+      WebSocketTransformer.upgrade(request)
+      .then((WebSocket ws) => _panels[type][objectID].handleWebSocket(ws));
       return;
     }
 
@@ -131,8 +133,8 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
     _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
-    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
-    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
+//    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
+//    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
 
     _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
   }
@@ -174,7 +176,7 @@ class CmdrServer {
         }
         if (workspace == true) {
           names.add(pathLib.basename(folder.path));
-          _explorers[num] = new CmdrExplorer(folder, num);
+          _panels[num] = new CmdrExplorer(folder, num);
           num += 1;
         }
       }
@@ -192,11 +194,11 @@ class CmdrServer {
 
     help.debug('Open panel request received: $id', 0);
 
-    if (!_tabs.containsKey(type)) _tabs[type] = {};
+    if (!_panels.containsKey(type)) _panels[type] = {};
 
     switch (type) {
       case 'updroidexplorer':
-        _tabs[type][num] = new CmdrExplorer(num, dir);
+        _panels[type][num] = new CmdrExplorer(num, dir);
         break;
     }
   }
@@ -245,7 +247,7 @@ class CmdrServer {
   void _cleanUpBackend() {
     help.debug('Client disconnected, cleaning up...', 0);
 
-    _explorers = {};
+    _panels = {};
 
     _tabs.values.forEach((Map<int, dynamic> tabMap) {
       tabMap.values.forEach((dynamic tab) {

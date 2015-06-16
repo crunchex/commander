@@ -19,7 +19,7 @@ class CmdrExplorer {
 
   //TODO: make asynchroneous
   CmdrExplorer(this.expNum, this.uproot) {
-    _currentWatcher = new DirectoryWatcher(_dir.src.path);
+
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
@@ -94,13 +94,12 @@ class CmdrExplorer {
       }
 
     });
-    watcher.events.listen((e) => help.formattedFsUpdate(ws, e));
+    _currentWatcher.events.listen((e) => help.formattedFsUpdate(ws, e));
   }
 
   void killExplorer() {
-    this.expPath = null;
     this.expNum = null;
-    this.watcher = null;
+    this._currentWatcher = null;
   }
 
   void _sendInitial(WebSocket s) {

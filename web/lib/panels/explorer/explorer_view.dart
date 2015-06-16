@@ -87,9 +87,6 @@ class ExplorerView {
       ..classes.add("new-file-drop")
       ..id = "new-file-drop-$id";
     _hrContainer.append(drop);
-    ParagraphElement p = new ParagraphElement();
-    p.text = "Top Level";
-    drop.append(p);
     DivElement body = new DivElement()
       ..classes.addAll(['well', 'well-sm', 'explorer-container'])
       ..id = "explorer-$id";

@@ -63,7 +63,6 @@ class UpDroidExplorer extends PanelController {
   Draggable dragNewFile;
   Draggable dragNewFolder;
 
-  Dropzone dzTopLevel;
   Dropzone dzRecycle;
   StreamSubscription outsideClickListener;
   StreamSubscription controlLeave;
@@ -99,7 +98,6 @@ class UpDroidExplorer extends PanelController {
     return await ExplorerView.createExplorerView(id, folderName, view.content).then((explorerView) {
       _explorerView = explorerView;
 
-      dzTopLevel = new Dropzone(_explorerView._hrContainer);
       dzRecycle = new Dropzone(_explorerView._recycle);
 
       newFileDragSetup();
@@ -189,62 +187,6 @@ class UpDroidExplorer extends PanelController {
       }
       currentSelected = null;
       currentSelectedPath = workspacePath;
-    });
-
-    dzTopLevel.onDragEnter.listen((e) => _explorerView.drop.classes.add('file-drop-entered'));
-    dzTopLevel.onDragLeave.listen((e) => _explorerView.drop.classes.remove('file-drop-entered'));
-
-    dzTopLevel.onDrop.listen((e) {
-      String dragType = e.draggableElement.className;
-      if (!(dragType.contains('explorer-li') || dragType.contains('file'))) {
-        mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + workspacePath + '/untitled');
-        return;
-      }
-
-      // The draggable is a new file.
-      if (dragType.contains('file')) {
-        mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + workspacePath);
-        return;
-      }
-
-      // The draggable is an existing file/folder.
-      var currentPath = getPath(e.draggableElement);
-      LIElement item = pathToFile[currentPath];
-      var newPath = '$workspacePath/${getName(e.draggableElement)}';
-      bool duplicate = false;
-
-      // Check for duplicate file name
-      if (pathToFile.containsKey(newPath)) {
-        duplicate = true;
-      }
-
-      bool alert = false;
-
-      if (duplicate) {
-        alert = true;
-        window.alert("Cannot move here, filename already exists");
-      }
-
-      mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
-      cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [currentPath, newPath]));
-      if (e.draggableElement.dataset['isDir'] == 'true') {
-        // Avoid an exception thrown when the new name already exists or dragging to same folder.
-        if (currentPath != newPath && alert == false) {
-          if (item.lastChild.hasChildNodes() == false) {
-            var name = getName(e.draggableElement);
-            removeFileData(item, currentPath);
-            newElementFromFile(new SimpleFile.fromPath(workspacePath + '/' + name, workspacePath, true));
-          } // TODO: Preserve structure
-          else if (checkContents(item) == true) {
-            removeSubFolders(item);
-            removeFileData(e.draggableElement, currentPath);
-            mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
-          } else {
-            removeFileData(e.draggableElement, currentPath);
-          }
-          item.remove();
-        }
-      }
     });
 
     _explorerView.folder.onDoubleClick.listen((e) {

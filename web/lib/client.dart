@@ -77,13 +77,11 @@ class UpDroidClient {
     //if (strConfig == null) strConfig = UpDroidClient.defaultConfig;
     if (strConfig != '') return strConfig;
 
-    List listConfig = [[
-      [{'id': 1, 'class': 'UpDroidExplorer'}]],
+    List listConfig = [
+      [{'id': 1, 'class': 'UpDroidExplorer'}],
       [{'id': 1, 'class': 'UpDroidEditor'}],
       [{'id': 1, 'class': 'UpDroidConsole'}]
     ];
-
-//    List listConfig = [[],[]];
 
     return JSON.encode(listConfig);
   }
@@ -111,18 +109,14 @@ class UpDroidClient {
   }
 
   /// Initializes all classes based on the loaded configuration in [_config].
-  /// TODO: create an abstract class [UpDroidTab] that all others implement.
-  /// TODO: call a generic UpDroidTab constructor instead of ifs or switches.
-  void _initializeTabs(String strConfig, List explorerPaths) {
-    List config = JSON.decode(strConfig);
+  /// TODO: use isolates.
+  void _initializeClient(UpDroidMessage um) {
+    List config = JSON.decode(_config);
 
-    int i = 1;
-    if(explorerPaths.isEmpty) {
-      _addWorkspace.click();
-    }
-    for (var name in explorerPaths) {
-      _openExplorer(i, name);
-      i += 1;
+    for (int i = 0; i < 1; i++) {
+      for (Map panel in config[i]) {
+        _openPanel(i, panel['id'], panel['class']);
+      }
     }
 
     for (int i = 1; i < config.length; i++) {
@@ -139,11 +133,22 @@ class UpDroidClient {
     }
   }
 
-  void _openExplorer(int id, name) {
-    _columns[0].add(new UpDroidExplorer(id, 0, _cs, name));
+  void _openPanel(int column, int id, String className) {
+    if (_columns[column].length >= 1) return;
+
+    if (_columns[column].isNotEmpty) {
+      for (var panel in _columns[column]) {
+        panel.makeInactive();
+      }
+    }
+
+    if (className == 'UpDroidExplorer') {
+      _mailbox.ws.send('[[OPEN_PANEL]]' + '$column-$id-$className');
+       _columns[column].add(new UpDroidExplorer(id, column, _cs));
+    }
   }
 
-  void _openTab (int column, int id, String className) {
+  void _openTab(int column, int id, String className) {
     if (_columns[column].length >= 4) return;
 
     if (_columns[column].isNotEmpty) {
@@ -262,7 +267,7 @@ class UpDroidClient {
         }
       }
       _mailbox.ws.send('[[ADD_EXPLORER]]' + JSON.encode([newNum.toString(), name]));
-      _openExplorer(newNum, name);
+//      _openExplorer(newNum, name);
       _cs.add(new CommanderMessage('UPDROIDEDITOR', 'RESEND_DROP'));
       if(_explorersDiv.classes.contains('hidden')) {
         DivElement control = querySelector('#control');
@@ -341,8 +346,7 @@ class UpDroidClient {
     });
   }
 
-  void _sendClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
-  void _serverReady(UpDroidMessage um) => _initializeTabs(_config, JSON.decode(um.body));
+  void _getClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
 
   void _registerMailbox() {
     _mailbox.registerCommanderEvent('CLOSE_TAB', _closeTab);
@@ -352,8 +356,8 @@ class UpDroidClient {
     _mailbox.registerCommanderEvent('ADD_WORKSPACE', _addWorkspace);
     _mailbox.registerCommanderEvent('DELETE_WORKSPACE', _deleteWorkspace);
 
-    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'CLIENT_CONFIG', _sendClientConfig);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLIENT_SERVER_READY', _serverReady);
+    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
   }
 

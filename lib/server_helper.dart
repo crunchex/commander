@@ -93,14 +93,14 @@ void formattedFsUpdate(WebSocket socket, WatchEvent e) {
 
 /// Recursively traverses the given directory path and asynchronously
 /// returns a list of filesystem entities.
-Future<List<FileSystemEntity>> getWorkspace(Workspace dir) {
-var files = <FileSystemEntity>[];
-var completer = new Completer();
-var lister = dir.list(recursive: true);
-lister.listen (
-    (file) => files.add(file),
-    // Should also register onError.
-    onDone:   () => completer.complete(files)
-    );
-return completer.future;
+Future<List<FileSystemEntity>> getDirectory(Directory dir) {
+  var files = <FileSystemEntity>[];
+  var completer = new Completer();
+  var lister = dir.list(recursive: true);
+  lister.listen (
+      (file) => files.add(file),
+      // Should also register onError.
+      onDone:   () => completer.complete(files)
+      );
+  return completer.future;
 }

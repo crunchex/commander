@@ -4,9 +4,9 @@ class ExplorerView {
   /// Returns an initialized [PanelView] as a [Future] given all normal constructors.
   ///
   /// Use this instead of calling the constructor directly.
-  static Future<ExplorerView> createExplorerView(int num, String name, DivElement content) {
+  static Future<ExplorerView> createExplorerView(int id, String name, DivElement content) {
     Completer c = new Completer();
-    c.complete(new ExplorerView(num, name, content));
+    c.complete(new ExplorerView(id, name, content));
     return c.future;
   }
 
@@ -27,7 +27,7 @@ class ExplorerView {
   UListElement _packageList;
   ButtonElement _dropdown;
 
-  ExplorerView(int num, String name, DivElement content) {
+  ExplorerView(int id, String name, DivElement content) {
     this.content = content;
 
     _dropdown = querySelector('#exp-dropdown');
@@ -45,9 +45,9 @@ class ExplorerView {
     content.children.add(explorersDiv);
 
     _explorer = new DivElement()
-      ..id = "exp-$num"
+      ..id = "exp-$id"
       ..classes.add('exp')
-      ..dataset['num'] = num.toString()
+      ..dataset['num'] = id.toString()
       ..dataset['name'] = name;
     explorersDiv.children.add(_explorer);
 
@@ -73,30 +73,30 @@ class ExplorerView {
       ..text = "New";
     explorerHead.append(newDnd);
     folder = new SpanElement()
-      ..id = "folder-$num"
+      ..id = "folder-$id"
       ..classes.addAll(['glyphicons', 'glyphicons-folder-closed', 'folder']);
     file = new SpanElement()
-      ..id = "file-$num"
+      ..id = "file-$id"
       ..classes.addAll(['glyphicons', 'glyphicons-file', 'file']);
     newDnd.append(folder);
     newDnd.append(file);
     _hrContainer = new DivElement()
-      ..id = "file-explorer-hr-container-$num";
+      ..id = "file-explorer-hr-container-$id";
     explorerHead.append(_hrContainer);
     drop = new DivElement()
       ..classes.add("new-file-drop")
-      ..id = "new-file-drop-$num";
+      ..id = "new-file-drop-$id";
     _hrContainer.append(drop);
     ParagraphElement p = new ParagraphElement();
     p.text = "Top Level";
     drop.append(p);
     DivElement body = new DivElement()
       ..classes.addAll(['well', 'well-sm', 'explorer-container'])
-      ..id = "explorer-$num";
+      ..id = "explorer-$id";
     _explorer.append(body);
     UListElement guts = new UListElement()
       ..classes.add("explorer-body")
-      ..id = "explorer-body-$num";
+      ..id = "explorer-body-$id";
     body.append(guts);
   }
 

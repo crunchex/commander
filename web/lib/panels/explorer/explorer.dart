@@ -40,7 +40,7 @@ class UpDroidExplorer extends PanelController {
   // Make dynamic
   String name;
   bool closed;
-  String folderName;
+  String folderName = 'Change Me';
 
   String workspacePath;
   DivElement currentSelected;
@@ -81,7 +81,7 @@ class UpDroidExplorer extends PanelController {
 
   ExplorerView _explorerView;
 
-  UpDroidExplorer(int id, int col, StreamController<CommanderMessage> cs, this.folderName) :
+  UpDroidExplorer(int id, int col, StreamController<CommanderMessage> cs) :
   super(id, col, className, 'Explorer', getMenuConfig(), cs, true) {
 
   }

@@ -130,6 +130,7 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('GIT_PUSH', _gitPush);
     _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
+    _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
     _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
     _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
 
@@ -137,9 +138,8 @@ class CmdrServer {
   }
 
   void _clientConfig(UpDroidMessage um) {
-    _initBackendClasses(dir).then((value) {
-      _mailbox.ws.add('[[CLIENT_SERVER_READY]]' + JSON.encode(value));
-    });
+    // TODO: send back some kind of saved config from the filesystem.
+    _mailbox.ws.add('[[SERVER_READY]]');
   }
 
   void _gitPush(UpDroidMessage um) {
@@ -184,31 +184,26 @@ class CmdrServer {
     return completer.future;
   }
 
-  void _newExplorerCmdr(UpDroidMessage um) {
-    List explorerInfo = JSON.decode(um.body);
-    int expNum = int.parse(explorerInfo[0]);
-    String name = explorerInfo[1];
-    Workspace workspace = new Workspace(pathLib.normalize('${dir.path}/$name'));
-    workspace.create();
-    workspace.initSync();
-    _explorers[expNum] = new CmdrExplorer(workspace, expNum);
-  }
+  void _openPanel(UpDroidMessage um) {
+    String id = um.body;
+    List idList = id.split('-');
+    int num = int.parse(idList[1]);
+    String type = idList[2].toLowerCase();
 
-  void _closeExplorerCmdr(UpDroidMessage um) {
-    int expNum = int.parse(um.body);
-    var toRemove;
+    help.debug('Open panel request received: $id', 0);
 
-    toRemove = _explorers[expNum];
-    Directory workspace = new Directory(toRemove.expPath);
-    _explorers.remove(expNum);
-    workspace.delete(recursive: true);
-    toRemove.killExplorer();
+    if (!_tabs.containsKey(type)) _tabs[type] = {};
+
+    switch (type) {
+      case 'updroidexplorer':
+        _tabs[type][num] = new CmdrExplorer(num, dir);
+        break;
+    }
   }
 
   void _openTab(UpDroidMessage um) {
     String id = um.body;
     List idList = id.split('-');
-    //int col = int.parse(idList[0]);
     int num = int.parse(idList[1]);
     String type = idList[2].toLowerCase();
 

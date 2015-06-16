@@ -20,7 +20,9 @@ class Workspace {
   Workspace(String path) : _delegate = new Directory(path);
 
   /// Returns the [Directory] for the default src directory.
-  Directory get src => new Directory('$path/up_ws1/src');
+  Directory get src {
+    return new Directory('${_delegate.path}/src');
+  }
 
   /// Creates a [Workspace] with this name and a src directory within.
   ///
@@ -44,13 +46,16 @@ class Workspace {
     Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: src.path, runInShell: true);
   }
 
-  Stream<FileSystemEntity> list({bool recursive: false, bool followLinks: true}) {
-    return _delegate.list(recursive: recursive, followLinks: followLinks);
+  Future<List<FileSystemEntity>> getContents() async {
+    List files = new List<FileSystemEntity>();
+    await _delegate.list(recursive: true).listen((file) {
+      files.add(file);
+    }).onDone;
   }
 
-  List<FileSystemEntity> listSync({bool recursive: false, bool followLinks: true}) {
-    return _delegate.listSync(recursive: recursive, followLinks: followLinks);
-  }
+//  List<FileSystemEntity> listSync({bool recursive: false, bool followLinks: true}) {
+//    return _delegate.listSync(recursive: recursive, followLinks: followLinks);
+//  }
 
   /// Cleans the workspace by removing build, devel, and install directories.
   Future<ProcessResult> clean() => Process.run('rm', ['-rf', 'build', 'devel', 'install'], workingDirectory: path, runInShell: true);

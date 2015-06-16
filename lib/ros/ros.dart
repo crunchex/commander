@@ -16,7 +16,7 @@ abstract class Ros {
     List launchList = [];
     List nodeList = [];
 
-    help.getWorkspace(workspace).then((fsEntities) {
+    workspace.getContents().then((fsEntities) {
       Directory package;
       fsEntities.forEach((f) {
         if (FileSystemEntity.isFileSync(f.path)) {

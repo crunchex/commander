@@ -995,12 +995,16 @@ class SimpleFile {
   String path;
   bool isDirectory;
 
+  String workspaceName;
+
   SimpleFile.fromDirectoryList(String raw, String prefix) {
+    workspaceName = prefix.split('/').last;
     String workingString = stripFormatting(raw, prefix);
     getData(workingString);
   }
 
   SimpleFile.fromPath(String raw, String prefix, bool isDir) {
+    workspaceName = prefix.split('/').last;
     path = raw.replaceAll(r'\', '');
     isDirectory = isDir;
     raw = raw.replaceFirst(prefix, '');
@@ -1019,7 +1023,10 @@ class SimpleFile {
 
   void getData(String fullPath) {
     List<String> pathList = fullPath.split('/');
-    name = pathList[pathList.length - 1];
+    // Change the name of the top-level src folder to the name
+    // of the workspace (but leave path unchanged.
+    name = (pathList.last == 'src') ? workspaceName : pathList[pathList.length - 1];
+
     if (pathList.length > 1) {
       parentDir = pathList[pathList.length - 2];
     } else {

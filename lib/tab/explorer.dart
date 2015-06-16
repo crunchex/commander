@@ -109,7 +109,13 @@ class CmdrExplorer {
   }
 
   void _sendInitial(WebSocket s) {
+    if (_currentWatcher == null) {
+      _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
+      _currentWatcher.events.listen((e) => help.formattedFsUpdate(s, e));
+    }
+
     _currentWorkspace.getContents().then((files) {
+      print(files.toString());
       s.add('[[INITIAL_DIRECTORY_LIST]]' + files.toString());
     });
   }

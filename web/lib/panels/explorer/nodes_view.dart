@@ -4,9 +4,9 @@ class NodesView extends ExplorerView {
   /// Returns an initialized [PanelView] as a [Future] given all normal constructors.
   ///
   /// Use this instead of calling the constructor directly.
-  static Future<NodesView> createNodesView(int id, String name, DivElement content) {
+  static Future<NodesView> createNodesView(int id, DivElement content) {
     Completer c = new Completer();
-    c.complete(new NodesView(id, name, content));
+    c.complete(new NodesView(id, content));
     return c.future;
   }
 
@@ -28,8 +28,8 @@ class NodesView extends ExplorerView {
   UListElement _packageList;
   ButtonElement _dropdown;
 
-  NodesView(int id, String name, DivElement content) :
-  super(id, name, content) {
+  NodesView(int id, DivElement content) :
+  super(id, content) {
     this.content = content;
 
   }

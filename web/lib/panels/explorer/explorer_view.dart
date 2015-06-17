@@ -16,7 +16,7 @@ abstract class ExplorerView {
   UListElement _packageList;
   ButtonElement _dropdown;
 
-  ExplorerView(int id, String name, DivElement content) {
+  ExplorerView(int id, DivElement content) {
     this.content = content;
 
     explorersDiv = new DivElement()
@@ -26,8 +26,7 @@ abstract class ExplorerView {
     _explorer = new DivElement()
       ..id = "exp-$id"
       ..classes.add('exp')
-      ..dataset['num'] = id.toString()
-      ..dataset['name'] = name;
+      ..dataset['num'] = id.toString();
     explorersDiv.children.add(_explorer);
 
     DivElement explorerHead = new DivElement()

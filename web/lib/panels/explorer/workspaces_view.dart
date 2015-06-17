@@ -4,17 +4,17 @@ class WorkspacesView extends ExplorerView {
   /// Returns an initialized [PanelView] as a [Future] given all normal constructors.
   ///
   /// Use this instead of calling the constructor directly.
-  static Future<WorkspacesView> createWorkspacesView(int id, String name, DivElement content) {
+  static Future<WorkspacesView> createWorkspacesView(int id, DivElement content) {
     Completer c = new Completer();
-    c.complete(new WorkspacesView(id, name, content));
+    c.complete(new WorkspacesView(id, content));
     return c.future;
   }
 
   SpanElement trash;
   ParagraphElement _recycle;
 
-  WorkspacesView(int id, String name, DivElement content) :
-  super(id, name, content) {
+  WorkspacesView(int id, DivElement content) :
+  super(id, content) {
     this.content = content;
 
     DivElement body = new DivElement()

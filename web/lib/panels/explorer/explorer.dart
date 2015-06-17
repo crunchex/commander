@@ -43,7 +43,6 @@ class UpDroidExplorer extends PanelController {
   // Make dynamic
   String name;
   bool closed;
-  String folderName = 'Change Me';
 
   String workspacePath;
   DivElement currentSelected;
@@ -98,7 +97,7 @@ class UpDroidExplorer extends PanelController {
     _workspacesButton = view.refMap['workspaces'];
     _nodesButton = view.refMap['nodes'];
 
-    return await WorkspacesView.createWorkspacesView(id, folderName, view.content).then((explorerView) {
+    return await WorkspacesView.createWorkspacesView(id, view.content).then((explorerView) {
       _explorerView = explorerView;
 
       dzRecycle = new Dropzone(_explorerView.trash);

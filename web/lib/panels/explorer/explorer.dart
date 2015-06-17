@@ -99,7 +99,7 @@ class UpDroidExplorer extends PanelController {
     return await ExplorerView.createExplorerView(id, folderName, view.content).then((explorerView) {
       _explorerView = explorerView;
 
-      dzRecycle = new Dropzone(_explorerView._recycle);
+      dzRecycle = new Dropzone(_explorerView.trash);
     });
   }
 
@@ -190,8 +190,8 @@ class UpDroidExplorer extends PanelController {
 
     // TODO: cancel when inactive
 
-    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _explorerView._recycle.classes.add('recycle-entered'));
-    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _explorerView._recycle.classes.remove('recycle-entered'));
+    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _explorerView.trash.classes.add('recycle-entered'));
+    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _explorerView.trash.classes.remove('recycle-entered'));
 
     var recycleDrop = dzRecycle.onDrop.listen((e) {
       if (!_explorerView._explorer.classes.contains('hidden')) {
@@ -701,7 +701,7 @@ class UpDroidExplorer extends PanelController {
     d.onDragStart.listen((event) {
       d.avatarHandler.avatar.children.first.classes.remove('highlighted');
       if (pathLib.dirname(li.dataset['path']) != workspacePath) _explorerView.drop.classes.add('file-drop-ondrag');
-      _explorerView._recycle.classes.add('recycle-ondrag');
+      _explorerView.trash.classes.add('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -717,7 +717,7 @@ class UpDroidExplorer extends PanelController {
 
     d.onDragEnd.listen((event) {
       _explorerView.drop.classes.remove('file-drop-ondrag');
-      _explorerView._recycle.classes.remove('recycle-ondrag');
+      _explorerView.trash.classes.remove('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {

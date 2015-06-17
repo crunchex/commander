@@ -15,6 +15,7 @@ class ExplorerView {
   SpanElement folder;
   SpanElement file;
   DivElement drop;
+  SpanElement trash;
 
   DivElement _titleWrap;
   UListElement _expList;
@@ -52,12 +53,11 @@ class ExplorerView {
     explorersDiv.children.add(_explorer);
 
     _recycle = new ParagraphElement()
-      ..id = 'recycle'
-      ..text = 'Recycle ';
+      ..id = 'recycle';
     explorersDiv.children.add(_recycle);
 
-    SpanElement trash = new SpanElement()
-      ..id = 'recycle'
+    trash = new SpanElement()
+      ..id = 'trash'
       ..classes.addAll(['glyphicons', 'glyphicons-bin']);
     _recycle.children.add(trash);
 

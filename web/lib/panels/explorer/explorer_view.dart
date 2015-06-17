@@ -21,7 +21,7 @@ class ExplorerView {
   DivElement _controlPanel;
   LIElement _title;
   ButtonElement _controlToggle;
-  SpanElement _recycle;
+  ParagraphElement _recycle;
   DivElement _explorer;
   DivElement _hrContainer;
   UListElement _packageList;
@@ -51,10 +51,15 @@ class ExplorerView {
       ..dataset['name'] = name;
     explorersDiv.children.add(_explorer);
 
-    _recycle = new SpanElement()
+    _recycle = new ParagraphElement()
       ..id = 'recycle'
-      ..classes.addAll(['glyphicon', 'glyphicon-trash']);
+      ..text = 'Recycle ';
     explorersDiv.children.add(_recycle);
+
+    SpanElement trash = new SpanElement()
+      ..id = 'recycle'
+      ..classes.addAll(['glyphicons', 'glyphicons-bin']);
+    _recycle.children.add(trash);
 
     DivElement explorerHead = new DivElement()
       ..classes.add('explorer-head');

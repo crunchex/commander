@@ -180,6 +180,7 @@ class UpDroidExplorer extends PanelController {
     _nodesButton.onClick.listen((e) => showControl());
 
     _explorerView.drop.onClick.listen((e) {
+      print('click');
       if (currentSelected != null) {
         currentSelected.classes.remove('highlighted');
       }

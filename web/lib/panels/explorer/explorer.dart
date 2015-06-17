@@ -41,7 +41,6 @@ class UpDroidExplorer extends PanelController {
   }
 
   // Make dynamic
-  String name;
   bool closed;
 
   String workspacePath;
@@ -49,6 +48,7 @@ class UpDroidExplorer extends PanelController {
   LIElement currentSelectedNode;
   String currentSelectedPath;
   InputElement nodeArgs;
+
   AnchorElement _dropdown;
   AnchorElement _addWorkspaceButton;
   AnchorElement _deleteWorkspaceButton;
@@ -58,12 +58,6 @@ class UpDroidExplorer extends PanelController {
   AnchorElement _runButton;
   AnchorElement _workspacesButton;
   AnchorElement _nodesButton;
-
-  DivElement editorDiv;
-  LIElement fileName;
-
-  Draggable dragNewFile;
-  Draggable dragNewFolder;
 
   Dropzone dzRecycle;
   StreamSubscription outsideClickListener;

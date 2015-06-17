@@ -10,23 +10,7 @@ class NodesView extends ExplorerView {
     return c.future;
   }
 
-  DivElement content;
-  DivElement explorersDiv;
-  SpanElement folder;
-  SpanElement file;
-  DivElement drop;
-  SpanElement trash;
-
-  DivElement _titleWrap;
-  UListElement _expList;
-  DivElement _controlPanel;
-  LIElement _title;
-  ButtonElement _controlToggle;
-  ParagraphElement _recycle;
-  DivElement _explorer;
-  DivElement _hrContainer;
   UListElement _packageList;
-  ButtonElement _dropdown;
 
   NodesView(int id, DivElement content) :
   super(id, content) {

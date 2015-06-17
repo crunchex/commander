@@ -3,8 +3,6 @@ part of updroid_explorer;
 abstract class ExplorerView {
   DivElement content;
   DivElement explorersDiv;
-  SpanElement folder;
-  SpanElement file;
   DivElement drop;
 
   DivElement _titleWrap;
@@ -13,8 +11,6 @@ abstract class ExplorerView {
   ButtonElement _controlToggle;
   DivElement _explorer;
   DivElement _hrContainer;
-  UListElement _packageList;
-  ButtonElement _dropdown;
 
   ExplorerView(int id, DivElement content) {
     this.content = content;

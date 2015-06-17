@@ -64,29 +64,21 @@ class ExplorerView {
     DivElement explorerHead = new DivElement()
       ..classes.add('explorer-head');
     _explorer.append(explorerHead);
-    LIElement newDnd = new LIElement()
-      ..classes.add('new')
-      ..text = "New";
-    explorerHead.append(newDnd);
-    folder = new SpanElement()
-      ..id = "folder-$id"
-      ..classes.addAll(['glyphicons', 'glyphicons-folder-closed', 'folder']);
-    file = new SpanElement()
-      ..id = "file-$id"
-      ..classes.addAll(['glyphicons', 'glyphicons-file', 'file']);
-    newDnd.append(folder);
-    newDnd.append(file);
+
     _hrContainer = new DivElement()
       ..id = "file-explorer-hr-container-$id";
     explorerHead.append(_hrContainer);
+
     drop = new DivElement()
       ..classes.add("new-file-drop")
       ..id = "new-file-drop-$id";
     _hrContainer.append(drop);
+
     DivElement body = new DivElement()
       ..classes.addAll(['well', 'well-sm', 'explorer-container'])
       ..id = "explorer-$id";
     _explorer.append(body);
+
     UListElement guts = new UListElement()
       ..classes.add("explorer-body")
       ..id = "explorer-body-$id";

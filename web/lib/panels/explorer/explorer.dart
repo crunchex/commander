@@ -100,9 +100,6 @@ class UpDroidExplorer extends PanelController {
       _explorerView = explorerView;
 
       dzRecycle = new Dropzone(_explorerView._recycle);
-
-      newFileDragSetup();
-      newFolderDragSetup();
     });
   }
 
@@ -188,16 +185,6 @@ class UpDroidExplorer extends PanelController {
       }
       currentSelected = null;
       currentSelectedPath = workspacePath;
-    });
-
-    _explorerView.folder.onDoubleClick.listen((e) {
-      String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
-      mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled');
-    });
-
-    _explorerView.file.onDoubleClick.listen((e) {
-      String path = (currentSelectedPath == null) ? workspacePath : currentSelectedPath;
-      mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + path);
     });
 
     // TODO: cancel when inactive
@@ -701,72 +688,6 @@ class UpDroidExplorer extends PanelController {
       input.focus();
       input.select();
     }
-  }
-
-  /// Sets up a [Draggable] for the [newFile] to handle the drag event.
-  void newFileDragSetup() {
-    // Create a new draggable using the current element as
-    // the visual element (avatar) being dragged.
-    Draggable d = new Draggable(_explorerView.file, avatarHandler: new AvatarHandler.clone());
-
-    // Highlight valid dropzones: rootline, editor, any workspace folder.
-    d.onDragStart.listen((event) {
-      _explorerView.drop.classes.add('file-drop-ondrag');
-      cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_ADD', body: 'updroideditor-ondrag'));
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
-      ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      for (SpanElement span in spanList) {
-        span.classes.add('span-ondrag');
-      }
-      for (SpanElement span in closedList) {
-        span.classes.add('span-ondrag');
-      }
-    });
-
-    d.onDragEnd.listen((event) {
-      _explorerView.drop.classes.remove('file-drop-ondrag');
-      cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-ondrag'));
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
-      ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      for (SpanElement span in spanList) {
-        span.classes.remove('span-ondrag');
-      }
-      for (SpanElement span in closedList) {
-        span.classes.remove('span-ondrag');
-      }
-    });
-  }
-
-  /// Sets up a [Draggable] for the [newFolder] to handle the drag event.
-  void newFolderDragSetup() {
-    // Create a new draggable using the current element as
-    // the visual element (avatar) being dragged.
-    Draggable d = new Draggable(_explorerView.folder, avatarHandler: new AvatarHandler.clone());
-
-    // Highlight valid dropzones: rootline, any workspace folder.
-    d.onDragStart.listen((event) {
-      _explorerView.drop.classes.add('file-drop-ondrag');
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
-      ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      for (SpanElement span in spanList) {
-        span.classes.add('span-ondrag');
-      }
-      for (SpanElement span in closedList) {
-        span.classes.add('span-ondrag');
-      }
-    });
-
-    d.onDragEnd.listen((event) {
-      _explorerView.drop.classes.remove('file-drop-ondrag');
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
-      ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      for (SpanElement span in spanList) {
-        span.classes.remove('span-ondrag');
-      }
-      for (SpanElement span in closedList) {
-        span.classes.remove('span-ondrag');
-      }
-    });
   }
 
   /// Sets up a [Draggable] for the existing [LIElement] to handle file open and delete.

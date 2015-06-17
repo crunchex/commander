@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:dnd/dnd.dart';
 import 'package:path/path.dart' as pathLib;
 
+import '../../context_menu.dart';
 import '../../mailbox.dart';
 import '../../modal/modal.dart';
 import '../panel_controller.dart';
@@ -462,6 +463,18 @@ class UpDroidExplorer extends PanelController {
         glyph.replaceWith(glyphicon);
         li.dataset['expanded'] = 'true';
         ul.classes.remove("hidden");
+      });
+
+      glyph.onContextMenu.listen((e) {
+        e.preventDefault();
+
+        List menu = [
+          {'type': 'toggle', 'title': 'New File', 'handler': () => mailbox.ws.send('[[EXPLORER_NEW_FILE]]' + file.path)},
+          {'type': 'toggle', 'title': 'New Folder', 'handler': () => mailbox.ws.send('[[EXPLORER_NEW_FOLDER]]' + file.path + '/untitled')},
+          {'type': 'toggle', 'title': 'Delete', 'handler': () => mailbox.ws.send('[[EXPLORER_DELETE]]' + file.path)}];
+
+        new ContextMenu(glyph, menu);
+
       });
     }
 

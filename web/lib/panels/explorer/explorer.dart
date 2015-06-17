@@ -177,7 +177,7 @@ class UpDroidExplorer extends PanelController {
       }
     });
 
-    _nodesButton.onClick.listen((e) => showControl());
+    _nodesButton.onClick.listen((e) => showNodes());
 
     _explorerView.drop.onClick.listen((e) {
       print('click');
@@ -329,7 +329,7 @@ class UpDroidExplorer extends PanelController {
   }
 
   /// Shows control panel
-  void showControl() {
+  void showNodes() {
     if (_explorerView.explorersDiv != null) _explorerView.explorersDiv.classes.add('hidden');
     _explorerView._controlPanel.classes.remove('hidden');
     _explorerView._controlToggle.classes.remove('shadow');

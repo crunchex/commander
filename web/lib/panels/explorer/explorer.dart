@@ -69,6 +69,9 @@ class UpDroidExplorer extends PanelController {
   StreamSubscription outsideClickListener;
   StreamSubscription controlLeave;
 
+  WorkspacesView _workspacesView;
+  NodesView _nodesView;
+
   Map editors = {};
   Map editorListeners = {};
   Map fileInfo = {};
@@ -79,8 +82,6 @@ class UpDroidExplorer extends PanelController {
   List recycleListeners = [];
 
   StreamController<CommanderMessage> cs;
-
-  ExplorerView _explorerView;
 
   UpDroidExplorer(int id, int col, StreamController<CommanderMessage> cs) :
   super(id, col, className, 'Explorer', getMenuConfig(), cs, true) {
@@ -98,9 +99,9 @@ class UpDroidExplorer extends PanelController {
     _nodesButton = view.refMap['nodes'];
 
     return await WorkspacesView.createWorkspacesView(id, view.content).then((explorerView) {
-      _explorerView = explorerView;
+      _workspacesView = explorerView;
 
-      dzRecycle = new Dropzone(_explorerView.trash);
+      dzRecycle = new Dropzone(_workspacesView.trash);
     });
   }
 
@@ -166,7 +167,7 @@ class UpDroidExplorer extends PanelController {
     });
 
     _workspacesButton.onClick.listen((e) {
-      for(var explorer in _explorerView.explorersDiv.children) {
+      for(var explorer in _workspacesView.explorersDiv.children) {
         if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
           if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
             explorer.classes.add('hidden');
@@ -180,7 +181,7 @@ class UpDroidExplorer extends PanelController {
 
     _nodesButton.onClick.listen((e) => showNodes());
 
-    _explorerView.drop.onClick.listen((e) {
+    _workspacesView.drop.onClick.listen((e) {
       print('click');
       if (currentSelected != null) {
         currentSelected.classes.remove('highlighted');
@@ -191,11 +192,11 @@ class UpDroidExplorer extends PanelController {
 
     // TODO: cancel when inactive
 
-    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _explorerView.trash.classes.add('recycle-entered'));
-    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _explorerView.trash.classes.remove('recycle-entered'));
+    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _workspacesView.trash.classes.add('recycle-entered'));
+    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _workspacesView.trash.classes.remove('recycle-entered'));
 
     var recycleDrop = dzRecycle.onDrop.listen((e) {
-      if (!_explorerView._explorer.classes.contains('hidden')) {
+      if (!_workspacesView._explorer.classes.contains('hidden')) {
         var path = getPath(e.draggableElement);
 
         // Draggable is an empty folder
@@ -228,7 +229,7 @@ class UpDroidExplorer extends PanelController {
   }
 
   void _requestParentPath(CommanderMessage m) {
-    if (!_explorerView._explorer.classes.contains('hidden')) {
+    if (!_workspacesView._explorer.classes.contains('hidden')) {
       cs.add(new CommanderMessage('UPDROIDEDITOR', 'PARENT_PATH', body: currentSelectedPath));
     }
   }
@@ -290,7 +291,7 @@ class UpDroidExplorer extends PanelController {
     .listen((e) => cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-entered')));
 
     var drop = dzEditor.onDrop.listen((e) {
-      if (!_explorerView._explorer.classes.contains('hidden')) {
+      if (!_workspacesView._explorer.classes.contains('hidden')) {
         var isDir = e.draggableElement.dataset['isDir'];
         if (isDir == 'false') {
           var num = editors[dzEditor];
@@ -305,7 +306,7 @@ class UpDroidExplorer extends PanelController {
     bool active;
     if (closed == true) active = false;
     else {
-      if (!_explorerView._explorer.classes.contains('hidden')) active = true;
+      if (!_workspacesView._explorer.classes.contains('hidden')) active = true;
       else {
         active = false;
       }
@@ -331,23 +332,23 @@ class UpDroidExplorer extends PanelController {
 
   /// Shows control panel
   void showNodes() {
-    if (_explorerView.explorersDiv != null) _explorerView.explorersDiv.classes.add('hidden');
-    _explorerView._controlPanel.classes.remove('hidden');
-    _explorerView._controlToggle.classes.remove('shadow');
+    if (_workspacesView.explorersDiv != null) _workspacesView.explorersDiv.classes.add('hidden');
+    _workspacesView._controlPanel.classes.remove('hidden');
+    _workspacesView._controlToggle.classes.remove('shadow');
     _dropdown.classes.remove('shadow');
-    _explorerView._titleWrap.classes.add('shadow');
-    controlLeave = _explorerView._title.onClick.listen((e) {
+    _workspacesView._titleWrap.classes.add('shadow');
+    controlLeave = _workspacesView._title.onClick.listen((e) {
       hideControl();
-      _explorerView._controlToggle.classes.add('shadow');
+      _workspacesView._controlToggle.classes.add('shadow');
       _dropdown.classes.add('shadow');
-      _explorerView._titleWrap.classes.remove('shadow');
+      _workspacesView._titleWrap.classes.remove('shadow');
       controlLeave.cancel();
     });
   }
 
   void hideControl() {
-    _explorerView._controlPanel.classes.add('hidden');
-    _explorerView.explorersDiv.classes.remove('hidden');
+    _workspacesView._controlPanel.classes.add('hidden');
+    _workspacesView.explorersDiv.classes.remove('hidden');
   }
 
   /// Functions for updating tracked file info
@@ -573,11 +574,11 @@ class UpDroidExplorer extends PanelController {
 
   void populateNodes(UpDroidMessage um) {
     List<Map> nodeList = JSON.decode(um.body);
-    Map packageMap = _explorerView.createPackageList(nodeList);
+    Map packageMap = _nodesView.createPackageList(nodeList);
 
     for (var packageNode in nodeList) {
       if(!packageNode['node'].contains('.xml')) {
-        var element = _explorerView.createNodeLi(cs, packageNode);
+        var element = _nodesView.createNodeLi(cs, packageNode);
         var listToAppend = packageMap[packageNode['package']];
         listToAppend.append(element);
         setupNodeHighlighter(element);
@@ -701,8 +702,8 @@ class UpDroidExplorer extends PanelController {
     // Dragging through nested dropzones appears to be glitchy.
     d.onDragStart.listen((event) {
       d.avatarHandler.avatar.children.first.classes.remove('highlighted');
-      if (pathLib.dirname(li.dataset['path']) != workspacePath) _explorerView.drop.classes.add('file-drop-ondrag');
-      _explorerView.trash.classes.add('recycle-ondrag');
+      if (pathLib.dirname(li.dataset['path']) != workspacePath) _workspacesView.drop.classes.add('file-drop-ondrag');
+      _workspacesView.trash.classes.add('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {
@@ -717,8 +718,8 @@ class UpDroidExplorer extends PanelController {
     });
 
     d.onDragEnd.listen((event) {
-      _explorerView.drop.classes.remove('file-drop-ondrag');
-      _explorerView.trash.classes.remove('recycle-ondrag');
+      _workspacesView.drop.classes.remove('file-drop-ondrag');
+      _workspacesView.trash.classes.remove('recycle-ondrag');
       ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
       ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
       for (SpanElement span in spanList) {

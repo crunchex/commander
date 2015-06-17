@@ -105,7 +105,6 @@ class UpDroidExplorer extends PanelController {
     mailbox.registerCommanderEvent('EDITOR_READY', _editorReady);
     mailbox.registerCommanderEvent('REQUEST_PARENT_PATH', _requestParentPath);
     mailbox.registerCommanderEvent('CATKIN_NODE_LIST', _catkinNodeList);
-    mailbox.registerCommanderEvent('RUN_NODE', _runNode);
 
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SEND_DIRECTORY_PATH', _getDirPath);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_PATH', _explorerDirPath);
@@ -121,44 +120,12 @@ class UpDroidExplorer extends PanelController {
 
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
-    _addWorkspaceButton.onClick.listen((e) {
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'ADD_WORKSPACE'));
-
-    });
-
-    // TODO: need to find better way for client to track active explorer
-    _deleteWorkspaceButton.onClick.listen((e) {
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE'));
-    });
-
-    _cleanButton.onClick.listen((e) {
-//      _cleanButton.children.first.classes.remove('glyphicons-cleaning');
-//      _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
-
-//      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_CLEAN'));
-      _workspaceClean();
-
-//      _controlButton.classes.add('control-button-disabled');
-//      _runButton.classes.add('control-button-disabled');
-//      _controlButtonEnabled = false;
-    });
-
-    _buildButton.onClick.listen((e) {
-//      _buildButton.children.first.classes.remove('glyphicons-classic-hammer');
-//      _buildButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
-//
-//      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_BUILD'));
-      _workspaceBuild();
-    });
-
-    _uploadButton.onClick.listen((e) {
-      new UpDroidGitPassModal(cs);
-    });
-
-    _runButton.onClick.listen((e) {
-//      if (!_controlButtonEnabled) return;
-//      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'RUN_NODE'));
-    });
+    _addWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'ADD_WORKSPACE')));
+    _deleteWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE')));
+    _cleanButton.onClick.listen((e) => mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]'));
+    _buildButton.onClick.listen((e) => mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]'));
+    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
+    _runButton.onClick.listen((e) => _runNode());
 
     _workspacesButton.onClick.listen((e) {
       for(var explorer in _workspacesView.explorersDiv.children) {
@@ -228,34 +195,16 @@ class UpDroidExplorer extends PanelController {
     }
   }
 
-  void _workspaceClean() {
-    if (isActive()) {
-      mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]');
-    }
-  }
+  void _catkinNodeList(CommanderMessage m) => mailbox.ws.send('[[CATKIN_NODE_LIST]]');
 
-  void _workspaceBuild() {
-    if (isActive()) {
-      mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]');
+  void _runNode() {
+    String runCommand;
+    if (nodeArgs.value.isEmpty) {
+      runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name']]);
+    } else {
+      runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
     }
-  }
-
-  void _catkinNodeList(CommanderMessage m) {
-    if (isActive()) {
-      mailbox.ws.send('[[CATKIN_NODE_LIST]]');
-    }
-  }
-
-  void _runNode(CommanderMessage m) {
-    if (isActive()) {
-      String runCommand;
-      if (nodeArgs.value.isEmpty) {
-        runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name']]);
-      } else {
-        runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
-      }
-      mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
-    }
+    mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
   }
 
   //\/\/ UpDroidMessage Handlers /\/\//
@@ -294,18 +243,6 @@ class UpDroidExplorer extends PanelController {
       }
     });
     return [enter, leave, drop];
-  }
-
-  bool isActive() {
-    bool active;
-    if (closed == true) active = false;
-    else {
-      if (!_workspacesView._explorer.classes.contains('hidden')) active = true;
-      else {
-        active = false;
-      }
-    }
-    return active;
   }
 
   /// Returns a list of file objects from the flattened string returned from

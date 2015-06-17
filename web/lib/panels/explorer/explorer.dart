@@ -14,6 +14,8 @@ import '../panel_controller.dart';
 
 part 'explorer_helper.dart';
 part 'explorer_view.dart';
+part 'workspaces_view.dart';
+part 'nodes_view.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket] into an UpDroid Commander tab.
@@ -96,7 +98,7 @@ class UpDroidExplorer extends PanelController {
     _workspacesButton = view.refMap['workspaces'];
     _nodesButton = view.refMap['nodes'];
 
-    return await ExplorerView.createExplorerView(id, folderName, view.content).then((explorerView) {
+    return await WorkspacesView.createWorkspacesView(id, folderName, view.content).then((explorerView) {
       _explorerView = explorerView;
 
       dzRecycle = new Dropzone(_explorerView.trash);

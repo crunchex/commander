@@ -163,11 +163,6 @@ class PanelView {
       _menus.children.add(_createDropdownMenu(configItem));
     }
 
-    extra = new LIElement();
-    extra.id = 'extra-$num';
-    extra.classes.add('extra-menubar');
-    _menus.children.add(extra);
-
     _tabContent = new DivElement()
         ..classes.add('tab-content')
         ..classes.add('active');

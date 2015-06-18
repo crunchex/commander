@@ -2,6 +2,7 @@ library cmdr_explorer;
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as pathLib;
 
@@ -114,8 +115,8 @@ class CmdrExplorer {
       _currentWatcher.events.listen((e) => help.formattedFsUpdate(s, e));
     }
 
-    _currentWorkspace.getContents().then((files) {
-      s.add('[[INITIAL_DIRECTORY_LIST]]' + files.toString());
+    _currentWorkspace.getContentsAsStrings().then((files) {
+      s.add('[[INITIAL_DIRECTORY_LIST]]' + JSON.encode(files));
     });
   }
 
@@ -125,14 +126,14 @@ class CmdrExplorer {
       _currentWatcher.events.listen((e) => help.formattedFsUpdate(s, e));
     }
 
-    _currentWorkspace.getContents().then((files) {
-      s.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
+    _currentWorkspace.getContentsAsStrings().then((files) {
+      s.add('[[EXPLORER_DIRECTORY_LIST]]' + JSON.encode(files));
     });
   }
 
   void _refreshDirectory(WebSocket s) {
-    _currentWorkspace.getContents().then((files) {
-      s.add('[[EXPLORER_DIRECTORY_REFRESH]]' + files.toString());
+    _currentWorkspace.getContentsAsStrings().then((files) {
+      s.add('[[EXPLORER_DIRECTORY_REFRESH]]' + JSON.encode(files));
     });
   }
 

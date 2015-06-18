@@ -66,9 +66,7 @@ class UpDroidExplorer extends PanelController {
   WorkspacesView _workspacesView;
   NodesView _nodesView;
 
-  Map fileInfo = {};
-  Map pathToFile = {};
-  Map ulInfo = {};
+  Map<String, FileSystemEntity> entities = {};
   Map runParams = {};
 
   List recycleListeners = [];
@@ -199,6 +197,7 @@ class UpDroidExplorer extends PanelController {
   /// Returns a list of file objects from the flattened string returned from
   /// the server.
   List<FileSystemEntity> fileList(String data) {
+    print(data);
     var files = [];
 
     // Strip the brackets/single-quotes and split by ','.
@@ -210,17 +209,6 @@ class UpDroidExplorer extends PanelController {
       if(entity != "") files.add(new FileSystemEntity.fromDirectoryList(entity, workspacePath));
     }
     return files;
-  }
-
-  /// Functions for updating tracked file info
-  void removeFileData([LIElement li, String path]) {
-    if (li != null) {
-      fileInfo.remove(li);
-    }
-    if (path != null) {
-      pathToFile.remove(path);
-      ulInfo.remove(path);
-    }
   }
 
   void removeSubFolders(LIElement li) {
@@ -243,35 +231,22 @@ class UpDroidExplorer extends PanelController {
     }
   }
 
-  String getName(LIElement li) {
-    return fileInfo[li][0];
-  }
-
-  String getPath(LIElement li) {
-    return fileInfo[li][1];
-  }
-
   /// Returns a generated [LIElement] with inner HTML based on
   /// the [SimpleFile]'s contents.
   LIElement generateLiHtml(file, [expanded]) {
     LIElement li = new LIElement()
-      ..dataset['name'] = file.name
-      ..dataset['path'] = file.path
-      ..dataset['exp'] = id.toString()
-      ..dataset['isDir'] = file.isDirectory.toString()
       ..draggable = true
       ..classes.add('explorer-li');
 
-    fileInfo.putIfAbsent(li, () => [file.name, file.path]);
-    pathToFile.putIfAbsent(file.path, () => li);
     // Create a span element for the glyphicon
     SpanElement glyphicon = new SpanElement();
     SpanElement glyph = new SpanElement();
     glyph.classes.addAll(['glyphicons', 'glyphicons-folder-closed', "list-folder"]);
     var glyphType = (file.isDirectory) ? 'glyphicons-folder-open' : 'glyphicons-file';
     glyphicon.classes.addAll(['glyphicons', glyphType]);
-    dropSetup(glyphicon, file);
-    dropSetup(glyph, file);
+//    dropSetup(glyphicon, file);
+//    dropSetup(glyph, file);
+
     DivElement fileContainer = new DivElement();
     setupHighlighter(fileContainer);
     fileContainer.classes.add('file-container');
@@ -289,8 +264,6 @@ class UpDroidExplorer extends PanelController {
       UListElement ul = new UListElement();
       ul..classes.addAll(['explorer', 'explorer-ul']);
       li.children.add(ul);
-
-      ulInfo.putIfAbsent(file.path, () => ul);
 
       ul.classes.add("hidden");
       glyphicon.replaceWith(glyph);
@@ -641,7 +614,7 @@ class UpDroidExplorer extends PanelController {
     dragSetup(li, file);
 
     UListElement dirElement;
-    if (file.parentDir == '' && !file.path.contains('/.')) {
+    if (file.parent == '' && !file.path.contains('/.')) {
       dirElement = _workspacesView.uList;
       dirElement.append(li);
     } else if (!file.path.contains('/.')) {
@@ -655,12 +628,21 @@ class UpDroidExplorer extends PanelController {
 
   /// First Directory List Generation
   void initialDirectoryList(UpDroidMessage um) {
-    var files = fileList(um.body);
+    List<String> fileStrings = JSON.decode(um.body);
 
     _workspacesView.uList.innerHtml = '';
 
-    for (FileSystemEntity file in files) {
-      newElementFromFile(file, false);
+    for (String rawString in fileStrings) {
+      FileSystemEntity entity = new FileSystemEntity.fromDirectoryList(rawString, workspacePath);
+      entities[entity.path] = entity;
+//      print(entities.toString());
+
+      if (entity.parent == null) {
+        _workspacesView.uList.children.add(entity.view.element);
+      } else {
+        FolderView parent = entities[entity.parent].view;
+        parent.uElement.children.add(entity.view.element);
+      }
     }
   }
 
@@ -716,17 +698,41 @@ class UpDroidExplorer extends PanelController {
 /// the server over [WebSocket]. Primarily used for generating the HTML views
 /// in the file explorer that represent the filesystem.
 class FileSystemEntity {
-  String name;
-  String parentDir;
-  String path;
+  String workspacePath, path, name, parent;
   bool isDirectory;
+
+  FileSystemEntityView view;
 
   String workspaceName;
 
-  FileSystemEntity.fromDirectoryList(String raw, String prefix) {
-    workspaceName = prefix.split('/').last;
-    String workingString = stripFormatting(raw, prefix);
-    getData(workingString);
+  FileSystemEntity.fromDirectoryList(String raw, String workspacePath) {
+    this.workspacePath = pathLib.normalize(workspacePath);
+
+    List<String> rawList = raw.split(':');
+    isDirectory = rawList[0] == 'D' ? true : false;
+    path = pathLib.normalize(rawList[1]);
+
+    // Change the name of the top-level src folder to the name
+    // of the workspace (but leave path unchanged).
+    List<String> pathList = path.split('/');
+    if (path == '$workspacePath/src') {
+      name = pathList[pathList.length - 2];
+      parent = null;
+    } else {
+      name = pathList.last;
+      parent = '';
+      pathList.forEach((String s) => parent += (s == name) ? '' : '$s/');
+      parent = pathLib.normalize(parent);
+    }
+
+    // Set up the [Element] (view).
+    if (isDirectory) {
+      view = new FolderView(name);
+    } else {
+      view = new FileView(name);
+    }
+
+    //print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
   }
 
   FileSystemEntity.fromPath(String raw, String prefix, bool isDir) {
@@ -739,7 +745,7 @@ class FileSystemEntity {
 
   String stripFormatting(String raw, String prefix) {
     raw = raw.trim();
-    isDirectory = raw.startsWith('Directory: ') ? true : false;
+
     raw = raw.replaceFirst(new RegExp(r'(Directory: |File: )'), '');
 
     path = raw;
@@ -754,9 +760,9 @@ class FileSystemEntity {
     name = (pathList.last == 'src') ? workspaceName : pathList[pathList.length - 1];
 
     if (pathList.length > 1) {
-      parentDir = pathList[pathList.length - 2];
+      parent = pathList[pathList.length - 2];
     } else {
-      parentDir = '';
+      parent = '';
     }
   }
 }

@@ -248,24 +248,21 @@
     min-height: 300px;
 }
 
-#recycle {
-    margin-top: 15px;
+.toolbar {
+    position: absolute;
+    right: 0;
+    bottom: 0;
     padding: 4px;
-    text-align: right;
     vertical-align: middle;
-    color: #0c0c0c;
-    font-family: Avenir Next LT Pro Demi;
-    font-size: 14px;
-    background-color: #eaecec;
-    border: 1px solid #e3e3e3;
+    border-top: 1px solid #e3e3e3;
 }
 
-#recycle.recycle-ondrag {
+.recycle.recycle-ondrag {
     color: #ff2919;
     border-color: #ff2919;
 }
 
-#recycle.recycle-entered {
+.recycle.recycle-entered {
     color: #ffffff;
     border-color: #ffffff;
 }

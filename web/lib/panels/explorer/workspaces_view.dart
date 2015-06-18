@@ -10,10 +10,8 @@ class WorkspacesView extends ExplorerView {
     return c.future;
   }
 
-  SpanElement trash;
+  SpanElement recycle;
   UListElement uList;
-
-  ParagraphElement _recycle;
 
   WorkspacesView(int id, DivElement content) :
   super(id, content) {
@@ -27,14 +25,13 @@ class WorkspacesView extends ExplorerView {
       ..classes.add("explorer-ul");
     explorersDiv.append(uList);
 
-    _recycle = new ParagraphElement()
-      ..id = 'recycle';
-    explorersDiv.children.add(_recycle);
+    DivElement toolbar = new DivElement()
+      ..classes.add('toolbar');
+    explorersDiv.children.add(toolbar);
 
-    trash = new SpanElement()
-      ..id = 'trash'
-      ..classes.addAll(['glyphicons', 'glyphicons-bin']);
-    _recycle.children.add(trash);
+    recycle = new SpanElement()
+      ..classes.addAll(['glyphicons', 'glyphicons-bin', 'recycle']);
+    toolbar.children.add(recycle);
   }
 
   void hideExplorer() {

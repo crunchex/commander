@@ -11,21 +11,21 @@ class WorkspacesView extends ExplorerView {
   }
 
   SpanElement trash;
+  UListElement uList;
+
   ParagraphElement _recycle;
 
   WorkspacesView(int id, DivElement content) :
   super(id, content) {
     this.content = content;
 
-    DivElement body = new DivElement()
-      ..classes.addAll(['well', 'well-sm', 'explorer-container'])
-      ..id = "explorer-$id";
-    _explorer.append(body);
+    DivElement explorerContainer = new DivElement()
+      ..classes.addAll(['well', 'well-sm', 'explorer-container']);
+//    explorersDiv.append(explorerContainer);
 
-    UListElement guts = new UListElement()
-      ..classes.add("explorer-body")
-      ..id = "explorer-body-$id";
-    body.append(guts);
+    uList = new UListElement()
+      ..classes.add("explorer-ul");
+    explorersDiv.append(uList);
 
     _recycle = new ParagraphElement()
       ..id = 'recycle';

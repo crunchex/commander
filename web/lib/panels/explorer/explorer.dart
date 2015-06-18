@@ -140,16 +140,7 @@ class UpDroidExplorer extends PanelController {
       }
     });
 
-    _nodesButton.onClick.listen((e) => showNodes());
-
-    _workspacesView.drop.onClick.listen((e) {
-      print('click');
-      if (currentSelected != null) {
-        currentSelected.classes.remove('highlighted');
-      }
-      currentSelected = null;
-      currentSelectedPath = workspacePath;
-    });
+//    _nodesButton.onClick.listen((e) => showNodes());
 
     // TODO: cancel when inactive
 
@@ -259,27 +250,6 @@ class UpDroidExplorer extends PanelController {
       if(entity != "") files.add(new SimpleFile.fromDirectoryList(entity, workspacePath));
     }
     return files;
-  }
-
-  /// Shows control panel
-  void showNodes() {
-    if (_workspacesView.explorersDiv != null) _workspacesView.explorersDiv.classes.add('hidden');
-    _workspacesView._controlPanel.classes.remove('hidden');
-    _workspacesView._controlToggle.classes.remove('shadow');
-    _dropdown.classes.remove('shadow');
-    _workspacesView._titleWrap.classes.add('shadow');
-    controlLeave = _workspacesView._title.onClick.listen((e) {
-      hideControl();
-      _workspacesView._controlToggle.classes.add('shadow');
-      _dropdown.classes.add('shadow');
-      _workspacesView._titleWrap.classes.remove('shadow');
-      controlLeave.cancel();
-    });
-  }
-
-  void hideControl() {
-    _workspacesView._controlPanel.classes.add('hidden');
-    _workspacesView.explorersDiv.classes.remove('hidden');
   }
 
   /// Functions for updating tracked file info
@@ -725,7 +695,7 @@ class UpDroidExplorer extends PanelController {
 
     UListElement dirElement;
     if (file.parentDir == '' && !file.path.contains('/.')) {
-      dirElement = querySelector('#explorer-body-$id');
+      dirElement = _workspacesView.uList;
       dirElement.append(li);
     } else if (!file.path.contains('/.')) {
       dirElement = ulInfo[pathLib.dirname(file.path)];
@@ -740,8 +710,7 @@ class UpDroidExplorer extends PanelController {
   void initialDirectoryList(UpDroidMessage um) {
     var files = fileList(um.body);
 
-    UListElement explorer = querySelector('#explorer-body-$id');
-    explorer.innerHtml = '';
+    _workspacesView.uList.innerHtml = '';
 
     for (SimpleFile file in files) {
       newElementFromFile(file, false);
@@ -767,7 +736,7 @@ class UpDroidExplorer extends PanelController {
     pathToFile.clear();
 
     // Set the explorer list to empty for a full refresh.
-    UListElement explorer = querySelector('#explorer-body-$id');
+    UListElement explorer = _workspacesView.uList;
     explorer.innerHtml = '';
 
     for (SimpleFile file in files) {

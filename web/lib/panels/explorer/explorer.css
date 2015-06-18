@@ -2,11 +2,6 @@
     background-color: #eaecec;
 }
 
-.explorer-head {
-    clear: both;
-    text-align: center;
-}
-
 .new {
     display: inline-block;
     padding: 2px 4px 2px 4px;
@@ -15,14 +10,6 @@
     border: 1px solid #dddddd;
     font-family: "Avenir Next LT Pro Demi";
     font-size: 14px;
-}
-
-#exp-container {
-    height: calc(100% - 28px);
-}
-
-.exp {
-    height: calc(100% - 153px);
 }
 
 .explorer-container {
@@ -36,8 +23,8 @@
     box-shadow: none;
 }
 
-.explorer-body > .explorer-li {
-    margin-left: -40px;
+.exp-container > .explorer-ul {
+    margin-left: -20px;
 }
 
 .explorer-ul > .explorer-li {
@@ -67,6 +54,12 @@
     list-style: none;
     min-width: 200px;
     cursor: default;
+}
+
+.file-container.highlighted,
+.file-container.highlighted>div>.glyphicons {
+    color: #ffffff;
+    background-color: #ff2919;
 }
 
 #title-container {

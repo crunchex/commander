@@ -424,12 +424,6 @@ li div input {
   width: 200%;
 }
 
-.file-container.highlighted,
-.file-container.highlighted>div>.glyphicons {
-  color: #ffffff;
-  background-color: #ff2919;
-}
-
 .extra-menubar {
   font-family: "Monosten A", monospace;
   font-size: 13px;

@@ -238,7 +238,7 @@ class UpDroidExplorer extends PanelController {
 
   /// Returns a list of file objects from the flattened string returned from
   /// the server.
-  List<SimpleFile> fileList(String data) {
+  List<FileSystemEntity> fileList(String data) {
     var files = [];
 
     // Strip the brackets/single-quotes and split by ','.
@@ -247,7 +247,7 @@ class UpDroidExplorer extends PanelController {
 
     // Build SimpleFile list our of raw strings.
     for (String entity in entities) {
-      if(entity != "") files.add(new SimpleFile.fromDirectoryList(entity, workspacePath));
+      if(entity != "") files.add(new FileSystemEntity.fromDirectoryList(entity, workspacePath));
     }
     return files;
   }
@@ -371,7 +371,7 @@ class UpDroidExplorer extends PanelController {
   }
 
   /// Sets up a [Dropzone] for the [SpanElement] to handle file moves.
-  void dropSetup(SpanElement span, SimpleFile file) {
+  void dropSetup(SpanElement span, FileSystemEntity file) {
     if (file.isDirectory) {
       Dropzone d = new Dropzone(span);
 
@@ -408,7 +408,7 @@ class UpDroidExplorer extends PanelController {
                 var name = getName(e.draggableElement);
                 removeFileData(e.draggableElement, currentPath);
                 newElementFromFile(
-                    new SimpleFile.fromPath(getPath(span.parent.parent) + '/' + name, workspacePath, true));
+                    new FileSystemEntity.fromPath(getPath(span.parent.parent) + '/' + name, workspacePath, true));
                 item.remove();
               } else if (checkContents(item) == true) {
                 mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
@@ -500,7 +500,7 @@ class UpDroidExplorer extends PanelController {
   }
 
   /// Handles file renaming with a double-click event.
-  void renameEventHandler(LIElement li, SimpleFile file) {
+  void renameEventHandler(LIElement li, FileSystemEntity file) {
     bool refresh = false;
     bool renameFinish = false;
     bool folder = false;
@@ -576,7 +576,7 @@ class UpDroidExplorer extends PanelController {
           // Create a folder icon if the item renamed was an empty folder
 
           if (file.isDirectory == true && li.lastChild.hasChildNodes() == false) {
-            newElementFromFile(new SimpleFile.fromPath(newPath, workspacePath, true));
+            newElementFromFile(new FileSystemEntity.fromPath(newPath, workspacePath, true));
           }
         } else {
           // TODO: need to make field width scale to the user's input.
@@ -593,7 +593,7 @@ class UpDroidExplorer extends PanelController {
   }
 
   /// Sets up a [Draggable] for the existing [LIElement] to handle file open and delete.
-  void dragSetup(LIElement li, SimpleFile file) {
+  void dragSetup(LIElement li, FileSystemEntity file) {
     // Create a new draggable using the current element as
     // the visual element (avatar) being dragged.
     Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
@@ -636,7 +636,7 @@ class UpDroidExplorer extends PanelController {
   /// Handles an Explorer add update for a single file.
   void addUpdate(UpDroidMessage um) {
     String path = um.body;
-    SimpleFile sFile = new SimpleFile.fromPath(path, workspacePath, false);
+    FileSystemEntity sFile = new FileSystemEntity.fromPath(path, workspacePath, false);
     var parentPath = pathLib.dirname(sFile.path);
 
     // Try to detect the parent, and if it doesn't exist then create the element for it.
@@ -648,7 +648,7 @@ class UpDroidExplorer extends PanelController {
       curPath += split[i];
       LIElement curLi = pathToFile['${pathLib.join(workspacePath, curPath)}'];
       if (curLi == null && pathLib.join(workspacePath, curPath) != workspacePath) {
-        newElementFromFile(new SimpleFile.fromPath(pathLib.join(workspacePath, curPath), workspacePath, true))
+        newElementFromFile(new FileSystemEntity.fromPath(pathLib.join(workspacePath, curPath), workspacePath, true))
         .then((result) {});
       }
       if (i != split.length - 1) {
@@ -676,7 +676,7 @@ class UpDroidExplorer extends PanelController {
   }
 
   /// Sets up a new HTML element from a SimpleFile.
-  Future newElementFromFile(SimpleFile file, [bool expanded]) {
+  Future newElementFromFile(FileSystemEntity file, [bool expanded]) {
     Completer completer = new Completer();
 
     LIElement li = generateLiHtml(file, expanded);
@@ -710,7 +710,7 @@ class UpDroidExplorer extends PanelController {
 
     _workspacesView.uList.innerHtml = '';
 
-    for (SimpleFile file in files) {
+    for (FileSystemEntity file in files) {
       newElementFromFile(file, false);
     }
   }
@@ -737,7 +737,7 @@ class UpDroidExplorer extends PanelController {
     UListElement explorer = _workspacesView.uList;
     explorer.innerHtml = '';
 
-    for (SimpleFile file in files) {
+    for (FileSystemEntity file in files) {
       file.isDirectory == true ? newElementFromFile(file, folderStateList[file]) : newElementFromFile(file);
     }
   }
@@ -747,7 +747,7 @@ class UpDroidExplorer extends PanelController {
     String raw = um.body;
     var files = fileList(raw);
 
-    for (SimpleFile file in files) {
+    for (FileSystemEntity file in files) {
       //only check for folders
       if (file.isDirectory == true) {
         LIElement curFolder = pathToFile[file.path];
@@ -766,7 +766,7 @@ class UpDroidExplorer extends PanelController {
 /// Container class that extracts data from the raw file text passed in from
 /// the server over [WebSocket]. Primarily used for generating the HTML views
 /// in the file explorer that represent the filesystem.
-class SimpleFile {
+class FileSystemEntity {
   String name;
   String parentDir;
   String path;
@@ -774,13 +774,13 @@ class SimpleFile {
 
   String workspaceName;
 
-  SimpleFile.fromDirectoryList(String raw, String prefix) {
+  FileSystemEntity.fromDirectoryList(String raw, String prefix) {
     workspaceName = prefix.split('/').last;
     String workingString = stripFormatting(raw, prefix);
     getData(workingString);
   }
 
-  SimpleFile.fromPath(String raw, String prefix, bool isDir) {
+  FileSystemEntity.fromPath(String raw, String prefix, bool isDir) {
     workspaceName = prefix.split('/').last;
     path = raw.replaceAll(r'\', '');
     isDirectory = isDir;

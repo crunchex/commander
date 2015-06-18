@@ -633,7 +633,7 @@ class UpDroidExplorer extends PanelController {
     _workspacesView.uList.innerHtml = '';
 
     for (String rawString in fileStrings) {
-      FileSystemEntity entity = new FileSystemEntity.fromDirectoryList(rawString, workspacePath);
+      FileSystemEntity entity = new FileSystemEntity.fromDirectoryList(rawString, workspacePath, mailbox.ws);
       entities[entity.path] = entity;
 //      print(entities.toString());
 
@@ -699,13 +699,14 @@ class UpDroidExplorer extends PanelController {
 /// in the file explorer that represent the filesystem.
 class FileSystemEntity {
   String workspacePath, path, name, parent;
+  WebSocket ws;
   bool isDirectory;
 
   FileSystemEntityView view;
 
   String workspaceName;
 
-  FileSystemEntity.fromDirectoryList(String raw, String workspacePath) {
+  FileSystemEntity.fromDirectoryList(String raw, String workspacePath, this.ws) {
     this.workspacePath = pathLib.normalize(workspacePath);
 
     List<String> rawList = raw.split(':');
@@ -728,8 +729,22 @@ class FileSystemEntity {
     // Set up the [Element] (view).
     if (isDirectory) {
       view = new FolderView(name);
+      view.container.onContextMenu.listen((e) {
+        e.preventDefault();
+        List menu = [
+          {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[EXPLORER_NEW_FILE]]' + path)},
+          {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled')},
+          {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
+        new ContextMenu(view.container, menu);
+      });
     } else {
       view = new FileView(name);
+      view.container.onContextMenu.listen((e) {
+        e.preventDefault();
+        List menu = [
+          {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
+        new ContextMenu(view.container, menu);
+      });
     }
 
     //print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');

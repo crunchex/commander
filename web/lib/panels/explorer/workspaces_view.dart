@@ -46,10 +46,24 @@ class WorkspacesView extends ExplorerView {
 abstract class FileSystemEntityView {
   String name;
   LIElement element;
+  DivElement container;
+  SpanElement icon;
 
   FileSystemEntityView(this.name) {
     element = new LIElement()
       ..classes.add('explorer-li');
+
+    container = new DivElement();
+    element.children.add(container);
+
+    icon = new SpanElement()
+      ..classes.add('glyphicons');
+    container.children.add(icon);
+
+    SpanElement filename = new SpanElement()
+      ..classes.add('explorer-fs-name')
+      ..text = this.name;
+    container.children.add(filename);
   }
 }
 
@@ -60,31 +74,11 @@ class FolderView extends FileSystemEntityView {
   bool expanded;
   UListElement uElement;
 
-  DivElement _container;
-  SpanElement _icon, _fileName;
-
   FolderView(String name, [bool expanded=false]) : super(name) {
     this.expanded = expanded;
 
-    _container = new DivElement()
-      ..id = this.name.toLowerCase();
-//    setupHighlighter(fileContainer);
-    _container.classes.addAll(['explorer-fs-container', 'explorer-folder']);
-    element.children.add(_container);
-
-    // Create a span element for the glyphicon
-    _icon = new SpanElement()
-      ..classes.add('glyphicons');
-    this.expanded ? _icon.classes.add(openFolderClass) : _icon.classes.add(closedFolderClass);
-    _container.children.add(_icon);
-//    dropSetup(glyphicon, file);
-//    dropSetup(glyph, file);
-
-    // Hold the text inline with the glyphicon
-    SpanElement filename = new SpanElement()
-      ..classes.add('explorer-fs-name')
-      ..text = this.name;
-    _container.children.add(filename);
+    container.classes.add('explorer-folder');
+    this.expanded ? icon.classes.add(openFolderClass) : icon.classes.add(closedFolderClass);
 
     uElement = new UListElement()
       ..classes.add('explorer-ul');
@@ -93,12 +87,12 @@ class FolderView extends FileSystemEntityView {
 
   void toggleExpansion() {
     if (expanded) {
-      _icon.classes.remove(openFolderClass);
-      _icon.classes.add(closedFolderClass);
+      icon.classes.remove(openFolderClass);
+      icon.classes.add(closedFolderClass);
       expanded = false;
     } else {
-      _icon.classes.remove(closedFolderClass);
-      _icon.classes.add(openFolderClass);
+      icon.classes.remove(closedFolderClass);
+      icon.classes.add(openFolderClass);
       expanded = true;
     }
   }
@@ -107,27 +101,8 @@ class FolderView extends FileSystemEntityView {
 class FileView extends FileSystemEntityView {
   final String fileClass = 'glyphicons-file';
 
-  DivElement _container;
-  SpanElement _icon, _fileName;
-
   FileView(String name) : super(name) {
-    _container = new DivElement()
-      ..id = this.name.toLowerCase();
-//    setupHighlighter(fileContainer);
-    _container.classes.addAll(['explorer-fs-container', 'explorer-file']);
-    element.children.add(_container);
-
-    // Create a span element for the glyphicon
-    _icon = new SpanElement()
-      ..classes.addAll(['glyphicons', fileClass]);
-    _container.children.add(_icon);
-//    dropSetup(glyphicon, file);
-//    dropSetup(glyph, file);
-
-    // Hold the text inline with the glyphicon
-    SpanElement filename = new SpanElement()
-      ..classes.add('explorer-fs-name')
-      ..text = this.name;
-    _container.children.add(filename);
+    container.classes.add('explorer-file');
+    icon.classes.add(fileClass);
   }
 }

@@ -735,7 +735,7 @@ class FileSystemEntity {
           {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[EXPLORER_NEW_FILE]]' + path)},
           {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled')},
           {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
-        new ContextMenu(view.container, menu);
+        new ContextMenu(e.page, menu);
       });
     } else {
       view = new FileView(name);
@@ -743,7 +743,7 @@ class FileSystemEntity {
         e.preventDefault();
         List menu = [
           {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
-        new ContextMenu(view.container, menu);
+        new ContextMenu(e.page, menu);
       });
     }
 

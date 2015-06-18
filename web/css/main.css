@@ -332,6 +332,16 @@ body>.navbar.navbar-inverse {
   border-color: #e3e3e3;
 }
 
+.context-menu {
+  margin: 0;
+}
+
+.context-menu > li > a {
+  margin: 0;
+  padding: 4px;
+  font-size: 12px;
+}
+
 li div input {
   margin-left: 10px;
   border-style: solid;

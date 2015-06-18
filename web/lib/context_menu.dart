@@ -3,20 +3,19 @@ library context_menu;
 import 'dart:html';
 
 class ContextMenu {
-  Element sourceElement;
   List<Map> config;
 
   UListElement _contextMenu;
   bool _clean;
 
-  ContextMenu(this.sourceElement, this.config) {
+  ContextMenu(Point origin, this.config) {
     _contextMenu = new UListElement()
-      ..style.position = 'fixed'
-      ..style.top = sourceElement.offsetTop.toString() + 'px'
-      ..style.left = sourceElement.offsetLeft.toString() + 'px'
-      ..classes.add('dropdown-menu')
+      ..style.position = 'absolute'
+      ..style.left = origin.x.toString() + 'px'
+      ..style.top = origin.y.toString() + 'px'
+      ..classes.addAll(['dropdown-menu', 'context-menu'])
       ..attributes['role'] = 'menu';
-    querySelector('#row-main').append(_contextMenu);
+    document.body.append(_contextMenu);
 
     _clean = false;
 

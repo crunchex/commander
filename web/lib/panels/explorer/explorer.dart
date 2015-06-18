@@ -66,8 +66,6 @@ class UpDroidExplorer extends PanelController {
   WorkspacesView _workspacesView;
   NodesView _nodesView;
 
-  Map editors = {};
-  Map editorListeners = {};
   Map fileInfo = {};
   Map pathToFile = {};
   Map ulInfo = {};
@@ -102,7 +100,6 @@ class UpDroidExplorer extends PanelController {
   //\/\/ Mailbox Handlers /\/\//
 
   void registerMailbox() {
-    mailbox.registerCommanderEvent('EDITOR_READY', _editorReady);
     mailbox.registerCommanderEvent('REQUEST_PARENT_PATH', _requestParentPath);
     mailbox.registerCommanderEvent('CATKIN_NODE_LIST', _catkinNodeList);
 
@@ -167,19 +164,6 @@ class UpDroidExplorer extends PanelController {
     recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
   }
 
-  void _editorReady(CommanderMessage m) {
-    var num = m.body[0];
-    // Editor num
-    var dropDiv = m.body[1];
-
-    var dzEditor = new Dropzone(dropDiv);
-    if (editorListeners != null) {
-      editorListeners.putIfAbsent(dzEditor, () => createEditorListeners(dzEditor));
-      editors.putIfAbsent(dzEditor, () => num);
-      cs.add(new CommanderMessage('UPDROIDEDITOR', 'PASS_EDITOR_INFO', body: [num, dzEditor]));
-    }
-  }
-
   void _requestParentPath(CommanderMessage m) {
     if (!_workspacesView._explorer.classes.contains('hidden')) {
       cs.add(new CommanderMessage('UPDROIDEDITOR', 'PARENT_PATH', body: currentSelectedPath));
@@ -211,30 +195,6 @@ class UpDroidExplorer extends PanelController {
   void _relayWorkspaceBuild(UpDroidMessage um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_BUILD', body: um.body));
 
   //\/\/ Handler Helpers /\/\//
-
-  // TODO: cancel when inactive
-  List<StreamSubscription> createEditorListeners(Dropzone dzEditor) {
-    var enter = dzEditor.onDragEnter.listen((e) {
-      var isDir = e.draggableElement.dataset['isDir'];
-      if (isDir == 'false') {
-        cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_ADD', body: 'updroideditor-entered'));
-      }
-    });
-
-    var leave = dzEditor.onDragLeave
-    .listen((e) => cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-entered')));
-
-    var drop = dzEditor.onDrop.listen((e) {
-      if (!_workspacesView._explorer.classes.contains('hidden')) {
-        var isDir = e.draggableElement.dataset['isDir'];
-        if (isDir == 'false') {
-          var num = editors[dzEditor];
-          cs.add(new CommanderMessage('UPDROIDEDITOR', 'OPEN_FILE', body: [num, getPath(e.draggableElement)]));
-        }
-      }
-    });
-    return [enter, leave, drop];
-  }
 
   /// Returns a list of file objects from the flattened string returned from
   /// the server.
@@ -443,17 +403,6 @@ class UpDroidExplorer extends PanelController {
         }
       });
     }
-  }
-
-  void cancelEditorListeners(List streams) {
-    for (var stream in streams) {
-      stream.cancel();
-    }
-  }
-
-  void destroyEditorListeners() {
-    editorListeners.forEach((k,v) => cancelEditorListeners(v));
-    editorListeners = null;
   }
 
   void setupHighlighter(DivElement div) {

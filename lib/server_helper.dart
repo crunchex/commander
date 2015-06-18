@@ -80,17 +80,6 @@ String fNameGrabber(List<String> split){
   return fName;
 }
 
-/// Convenience method for adding a formatted filesystem update to the socket
-/// stream.
-///   ex. add /home/user/tmp => [[ADD]]/home/user/tmp
-void formattedFsUpdate(WebSocket socket, WatchEvent e) {
-  var split = e.toString().split(' ');
-  var header = split[0].toUpperCase();
-  var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
-  debug('Outgoing: ' + formatted, 0);
-  if(header != 'MODIFY') socket.add(formatted);
-}
-
 /// Recursively traverses the given directory path and asynchronously
 /// returns a list of filesystem entities.
 Future<List<FileSystemEntity>> getDirectory(Directory dir) {

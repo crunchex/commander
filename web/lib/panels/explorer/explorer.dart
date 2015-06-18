@@ -556,28 +556,18 @@ class UpDroidExplorer extends PanelController {
   }
 
   /// Handles an Explorer add update for a single file.
-  void addUpdate(UpDroidMessage um) {
-    String path = um.body;
-    FileSystemEntity sFile = new FileSystemEntity.fromPath(path, workspacePath, false);
-    var parentPath = pathLib.dirname(sFile.path);
+  void addUpdate(UpDroidMessage um) => addFileSystemEntity(um.body);
 
-    // Try to detect the parent, and if it doesn't exist then create the element for it.
-    String curPath = '';
+  void addFileSystemEntity(String path) {
+    FileSystemEntity entity = new FileSystemEntity.fromDirectoryList(path, workspacePath, mailbox.ws);
+    entities[entity.path] = entity;
 
-    // Iterate through the path checking to see if the folder exists
-    var split = parentPath.replaceFirst(pathLib.normalize(workspacePath), '').split('/');
-    for (int i = 1; i < split.length; i++) {
-      curPath += split[i];
-      LIElement curLi = pathToFile['${pathLib.join(workspacePath, curPath)}'];
-      if (curLi == null && pathLib.join(workspacePath, curPath) != workspacePath) {
-        newElementFromFile(new FileSystemEntity.fromPath(pathLib.join(workspacePath, curPath), workspacePath, true))
-        .then((result) {});
-      }
-      if (i != split.length - 1) {
-        curPath += '/';
-      }
+    if (entity.parent == null) {
+      _workspacesView.uList.children.add(entity.view.element);
+    } else {
+      FolderView parent = entities[entity.parent].view;
+      parent.uElement.children.add(entity.view.element);
     }
-    newElementFromFile(sFile);
   }
 
   /// Handles an Explorer remove update for a single file.
@@ -633,16 +623,7 @@ class UpDroidExplorer extends PanelController {
     _workspacesView.uList.innerHtml = '';
 
     for (String rawString in fileStrings) {
-      FileSystemEntity entity = new FileSystemEntity.fromDirectoryList(rawString, workspacePath, mailbox.ws);
-      entities[entity.path] = entity;
-//      print(entities.toString());
-
-      if (entity.parent == null) {
-        _workspacesView.uList.children.add(entity.view.element);
-      } else {
-        FolderView parent = entities[entity.parent].view;
-        parent.uElement.children.add(entity.view.element);
-      }
+      addFileSystemEntity(rawString);
     }
   }
 

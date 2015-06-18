@@ -112,7 +112,7 @@ class CmdrExplorer {
   void _sendInitial(WebSocket s) {
     if (_currentWatcher == null) {
       _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-      _currentWatcher.events.listen((e) => help.formattedFsUpdate(s, e));
+      _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
     }
 
     _currentWorkspace.getContentsAsStrings().then((files) {
@@ -123,7 +123,7 @@ class CmdrExplorer {
   void _sendDirectory(WebSocket s) {
     if (_currentWatcher == null) {
       _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-      _currentWatcher.events.listen((e) => help.formattedFsUpdate(s, e));
+      _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
     }
 
     _currentWorkspace.getContentsAsStrings().then((files) {
@@ -139,6 +139,22 @@ class CmdrExplorer {
 
   void _sendPath(WebSocket s) {
     help.formattedMessage(s, 'EXPLORER_DIRECTORY_PATH', _currentWorkspace.path);
+  }
+
+  /// Convenience method for adding a formatted filesystem update to the socket
+  /// stream.
+  ///   ex. add /home/user/tmp => [[ADD]]/home/user/tmp
+  Future formattedFsUpdate(WebSocket socket, WatchEvent e) async {
+    List<String> split = e.toString().split(' ');
+    String header = split[0].toUpperCase();
+    String path = split[1];
+
+    bool isFile = await FileSystemEntity.isFile(path);
+    String fileString = isFile ? 'F:${path}' : 'D:${path}';
+
+    var formatted = '[[EXPLORER_$header]]' + fileString;
+    help.debug('Outgoing: ' + formatted, 0);
+    if (header != 'MODIFY') socket.add(formatted);
   }
 
   void _fsNewFile(String path) {

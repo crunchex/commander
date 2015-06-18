@@ -294,8 +294,7 @@ class UpDroidExplorer extends PanelController {
   /// Returns a generated [LIElement] with inner HTML based on
   /// the [SimpleFile]'s contents.
   LIElement generateLiHtml(file, [expanded]) {
-    LIElement li = new LIElement();
-    li
+    LIElement li = new LIElement()
       ..dataset['name'] = file.name
       ..dataset['path'] = file.path
       ..dataset['exp'] = id.toString()
@@ -320,8 +319,7 @@ class UpDroidExplorer extends PanelController {
     fileContainer.children.add(glyphicon);
 
     // Hold the text inline with the glyphicon
-    SpanElement filename = new SpanElement();
-    filename
+    SpanElement filename = new SpanElement()
       ..classes.add('filename')
       ..text = file.name;
     fileContainer.children.add(filename);

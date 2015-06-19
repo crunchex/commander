@@ -115,9 +115,7 @@ class CmdrExplorer {
       _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
     }
 
-    _currentWorkspace.getContentsAsStrings().then((files) {
-      s.add('[[INITIAL_DIRECTORY_LIST]]' + JSON.encode(files));
-    });
+    _currentWorkspace.listContents().listen((String file) => s.add('[[EXPLORER_ADD]]' + file));
   }
 
   void _sendDirectory(WebSocket s) {

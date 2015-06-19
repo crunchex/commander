@@ -59,6 +59,18 @@ class Workspace {
     return c.future;
   }
 
+  Stream listContents() => _delegate.list(recursive: true, followLinks: false).transform(toWorkspaceContents(path));
+
+  /// Transformer to convert serialized [WebSocket] messages into the UpDroidMessage.
+  StreamTransformer toWorkspaceContents(String path) => new StreamTransformer.fromHandlers(handleData: (file, sink) {
+    if (file.path.contains('$path/src')) {
+      FileSystemEntity.isFile(file.path).then((bool isFile) {
+        String fileString = isFile ? 'F:${file.path}' : 'D:${file.path}';
+        sink.add(fileString);
+      });
+    }
+  });
+
 //  List<FileSystemEntity> listSync({bool recursive: false, bool followLinks: true}) {
 //    return _delegate.listSync(recursive: recursive, followLinks: followLinks);
 //  }

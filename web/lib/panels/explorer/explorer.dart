@@ -587,19 +587,23 @@ class UpDroidExplorer extends PanelController {
     String type = split[0];
     String path = split[1];
 
+    // Don't do anything if the entity is not in the system.
+    if (!entities.containsKey(path)) return;
+
+    // Simple case for a file.
     if (type == 'F') {
       entities[path].cleanup();
       entities.remove(path);
       return;
     }
 
-    List<String> entityKeys = new List.from(entities.keys);
-    for (String key in entityKeys) {
-      if (key.contains(path)) {
-        entities[key].cleanup();
-        entities.remove(key);
-      }
-    }
+    // More work for a directory where we recursively delete (sort of).
+    List<String> keysWithPath = entities.keys.where((String key) => key.contains(path));
+    List<String> entityKeys = new List.from(keysWithPath);
+    entityKeys.forEach((String key) {
+      entities[key].cleanup();
+      entities.remove(key);
+    });
   }
 
   void destroyRecycleListeners() {

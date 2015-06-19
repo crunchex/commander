@@ -196,18 +196,15 @@ class CmdrExplorer {
   }
 
   void _fsDelete(String path, WebSocket socket) {
-    // Can't simply just create a FileSystemEntity and delete it, since
-    // it is an abstract class. This is a dumb way to create the proper
-    // entity class.
-    try {
-      var dirToDelete = new Directory(path);
-      dirToDelete.delete(recursive:true).then((path){
-      //  sendDirectory(socket, dir);
-      });
-    } catch (e) {
-      var fileToDelete = new File(path);
-      fileToDelete.delete();
-    }
+    FileSystemEntity entity;
+    bool isDir = FileSystemEntity.isDirectorySync(path);
+
+    entity = isDir ? new Directory(path) : new File(path);
+    entity.delete(recursive: true);
+
+    // Force a remove update on the top level folder as
+    // watcher issue workaround.
+    if (isDir) socket.add('[[EXPLORER_REMOVE]]D:$path');
   }
 
   void _workspaceClean(WebSocket s) {

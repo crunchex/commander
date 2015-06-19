@@ -717,7 +717,7 @@ class FileSystemEntity {
 
     isDirectory ? setUpFolderView() : setUpFileView();
 
-    print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
+    //print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
   }
 
   void setUpFolderView() {

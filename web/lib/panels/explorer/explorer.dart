@@ -571,12 +571,14 @@ class UpDroidExplorer extends PanelController {
     FileSystemEntity entity = new FileSystemEntity(data, workspacePath, mailbox.ws);
     entities[entity.path] = entity;
 
+    // Special case for the workspace src directory (root node).
     if (entity.parent == null) {
       _workspacesView.uList.children.add(entity.view.element);
-    } else {
-      FolderView parentFolder = entities[entity.parent].view;
-      parentFolder.uElement.children.add(entity.view.element);
+      return;
     }
+
+    FolderView parentFolder = entities[entity.parent].view;
+    parentFolder.uElement.children.add(entity.view.element);
   }
 
   /// Handles an Explorer remove update for a single file.

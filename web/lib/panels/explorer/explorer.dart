@@ -702,11 +702,16 @@ class UpDroidExplorer extends PanelController {
 /// in the file explorer that represent the filesystem.
 class FileSystemEntity {
   String path, workspacePath, name, parent;
-  bool isDirectory;
+  bool isDirectory, selected;
   WebSocket ws;
   FileSystemEntityView view;
 
+  bool _selectEnabled;
+
   FileSystemEntity(String raw, String workspacePath, this.ws) {
+    selected = false;
+    _selectEnabled = true;
+
     List<String> rawList = raw.split(':');
     isDirectory = rawList[0] == 'D' ? true : false;
     path = pathLib.normalize(rawList[1]);
@@ -722,6 +727,24 @@ class FileSystemEntity {
 
   void setUpFolderView() {
     view = new FolderView(name);
+
+    view.container.onClick.listen((e) {
+      if (_selectEnabled) {
+        toggleSelected();
+        _selectEnabled = false;
+
+        new Timer(new Duration(milliseconds: 500), () {
+          _selectEnabled = true;
+        });
+      }
+    });
+
+    view.container.onDoubleClick.listen((e) {
+      FolderView folderView = view;
+      folderView.toggleExpansion();
+      select();
+    });
+
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
       List menu = [
@@ -731,15 +754,22 @@ class FileSystemEntity {
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
       ContextMenu.createContextMenu(e.page, menu);
     });
-
-    view.container.onDoubleClick.listen((e) {
-      FolderView folderView = view;
-      folderView.toggleExpansion();
-    });
   }
 
   void setUpFileView() {
     view = new FileView(name);
+
+    view.container.onClick.listen((e) {
+      if (_selectEnabled) {
+        toggleSelected();
+        _selectEnabled = false;
+
+        new Timer(new Duration(milliseconds: 500), () {
+          _selectEnabled = true;
+        });
+      }
+    });
+
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
       List menu = [
@@ -747,6 +777,18 @@ class FileSystemEntity {
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
       ContextMenu.createContextMenu(e.page, menu);
     });
+  }
+
+  void toggleSelected() => selected ? deselect() : select();
+
+  void select() {
+    view.select();
+    selected = true;
+  }
+
+  void deselect() {
+    view.deselect();
+    selected = false;
   }
 
   void rename() {

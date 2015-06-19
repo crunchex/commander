@@ -44,16 +44,21 @@ class WorkspacesView extends ExplorerView {
 }
 
 abstract class FileSystemEntityView {
+  final String selectedClass = 'selected';
+
   String name;
   LIElement element;
   DivElement container;
   SpanElement icon, filename;
+
+  bool _selected = false;
 
   FileSystemEntityView(this.name) {
     element = new LIElement()
       ..classes.add('explorer-li');
 
     container = new DivElement()
+      ..classes.add('explorer-fs-container')
       ..style.userSelect = 'none';
     element.children.add(container);
 
@@ -80,6 +85,16 @@ abstract class FileSystemEntityView {
 
   void completeRename(InputElement renameInput) {
     renameInput.replaceWith(filename);
+  }
+
+  void select() {
+    container.classes.add(selectedClass);
+    _selected = true;
+  }
+
+  void deselect() {
+    container.classes.remove(selectedClass);
+    _selected = false;
   }
 
   void cleanup() {

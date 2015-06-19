@@ -30,7 +30,13 @@
 
 .explorer-fs-container {
     display: inline;
+    padding: 2px;
     color: #0c0c0c;
+}
+
+.explorer-fs-container.selected {
+    background-color: #ff2919;
+    color: #ffffff;
 }
 
 .explorer-fs-name {

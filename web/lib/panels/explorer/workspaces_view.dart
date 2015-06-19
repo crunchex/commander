@@ -65,6 +65,13 @@ abstract class FileSystemEntityView {
       ..text = this.name;
     container.children.add(filename);
   }
+
+  void cleanup() {
+    for (Element child in element.children) {
+      child.remove();
+    }
+    element.remove();
+  }
 }
 
 class FolderView extends FileSystemEntityView {

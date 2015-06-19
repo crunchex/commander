@@ -558,8 +558,8 @@ class UpDroidExplorer extends PanelController {
   /// Handles an Explorer add update for a single file.
   void addUpdate(UpDroidMessage um) => addFileSystemEntity(um.body);
 
-  void addFileSystemEntity(String path) {
-    FileSystemEntity entity = new FileSystemEntity.fromDirectoryList(path, workspacePath, mailbox.ws);
+  void addFileSystemEntity(String data) {
+    FileSystemEntity entity = new FileSystemEntity.fromDirectoryList(data, workspacePath, mailbox.ws);
     entities[entity.path] = entity;
 
     if (entity.parent == null) {
@@ -571,14 +571,26 @@ class UpDroidExplorer extends PanelController {
   }
 
   /// Handles an Explorer remove update for a single file.
-  void removeUpdate(UpDroidMessage um) {
-    String path = um.body;
-    LIElement li = pathToFile[path];
+  void removeUpdate(UpDroidMessage um) => removeFileSystemEntity(um.body);
 
-    // Case to deal with removeUpdate grabbing null objects when items are renamed
-    if (li != null) li.remove();
+  void removeFileSystemEntity(String data) {
+    List<String> split = data.split(':');
+    String type = split[0];
+    String path = split[1];
 
-    removeFileData(li, path);
+    if (type == 'F') {
+      entities[path].cleanup();
+      entities.remove(path);
+      return;
+    }
+
+    List<String> entityKeys = new List.from(entities.keys);
+    for (String key in entityKeys) {
+      if (key.contains(path)) {
+        entities[key].cleanup();
+        entities.remove(key);
+      }
+    }
   }
 
   void destroyRecycleListeners() {
@@ -682,8 +694,9 @@ class FileSystemEntity {
   String workspacePath, path, name, parent;
   WebSocket ws;
   bool isDirectory;
-
   FileSystemEntityView view;
+
+  List<StreamSubscription> _contextListeners;
 
   String workspaceName;
 
@@ -707,25 +720,27 @@ class FileSystemEntity {
       parent = pathLib.normalize(parent);
     }
 
+    _contextListeners = [];
+
     // Set up the [Element] (view).
     if (isDirectory) {
       view = new FolderView(name);
-      view.container.onContextMenu.listen((e) {
+      _contextListeners.add(view.container.onContextMenu.listen((e) {
         e.preventDefault();
         List menu = [
           {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[EXPLORER_NEW_FILE]]' + path)},
           {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled')},
           {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
         new ContextMenu(e.page, menu);
-      });
+      }));
     } else {
       view = new FileView(name);
-      view.container.onContextMenu.listen((e) {
+      _contextListeners.add(view.container.onContextMenu.listen((e) {
         e.preventDefault();
         List menu = [
           {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
         new ContextMenu(e.page, menu);
-      });
+      }));
     }
 
     //print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
@@ -760,5 +775,10 @@ class FileSystemEntity {
     } else {
       parent = '';
     }
+  }
+
+  void cleanup() {
+    _contextListeners.forEach((StreamSubscription listener) => listener.cancel());
+    view.cleanup();
   }
 }

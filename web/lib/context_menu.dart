@@ -92,6 +92,7 @@ class ContextMenu {
       ..text = title;
     if (onClick != null) {
       button.onClick.first.then((MouseEvent e) {
+        e.stopPropagation();
         args != null ? onClick(args) : onClick();
         cleanup();
       });

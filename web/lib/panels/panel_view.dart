@@ -84,6 +84,8 @@ class PanelView {
       itemElement = _createInputItem(itemConfig['title']);
     } else if (itemConfig['type'] == 'submenu') {
       itemElement = _createSubMenu("Templates", ['Publisher', 'Subscriber', 'Hello World Talker', 'Hello World Listener', 'Basic Launch File']);
+    } else if (itemConfig['type'] == 'divider') {
+      itemElement = _createDivider(itemConfig['title']);
     }
 
     if (dropdownMenuSelector != null) {
@@ -205,6 +207,23 @@ class PanelView {
     }
 
     return dropdown;
+  }
+
+  /// Generates a toggle item (button) and returns the new [LIElement].
+  LIElement _createDivider(String title) {
+
+    LIElement dividerList = new LIElement();
+
+    ParagraphElement dividerTitle = new ParagraphElement()
+      ..classes.add('menu-divider-title')
+      ..text = title;
+    dividerList.children.add(dividerTitle);
+
+    HRElement divider = new HRElement()
+      ..classes.add('menu-divider');
+    dividerList.children.add(divider);
+
+    return dividerList;
   }
 
   ///Create a submenu within a dropdown

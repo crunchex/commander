@@ -332,6 +332,22 @@ body>.navbar.navbar-inverse {
   border-color: #e3e3e3;
 }
 
+.menu-divider {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.menu-divider-title {
+  position: relative;
+  left: 5px;
+  margin: 0;
+  margin-top: 7px;
+  font-family: "Avenir Next LT Pro Regular";
+  color: #80808080;
+  font-size: 12px;
+  line-height: 9px;
+}
+
 .context-menu {
   margin: 0;
 }

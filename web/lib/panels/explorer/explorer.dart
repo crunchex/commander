@@ -706,8 +706,6 @@ class FileSystemEntity {
   WebSocket ws;
   FileSystemEntityView view;
 
-  List<StreamSubscription> _contextListeners;
-
   FileSystemEntity(String raw, String workspacePath, this.ws) {
     List<String> rawList = raw.split(':');
     isDirectory = rawList[0] == 'D' ? true : false;
@@ -717,7 +715,6 @@ class FileSystemEntity {
     name = getNameFromPath(path, workspacePath);
     parent = getParentFromPath(path, workspacePath);
 
-    _contextListeners = [];
     isDirectory ? setUpFolderView() : setUpFileView();
 
     print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
@@ -725,26 +722,26 @@ class FileSystemEntity {
 
   void setUpFolderView() {
     view = new FolderView(name);
-    _contextListeners.add(view.container.onContextMenu.listen((e) {
+    view.container.onContextMenu.listen((e) {
       e.preventDefault();
       List menu = [
         {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[EXPLORER_NEW_FILE]]' + path)},
         {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled')},
         {'type': 'toggle', 'title': 'Rename', 'handler': rename},
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
-      new ContextMenu(e.page, menu);
-    }));
+      ContextMenu.createContextMenu(e.page, menu);
+    });
   }
 
   void setUpFileView() {
     view = new FileView(name);
-    _contextListeners.add(view.container.onContextMenu.listen((e) {
+    view.container.onContextMenu.listen((e) {
       e.preventDefault();
       List menu = [
         {'type': 'toggle', 'title': 'Rename', 'handler': rename},
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
-      new ContextMenu(e.page, menu);
-    }));
+      ContextMenu.createContextMenu(e.page, menu);
+    });
   }
 
   void rename() {
@@ -761,7 +758,7 @@ class FileSystemEntity {
   }
 
   void cleanup() {
-    _contextListeners.forEach((StreamSubscription listener) => listener.cancel());
+    //_contextListeners.forEach((StreamSubscription listener) => listener.cancel());
     view.cleanup();
   }
 

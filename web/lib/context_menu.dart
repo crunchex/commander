@@ -2,7 +2,18 @@ library context_menu;
 
 import 'dart:html';
 
+ContextMenu _singleton;
+
 class ContextMenu {
+  static ContextMenu createContextMenu(Point origin, List<Map> config) {
+    if (_singleton != null) {
+      _singleton.cleanup();
+      _singleton = null;
+    }
+
+    _singleton = new ContextMenu(origin, config);
+  }
+
   List<Map> config;
 
   UListElement _contextMenu;

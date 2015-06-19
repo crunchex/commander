@@ -108,8 +108,6 @@ class UpDroidExplorer extends PanelController {
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_REFRESH', refreshPage);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_ADD', addUpdate);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_REMOVE', removeUpdate);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CLEAN', _relayWorkspaceClean);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_BUILD', _relayWorkspaceBuild);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CATKIN_NODE_LIST', populateNodes);
   }
 
@@ -188,9 +186,6 @@ class UpDroidExplorer extends PanelController {
     workspacePath = um.body;
     mailbox.ws.send('[[INITIAL_DIRECTORY_LIST]]');
   }
-
-  void _relayWorkspaceClean(UpDroidMessage um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_CLEAN'));
-  void _relayWorkspaceBuild(UpDroidMessage um) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'WORKSPACE_BUILD', body: um.body));
 
   //\/\/ Handler Helpers /\/\//
 

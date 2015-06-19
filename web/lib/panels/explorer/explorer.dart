@@ -206,7 +206,7 @@ class UpDroidExplorer extends PanelController {
 
     // Build SimpleFile list our of raw strings.
     for (String entity in entities) {
-      if(entity != "") files.add(new FileSystemEntity.fromDirectoryList(entity, workspacePath));
+      if(entity != "") files.add(new FileSystemEntity(entity, workspacePath, ws));
     }
     return files;
   }
@@ -341,7 +341,7 @@ class UpDroidExplorer extends PanelController {
                 var name = getName(e.draggableElement);
                 removeFileData(e.draggableElement, currentPath);
                 newElementFromFile(
-                    new FileSystemEntity.fromPath(getPath(span.parent.parent) + '/' + name, workspacePath, true));
+                    new FileSystemEntity('D:' + getPath(span.parent.parent) + '/' + name, workspacePath, ws));
                 item.remove();
               } else if (checkContents(item) == true) {
                 mailbox.ws.send('[[EXPLORER_MOVE]]' + currentPath + ':divider:' + newPath);
@@ -498,7 +498,7 @@ class UpDroidExplorer extends PanelController {
           // Create a folder icon if the item renamed was an empty folder
 
           if (file.isDirectory == true && li.lastChild.hasChildNodes() == false) {
-            newElementFromFile(new FileSystemEntity.fromPath(newPath, workspacePath, true));
+            newElementFromFile(new FileSystemEntity('D:$newPath', workspacePath, mailbox.ws));
           }
         } else {
           // TODO: need to make field width scale to the user's input.
@@ -559,14 +559,23 @@ class UpDroidExplorer extends PanelController {
   void addUpdate(UpDroidMessage um) => addFileSystemEntity(um.body);
 
   void addFileSystemEntity(String data) {
-    FileSystemEntity entity = new FileSystemEntity.fromDirectoryList(data, workspacePath, mailbox.ws);
+    String path = data.split(':')[1];
+
+    // Don't do anything if the entity is already in the system.
+    if (entities.containsKey(path)) return;
+
+    // Recursively add a parent that isn't in the system yet.
+    String parent = FileSystemEntity.getParentFromPath(path, workspacePath);
+    if (parent != null && !entities.containsKey(parent)) addFileSystemEntity('D:$parent');
+
+    FileSystemEntity entity = new FileSystemEntity(data, workspacePath, mailbox.ws);
     entities[entity.path] = entity;
 
     if (entity.parent == null) {
       _workspacesView.uList.children.add(entity.view.element);
     } else {
-      FolderView parent = entities[entity.parent].view;
-      parent.uElement.children.add(entity.view.element);
+      FolderView parentFolder = entities[entity.parent].view;
+      parentFolder.uElement.children.add(entity.view.element);
     }
   }
 
@@ -691,94 +700,68 @@ class UpDroidExplorer extends PanelController {
 /// the server over [WebSocket]. Primarily used for generating the HTML views
 /// in the file explorer that represent the filesystem.
 class FileSystemEntity {
-  String workspacePath, path, name, parent;
-  WebSocket ws;
+  String path, workspacePath, name, parent;
   bool isDirectory;
+  WebSocket ws;
   FileSystemEntityView view;
 
   List<StreamSubscription> _contextListeners;
 
-  String workspaceName;
-
-  FileSystemEntity.fromDirectoryList(String raw, String workspacePath, this.ws) {
-    this.workspacePath = pathLib.normalize(workspacePath);
-
+  FileSystemEntity(String raw, String workspacePath, this.ws) {
     List<String> rawList = raw.split(':');
     isDirectory = rawList[0] == 'D' ? true : false;
     path = pathLib.normalize(rawList[1]);
+    this.workspacePath = pathLib.normalize(workspacePath);
 
-    // Change the name of the top-level src folder to the name
-    // of the workspace (but leave path unchanged).
-    List<String> pathList = path.split('/');
-    if (path == '$workspacePath/src') {
-      name = pathList[pathList.length - 2];
-      parent = null;
-    } else {
-      name = pathList.last;
-      parent = '';
-      pathList.forEach((String s) => parent += (s == name) ? '' : '$s/');
-      parent = pathLib.normalize(parent);
-    }
+    name = getNameFromPath(path, workspacePath);
+    parent = getParentFromPath(path, workspacePath);
 
     _contextListeners = [];
+    isDirectory ? setUpFolderView() : setUpFileView();
 
-    // Set up the [Element] (view).
-    if (isDirectory) {
-      view = new FolderView(name);
-      _contextListeners.add(view.container.onContextMenu.listen((e) {
-        e.preventDefault();
-        List menu = [
-          {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[EXPLORER_NEW_FILE]]' + path)},
-          {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled')},
-          {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
-        new ContextMenu(e.page, menu);
-      }));
-    } else {
-      view = new FileView(name);
-      _contextListeners.add(view.container.onContextMenu.listen((e) {
-        e.preventDefault();
-        List menu = [
-          {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
-        new ContextMenu(e.page, menu);
-      }));
-    }
-
-    //print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
+    print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
   }
 
-  FileSystemEntity.fromPath(String raw, String prefix, bool isDir) {
-    workspaceName = prefix.split('/').last;
-    path = raw.replaceAll(r'\', '');
-    isDirectory = isDir;
-    raw = raw.replaceFirst(prefix, '');
-    getData(raw);
+  void setUpFolderView() {
+    view = new FolderView(name);
+    _contextListeners.add(view.container.onContextMenu.listen((e) {
+      e.preventDefault();
+      List menu = [
+        {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[EXPLORER_NEW_FILE]]' + path)},
+        {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled')},
+        {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
+      new ContextMenu(e.page, menu);
+    }));
   }
 
-  String stripFormatting(String raw, String prefix) {
-    raw = raw.trim();
-
-    raw = raw.replaceFirst(new RegExp(r'(Directory: |File: )'), '');
-
-    path = raw;
-    raw = raw.replaceFirst(prefix, '');
-    return raw;
-  }
-
-  void getData(String fullPath) {
-    List<String> pathList = fullPath.split('/');
-    // Change the name of the top-level src folder to the name
-    // of the workspace (but leave path unchanged.
-    name = (pathList.last == 'src') ? workspaceName : pathList[pathList.length - 1];
-
-    if (pathList.length > 1) {
-      parent = pathList[pathList.length - 2];
-    } else {
-      parent = '';
-    }
+  void setUpFileView() {
+    view = new FileView(name);
+    _contextListeners.add(view.container.onContextMenu.listen((e) {
+      e.preventDefault();
+      List menu = [
+        {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
+      new ContextMenu(e.page, menu);
+    }));
   }
 
   void cleanup() {
     _contextListeners.forEach((StreamSubscription listener) => listener.cancel());
     view.cleanup();
+  }
+
+  static String getNameFromPath(String path, String workspacePath) {
+    List<String> pathList = path.split('/');
+    return (path == '$workspacePath/src') ? pathList[pathList.length - 2] : pathList.last;
+  }
+
+  static String getParentFromPath(String path, String workspacePath) {
+    List<String> pathList = path.split('/');
+    if (path == '$workspacePath/src') {
+      return null;
+    }
+
+    String parent = '';
+    pathList.sublist(0, pathList.length - 1).forEach((String s) => parent += '$s/');
+    return pathLib.normalize(parent);
   }
 }

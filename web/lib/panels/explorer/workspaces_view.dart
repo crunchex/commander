@@ -47,7 +47,7 @@ abstract class FileSystemEntityView {
   String name;
   LIElement element;
   DivElement container;
-  SpanElement icon;
+  SpanElement icon, filename;
 
   FileSystemEntityView(this.name) {
     element = new LIElement()
@@ -60,10 +60,25 @@ abstract class FileSystemEntityView {
       ..classes.add('glyphicons');
     container.children.add(icon);
 
-    SpanElement filename = new SpanElement()
+    filename = new SpanElement()
       ..classes.add('explorer-fs-name')
       ..text = this.name;
     container.children.add(filename);
+  }
+
+  InputElement startRename() {
+    InputElement renameInput = new InputElement()
+      ..classes.add('explorer-fs-rename')
+      ..placeholder = name;
+    filename.replaceWith(renameInput);
+
+    renameInput.onClick.first.then((e) => e.stopPropagation());
+    renameInput.focus();
+    return renameInput;
+  }
+
+  void completeRename(InputElement renameInput) {
+    renameInput.replaceWith(filename);
   }
 
   void cleanup() {

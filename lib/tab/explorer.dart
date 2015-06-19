@@ -183,16 +183,18 @@ class CmdrExplorer {
     newFolder.createSync();
   }
 
-  void _fsRename(String rename) {
-    List<String> renameList = rename.split(':divider:');
+  void _fsRename(String data) {
+    List<String> split = data.split(':');
+    String oldPath = split[0];
+    String newPath = split[1];
 
-    if (!FileSystemEntity.isDirectorySync(renameList[0])) {
-      var fileToRename = new File(renameList[0]);
-      fileToRename.rename(renameList[1]);
-    } else {
-      var dirToRename = new Directory(renameList[0]);
-      dirToRename.rename(renameList[1]);
-    }
+    FileSystemEntity.type(oldPath).then((FileSystemEntityType type) {
+      if (type == FileSystemEntityType.NOT_FOUND) return;
+
+      bool isDir = FileSystemEntity.isDirectorySync(oldPath);
+      FileSystemEntity entity = isDir ? new Directory(oldPath) : new File(oldPath);
+      entity.rename(newPath);
+    });
   }
 
   void _fsDelete(String path, WebSocket socket) {

@@ -730,6 +730,7 @@ class FileSystemEntity {
       List menu = [
         {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[EXPLORER_NEW_FILE]]' + path)},
         {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled')},
+        {'type': 'toggle', 'title': 'Rename', 'handler': rename},
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
       new ContextMenu(e.page, menu);
     }));
@@ -740,9 +741,23 @@ class FileSystemEntity {
     _contextListeners.add(view.container.onContextMenu.listen((e) {
       e.preventDefault();
       List menu = [
+        {'type': 'toggle', 'title': 'Rename', 'handler': rename},
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
       new ContextMenu(e.page, menu);
     }));
+  }
+
+  void rename() {
+    InputElement renameInput = view.startRename();
+    renameInput.onKeyUp.listen((e) {
+      if (e.keyCode == KeyCode.ENTER) {
+        String newPath = pathLib.normalize('$parent/${renameInput.value}');
+        ws.send('[[EXPLORER_RENAME]]$path:$newPath');
+        view.completeRename(renameInput);
+      }
+    });
+
+    document.body.onClick.first.then((_) => view.completeRename(renameInput));
   }
 
   void cleanup() {

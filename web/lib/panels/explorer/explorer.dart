@@ -731,6 +731,11 @@ class FileSystemEntity {
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
       ContextMenu.createContextMenu(e.page, menu);
     });
+
+    view.container.onDoubleClick.listen((e) {
+      FolderView folderView = view;
+      folderView.toggleExpansion();
+    });
   }
 
   void setUpFileView() {

@@ -53,7 +53,8 @@ abstract class FileSystemEntityView {
     element = new LIElement()
       ..classes.add('explorer-li');
 
-    container = new DivElement();
+    container = new DivElement()
+      ..style.userSelect = 'none';
     element.children.add(container);
 
     icon = new SpanElement()
@@ -93,16 +94,17 @@ class FolderView extends FileSystemEntityView {
   final String openFolderClass = 'glyphicons-folder-open';
   final String closedFolderClass = 'glyphicons-folder-closed';
 
-  bool expanded;
+  bool expanded = false;
   UListElement uElement;
 
-  FolderView(String name, [bool expanded=false]) : super(name) {
+  FolderView(String name, [bool expanded]) : super(name) {
     this.expanded = expanded;
 
     container.classes.add('explorer-folder');
     this.expanded ? icon.classes.add(openFolderClass) : icon.classes.add(closedFolderClass);
 
     uElement = new UListElement()
+      ..hidden = true
       ..classes.add('explorer-ul');
     element.children.add(uElement);
   }
@@ -111,10 +113,12 @@ class FolderView extends FileSystemEntityView {
     if (expanded) {
       icon.classes.remove(openFolderClass);
       icon.classes.add(closedFolderClass);
+      uElement.hidden = true;
       expanded = false;
     } else {
       icon.classes.remove(closedFolderClass);
       icon.classes.add(openFolderClass);
+      uElement.hidden = false;
       expanded = true;
     }
   }

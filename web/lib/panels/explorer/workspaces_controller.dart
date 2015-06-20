@@ -1,17 +1,29 @@
 part of updroid_explorer;
 
 class UpDroidWorkspaces implements ExplorerController {
-  ExplorerView view;
+  PanelView _view;
   WorkspacesView _workspacesView;
   Mailbox _mailbox;
 
+  AnchorElement _cleanButton;
+  AnchorElement _buildButton;
+  AnchorElement _uploadButton;
+
   Dropzone dzRecycle;
 
-  UpDroidWorkspaces(int id, DivElement content, Mailbox mailbox) {
+  Map<String, FileSystemEntity> entities = {};
+  String workspacePath;
+
+  UpDroidWorkspaces(int id, this.workspacePath, PanelView view, Mailbox mailbox) {
+    _view = view;
     _mailbox = mailbox;
 
-    WorkspacesView.createWorkspacesView(id, content).then((view) {
-      _workspacesView = view;
+    WorkspacesView.createWorkspacesView(id, _view.content).then((workspacesView) {
+      _workspacesView = workspacesView;
+
+      _cleanButton = _view.refMap['clean-workspace'];
+      _buildButton = _view.refMap['build-workspace'];
+      _uploadButton = _view.refMap['upload-with-git'];
 
       dzRecycle = new Dropzone(_workspacesView.recycle);
     });
@@ -23,6 +35,12 @@ class UpDroidWorkspaces implements ExplorerController {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_REFRESH', refreshPage);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_ADD', addUpdate);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_REMOVE', removeUpdate);
+  }
+
+  void registerEventHandlers() {
+    _cleanButton.onClick.listen((e) => _mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]'));
+    _buildButton.onClick.listen((e) => _mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]'));
+//    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
   }
 
   /// Handles file renaming with a double-click event.
@@ -172,7 +190,7 @@ class UpDroidWorkspaces implements ExplorerController {
     String parent = FileSystemEntity.getParentFromPath(path, workspacePath);
     if (parent != null && !entities.containsKey(parent)) addFileSystemEntity('D:$parent');
 
-    FileSystemEntity entity = new FileSystemEntity(data, workspacePath, mailbox.ws);
+    FileSystemEntity entity = new FileSystemEntity(data, workspacePath, _mailbox.ws);
     entities[entity.path] = entity;
 
     // Special case for the workspace src directory (root node).

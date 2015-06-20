@@ -27,7 +27,7 @@ class CmdrExplorer {
 
     // Just pick the first workspace unless there's a better choice.
     // TODO: retrieve saved data for the most recently opened workspace.
-    uproot.list().first.then((Directory firstWorkspace) =>_currentWorkspace = new Workspace(firstWorkspace.path));
+    uproot.list().first.then((Directory firstWorkspace) => _currentWorkspace = new Workspace(firstWorkspace.path));
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests

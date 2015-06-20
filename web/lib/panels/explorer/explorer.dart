@@ -79,7 +79,7 @@ class UpDroidExplorer extends PanelController {
 
   }
 
-  Future setUpController() async {
+  Future setUpController() {
     _addWorkspaceButton = view.refMap['add-workspace'];
     _deleteWorkspaceButton = view.refMap['delete-workspace'];
     _cleanButton = view.refMap['clean-workspace'];
@@ -89,7 +89,7 @@ class UpDroidExplorer extends PanelController {
     _workspacesButton = view.refMap['workspaces'];
     _nodesButton = view.refMap['nodes'];
 
-
+    controller = new UpDroidWorkspaces(id, view.content, mailbox);
   }
 
   //\/\/ Mailbox Handlers /\/\//

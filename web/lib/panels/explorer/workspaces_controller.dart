@@ -3,15 +3,26 @@ part of updroid_explorer;
 class UpDroidWorkspaces implements ExplorerController {
   ExplorerView view;
   WorkspacesView _workspacesView;
+  Mailbox _mailbox;
 
   Dropzone dzRecycle;
 
-  UpDroidWorkspaces(int id, DivElement content) {
-    return await WorkspacesView.createWorkspacesView(id, content).then((view) {
+  UpDroidWorkspaces(int id, DivElement content, Mailbox mailbox) {
+    _mailbox = mailbox;
+
+    WorkspacesView.createWorkspacesView(id, content).then((view) {
       _workspacesView = view;
 
       dzRecycle = new Dropzone(_workspacesView.recycle);
     });
+  }
+
+  void registerMailbox() {
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'INITIAL_DIRECTORY_LIST', initialDirectoryList);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_LIST', generateDirectoryList);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_REFRESH', refreshPage);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_ADD', addUpdate);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_REMOVE', removeUpdate);
   }
 
   /// Handles file renaming with a double-click event.

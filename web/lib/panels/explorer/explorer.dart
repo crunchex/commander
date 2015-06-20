@@ -55,7 +55,6 @@ class UpDroidExplorer extends PanelController {
   AnchorElement _dropdown;
   AnchorElement _addWorkspaceButton;
   AnchorElement _deleteWorkspaceButton;
-  AnchorElement _runButton;
   AnchorElement _workspacesButton;
   AnchorElement _nodesButton;
 
@@ -78,7 +77,6 @@ class UpDroidExplorer extends PanelController {
   Future setUpController() {
     _addWorkspaceButton = view.refMap['add-workspace'];
     _deleteWorkspaceButton = view.refMap['delete-workspace'];
-    _runButton = view.refMap['run-node'];
     _workspacesButton = view.refMap['workspaces'];
     _nodesButton = view.refMap['nodes'];
   }
@@ -94,6 +92,8 @@ class UpDroidExplorer extends PanelController {
   void registerEventHandlers() {
     _addWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'ADD_WORKSPACE')));
     _deleteWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE')));
+    _workspacesButton.onClick.listen((e) => _showWorkspacesController());
+    _nodesButton.onClick.listen((e) => _showNodesController());
 //    _runButton.onClick.listen((e) => _runNode());
 //
 //    _workspacesButton.onClick.listen((e) {
@@ -140,7 +140,27 @@ class UpDroidExplorer extends PanelController {
 
   void _explorerDirPath(UpDroidMessage um) {
     workspacePath = um.body;
+    controller = new UpDroidNodes(id, workspacePath, view, mailbox);
+  }
+
+  void _showWorkspacesController() {
+    if (controller != null) {
+      controller.cleanUp();
+      controller = null;
+    }
+
+    // TODO: disable Workspaces button.
     controller = new UpDroidWorkspaces(id, workspacePath, view, mailbox);
+  }
+
+  void _showNodesController() {
+    if (controller != null) {
+      controller.cleanUp();
+      controller = null;
+    }
+
+    // TODO: disable Nodes button.
+    controller = new UpDroidNodes(id, workspacePath, view, mailbox);
   }
 
   //\/\/ Handler Helpers /\/\//
@@ -154,4 +174,5 @@ class UpDroidExplorer extends PanelController {
 abstract class ExplorerController {
   void registerMailbox();
   void registerEventHandlers();
+  void cleanUp();
 }

@@ -324,6 +324,10 @@ class UpDroidWorkspaces implements ExplorerController {
       }
     }
   }
+
+  void cleanUp() {
+
+  }
 }
 
 /// Container class that extracts data from the raw file text passed in from

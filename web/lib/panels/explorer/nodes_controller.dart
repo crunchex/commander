@@ -3,13 +3,35 @@ part of updroid_explorer;
 class UpDroidNodes implements ExplorerController {
   PanelView _view;
   NodesView _nodesView;
+  Mailbox _mailbox;
 
-  UpDroidNodes() {
+  AnchorElement _runButton;
 
+  String workspacePath;
+
+  UpDroidNodes(int id, this.workspacePath, PanelView view, Mailbox mailbox) {
+    _view = view;
+    _mailbox = mailbox;
+
+    registerMailbox();
+
+    NodesView.createNodesView(id, _view.content).then((nodesView) {
+      _nodesView = nodesView;
+
+      _runButton = _view.refMap['run'];
+
+      _mailbox.ws.send('[[CATKIN_NODE_LIST]]');
+
+      registerEventHandlers();
+    });
   }
 
   void registerMailbox() {
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CATKIN_NODE_LIST', populateNodes);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CATKIN_NODE_LIST', populateNodes);
+  }
+
+  void registerEventHandlers() {
+
   }
 
   void populateNodes(UpDroidMessage um) {
@@ -50,5 +72,9 @@ class UpDroidNodes implements ExplorerController {
       runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
     }
     mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
+  }
+
+  void cleanUp() {
+
   }
 }

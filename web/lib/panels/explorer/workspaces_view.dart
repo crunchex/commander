@@ -41,6 +41,10 @@ class WorkspacesView extends ExplorerView {
   void showExplorer() {
     _explorer.classes.remove('hidden');
   }
+
+  void cleanUp() {
+    content.innerHtml = '';
+  }
 }
 
 abstract class FileSystemEntityView {

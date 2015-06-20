@@ -18,6 +18,8 @@ class UpDroidWorkspaces implements ExplorerController {
     _view = view;
     _mailbox = mailbox;
 
+    registerMailbox();
+
     WorkspacesView.createWorkspacesView(id, _view.content).then((workspacesView) {
       _workspacesView = workspacesView;
 
@@ -26,6 +28,10 @@ class UpDroidWorkspaces implements ExplorerController {
       _uploadButton = _view.refMap['upload-with-git'];
 
       dzRecycle = new Dropzone(_workspacesView.recycle);
+
+      _mailbox.ws.send('[[INITIAL_DIRECTORY_LIST]]');
+
+      registerEventHandlers();
     });
   }
 

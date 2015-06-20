@@ -81,25 +81,19 @@ class UpDroidExplorer extends PanelController {
     _runButton = view.refMap['run-node'];
     _workspacesButton = view.refMap['workspaces'];
     _nodesButton = view.refMap['nodes'];
-
-    controller = new UpDroidWorkspaces(id, workspacePath, view, mailbox);
   }
 
   //\/\/ Mailbox Handlers /\/\//
 
   void registerMailbox() {
-    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SEND_DIRECTORY_PATH', _getDirPath);
+    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'REQUEST_WORKSPACE_PATH', _requestWorkspacePath);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_PATH', _explorerDirPath);
-
-    controller.registerMailbox();
   }
 
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
     _addWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'ADD_WORKSPACE')));
     _deleteWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE')));
-
-    controller.registerEventHandlers();
 //    _runButton.onClick.listen((e) => _runNode());
 //
 //    _workspacesButton.onClick.listen((e) {
@@ -142,11 +136,11 @@ class UpDroidExplorer extends PanelController {
 
   //\/\/ UpDroidMessage Handlers /\/\//
 
-  void _getDirPath(UpDroidMessage um) => mailbox.ws.send('[[EXPLORER_DIRECTORY_PATH]]');
+  void _requestWorkspacePath(UpDroidMessage um) => mailbox.ws.send('[[REQUEST_WORKSPACE_PATH]]');
 
   void _explorerDirPath(UpDroidMessage um) {
     workspacePath = um.body;
-    mailbox.ws.send('[[INITIAL_DIRECTORY_LIST]]');
+    controller = new UpDroidWorkspaces(id, workspacePath, view, mailbox);
   }
 
   //\/\/ Handler Helpers /\/\//

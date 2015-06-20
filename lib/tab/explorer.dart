@@ -44,7 +44,7 @@ class CmdrExplorer {
           _sendInitial(ws);
           break;
 
-        case 'EXPLORER_DIRECTORY_PATH':
+        case 'REQUEST_WORKSPACE_PATH':
           _sendPath(ws);
           break;
 
@@ -112,7 +112,7 @@ class CmdrExplorer {
   void _sendInitial(WebSocket s) {
     if (_currentWatcher == null) {
       _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-      _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
+      _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
     }
 
     _currentWorkspace.listContents().listen((String file) => s.add('[[EXPLORER_ADD]]' + file));
@@ -228,5 +228,9 @@ class CmdrExplorer {
 
   void _runNode(String runCommand) {
     Ros.runNode(_currentWorkspace, runCommand);
+  }
+
+  void cleanup() {
+    _currentWatcherStream.cancel();
   }
 }

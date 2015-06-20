@@ -59,7 +59,9 @@ class Workspace {
     return c.future;
   }
 
-  Stream listContents() => _delegate.list(recursive: true, followLinks: false).transform(toWorkspaceContents(path));
+  Stream listContents() {
+    return _delegate.list(recursive: true, followLinks: false).transform(toWorkspaceContents(path)).asBroadcastStream();
+  }
 
   /// Transformer to convert serialized [WebSocket] messages into the UpDroidMessage.
   StreamTransformer toWorkspaceContents(String path) => new StreamTransformer.fromHandlers(handleData: (file, sink) {

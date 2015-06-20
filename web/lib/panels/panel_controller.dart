@@ -27,7 +27,7 @@ abstract class PanelController {
     }
     registerMailbox();
 
-    PanelView.createPanelView(id, col, panelType, shortName, menuConfig, externalCss).then((tabView) {
+    PanelView.createPanelView(id, col, panelType, shortName, menuConfig, externalCss).then((tabView) async {
       view = tabView;
 
       _closePanelButton = view.refMap['close-panel'];
@@ -35,9 +35,8 @@ abstract class PanelController {
       view.closeControlHitbox.onClick.listen((e) => _closePanel());
       view.cloneControlHitbox.onClick.listen((e) => _clonePanel(e));
 
-      setUpController().then((_) {
-        registerEventHandlers();
-      });
+      await setUpController();
+      registerEventHandlers();
     });
   }
 

@@ -59,8 +59,14 @@ class Workspace {
     return c.future;
   }
 
+  Stream listSrc() => src.list(followLinks: false);
+
   Stream listContents() {
     return _delegate.list(recursive: true, followLinks: false).transform(toWorkspaceContents(path)).asBroadcastStream();
+  }
+
+  Stream listNodes() {
+    return src.list(recursive: true, followLinks: false).transform(toLaunchFiles()).asBroadcastStream();
   }
 
   /// Transformer to convert serialized [WebSocket] messages into the UpDroidMessage.
@@ -70,6 +76,50 @@ class Workspace {
         String fileString = isFile ? 'F:${file.path}' : 'D:${file.path}';
         sink.add(fileString);
       });
+    }
+  });
+
+  StreamTransformer toLaunchFiles() => new StreamTransformer.fromHandlers(handleData: (file, sink) {
+    String filename = file.path.split('/').last;
+
+    // Scan for launch files.
+    if (filename.endsWith('.launch')) {
+      // Extract args from launch file.
+      String contents = file.readAsStringSync();
+      XmlDocument xml = parse(contents);
+
+      List args = [];
+      List<XmlElement> argNodes = xml.findAllElements('arg');
+      argNodes.forEach((XmlElement node) {
+        String xmlString = node.toXmlString();
+
+        // Extract name.
+        String namePart = xmlString.replaceAll(new RegExp(r'<[a-z ]+name="'), '');
+        String name = namePart.substring(0, namePart.indexOf('"'));
+
+        // Extract default and return both, or just return the name.
+        if (xmlString.contains('default="')) {
+          String defaultPart = xmlString.replaceAll(new RegExp(r'<[a-z ="]+default="'), '');
+          String defaultString = defaultPart.substring(0, defaultPart.indexOf('"'));
+          args.add([name, defaultString]);
+        } else {
+          args.add([name]);
+        }
+      });
+
+      // Only pick up launch files that are within the 'launch' dir
+      // at the top level of the package root.
+      //print(f.parent.path.split('/').toString());
+      if (file.parent.path.split('/').last == 'launch') {
+        Directory package = file.parent.parent;
+
+        sink.add({
+          'package': package.path.split('/').last,
+          'package-path': package.path,
+          'node': filename,
+          'args': args
+        });
+      }
     }
   });
 

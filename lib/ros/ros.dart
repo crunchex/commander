@@ -12,7 +12,7 @@ import '../server_helper.dart' as help;
 part 'workspace.dart';
 
 abstract class Ros {
-  static void nodeList(Workspace workspace, WebSocket ws) {
+  static void nodeList(Workspace workspace) {
     List launchList = [];
     List nodeList = [];
 

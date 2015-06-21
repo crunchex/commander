@@ -223,7 +223,9 @@ class CmdrExplorer {
   }
 
   void _nodeList(WebSocket s) {
-    Ros.nodeList(_currentWorkspace, s);
+    _currentWorkspace.listNodes().listen((Map package) {
+      s.add('[[PACKAGE]]' + JSON.encode(package));
+    });
   }
 
   void _runNode(String runCommand) {

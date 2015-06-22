@@ -52,11 +52,8 @@ class CmdrExplorer {
           _fsNewFile(um.body);
           break;
 
-        case 'EXPLORER_NEW_FOLDER':
+        case 'NEW_FOLDER':
           _fsNewFolder(um.body);
-          // Empty folders don't trigger an incremental update, so we need to
-          // refresh the entire workspace.
-//          _sendWorkspace(ws);
           break;
 
         case 'RENAME':

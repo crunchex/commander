@@ -43,10 +43,12 @@ class UpDroidNodes implements ExplorerController {
     String nodeName = data['node'];
     List args = data['args'];
 
-    packages.putIfAbsent(packageName, new Package(packageName, packagePath));
-    packages[packageName].nodes.add(new Node(nodeName, args));
+    Package package = packages.putIfAbsent(packageName, () => new Package(packageName, packagePath));
+    if (package != null) _nodesView.uList.children.add(package.view.element);
 
-//    print(data);
+    Node node = new Node(nodeName, args);
+    packages[packageName].nodes.add(node);
+    packages[packageName].view.element.children.add(node.view.element);
   }
 
   void populateNodes(UpDroidMessage um) {
@@ -97,19 +99,19 @@ class UpDroidNodes implements ExplorerController {
 class Package {
   String name, path;
   List<Node> nodes;
-
-  PackageView _view;
+  PackageView view;
 
   Package(this.name, this.path) {
-    nodes = new List<Node>();
+    nodes = [];
+
     setUpPackageView();
   }
 
   void setUpPackageView() {
-    _view = new PackageView();
+    view = new PackageView(name);
 
-    _view.container.onDoubleClick.listen((e) {
-      _view.toggleExpansion();
+    view.container.onDoubleClick.listen((e) {
+      view.toggleExpansion();
     });
   }
 
@@ -121,17 +123,15 @@ class Package {
 class Node {
   String name;
   List args;
+  NodeView view;
 
   WebSocket _ws;
-  NodeView _view;
 
   bool _selectEnabled, _selected;
 
-  Node(Map data, WebSocket ws) {
+  Node(this.name, this.args) {
     _selected = false;
     _selectEnabled = true;
-
-    _ws = ws;
 
     _setUpNodeView();
 
@@ -139,9 +139,9 @@ class Node {
   }
 
   void _setUpNodeView() {
-    _view = new NodeView(name);
+    view = new NodeView(name);
 
-    _view.container.onClick.listen((e) {
+    view.container.onClick.listen((e) {
       if (_selectEnabled) {
         toggleSelected();
         _selectEnabled = false;
@@ -156,17 +156,17 @@ class Node {
   void toggleSelected() => _selected ? deselect() : select();
 
   void select() {
-    _view.select();
+    view.select();
     _selected = true;
   }
 
   void deselect() {
-    _view.deselect();
+    view.deselect();
     _selected = false;
   }
 
   void cleanup() {
     //_contextListeners.forEach((StreamSubscription listener) => listener.cancel());
-    _view.cleanup();
+    view.cleanup();
   }
 }

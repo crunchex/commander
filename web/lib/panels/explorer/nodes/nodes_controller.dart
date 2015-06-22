@@ -59,7 +59,7 @@ class UpDroidNodes implements ExplorerController {
 
     Node node = new Node(nodeName, args, packageName, _mailbox.ws);
     packages[packageName].nodes.add(node);
-    packages[packageName].view.element.children.add(node.view.element);
+    packages[packageName].view.uElement.children.add(node.view.element);
   }
 
   void cleanUp() {

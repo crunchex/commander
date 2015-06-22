@@ -48,23 +48,8 @@ class CmdrExplorer {
           _sendPath(ws);
           break;
 
-        case 'EXPLORER_DIRECTORY_LIST':
-          _sendDirectory(ws);
-          break;
-
-        case 'EXPLORER_DIRECTORY_REFRESH':
-          _refreshDirectory(ws);
-          break;
-
         case 'EXPLORER_NEW_FILE':
           _fsNewFile(um.body);
-          break;
-
-        case 'EXPLORER_NEW_FOLDER':
-          _fsNewFolder(um.body);
-          // Empty folders don't trigger an incremental update, so we need to
-          // refresh the entire workspace.
-          _sendDirectory(ws);
           break;
 
         case 'EXPLORER_RENAME':
@@ -116,23 +101,6 @@ class CmdrExplorer {
     }
 
     _currentWorkspace.listContents().listen((String file) => s.add('[[EXPLORER_ADD]]' + file));
-  }
-
-  void _sendDirectory(WebSocket s) {
-    if (_currentWatcher == null) {
-      _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-      _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
-    }
-
-    _currentWorkspace.getContentsAsStrings().then((files) {
-      s.add('[[EXPLORER_DIRECTORY_LIST]]' + JSON.encode(files));
-    });
-  }
-
-  void _refreshDirectory(WebSocket s) {
-    _currentWorkspace.getContentsAsStrings().then((files) {
-      s.add('[[EXPLORER_DIRECTORY_REFRESH]]' + JSON.encode(files));
-    });
   }
 
   void _sendPath(WebSocket s) {

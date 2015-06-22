@@ -37,8 +37,6 @@ class UpDroidWorkspaces implements ExplorerController {
 
   void registerMailbox() {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'INITIAL_DIRECTORY_LIST', initialDirectoryList);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_LIST', generateDirectoryList);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_REFRESH', refreshPage);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_ADD', addUpdate);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_REMOVE', removeUpdate);
   }
@@ -47,99 +45,6 @@ class UpDroidWorkspaces implements ExplorerController {
     _cleanButton.onClick.listen((e) => _mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]'));
     _buildButton.onClick.listen((e) => _mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]'));
 //    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
-  }
-
-  /// Handles file renaming with a double-click event.
-  void renameEventHandler(LIElement li, FileSystemEntity file) {
-    bool refresh = false;
-    bool renameFinish = false;
-    bool folder = false;
-
-    if (li.dataset['isDir'] == 'true') {
-      folder = true;
-      if (checkContents(li) == true) {
-        refresh = true;
-      }
-    }
-
-    if (!li.className.contains('editing')) {
-      li.classes.add('editing');
-
-      InputElement input = new InputElement();
-      input.value = '${li.dataset['name']}';
-
-      Element outside = querySelector('.container-fluid');
-
-      outsideClickListener = outside.onClick.listen((e) {
-        if (e.target != input && renameFinish == false) {
-          mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
-          outsideClickListener.cancel();
-        }
-      });
-
-      input.onKeyUp.listen((e) {
-        var keyEvent = new KeyEvent.wrap(e);
-        if (keyEvent.keyCode == KeyCode.ENTER) {
-          renameFinish = true;
-          var newPath = pathLib.join(pathLib.dirname(file.path), input.value);
-
-          bool duplicate = pathToFile.containsKey(newPath);
-          if (duplicate == false) {
-            mailbox.ws.send('[[EXPLORER_RENAME]]' + file.path + ':divider:' + newPath);
-            cs.add(new CommanderMessage('UPDROIDEDITOR', 'FILE_UPDATE', body: [file.path, newPath]));
-            if (folder == true) {
-              removeFileData(li, file.path);
-            }
-          }
-
-          // TODO: Create a overwrite option in case of existing file name
-
-          if (duplicate == true) {
-            if (duplicate == li) {
-              mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
-            } else {
-              window.alert("File name already exists");
-              mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
-            }
-          }
-
-          // Remove this element once editing is complete, as the new one will soon appear.
-          if (file.path != newPath) {
-            UListElement ul = li.parent;
-            ul.children.remove(li);
-          }
-
-          // Put the element back in the case that rename is canceled
-
-          if (file.path == newPath) {
-            li.remove();
-            if (file.isDirectory == true) {
-              mailbox.ws.send('[[EXPLORER_DIRECTORY_LIST]]');
-            }
-          }
-
-          if (refresh == true) {
-            removeSubFolders(li);
-            mailbox.ws.send('[[EXPLORER_DIRECTORY_REFRESH]]');
-          }
-
-          // Create a folder icon if the item renamed was an empty folder
-
-          if (file.isDirectory == true && li.lastChild.hasChildNodes() == false) {
-            newElementFromFile(new FileSystemEntity('D:$newPath', workspacePath, mailbox.ws));
-          }
-        } else {
-          // TODO: need to make field width scale to the user's input.
-          // Using a 'contenteditable' <span> instead of an <input> is a possible option.
-          //input.size = auto;
-        }
-      });
-
-      // Replace child 1 (span filename) with input.
-      li.children[0].children[1] = input;
-      input.focus();
-      input.select();
-    }
   }
 
   /// Sets up a [Draggable] for the existing [LIElement] to handle file open and delete.
@@ -236,41 +141,6 @@ class UpDroidWorkspaces implements ExplorerController {
     });
   }
 
-  void destroyRecycleListeners() {
-    for (var listener in recycleListeners) {
-      listener.cancel();
-    }
-  }
-
-  /// Sets up a new HTML element from a SimpleFile.
-  Future newElementFromFile(FileSystemEntity file, [bool expanded]) {
-    Completer completer = new Completer();
-
-    LIElement li = generateLiHtml(file, expanded);
-
-    // Register double-click event handler for file renaming.
-    li.children[0].children[1].onDoubleClick.listen((e) {
-      renameEventHandler(li, file);
-      // To prevent the rename event from propagating up the directory tree.
-      e.stopPropagation();
-    });
-
-    // Set up drag and drop for file open & delete.
-    dragSetup(li, file);
-
-    UListElement dirElement;
-    if (file.parent == '' && !file.path.contains('/.')) {
-      dirElement = _workspacesView.uList;
-      dirElement.append(li);
-    } else if (!file.path.contains('/.')) {
-      dirElement = ulInfo[pathLib.dirname(file.path)];
-      dirElement.append(li);
-    }
-
-    completer.complete(true);
-    return completer.future;
-  }
-
   /// First Directory List Generation
   void initialDirectoryList(UpDroidMessage um) {
     List<String> fileStrings = JSON.decode(um.body);
@@ -280,55 +150,6 @@ class UpDroidWorkspaces implements ExplorerController {
     for (String rawString in fileStrings) {
       addFileSystemEntity(rawString);
     }
-  }
-
-  /// Redraws all file explorer views.
-  void generateDirectoryList(UpDroidMessage um) {
-    String raw = um.body;
-    var files = fileList(raw);
-    var folderStateList = {};
-    for (var file in files) {
-      if (file.isDirectory == true) {
-        LIElement folder = pathToFile[file.path];
-        if (folder != null) {
-          folder.dataset['expanded'] == "true" ? folderStateList[file] = true : folderStateList[file] = false;
-        }
-      }
-    }
-
-    ulInfo.clear();
-    fileInfo.clear();
-    pathToFile.clear();
-
-    // Set the explorer list to empty for a full refresh.
-    UListElement explorer = _workspacesView.uList;
-    explorer.innerHtml = '';
-
-    for (FileSystemEntity file in files) {
-      file.isDirectory == true ? newElementFromFile(file, folderStateList[file]) : newElementFromFile(file);
-    }
-  }
-
-  /// Update the explorer view in case of nested folder movement to cover for empty folders
-  void refreshPage(UpDroidMessage um) {
-    String raw = um.body;
-    var files = fileList(raw);
-
-    for (FileSystemEntity file in files) {
-      //only check for folders
-      if (file.isDirectory == true) {
-        LIElement curFolder = pathToFile[file.path];
-        if (curFolder == null) {
-          newElementFromFile(file);
-        }
-      }
-    }
-  }
-
-  void cleanUp() {
-    entities.values.forEach((FileSystemEntity f) => f.cleanUp());
-    entities = null;
-    _workspacesView.cleanUp();
   }
 }
 

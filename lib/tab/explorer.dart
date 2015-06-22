@@ -60,7 +60,7 @@ class CmdrExplorer {
           break;
 
         case 'RENAME':
-          _fsRename(um.body);
+          _fsRename(um.body, ws);
           break;
 
         case 'DELETE':
@@ -152,7 +152,7 @@ class CmdrExplorer {
     newFolder.createSync();
   }
 
-  void _fsRename(String data) {
+  void _fsRename(String data, WebSocket ws) {
     List<String> split = data.split(':');
     String oldPath = split[0];
     String newPath = split[1];
@@ -163,6 +163,10 @@ class CmdrExplorer {
       bool isDir = FileSystemEntity.isDirectorySync(oldPath);
       FileSystemEntity entity = isDir ? new Directory(oldPath) : new File(oldPath);
       entity.rename(newPath);
+
+      // Force a remove update on the top level folder as
+      // watcher issue workaround.
+      if (isDir) ws.add('[[REMOVE_UPDATE]]D:$oldPath');
     });
   }
 

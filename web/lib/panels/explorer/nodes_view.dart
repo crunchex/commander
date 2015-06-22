@@ -249,11 +249,10 @@ class NodeView extends RosEntityView {
         ..text = argument[0];
       container.children.add(arg);
 
-      if (argument[1] != null) {
-        InputElement argValue = new InputElement()
-          ..placeholder = argument[1];
-        container.children.add(argValue);
-      }
+
+      InputElement argValue = new InputElement();
+      if (argument[1] != null) argValue.placeholder = argument[1];
+      container.children.add(argValue);
     });
   }
 }

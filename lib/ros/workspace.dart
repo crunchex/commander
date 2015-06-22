@@ -95,16 +95,20 @@ class Workspace {
         List singleArg = new List(2);
         bool validArg = false;
 
-        node.attributes.forEach((XmlAttribute attribute) {
-          if (attribute.name.toString() == 'name') {
-            singleArg[0] = attribute.value;
-            validArg = true;
-          }
+        if (node.attributes.first.name.toString() == 'name') {
+          singleArg[0] = node.attributes.first.value;
+          validArg = true;
+        }
 
-          if (attribute.name.toString() == 'default') singleArg[1] = attribute.value;
+        node.attributes.forEach((XmlAttribute attribute) {
+          if (attribute.name.toString() == 'default') {
+            String defaultValue = attribute.value;
+            // TODO: figure out how to handle arg substitution.
+            if (!defaultValue.contains('\$(')) singleArg[1] = defaultValue;
+          }
         });
 
-        // Only add an arg if a name was found. Default value is optional.
+        // Only add an arg if the first attribute is the name.
         if (validArg) args.add(singleArg);
       });
 

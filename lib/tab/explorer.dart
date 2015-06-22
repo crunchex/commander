@@ -224,7 +224,8 @@ class CmdrExplorer {
 
   void _nodeList(WebSocket s) {
     _currentWorkspace.listNodes().listen((Map package) {
-      s.add('[[PACKAGE]]' + JSON.encode(package));
+      String data = JSON.encode(package);
+      s.add('[[LAUNCH]]' + data);
     });
   }
 

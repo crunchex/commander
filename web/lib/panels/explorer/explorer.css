@@ -30,7 +30,6 @@
 
 .explorer-fs-container,
 .explorer-ros-container {
-    display: inline;
     padding: 2px;
     color: #0c0c0c;
 }
@@ -41,8 +40,13 @@
     color: #ffffff;
 }
 
+.explorer-icon {
+    display: inline;
+}
+
 .explorer-fs-name,
 .explorer-ros-name {
+    display: inline;
     font-family: "Avenir Next LT Pro Regular";
     font-size: 12px;
     margin-left: 3px;

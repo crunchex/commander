@@ -67,7 +67,7 @@ abstract class FileSystemEntityView {
     element.children.add(container);
 
     icon = new SpanElement()
-      ..classes.add('glyphicons');
+      ..classes.addAll(['glyphicons', 'explorer-icon']);
     container.children.add(icon);
 
     filename = new SpanElement()

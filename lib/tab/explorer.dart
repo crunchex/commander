@@ -72,11 +72,11 @@ class CmdrExplorer {
           _workspaceBuild(ws);
           break;
 
-        case 'CATKIN_NODE_LIST':
+        case 'REQUEST_NODE_LIST':
           _nodeList(ws);
           break;
 
-        case 'CATKIN_RUN':
+        case 'RUN_NODE':
           _runNode(um.body);
           break;
 

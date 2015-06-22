@@ -32,7 +32,7 @@ class UpDroidNodes implements ExplorerController {
 
       _runButton = _view.refMap['run'];
 
-      _mailbox.ws.send('[[CATKIN_NODE_LIST]]');
+      _mailbox.ws.send('[[REQUEST_NODE_LIST]]');
 
       registerEventHandlers();
     });
@@ -125,7 +125,7 @@ class Node {
       runCommand.add(arg);
     });
 
-    _ws.send('[[CATKIN_RUN]]' + JSON.encode(runCommand));
+    _ws.send('[[RUN_NODE]]' + JSON.encode(runCommand));
   }
 
 

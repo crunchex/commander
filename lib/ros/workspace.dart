@@ -89,22 +89,23 @@ class Workspace {
       XmlDocument xml = parse(contents);
 
       List args = [];
-      List<XmlElement> argNodes = xml.findAllElements('arg');
+      XmlElement launchNode = xml.findElements('launch').first;
+      List<XmlElement> argNodes = launchNode.findElements('arg');
       argNodes.forEach((XmlElement node) {
-        String xmlString = node.toXmlString();
+        List singleArg = new List(2);
+        bool validArg = false;
 
-        // Extract name.
-        String namePart = xmlString.replaceAll(new RegExp(r'<[a-z ]+name="'), '');
-        String name = namePart.substring(0, namePart.indexOf('"'));
+        node.attributes.forEach((XmlAttribute attribute) {
+          if (attribute.name.toString() == 'name') {
+            singleArg[0] = attribute.value;
+            validArg = true;
+          }
 
-        // Extract default and return both, or just return the name.
-        if (xmlString.contains('default="')) {
-          String defaultPart = xmlString.replaceAll(new RegExp(r'<[a-z ="]+default="'), '');
-          String defaultString = defaultPart.substring(0, defaultPart.indexOf('"'));
-          args.add([name, defaultString]);
-        } else {
-          args.add([name]);
-        }
+          if (attribute.name.toString() == 'default') singleArg[1] = attribute.value;
+        });
+
+        // Only add an arg if a name was found. Default value is optional.
+        if (validArg) args.add(singleArg);
       });
 
       // Only pick up launch files that are within the 'launch' dir

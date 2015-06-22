@@ -225,8 +225,35 @@ class PackageView extends RosEntityView {
 class NodeView extends RosEntityView {
   final String fileClass = 'glyphicons-play-button';
 
-  NodeView(String name) : super(name) {
+  UListElement uElement;
+
+  NodeView(String name, List<List<String>> args) : super(name) {
     container.classes.add('explorer-node');
     icon.classes.add(fileClass);
+
+    uElement = new UListElement()
+      ..classes.add('explorer-ul');
+    element.children.add(uElement);
+
+    args.forEach((List<String> argument) {
+      LIElement element = new LIElement()
+        ..classes.add('explorer-li');
+      uElement.children.add(element);
+
+      DivElement container = new DivElement()
+        ..classes.add('explorer-ros-container')
+        ..style.userSelect = 'none';
+      element.children.add(container);
+
+      SpanElement arg = new SpanElement()
+        ..text = argument[0];
+      container.children.add(arg);
+
+      if (argument[1] != null) {
+        InputElement argValue = new InputElement()
+          ..placeholder = argument[1];
+        container.children.add(argValue);
+      }
+    });
   }
 }

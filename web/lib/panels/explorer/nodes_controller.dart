@@ -142,7 +142,7 @@ class Node {
   }
 
   void _setUpNodeView() {
-    view = new NodeView(name);
+    view = new NodeView(name, args);
 
     view.container.onClick.listen((e) {
       if (_selectEnabled) {

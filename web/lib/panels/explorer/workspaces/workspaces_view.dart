@@ -17,10 +17,6 @@ class WorkspacesView extends ExplorerView {
   super(id, content) {
     this.content = content;
 
-    DivElement explorerContainer = new DivElement()
-      ..classes.addAll(['well', 'well-sm', 'explorer-container']);
-//    explorersDiv.append(explorerContainer);
-
     uList = new UListElement()
       ..classes.add("explorer-ul");
     explorersDiv.append(uList);
@@ -32,14 +28,6 @@ class WorkspacesView extends ExplorerView {
     recycle = new SpanElement()
       ..classes.addAll(['glyphicons', 'glyphicons-bin', 'recycle']);
     toolbar.children.add(recycle);
-  }
-
-  void hideExplorer() {
-    _explorer.classes.add('hidden');
-  }
-
-  void showExplorer() {
-    _explorer.classes.remove('hidden');
   }
 
   void cleanUp() {

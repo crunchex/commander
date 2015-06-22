@@ -2,22 +2,14 @@ library updroid_explorer;
 
 import 'dart:html';
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:dnd/dnd.dart';
-import 'package:path/path.dart' as pathLib;
-
-import '../../context_menu.dart';
 import '../../mailbox.dart';
-import '../../modal/modal.dart';
 import '../panel_controller.dart';
+import 'workspaces/workspaces_controller.dart';
+import 'nodes/nodes_controller.dart';
 
 part 'explorer_helper.dart';
 part 'explorer_view.dart';
-part 'workspaces_controller.dart';
-part 'nodes_controller.dart';
-part 'workspaces_view.dart';
-part 'nodes_view.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]
 /// and [WebSocket] into an UpDroid Commander tab.

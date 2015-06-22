@@ -1,4 +1,4 @@
-part of updroid_explorer;
+part of updroid_explorer_workspaces;
 
 class WorkspacesView extends ExplorerView {
   /// Returns an initialized [PanelView] as a [Future] given all normal constructors.

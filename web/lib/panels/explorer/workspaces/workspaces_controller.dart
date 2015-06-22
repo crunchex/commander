@@ -1,4 +1,18 @@
-part of updroid_explorer;
+library updroid_explorer_workspaces;
+
+import 'dart:html';
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:dnd/dnd.dart';
+import 'package:path/path.dart' as pathLib;
+
+import '../../../context_menu.dart';
+import '../../../mailbox.dart';
+import '../../panel_controller.dart';
+import '../explorer.dart';
+
+part 'workspaces_view.dart';
 
 class UpDroidWorkspaces implements ExplorerController {
   PanelView _view;
@@ -150,6 +164,12 @@ class UpDroidWorkspaces implements ExplorerController {
     for (String rawString in fileStrings) {
       addFileSystemEntity(rawString);
     }
+  }
+
+  void cleanUp() {
+    entities.values.forEach((FileSystemEntity f) => f.cleanUp());
+    entities = null;
+    _workspacesView.cleanUp();
   }
 }
 

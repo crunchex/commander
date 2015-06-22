@@ -1,4 +1,15 @@
-part of updroid_explorer;
+library updroid_explorer_nodes;
+
+import 'dart:html';
+import 'dart:async';
+import 'dart:convert';
+
+import '../../../context_menu.dart';
+import '../../../mailbox.dart';
+import '../../panel_controller.dart';
+import '../explorer.dart';
+
+part 'nodes_view.dart';
 
 class UpDroidNodes implements ExplorerController {
   PanelView _view;

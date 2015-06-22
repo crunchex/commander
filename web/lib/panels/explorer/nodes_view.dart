@@ -141,7 +141,7 @@ abstract class RosEntityView {
       ..classes.add('explorer-li');
 
     container = new DivElement()
-      ..classes.add('explorer-fs-container')
+      ..classes.add('explorer-ros-container')
       ..style.userSelect = 'none';
     element.children.add(container);
 
@@ -150,7 +150,7 @@ abstract class RosEntityView {
     container.children.add(icon);
 
     filename = new SpanElement()
-      ..classes.add('explorer-fs-name')
+      ..classes.add('explorer-ros-name')
       ..text = this.name;
     container.children.add(filename);
   }
@@ -198,7 +198,7 @@ class PackageView extends RosEntityView {
   PackageView(String name, [bool expanded]) : super(name) {
     this.expanded = expanded;
 
-    container.classes.add('explorer-folder');
+    container.classes.add('explorer-package');
     this.expanded ? icon.classes.add(openFolderClass) : icon.classes.add(closedFolderClass);
 
     uElement = new UListElement()
@@ -226,7 +226,7 @@ class NodeView extends RosEntityView {
   final String fileClass = 'glyphicons-play-button';
 
   NodeView(String name) : super(name) {
-    container.classes.add('explorer-file');
+    container.classes.add('explorer-node');
     icon.classes.add(fileClass);
   }
 }

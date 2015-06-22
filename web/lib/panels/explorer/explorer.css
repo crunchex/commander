@@ -28,18 +28,21 @@
     margin-left: 0;
 }
 
-.explorer-fs-container {
+.explorer-fs-container,
+.explorer-ros-container {
     display: inline;
     padding: 2px;
     color: #0c0c0c;
 }
 
-.explorer-fs-container.selected {
+.explorer-fs-container.selected,
+.explorer-ros-container.selected {
     background-color: #ff2919;
     color: #ffffff;
 }
 
-.explorer-fs-name {
+.explorer-fs-name,
+.explorer-ros-name {
     font-family: "Avenir Next LT Pro Regular";
     font-size: 12px;
     margin-left: 3px;

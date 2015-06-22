@@ -40,37 +40,38 @@ class CmdrExplorer {
       help.debug('Explorer incoming: ' + s, 0);
 
       switch (um.header) {
-        case "INITIAL_DIRECTORY_LIST":
-          _sendInitial(ws);
+        case "REQUEST_WORKSPACE_CONTENTS":
+          _sendWorkspace(ws);
           break;
 
         case 'REQUEST_WORKSPACE_PATH':
           _sendPath(ws);
           break;
 
-        case 'EXPLORER_NEW_FILE':
+        case 'NEW_FILE':
           _fsNewFile(um.body);
           break;
 
-        case 'EXPLORER_RENAME':
+        case 'EXPLORER_NEW_FOLDER':
+          _fsNewFolder(um.body);
+          // Empty folders don't trigger an incremental update, so we need to
+          // refresh the entire workspace.
+//          _sendWorkspace(ws);
+          break;
+
+        case 'RENAME':
           _fsRename(um.body);
           break;
 
-        case 'EXPLORER_MOVE':
-          // Currently implemented in the same way as RENAME as there is no
-          // direct API for MOVE.
-          _fsRename(um.body);
-          break;
-
-        case 'EXPLORER_DELETE':
+        case 'DELETE':
           _fsDelete(um.body, ws);
           break;
 
-        case 'EXPLORER_WORKSPACE_CLEAN':
+        case 'WORKSPACE_CLEAN':
           _workspaceClean(ws);
           break;
 
-        case 'EXPLORER_WORKSPACE_BUILD':
+        case 'WORKSPACE_BUILD':
           _workspaceBuild(ws);
           break;
 
@@ -94,13 +95,13 @@ class CmdrExplorer {
     this._currentWatcher = null;
   }
 
-  void _sendInitial(WebSocket s) {
+  void _sendWorkspace(WebSocket s) {
     if (_currentWatcher == null) {
       _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
       _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
     }
 
-    _currentWorkspace.listContents().listen((String file) => s.add('[[EXPLORER_ADD]]' + file));
+    _currentWorkspace.listContents().listen((String file) => s.add('[[ADD_UPDATE]]' + file));
   }
 
   void _sendPath(WebSocket s) {
@@ -118,7 +119,7 @@ class CmdrExplorer {
     bool isFile = await FileSystemEntity.isFile(path);
     String fileString = isFile ? 'F:${path}' : 'D:${path}';
 
-    var formatted = '[[EXPLORER_$header]]' + fileString;
+    var formatted = '[[${header}_UPDATE]]' + fileString;
     help.debug('Outgoing: ' + formatted, 0);
     if (header != 'MODIFY') socket.add(formatted);
   }
@@ -174,7 +175,7 @@ class CmdrExplorer {
 
     // Force a remove update on the top level folder as
     // watcher issue workaround.
-    if (isDir) socket.add('[[EXPLORER_REMOVE]]D:$path');
+    if (isDir) socket.add('[[REMOVE_UPDATE]]D:$path');
   }
 
   void _workspaceClean(WebSocket s) {

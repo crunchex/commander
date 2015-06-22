@@ -29,21 +29,21 @@ class UpDroidWorkspaces implements ExplorerController {
 
       dzRecycle = new Dropzone(_workspacesView.recycle);
 
-      _mailbox.ws.send('[[INITIAL_DIRECTORY_LIST]]');
+      _mailbox.ws.send('[[REQUEST_WORKSPACE_CONTENTS]]');
 
       registerEventHandlers();
     });
   }
 
   void registerMailbox() {
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'INITIAL_DIRECTORY_LIST', initialDirectoryList);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_ADD', addUpdate);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_REMOVE', removeUpdate);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CONTENTS', workspaceContents);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'ADD_UPDATE', addUpdate);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REMOVE_UPDATE', removeUpdate);
   }
 
   void registerEventHandlers() {
-    _cleanButton.onClick.listen((e) => _mailbox.ws.send('[[EXPLORER_WORKSPACE_CLEAN]]'));
-    _buildButton.onClick.listen((e) => _mailbox.ws.send('[[EXPLORER_WORKSPACE_BUILD]]'));
+    _cleanButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_CLEAN]]'));
+    _buildButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_BUILD]]'));
 //    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
   }
 
@@ -142,7 +142,7 @@ class UpDroidWorkspaces implements ExplorerController {
   }
 
   /// First Directory List Generation
-  void initialDirectoryList(UpDroidMessage um) {
+  void workspaceContents(UpDroidMessage um) {
     List<String> fileStrings = JSON.decode(um.body);
 
     _workspacesView.uList.innerHtml = '';
@@ -204,10 +204,10 @@ class FileSystemEntity {
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
       List menu = [
-        {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[EXPLORER_NEW_FILE]]' + path)},
-        {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[EXPLORER_NEW_FOLDER]]' + path + '/untitled')},
+        {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[NEW_FILE]]' + path)},
+        {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[NEW_FOLDER]]' + path + '/untitled')},
         {'type': 'toggle', 'title': 'Rename', 'handler': rename},
-        {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
+        {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[DELETE]]' + path)}];
       ContextMenu.createContextMenu(e.page, menu);
     });
   }
@@ -230,7 +230,7 @@ class FileSystemEntity {
       e.preventDefault();
       List menu = [
         {'type': 'toggle', 'title': 'Rename', 'handler': rename},
-        {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[EXPLORER_DELETE]]' + path)}];
+        {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[DELETE]]' + path)}];
       ContextMenu.createContextMenu(e.page, menu);
     });
   }
@@ -252,7 +252,7 @@ class FileSystemEntity {
     renameInput.onKeyUp.listen((e) {
       if (e.keyCode == KeyCode.ENTER) {
         String newPath = pathLib.normalize('$parent/${renameInput.value}');
-        ws.send('[[EXPLORER_RENAME]]$path:$newPath');
+        ws.send('[[RENAME]]$path:$newPath');
         view.completeRename(renameInput);
       }
     });

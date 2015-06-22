@@ -142,6 +142,21 @@ class Workspace {
     return Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_make && catkin_make install'], workingDirectory: path, runInShell: true);
   }
 
+  void runNode(String packageName, String nodeName, List args) {
+    String launchArgs = '';
+    args.forEach((List<String> arg) {
+      if (!arg[1].isEmpty) launchArgs += ' ${arg[0]}:=${arg[1]}';
+    });
+
+    String runCommand = '$path/devel/setup.bash && roscd $packageName && roslaunch launch/$nodeName$launchArgs';
+    help.debug('running: roscd $packageName && roslaunch launch/$nodeName$launchArgs', 0);
+    Process.run('bash', ['-c', '. $runCommand'], runInShell: true).then((process) {
+      // TODO: pipe the output somewhere.
+//      stdout.addStream(process.stdout);
+//      stderr.addStream(process.stderr);
+    });
+  }
+
   /// Gets the path of this workspace.
   String get path => _delegate.path;
 }

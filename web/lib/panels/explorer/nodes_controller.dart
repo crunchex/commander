@@ -28,7 +28,6 @@ class UpDroidNodes implements ExplorerController {
   }
 
   void registerMailbox() {
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CATKIN_NODE_LIST', populateNodes);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'LAUNCH', addLaunch);
   }
 
@@ -46,19 +45,9 @@ class UpDroidNodes implements ExplorerController {
     Package package = packages.putIfAbsent(packageName, () => new Package(packageName, packagePath));
     if (package != null) _nodesView.uList.children.add(package.view.element);
 
-    Node node = new Node(nodeName, args);
+    Node node = new Node(nodeName, args, packageName, _mailbox.ws);
     packages[packageName].nodes.add(node);
     packages[packageName].view.element.children.add(node.view.element);
-  }
-
-  void _runNode() {
-    String runCommand;
-    if (nodeArgs.value.isEmpty) {
-      runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name']]);
-    } else {
-      runCommand = JSON.encode([runParams['package'], runParams['package-path'], runParams['name'], nodeArgs.value]);
-    }
-    mailbox.ws.send('[[CATKIN_RUN]]' + runCommand);
   }
 
   void cleanUp() {
@@ -94,7 +83,7 @@ class Package {
 }
 
 class Node {
-  String name;
+  String name, packageName;
   List args;
   NodeView view;
 
@@ -102,7 +91,8 @@ class Node {
 
   bool _selectEnabled, _selected;
 
-  Node(this.name, this.args) {
+  Node(this.name, this.args, this.packageName, WebSocket ws) {
+    _ws = ws;
     _selected = false;
     _selectEnabled = true;
 
@@ -110,6 +100,23 @@ class Node {
 
     //print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
   }
+
+  void runNode() {
+    List runCommand = [];
+    runCommand.addAll([packageName, name]);
+    view.uElement.children.forEach((LIElement li) {
+      List<String> arg = [];
+
+      DivElement container = li.firstChild;
+      arg.add(container.firstChild.text);
+      arg.add(container.lastChild.value);
+
+      runCommand.add(arg);
+    });
+
+    _ws.send('[[CATKIN_RUN]]' + JSON.encode(runCommand));
+  }
+
 
   void _setUpNodeView() {
     view = new NodeView(name, args);
@@ -123,6 +130,13 @@ class Node {
           _selectEnabled = true;
         });
       }
+    });
+
+    view.container.onContextMenu.listen((e) {
+      e.preventDefault();
+      List menu = [
+        {'type': 'toggle', 'title': 'Run', 'handler': runNode}];
+      ContextMenu.createContextMenu(e.page, menu);
     });
   }
 

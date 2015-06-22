@@ -229,8 +229,13 @@ class CmdrExplorer {
     });
   }
 
-  void _runNode(String runCommand) {
-    Ros.runNode(_currentWorkspace, runCommand);
+  void _runNode(String data) {
+    List decodedData = JSON.decode(data);
+    String packageName = decodedData[0];
+    String nodeName = decodedData[1];
+    List nodeArgs = decodedData.sublist(2);
+
+    _currentWorkspace.runNode(packageName, nodeName, nodeArgs);
   }
 
   void cleanup() {

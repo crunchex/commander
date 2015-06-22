@@ -236,14 +236,14 @@ class NodeView extends RosEntityView {
     element.children.add(uElement);
 
     args.forEach((List<String> argument) {
-      LIElement element = new LIElement()
+      LIElement li = new LIElement()
         ..classes.add('explorer-li');
-      uElement.children.add(element);
+      uElement.children.add(li);
 
       DivElement container = new DivElement()
         ..classes.add('explorer-ros-container')
         ..style.userSelect = 'none';
-      element.children.add(container);
+      li.children.add(container);
 
       SpanElement arg = new SpanElement()
         ..text = argument[0];

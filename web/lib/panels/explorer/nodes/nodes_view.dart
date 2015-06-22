@@ -59,21 +59,6 @@ abstract class RosEntityView {
     container.children.add(filename);
   }
 
-  InputElement startRename() {
-    InputElement renameInput = new InputElement()
-      ..classes.add('explorer-fs-rename')
-      ..placeholder = name;
-    filename.replaceWith(renameInput);
-
-    renameInput.onClick.first.then((e) => e.stopPropagation());
-    renameInput.focus();
-    return renameInput;
-  }
-
-  void completeRename(InputElement renameInput) {
-    renameInput.replaceWith(filename);
-  }
-
   void select() {
     container.classes.add(selectedClass);
     _selected = true;

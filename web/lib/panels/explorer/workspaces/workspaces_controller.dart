@@ -121,6 +121,8 @@ class UpDroidWorkspaces implements ExplorerController {
     // Special case for the workspace src directory (root node).
     if (entity.parent == null) {
       _workspacesView.uList.children.add(entity.view.element);
+      FolderView folderView = entity.view;
+      folderView.toggleExpansion();
       return;
     }
 

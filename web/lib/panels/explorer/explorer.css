@@ -34,14 +34,37 @@
     color: #0c0c0c;
 }
 
+.explorer-ros-container.explorer-arg-container {
+    padding: 0;
+    margin-left: 2px;
+}
+
 .explorer-fs-container.selected,
 .explorer-ros-container.selected {
     background-color: #ff2919;
     color: #ffffff;
 }
 
+.explorer-arg-name {
+    position: relative;
+    bottom: -2px;
+    left: 6px;
+    font-family: "Avenir Next LT Pro Regular";
+    font-size: 10px;
+}
+
+.explorer-arg-input {
+    width: 100%;
+    margin-left: 0;
+    font-family: "Avenir Next LT Pro Regular";
+    font-size: 12px;
+}
+
 .explorer-icon {
     display: inline;
+    position: relative;
+    top: 2px;
+    margin-right: 3px;
 }
 
 .explorer-fs-name,
@@ -57,6 +80,10 @@
     width: 100%;
     vertical-align: middle;
     border-top: 1px solid #e3e3e3;
+}
+
+.recycle {
+    color: #0c0c0c;
 }
 
 .recycle .recycle-ondrag {

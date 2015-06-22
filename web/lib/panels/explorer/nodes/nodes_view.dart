@@ -130,16 +130,17 @@ class NodeView extends RosEntityView {
       uElement.children.add(li);
 
       DivElement container = new DivElement()
-        ..classes.add('explorer-ros-container')
+        ..classes.addAll(['explorer-ros-container', 'explorer-arg-container'])
         ..style.userSelect = 'none';
       li.children.add(container);
 
-      SpanElement arg = new SpanElement()
+      DivElement arg = new DivElement()
+        ..classes.add('explorer-arg-name')
         ..text = argument[0];
       container.children.add(arg);
 
-
-      InputElement argValue = new InputElement();
+      InputElement argValue = new InputElement()
+        ..classes.add('explorer-arg-input');
       if (argument[1] != null) argValue.placeholder = argument[1];
       container.children.add(argValue);
     });

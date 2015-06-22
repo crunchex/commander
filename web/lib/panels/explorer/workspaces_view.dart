@@ -101,7 +101,7 @@ abstract class FileSystemEntityView {
     _selected = false;
   }
 
-  void cleanup() {
+  void cleanUp() {
     for (Element child in element.children) {
       child.remove();
     }

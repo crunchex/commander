@@ -140,7 +140,7 @@ class UpDroidExplorer extends PanelController {
 
   void _explorerDirPath(UpDroidMessage um) {
     workspacePath = um.body;
-    _showNodesController();
+    _showWorkspacesController();
   }
 
   void _showWorkspacesController() {

@@ -222,7 +222,7 @@ class UpDroidWorkspaces implements ExplorerController {
 
     // Simple case for a file.
     if (type == 'F') {
-      entities[path].cleanup();
+      entities[path].cleanUp();
       entities.remove(path);
       return;
     }
@@ -231,7 +231,7 @@ class UpDroidWorkspaces implements ExplorerController {
     List<String> keysWithPath = entities.keys.where((String key) => key.contains(path));
     List<String> entityKeys = new List.from(keysWithPath);
     entityKeys.forEach((String key) {
-      entities[key].cleanup();
+      entities[key].cleanUp();
       entities.remove(key);
     });
   }
@@ -326,7 +326,9 @@ class UpDroidWorkspaces implements ExplorerController {
   }
 
   void cleanUp() {
-
+    entities.values.forEach((FileSystemEntity f) => f.cleanUp());
+    entities = null;
+    _workspacesView.cleanUp();
   }
 }
 
@@ -437,9 +439,9 @@ class FileSystemEntity {
     document.body.onClick.first.then((_) => view.completeRename(renameInput));
   }
 
-  void cleanup() {
+  void cleanUp() {
     //_contextListeners.forEach((StreamSubscription listener) => listener.cancel());
-    view.cleanup();
+    view.cleanUp();
   }
 
   static String getNameFromPath(String path, String workspacePath) {

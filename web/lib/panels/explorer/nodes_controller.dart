@@ -92,7 +92,9 @@ class UpDroidNodes implements ExplorerController {
   }
 
   void cleanUp() {
-
+    packages.values.forEach((Package p) => p.cleanUp());
+    packages = null;
+    _nodesView.cleanUp();
   }
 }
 
@@ -116,7 +118,8 @@ class Package {
   }
 
   void cleanUp() {
-
+    nodes.forEach((Node n) => n.cleanUp());
+    view.cleanUp();
   }
 }
 
@@ -165,8 +168,8 @@ class Node {
     _selected = false;
   }
 
-  void cleanup() {
+  void cleanUp() {
     //_contextListeners.forEach((StreamSubscription listener) => listener.cancel());
-    view.cleanup();
+    view.cleanUp();
   }
 }

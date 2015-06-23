@@ -24,7 +24,8 @@ class UpDroidEditor extends TabController {
     List menu = [
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'New'},
-        {'type': 'submenu', 'title': 'Templates'},
+        {'type': 'submenu', 'title': 'Templates', 'items':
+          ['Publisher', 'Subscriber', 'Hello World Talker', 'Hello World Listener', 'Basic Launch File']},
         {'type': 'toggle', 'title': 'Save'},
         {'type': 'toggle', 'title': 'Save As'},
         {'type': 'toggle', 'title': 'Close Tab'}]},

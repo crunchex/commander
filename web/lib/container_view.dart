@@ -71,7 +71,7 @@ abstract class ContainerView {
     } else if (itemConfig['type'] == 'input') {
       itemElement = _createInputItem(itemConfig['title']);
     } else if (itemConfig['type'] == 'submenu') {
-      itemElement = _createSubMenu("Templates", ['Publisher', 'Subscriber', 'Hello World Talker', 'Hello World Listener', 'Basic Launch File']);
+      itemElement = _createSubMenu(itemConfig['title'], itemConfig['items']);
     } else if (itemConfig['type'] == 'divider') {
       itemElement = _createDivider(itemConfig['title']);
     }

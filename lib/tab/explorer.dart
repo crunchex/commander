@@ -48,6 +48,14 @@ class CmdrExplorer {
           _sendPath(ws);
           break;
 
+        case 'REQUEST_WORKSPACE_NAMES':
+          _sendWorkspaceNames(ws);
+          break;
+
+        case 'SET_CURRENT_WORKSPACE':
+          _setCurrentWorkspace(um.body, ws);
+          break;
+
         case 'NEW_FILE':
           _fsNewFile(um.body);
           break;
@@ -107,6 +115,21 @@ class CmdrExplorer {
 
   void _sendPath(WebSocket s) {
     help.formattedMessage(s, 'EXPLORER_DIRECTORY_PATH', _currentWorkspace.path);
+  }
+
+  void _sendWorkspaceNames(WebSocket ws) {
+    uproot.list()
+      .where((Directory w) => w.path != _currentWorkspace.path)
+      .listen((Directory w) => ws.add('[[WORKSPACE_NAME]]' + w.path.split('/').last));
+  }
+
+  void _setCurrentWorkspace(String newWorkspaceName, WebSocket ws) {
+    _currentWatcherStream.cancel();
+
+    _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');
+    _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
+    _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(ws, e));
+    _sendPath(ws);
   }
 
   /// Convenience method for adding a formatted filesystem update to the socket

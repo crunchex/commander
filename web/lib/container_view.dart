@@ -200,6 +200,7 @@ abstract class ContainerView {
       ..text = title;
     item.append(button);
     UListElement dropdown = new UListElement()
+      ..id = '${shortName.toLowerCase()}-$id-${title.toLowerCase().replaceAll(' ', '-')}'
       ..classes.add('dropdown-menu');
     item.append(dropdown);
 

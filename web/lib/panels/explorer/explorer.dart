@@ -18,7 +18,7 @@ class UpDroidExplorer extends PanelController {
   static List getMenuConfig() {
     List menu = [
       {'title': 'File', 'items': [
-        {'type': 'toggle', 'title': 'Add Workspace'},
+        {'type': 'submenu', 'title': 'Open Workspace', 'items': []},
         {'type': 'toggle', 'title': 'Delete Workspace'},
         {'type': 'toggle', 'title': 'Close Panel'}]},
       {'title': 'Actions', 'items': [
@@ -44,7 +44,7 @@ class UpDroidExplorer extends PanelController {
   InputElement nodeArgs;
 
   AnchorElement _dropdown;
-  AnchorElement _addWorkspaceButton;
+  AnchorElement _openWorkspaceButton;
   AnchorElement _deleteWorkspaceButton;
   AnchorElement _workspacesButton;
   AnchorElement _nodesButton;
@@ -66,7 +66,7 @@ class UpDroidExplorer extends PanelController {
   }
 
   Future setUpController() {
-    _addWorkspaceButton = view.refMap['add-workspace'];
+    _openWorkspaceButton = view.refMap['open-workspace'];
     _deleteWorkspaceButton = view.refMap['delete-workspace'];
     _workspacesButton = view.refMap['workspaces'];
     _nodesButton = view.refMap['nodes'];
@@ -76,12 +76,13 @@ class UpDroidExplorer extends PanelController {
 
   void registerMailbox() {
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'REQUEST_WORKSPACE_PATH', _requestWorkspacePath);
+    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'REQUEST_WORKSPACE_NAMES', _requestWorkspaceNames);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_PATH', _explorerDirPath);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_NAME', _addWorkspaceToMenu);
   }
 
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
-    _addWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'ADD_WORKSPACE')));
     _deleteWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE')));
     _workspacesButton.onClick.listen((e) => _showWorkspacesController());
     _nodesButton.onClick.listen((e) => _showNodesController());
@@ -127,7 +128,29 @@ class UpDroidExplorer extends PanelController {
 
   //\/\/ UpDroidMessage Handlers /\/\//
 
+  void _addWorkspaceToMenu(UpDroidMessage um) {
+    view.addMenuItem({'type': 'toggle', 'title': um.body}, '#${shortName.toLowerCase()}-$id-open-workspace');
+    AnchorElement item = view.refMap[um.body];
+    item.onClick.listen((e) {
+      _openExistingWorkspace(um.body);
+    });
+  }
+
+  void _openExistingWorkspace(String name) {
+    if (controller != null) {
+      controller.cleanUp();
+      controller = null;
+    }
+
+    mailbox.ws.send('[[SET_CURRENT_WORKSPACE]]' + name);
+
+    // TODO: make sure all the inner nodes (and listeners) get cleaned up properly.
+    querySelector('#${shortName.toLowerCase()}-$id-open-workspace').innerHtml = '';
+    mailbox.ws.send('[[REQUEST_WORKSPACE_NAMES]]');
+  }
+
   void _requestWorkspacePath(UpDroidMessage um) => mailbox.ws.send('[[REQUEST_WORKSPACE_PATH]]');
+  void _requestWorkspaceNames(UpDroidMessage um) => mailbox.ws.send('[[REQUEST_WORKSPACE_NAMES]]');
 
   void _explorerDirPath(UpDroidMessage um) {
     workspacePath = um.body;

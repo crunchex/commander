@@ -5,7 +5,8 @@
 .exp-container {
     background-color: #eaecec;
     height: 100%;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     box-shadow: none;
 }
 
@@ -16,7 +17,7 @@
 }
 
 .explorer-li {
-    margin-left: 15px;
+    margin-left: 5px;
 }
 
 .exp-container > .explorer-ul {
@@ -32,6 +33,16 @@
 .explorer-ros-container {
     padding: 2px;
     color: #0c0c0c;
+}
+
+.explorer-fs-container {
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+}
+
+.explorer-ros-container.explorer-node {
+    text-overflow: ellipsis;
+    overflow-x: hidden;
 }
 
 .explorer-ros-container.explorer-arg-container {
@@ -51,6 +62,8 @@
     left: 6px;
     font-family: "Avenir Next LT Pro Regular";
     font-size: 10px;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
 }
 
 .explorer-arg-input {

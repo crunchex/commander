@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:async';
 
 import '../mailbox.dart';
+import '../container_view.dart';
 
 part 'panel_view.dart';
 

@@ -63,8 +63,6 @@ class Workspace {
     return c.future;
   }
 
-  Stream listSrc() => src.list(followLinks: false);
-
   Stream listContents() {
     return _delegate.list(recursive: true, followLinks: false).transform(toWorkspaceContents(path)).asBroadcastStream();
   }

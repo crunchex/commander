@@ -51,9 +51,9 @@ class UpDroidWorkspaces implements ExplorerController {
   }
 
   void registerMailbox() {
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CONTENTS', workspaceContents);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'ADD_UPDATE', addUpdate);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REMOVE_UPDATE', removeUpdate);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CONTENTS', _workspaceContents);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'ADD_UPDATE', _addUpdate);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REMOVE_UPDATE', _removeUpdate);
   }
 
   void registerEventHandlers() {
@@ -63,9 +63,9 @@ class UpDroidWorkspaces implements ExplorerController {
   }
 
   /// Handles an Explorer add update for a single file.
-  void addUpdate(UpDroidMessage um) => addFileSystemEntity(um.body);
+  void _addUpdate(UpDroidMessage um) => _addFileSystemEntity(um.body);
 
-  void addFileSystemEntity(String data) {
+  void _addFileSystemEntity(String data) {
     List<String> split = data.split(':');
     bool isDir = split[0] == 'D' ? true : false;
     String path = data.split(':')[1];
@@ -76,7 +76,7 @@ class UpDroidWorkspaces implements ExplorerController {
     // Recursively add a parent that isn't in the system yet.
     String parentPath = FileSystemEntity.getParentFromPath(path, workspacePath);
     if (parentPath != null && !entities.containsKey(parentPath)) {
-      addFileSystemEntity('D:$parentPath');
+      _addFileSystemEntity('D:$parentPath');
     }
 
     FileSystemEntity entity;
@@ -103,9 +103,9 @@ class UpDroidWorkspaces implements ExplorerController {
   }
 
   /// Handles an Explorer remove update for a single file.
-  void removeUpdate(UpDroidMessage um) => removeFileSystemEntity(um.body);
+  void _removeUpdate(UpDroidMessage um) => _removeFileSystemEntity(um.body);
 
-  void removeFileSystemEntity(String data) {
+  void _removeFileSystemEntity(String data) {
     List<String> split = data.split(':');
     String type = split[0];
     String path = split[1];
@@ -130,15 +130,16 @@ class UpDroidWorkspaces implements ExplorerController {
   }
 
   /// First Directory List Generation
-  void workspaceContents(UpDroidMessage um) {
+  void _workspaceContents(UpDroidMessage um) {
     List<String> fileStrings = JSON.decode(um.body);
 
     _workspacesView.uList.innerHtml = '';
 
     for (String rawString in fileStrings) {
-      addFileSystemEntity(rawString);
+      _addFileSystemEntity(rawString);
     }
   }
+
 
   void cleanUp() {
     entities.values.forEach((FileSystemEntity f) => f.cleanUp());

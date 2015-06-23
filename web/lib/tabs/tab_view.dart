@@ -14,6 +14,8 @@ class TabView extends ContainerView {
   }
 
   LIElement extra;
+  DivElement closeControlHitbox;
+  DivElement cloneControlHitbox;
 
   TabView(int id, int col, String title, String shortName, List config, [bool externalCss=false]) :
   super(id, col, title, shortName, config) {
@@ -26,5 +28,29 @@ class TabView extends ContainerView {
     extra.id = 'extra-$id';
     extra.classes.add('extra-menubar');
     menus.children.add(extra);
+
+    cloneControlHitbox = new DivElement()
+      ..title = 'Clone'
+      ..classes.add('clone-control-hitbox');
+    tabHandle.children.insert(0, cloneControlHitbox);
+
+    DivElement cloneControl = new DivElement()
+      ..classes.add('clone-control');
+    cloneControlHitbox.children.add(cloneControl);
+
+    closeControlHitbox = new DivElement()
+      ..title = 'Close'
+      ..classes.add('close-control-hitbox');
+    tabHandle.children.insert(1, closeControlHitbox);
+
+    DivElement closeControl = new DivElement()
+      ..classes.add('close-control');
+    closeControlHitbox.children.add(closeControl);
+
+//    SpanElement closeSymbol = new SpanElement()
+//      ..classes.add('close-control-symbol')
+//      ..text = 'X';
+//    closeControl.children.add(closeSymbol);
+
   }
 }

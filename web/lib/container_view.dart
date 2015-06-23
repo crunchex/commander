@@ -13,11 +13,9 @@ abstract class ContainerView {
 
   LinkElement styleLink;
   AnchorElement tabHandleButton;
-  DivElement closeControlHitbox;
-  DivElement cloneControlHitbox;
   DivElement content;
 
-  LIElement _tabHandle;
+  LIElement tabHandle;
   UListElement menus;
   DivElement _tabContainer,_tabContent;
   List config;
@@ -31,21 +29,21 @@ abstract class ContainerView {
 
   /// Adds the CSS classes to make a tab 'active'.
   void makeActive() {
-    _tabHandle.classes.add('active');
+    tabHandle.classes.add('active');
     _tabContainer.classes.add('active');
     _tabContent.classes.add('active');
   }
 
   /// Removes the CSS classes to make a tab 'inactive'.
   void makeInactive() {
-    _tabHandle.classes.remove('active');
+    tabHandle.classes.remove('active');
     _tabContainer.classes.remove('active');
     _tabContent.classes.remove('active');
   }
 
   /// Removes the tab elements from the DOM.
   void destroy() {
-    _tabHandle.remove();
+    tabHandle.remove();
     _tabContainer.remove();
     if (styleLink != null) styleLink.remove();
   }
@@ -89,34 +87,11 @@ abstract class ContainerView {
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
   void _setUpTabHandle() {
-    _tabHandle = new LIElement()
+    tabHandle = new LIElement()
       ..classes.add('tab-handle')
       ..classes.add('active');
 
     String name = title.toLowerCase().replaceAll(' ', '-');
-
-    closeControlHitbox = new DivElement()
-      ..title = 'Close'
-      ..classes.add('close-control-hitbox');
-    _tabHandle.children.add(closeControlHitbox);
-
-    DivElement closeControl = new DivElement()
-      ..classes.add('close-control');
-    closeControlHitbox.children.add(closeControl);
-
-//    SpanElement closeSymbol = new SpanElement()
-//      ..classes.add('close-control-symbol')
-//      ..text = 'X';
-//    closeControl.children.add(closeSymbol);
-
-    cloneControlHitbox = new DivElement()
-      ..title = 'Clone'
-      ..classes.add('clone-control-hitbox');
-    _tabHandle.children.add(cloneControlHitbox);
-
-    DivElement cloneControl = new DivElement()
-      ..classes.add('clone-control');
-    cloneControlHitbox.children.add(cloneControl);
 
     tabHandleButton = new AnchorElement()
         ..id = 'button-$name-$id'
@@ -128,10 +103,10 @@ abstract class ContainerView {
       //e.stopImmediatePropagation();
       //_renameEventHandler();
     });
-    _tabHandle.children.add(tabHandleButton);
+    tabHandle.children.add(tabHandleButton);
 
     DivElement column = querySelector('#column-$col');
-    column.children.first.children.add(_tabHandle);
+    column.children.first.children.add(tabHandle);
   }
 
   /// Takes a [num], [col], [title], [config], and [active] to generate the menu bar and menu items
@@ -295,10 +270,10 @@ abstract class ContainerView {
 
   /// Handles tab renaming with a single-click event.
   void _renameEventHandler() {
-    if (!_tabHandle.className.contains('editing') && _tabHandle.className.contains('active')) {
+    if (!tabHandle.className.contains('editing') && tabHandle.className.contains('active')) {
       bool editing = false;
 
-      _tabHandle.classes.add('editing');
+      tabHandle.classes.add('editing');
 
       String originalText = tabHandleButton.text;
 
@@ -307,7 +282,7 @@ abstract class ContainerView {
       a.children.add(input);
       input.value = originalText;
 
-      _tabHandle.children[0] = a;
+      tabHandle.children[0] = a;
       input.focus();
       input.select();
 
@@ -322,8 +297,8 @@ abstract class ContainerView {
           } else if (e.keyCode == KeyCode.ESC){
             tabHandleButton.text = originalText;
           }
-          _tabHandle.children[0] = tabHandleButton;
-          _tabHandle.classes.remove('editing');
+          tabHandle.children[0] = tabHandleButton;
+          tabHandle.classes.remove('editing');
           subs.forEach((sub) => sub.cancel());
         }
       }));
@@ -331,8 +306,8 @@ abstract class ContainerView {
       subs.add(document.onClick.listen((e) {
         if (editing == true) {
           tabHandleButton.text = originalText;
-          _tabHandle.children[0] = tabHandleButton;
-          _tabHandle.classes.remove('editing');
+          tabHandle.children[0] = tabHandleButton;
+          tabHandle.classes.remove('editing');
           subs.forEach((sub) => sub.cancel());
         }
       }));

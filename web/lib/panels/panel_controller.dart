@@ -33,8 +33,6 @@ abstract class PanelController {
 
       _closePanelButton = view.refMap['close-panel'];
       _closePanelButton.onClick.listen((e) => _closePanel());
-      view.closeControlHitbox.onClick.listen((e) => _closePanel());
-      view.cloneControlHitbox.onClick.listen((e) => _clonePanel(e));
 
       await setUpController();
       registerEventHandlers();

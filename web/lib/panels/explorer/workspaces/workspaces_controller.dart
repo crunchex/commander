@@ -71,7 +71,7 @@ class UpDroidWorkspaces implements ExplorerController {
     String path = data.split(':')[1];
 
     // Don't do anything if the entity is already in the system.
-    if (entities.containsKey(path)) return;
+    if (entities.containsKey(path) || path.split('/').last.startsWith('.')) return;
 
     // Recursively add a parent that isn't in the system yet.
     String parentPath = FileSystemEntity.getParentFromPath(path, workspacePath);

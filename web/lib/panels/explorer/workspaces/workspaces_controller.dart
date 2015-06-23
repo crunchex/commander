@@ -62,47 +62,6 @@ class UpDroidWorkspaces implements ExplorerController {
 //    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
   }
 
-  /// Sets up a [Draggable] for the existing [LIElement] to handle file open and delete.
-  void dragSetup(LIElement li, FileSystemEntity file) {
-    // Create a new draggable using the current element as
-    // the visual element (avatar) being dragged.
-    Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
-
-    // Dragging through nested dropzones appears to be glitchy.
-    d.onDragStart.listen((event) {
-      d.avatarHandler.avatar.children.first.classes.remove('highlighted');
-      if (pathLib.dirname(li.dataset['path']) != workspacePath) _workspacesView.drop.classes.add('file-drop-ondrag');
-      _workspacesView.recycle.classes.add('recycle-ondrag');
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
-      ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      for (SpanElement span in spanList) {
-        span.classes.add('span-ondrag');
-      }
-      for (SpanElement span in closedList) {
-        span.classes.add('span-ondrag');
-      }
-      if (!file.isDirectory) {
-        cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_ADD', body: 'updroideditor-ondrag'));
-      }
-    });
-
-    d.onDragEnd.listen((event) {
-      _workspacesView.drop.classes.remove('file-drop-ondrag');
-      _workspacesView.recycle.classes.remove('recycle-ondrag');
-      ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
-      ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
-      for (SpanElement span in spanList) {
-        span.classes.remove('span-ondrag');
-      }
-      for (SpanElement span in closedList) {
-        span.classes.remove('span-ondrag');
-      }
-      if (!file.isDirectory) {
-        cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-ondrag'));
-      }
-    });
-  }
-
   /// Handles an Explorer add update for a single file.
   void addUpdate(UpDroidMessage um) => addFileSystemEntity(um.body);
 
@@ -187,3 +146,44 @@ class UpDroidWorkspaces implements ExplorerController {
     _workspacesView.cleanUp();
   }
 }
+
+///// Sets up a [Draggable] for the existing [LIElement] to handle file open and delete.
+//void dragSetup(LIElement li, FileSystemEntity file) {
+//  // Create a new draggable using the current element as
+//  // the visual element (avatar) being dragged.
+//  Draggable d = new Draggable(li, avatarHandler: new AvatarHandler.clone());
+//
+//  // Dragging through nested dropzones appears to be glitchy.
+//  d.onDragStart.listen((event) {
+//    d.avatarHandler.avatar.children.first.classes.remove('highlighted');
+//    if (pathLib.dirname(li.dataset['path']) != workspacePath) _workspacesView.drop.classes.add('file-drop-ondrag');
+//    _workspacesView.recycle.classes.add('recycle-ondrag');
+//    ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
+//    ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
+//    for (SpanElement span in spanList) {
+//      span.classes.add('span-ondrag');
+//    }
+//    for (SpanElement span in closedList) {
+//      span.classes.add('span-ondrag');
+//    }
+//    if (!file.isDirectory) {
+//      cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_ADD', body: 'updroideditor-ondrag'));
+//    }
+//  });
+//
+//  d.onDragEnd.listen((event) {
+//    _workspacesView.drop.classes.remove('file-drop-ondrag');
+//    _workspacesView.recycle.classes.remove('recycle-ondrag');
+//    ElementList<SpanElement> spanList = querySelectorAll('.glyphicons-folder-open');
+//    ElementList<SpanElement> closedList = querySelectorAll('.list-folder');
+//    for (SpanElement span in spanList) {
+//      span.classes.remove('span-ondrag');
+//    }
+//    for (SpanElement span in closedList) {
+//      span.classes.remove('span-ondrag');
+//    }
+//    if (!file.isDirectory) {
+//      cs.add(new CommanderMessage('UPDROIDEDITOR', 'CLASS_REMOVE', body: 'updroideditor-ondrag'));
+//    }
+//  });
+//}

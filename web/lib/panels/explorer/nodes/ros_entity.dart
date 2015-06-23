@@ -46,6 +46,8 @@ class Node {
   }
 
   void runNode() {
+    if (!_selected) return;
+
     List runCommand = [];
     runCommand.addAll([packageName, name]);
     view.uElement.children.forEach((LIElement li) {

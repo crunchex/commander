@@ -17,7 +17,7 @@ class UpDroidNodes implements ExplorerController {
   NodesView _nodesView;
   Mailbox _mailbox;
 
-  AnchorElement _runButton;
+  AnchorElement _runNodesButton;
 
   Map<String, Package> packages = {};
   String workspacePath;
@@ -31,7 +31,7 @@ class UpDroidNodes implements ExplorerController {
     NodesView.createNodesView(id, _view.content).then((nodesView) {
       _nodesView = nodesView;
 
-      _runButton = _view.refMap['run'];
+      _runNodesButton = _view.refMap['run-nodes'];
 
       _mailbox.ws.send('[[REQUEST_NODE_LIST]]');
 
@@ -44,7 +44,9 @@ class UpDroidNodes implements ExplorerController {
   }
 
   void registerEventHandlers() {
-
+    _runNodesButton.onClick.listen((e) {
+      packages.values.forEach((Package p) => p.nodes.forEach((Node n) => n.runNode()));
+    });
   }
 
   void addLaunch(UpDroidMessage um) {

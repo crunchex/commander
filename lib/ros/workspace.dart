@@ -157,7 +157,7 @@ class Workspace {
 
     String runCommand = '$path/devel/setup.bash && roscd $packageName && roslaunch launch/$nodeName$launchArgs';
     help.debug('running: roscd $packageName && roslaunch launch/$nodeName$launchArgs', 0);
-    Process.run('bash', ['-c', '. $runCommand'], runInShell: true).then((process) {
+    Process.start('bash', ['-c', '. $runCommand'], runInShell: true).then((process) {
       // TODO: pipe the output somewhere.
 //      stdout.addStream(process.stdout);
 //      stderr.addStream(process.stderr);

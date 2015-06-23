@@ -7,18 +7,17 @@ import 'dart:async';
 /// container with a menu bar in the UpDroid Commander GUI.
 abstract class ContainerView {
   int id, col;
-  String title;
-  String shortName;
+  String title, shortName;
+  List config;
   Map refMap;
 
   LinkElement styleLink;
   AnchorElement tabHandleButton;
   DivElement content;
-
   LIElement tabHandle;
   UListElement menus;
-  DivElement _tabContainer,_tabContent;
-  List config;
+
+  DivElement _tabContainer, _tabContent;
 
   ContainerView(this.id, this.col, this.title, this.shortName, this.config) {
     refMap = {};

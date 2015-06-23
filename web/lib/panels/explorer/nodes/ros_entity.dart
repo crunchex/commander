@@ -29,12 +29,13 @@ class Node {
   String name, packageName;
   List args;
   NodeView view;
+  var deselectAllNodes;
 
   WebSocket _ws;
 
   bool _selectEnabled, _selected;
 
-  Node(this.name, this.args, this.packageName, WebSocket ws) {
+  Node(this.name, this.args, this.packageName, WebSocket ws, this.deselectAllNodes) {
     _ws = ws;
     _selected = false;
     _selectEnabled = true;
@@ -66,6 +67,8 @@ class Node {
 
     view.container.onClick.listen((e) {
       if (_selectEnabled) {
+        if (!e.shiftKey) deselectAllNodes();
+
         toggleSelected();
         _selectEnabled = false;
 

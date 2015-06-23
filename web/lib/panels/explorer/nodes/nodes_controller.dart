@@ -57,9 +57,13 @@ class UpDroidNodes implements ExplorerController {
     Package package = packages.putIfAbsent(packageName, () => new Package(packageName, packagePath));
     if (package != null) _nodesView.uList.children.add(package.view.element);
 
-    Node node = new Node(nodeName, args, packageName, _mailbox.ws);
+    Node node = new Node(nodeName, args, packageName, _mailbox.ws, _deselectAllNodes);
     packages[packageName].nodes.add(node);
     packages[packageName].view.uElement.children.add(node.view.element);
+  }
+
+  void _deselectAllNodes() {
+    packages.values.forEach((Package p) => p.nodes.forEach((Node n) => n.deselect()));
   }
 
   void cleanUp() {

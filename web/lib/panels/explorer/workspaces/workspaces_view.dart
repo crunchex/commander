@@ -27,7 +27,7 @@ class WorkspacesView extends ExplorerView {
 
     recycle = new SpanElement()
       ..classes.addAll(['glyphicons', 'glyphicons-bin', 'recycle']);
-    toolbar.children.add(recycle);
+//    toolbar.children.add(recycle);
   }
 
   void cleanUp() {

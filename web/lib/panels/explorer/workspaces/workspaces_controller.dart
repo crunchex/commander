@@ -107,16 +107,25 @@ class UpDroidWorkspaces implements ExplorerController {
   void addUpdate(UpDroidMessage um) => addFileSystemEntity(um.body);
 
   void addFileSystemEntity(String data) {
+    List<String> split = data.split(':');
+    bool isDir = split[0] == 'D' ? true : false;
     String path = data.split(':')[1];
 
     // Don't do anything if the entity is already in the system.
     if (entities.containsKey(path)) return;
 
     // Recursively add a parent that isn't in the system yet.
-    String parent = FileSystemEntity.getParentFromPath(path, workspacePath);
-    if (parent != null && !entities.containsKey(parent)) addFileSystemEntity('D:$parent');
+    String parentPath = FileSystemEntity.getParentFromPath(path, workspacePath);
+    if (parentPath != null && !entities.containsKey(parentPath)) {
+      addFileSystemEntity('D:$parentPath');
+    }
 
-    FileSystemEntity entity = new FileSystemEntity(data, workspacePath, _mailbox.ws);
+    FileSystemEntity entity;
+    if (isDir) {
+      entity = new FolderEntity(path, workspacePath, _mailbox.ws);
+    } else {
+      entity = new FileEntity(path, workspacePath, _mailbox.ws);
+    }
     entities[entity.path] = entity;
 
     // Special case for the workspace src directory (root node).

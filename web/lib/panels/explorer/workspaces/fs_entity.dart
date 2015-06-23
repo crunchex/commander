@@ -3,37 +3,83 @@ part of updroid_explorer_workspaces;
 /// Container class that extracts data from the raw file text passed in from
 /// the server over [WebSocket]. Primarily used for generating the HTML views
 /// in the file explorer that represent the filesystem.
-class FileSystemEntity {
+abstract class FileSystemEntity {
+  static bool testForWorkspace(String path, String workspacePath) => path == '$workspacePath/src';
+
+  static String getNameFromPath(String path, String workspacePath) {
+    List<String> pathList = path.split('/');
+    return (testForWorkspace(path, workspacePath)) ? pathList[pathList.length - 2] : pathList.last;
+  }
+
+  static String getParentFromPath(String path, String workspacePath) {
+    List<String> pathList = path.split('/');
+    if (testForWorkspace(path, workspacePath)) return null;
+
+    String parent = '';
+    pathList.sublist(0, pathList.length - 1).forEach((String s) => parent += '$s/');
+    return pathLib.normalize(parent);
+  }
+
   String path, workspacePath, name, parent;
   bool isDirectory, isPackage, selected;
   WebSocket ws;
   FileSystemEntityView view;
 
+  bool get isWorkspace => testForWorkspace(path, workspacePath);
+
   bool _selectEnabled;
 
-  FileSystemEntity(String raw, String workspacePath, this.ws) {
+  FileSystemEntity(String path, String workspacePath, bool isFolder, this.ws) {
     selected = false;
     _selectEnabled = true;
 
-    List<String> rawList = raw.split(':');
-    isDirectory = rawList[0] == 'D' ? true : false;
-    path = pathLib.normalize(rawList[1]);
+    this.path = pathLib.normalize(path);
     this.workspacePath = pathLib.normalize(workspacePath);
 
-    name = getNameFromPath(path, workspacePath);
-    parent = getParentFromPath(path, workspacePath);
-
-    if (isDirectory) {
-      isPackage = false;
-      setUpFolderView();
-    } else {
-      setUpFileView();
-    }
+    name = getNameFromPath(this.path, this.workspacePath);
+    parent = getParentFromPath(this.path, this.workspacePath);
 
     //print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
   }
 
-  void setUpFolderView() {
+  void toggleSelected() => selected ? deselect() : select();
+
+  void select() {
+    view.select();
+    selected = true;
+  }
+
+  void deselect() {
+    view.deselect();
+    selected = false;
+  }
+
+  void rename() {
+    InputElement renameInput = view.startRename();
+    renameInput.onKeyUp.listen((e) {
+      if (e.keyCode == KeyCode.ENTER) {
+        String newPath = pathLib.normalize('$parent/${renameInput.value}');
+        ws.send('[[RENAME]]$path:$newPath');
+        view.completeRename(renameInput);
+      }
+    });
+
+    document.body.onClick.first.then((_) => view.completeRename(renameInput));
+  }
+
+  void cleanUp() {
+    //_contextListeners.forEach((StreamSubscription listener) => listener.cancel());
+    view.cleanUp();
+  }
+}
+
+class FolderEntity extends FileSystemEntity {
+  FolderEntity(String path, String workspacePath, WebSocket ws) :
+  super(path, workspacePath, true, ws) {
+    setUpView();
+  }
+
+  void setUpView() {
     view = new FolderView(name);
 
     view.container.onClick.listen((e) {
@@ -70,7 +116,25 @@ class FileSystemEntity {
     });
   }
 
-  void setUpFileView() {
+  void build() {
+    // Special case if workspace folder.
+    if (name != path.split('/').last) {
+      ws.send('[[WORKSPACE_BUILD]]');
+      return;
+    }
+
+    ws.send('[[BUILD_PACKAGE]]' + name);
+  }
+}
+
+class FileEntity extends FileSystemEntity {
+
+  FileEntity(String path, String workspacePath, WebSocket ws) :
+  super(path, workspacePath, true, ws) {
+    setUpView();
+  }
+
+  void setUpView() {
     view = new FileView(name);
 
     view.container.onClick.listen((e) {
@@ -92,61 +156,5 @@ class FileSystemEntity {
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[DELETE]]' + path)}];
       ContextMenu.createContextMenu(e.page, menu);
     });
-  }
-
-  void toggleSelected() => selected ? deselect() : select();
-
-  void select() {
-    view.select();
-    selected = true;
-  }
-
-  void deselect() {
-    view.deselect();
-    selected = false;
-  }
-
-  void build() {
-    // Special case if workspace folder.
-    if (name != path.split('/').last) {
-      ws.send('[[WORKSPACE_BUILD]]');
-      return;
-    }
-
-    ws.send('[[BUILD_PACKAGE]]' + name);
-  }
-
-  void rename() {
-    InputElement renameInput = view.startRename();
-    renameInput.onKeyUp.listen((e) {
-      if (e.keyCode == KeyCode.ENTER) {
-        String newPath = pathLib.normalize('$parent/${renameInput.value}');
-        ws.send('[[RENAME]]$path:$newPath');
-        view.completeRename(renameInput);
-      }
-    });
-
-    document.body.onClick.first.then((_) => view.completeRename(renameInput));
-  }
-
-  void cleanUp() {
-    //_contextListeners.forEach((StreamSubscription listener) => listener.cancel());
-    view.cleanUp();
-  }
-
-  static String getNameFromPath(String path, String workspacePath) {
-    List<String> pathList = path.split('/');
-    return (path == '$workspacePath/src') ? pathList[pathList.length - 2] : pathList.last;
-  }
-
-  static String getParentFromPath(String path, String workspacePath) {
-    List<String> pathList = path.split('/');
-    if (path == '$workspacePath/src') {
-      return null;
-    }
-
-    String parent = '';
-    pathList.sublist(0, pathList.length - 1).forEach((String s) => parent += '$s/');
-    return pathLib.normalize(parent);
   }
 }

@@ -21,7 +21,7 @@ class UpDroidWorkspaces implements ExplorerController {
   Mailbox _mailbox;
 
   AnchorElement _cleanButton;
-  AnchorElement _buildButton;
+  AnchorElement _buildPackagesButton;
 //  AnchorElement _uploadButton;
 
   Dropzone dzRecycle;
@@ -39,7 +39,7 @@ class UpDroidWorkspaces implements ExplorerController {
       _workspacesView = workspacesView;
 
       _cleanButton = _view.refMap['clean-workspace'];
-      _buildButton = _view.refMap['build-workspace'];
+      _buildPackagesButton = _view.refMap['build-packages'];
 //      _uploadButton = _view.refMap['upload-with-git'];
 
       dzRecycle = new Dropzone(_workspacesView.recycle);
@@ -58,7 +58,7 @@ class UpDroidWorkspaces implements ExplorerController {
 
   void registerEventHandlers() {
     _cleanButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_CLEAN]]'));
-    _buildButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_BUILD]]'));
+    _buildPackagesButton.onClick.listen((e) => _buildPackages());
 //    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
   }
 
@@ -142,6 +142,17 @@ class UpDroidWorkspaces implements ExplorerController {
 
   void _deselectAllEntities() {
     entities.values.forEach((FileSystemEntity entity) => entity.deselect());
+  }
+
+  void _buildPackages() {
+    List<String> packageBuildList = [];
+    entities.values.forEach((FileSystemEntity entity) {
+      if (entity.isPackage && entity.selected) packageBuildList.add(entity.name);
+    });
+
+    _mailbox.ws.send('[[BUILD_PACKAGES]]' + JSON.encode(packageBuildList));
+
+//    _mailbox.ws.send('[[WORKSPACE_BUILD]]');
   }
 
   void cleanUp() {

@@ -23,7 +23,7 @@ class UpDroidExplorer extends PanelController {
 //        {'type': 'toggle', 'title': 'Close Panel'}]},
       {'title': 'Actions', 'items': [
         {'type': 'divider', 'title': 'Workspaces'},
-        {'type': 'toggle', 'title': 'Build Workspace'},
+        {'type': 'toggle', 'title': 'Build Packages'},
         {'type': 'toggle', 'title': 'Clean Workspace'},
 //        {'type': 'toggle', 'title': 'Upload with Git'},
         {'type': 'divider', 'title': 'Nodes'},

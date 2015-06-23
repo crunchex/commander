@@ -77,11 +77,15 @@ class CmdrExplorer {
           break;
 
         case 'WORKSPACE_BUILD':
-          _workspaceBuild(ws);
+          _buildWorkspace(ws);
           break;
 
         case 'BUILD_PACKAGE':
           _buildPackage(um.body, ws);
+          break;
+
+        case 'BUILD_PACKAGES':
+          _buildPackages(um.body, ws);
           break;
 
         case 'REQUEST_NODE_LIST':
@@ -212,8 +216,8 @@ class CmdrExplorer {
     });
   }
 
-  void _workspaceBuild(WebSocket s) {
-    _currentWorkspace.build().then((result) {
+  void _buildWorkspace(WebSocket s) {
+    _currentWorkspace.buildWorkspace().then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
 //      s.add('[[WORKSPACE_BUILD]]' + resultString);
@@ -222,6 +226,15 @@ class CmdrExplorer {
 
   void _buildPackage(String packageName, WebSocket s) {
     _currentWorkspace.buildPackage(packageName).then((result) {
+      String resultString = result.exitCode == 0 ? '' : result.stderr;
+      help.debug(resultString, 0);
+//      s.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
+    });
+  }
+
+  void _buildPackages(String data, WebSocket s) {
+    List<String> packageNames = JSON.decode(data);
+    _currentWorkspace.buildPackages(packageNames).then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
 //      s.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);

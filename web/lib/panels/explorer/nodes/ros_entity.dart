@@ -80,6 +80,7 @@ class Node {
 
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
+      deselectAllNodes();
       select();
       List menu = [
         {'type': 'toggle', 'title': 'Run', 'handler': runNode}];

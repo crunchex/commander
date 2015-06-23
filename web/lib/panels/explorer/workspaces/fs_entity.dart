@@ -97,6 +97,7 @@ class FolderEntity extends FileSystemEntity {
     });
 
     view.container.onDoubleClick.listen((e) {
+      deselectAllEntities();
       FolderView folderView = view;
       folderView.toggleExpansion();
       select();
@@ -104,6 +105,7 @@ class FolderEntity extends FileSystemEntity {
 
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
+      deselectAllEntities();
       select();
       List menu = [
         {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[NEW_FILE]]' + path)},
@@ -155,6 +157,7 @@ class FileEntity extends FileSystemEntity {
 
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
+      deselectAllEntities();
       select();
       List menu = [
         {'type': 'toggle', 'title': 'Rename', 'handler': rename},

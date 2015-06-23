@@ -19,5 +19,7 @@ class PanelView extends ContainerView {
       String cssPath = 'lib/panels/${shortName.toLowerCase()}/${shortName.toLowerCase()}.css';
       loadExternalCss(cssPath);
     }
+
+    tabHandleButton.text = '$shortName';
   }
 }

@@ -96,8 +96,7 @@ abstract class ContainerView {
     tabHandleButton = new AnchorElement()
         ..id = 'button-$name-$id'
         ..href = '#tab-$name-$id-container'
-        ..dataset['toggle'] = 'tab'
-        ..text = '$shortName-$id';
+        ..dataset['toggle'] = 'tab';
     tabHandleButton.onClick.listen((e) {
       e.preventDefault();
       //e.stopImmediatePropagation();

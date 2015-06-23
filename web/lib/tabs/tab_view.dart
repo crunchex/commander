@@ -24,6 +24,8 @@ class TabView extends ContainerView {
       loadExternalCss(cssPath);
     }
 
+    tabHandleButton.text = '$shortName-$id';
+
     extra = new LIElement();
     extra.id = 'extra-$id';
     extra.classes.add('extra-menubar');

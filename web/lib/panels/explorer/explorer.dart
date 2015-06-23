@@ -8,7 +8,6 @@ import '../panel_controller.dart';
 import 'workspaces/workspaces_controller.dart';
 import 'nodes/nodes_controller.dart';
 
-part 'explorer_helper.dart';
 part 'explorer_view.dart';
 
 /// [UpDroidConsole] is a client-side class that combines a [Terminal]

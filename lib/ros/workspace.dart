@@ -10,6 +10,8 @@ class Workspace {
 
   final Directory _delegate;
 
+  bool _building;
+
   /// Creates a [Workspace] object.
   ///
   /// If [path] is a relative path, it will be interpreted relative to the
@@ -17,7 +19,9 @@ class Workspace {
   ///
   /// If [path] is an absolute path, it will be immune to changes to the
   /// current working directory.
-  Workspace(String path) : _delegate = new Directory(path);
+  Workspace(String path) : _delegate = new Directory(path) {
+    _building = false;
+  }
 
   /// Returns the [Directory] for the default src directory.
   Directory get src {
@@ -138,15 +142,53 @@ class Workspace {
   /// Builds the workspace.
   ///
   /// Equivalent to running 'catkin_make' and 'catkin_make install'.
-  Future<ProcessResult> build() {
-    return Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_make && catkin_make install'], workingDirectory: path, runInShell: true);
+  Future<ProcessResult> buildWorkspace() {
+    Completer c = new Completer();
+    if (_building) c.complete(null);
+
+    _building = true;
+    String buildCommand = '/opt/ros/indigo/setup.bash && catkin_make && catkin_make install';
+    Process.run('bash', ['-c', '. $buildCommand'], workingDirectory: path, runInShell: true).then((ProcessResult result) {
+      _building = false;
+      c.complete(result);
+    });
+
+    return c.future;}
+
+  /// Builds a package.
+  ///
+  /// Equivalent to running 'catkin_make --pkg' and 'catkin_make install'.
+  Future<ProcessResult> buildPackage(String packageName) {
+    Completer c = new Completer();
+    if (_building) c.complete(null);
+
+    _building = true;
+    String buildCommand = '/opt/ros/indigo/setup.bash && catkin_make --pkg $packageName && catkin_make install';
+    Process.run('bash', ['-c', '. $buildCommand'], workingDirectory: path, runInShell: true).then((ProcessResult result) {
+      _building = false;
+      c.complete(result);
+    });
+
+    return c.future;
   }
 
-  /// Builds a package..
+  /// Builds multiple packages given a list of package names..
   ///
-  /// Equivalent to running 'catkin_make --pkg' and 'catkin_make --pkg install'.
-  Future<ProcessResult> buildPackage(String packageName) {
-    return Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_make --pkg $packageName && catkin_make install --pkg $packageName'], workingDirectory: path, runInShell: true);
+  /// Equivalent to running 'catkin_make --pkg pkg1...pk2...' and 'catkin_make install'.
+  Future<ProcessResult> buildPackages(List<String> packageNames) {
+    Completer c = new Completer();
+    if (_building) c.complete(null);
+
+    _building = true;
+    String packageListString = '';
+    packageNames.forEach((String packageName) => packageListString += ' $packageName');
+    String buildCommand = '/opt/ros/indigo/setup.bash && catkin_make --pkg$packageListString && catkin_make install';
+    Process.run('bash', ['-c', '. $buildCommand'], workingDirectory: path, runInShell: true).then((ProcessResult result) {
+      _building = false;
+      c.complete(result);
+    });
+
+    return c.future;
   }
 
   void runNode(String packageName, String nodeName, List args) {

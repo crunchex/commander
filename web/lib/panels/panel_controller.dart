@@ -31,8 +31,8 @@ abstract class PanelController {
     PanelView.createPanelView(id, col, panelType, shortName, menuConfig, externalCss).then((tabView) async {
       view = tabView;
 
-      _closePanelButton = view.refMap['close-panel'];
-      _closePanelButton.onClick.listen((e) => _closePanel());
+//      _closePanelButton = view.refMap['close-panel'];
+//      _closePanelButton.onClick.listen((e) => _closePanel());
 
       await setUpController();
       registerEventHandlers();

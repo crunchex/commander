@@ -18,6 +18,7 @@
 
 .explorer-li {
     margin-left: 5px;
+    cursor: pointer;
 }
 
 .exp-container > .explorer-ul {

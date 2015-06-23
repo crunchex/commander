@@ -55,6 +55,7 @@ class FileSystemEntity {
 
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
+      select();
       List menu = [
         {'type': 'toggle', 'title': 'New File', 'handler': () => ws.send('[[NEW_FILE]]' + path)},
         {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[NEW_FOLDER]]' + path + '/untitled')},
@@ -85,6 +86,7 @@ class FileSystemEntity {
 
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
+      select();
       List menu = [
         {'type': 'toggle', 'title': 'Rename', 'handler': rename},
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[DELETE]]' + path)}];

@@ -77,6 +77,7 @@ class Node {
 
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
+      select();
       List menu = [
         {'type': 'toggle', 'title': 'Run', 'handler': runNode}];
       ContextMenu.createContextMenu(e.page, menu);

@@ -18,9 +18,9 @@ class UpDroidExplorer extends PanelController {
   static List getMenuConfig() {
     List menu = [
       {'title': 'File', 'items': [
-        {'type': 'submenu', 'title': 'Open Workspace', 'items': []},
-        {'type': 'toggle', 'title': 'Delete Workspace'},
-        {'type': 'toggle', 'title': 'Close Panel'}]},
+        {'type': 'submenu', 'title': 'Open Workspace', 'items': []}]},
+//        {'type': 'toggle', 'title': 'Delete Workspace'},
+//        {'type': 'toggle', 'title': 'Close Panel'}]},
       {'title': 'Actions', 'items': [
         {'type': 'divider', 'title': 'Workspaces'},
         {'type': 'toggle', 'title': 'Build Workspace'},
@@ -45,7 +45,7 @@ class UpDroidExplorer extends PanelController {
 
   AnchorElement _dropdown;
   AnchorElement _openWorkspaceButton;
-  AnchorElement _deleteWorkspaceButton;
+//  AnchorElement _deleteWorkspaceButton;
   AnchorElement _workspacesButton;
   AnchorElement _nodesButton;
 
@@ -67,7 +67,7 @@ class UpDroidExplorer extends PanelController {
 
   Future setUpController() {
     _openWorkspaceButton = view.refMap['open-workspace'];
-    _deleteWorkspaceButton = view.refMap['delete-workspace'];
+//    _deleteWorkspaceButton = view.refMap['delete-workspace'];
     _workspacesButton = view.refMap['workspaces'];
     _nodesButton = view.refMap['nodes'];
   }
@@ -83,7 +83,7 @@ class UpDroidExplorer extends PanelController {
 
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
-    _deleteWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE')));
+//    _deleteWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE')));
     _workspacesButton.onClick.listen((e) => _showWorkspacesController());
     _nodesButton.onClick.listen((e) => _showNodesController());
 //    _runButton.onClick.listen((e) => _runNode());

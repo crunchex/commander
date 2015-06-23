@@ -22,7 +22,7 @@ class UpDroidWorkspaces implements ExplorerController {
 
   AnchorElement _cleanButton;
   AnchorElement _buildButton;
-  AnchorElement _uploadButton;
+//  AnchorElement _uploadButton;
 
   Dropzone dzRecycle;
 
@@ -40,7 +40,7 @@ class UpDroidWorkspaces implements ExplorerController {
 
       _cleanButton = _view.refMap['clean-workspace'];
       _buildButton = _view.refMap['build-workspace'];
-      _uploadButton = _view.refMap['upload-with-git'];
+//      _uploadButton = _view.refMap['upload-with-git'];
 
       dzRecycle = new Dropzone(_workspacesView.recycle);
 

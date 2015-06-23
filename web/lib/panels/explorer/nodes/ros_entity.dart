@@ -55,7 +55,8 @@ class Node {
 
       DivElement container = li.firstChild;
       arg.add(container.firstChild.text);
-      arg.add(container.lastChild.value);
+      InputElement input = container.lastChild;
+      arg.add(input.value);
 
       runCommand.add(arg);
     });

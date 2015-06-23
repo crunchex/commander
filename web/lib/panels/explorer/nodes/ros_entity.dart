@@ -70,7 +70,7 @@ class Node {
 
     view.container.onClick.listen((e) {
       if (_selectEnabled) {
-        if (!e.shiftKey) deselectAllNodes();
+        if (!e.ctrlKey) deselectAllNodes();
 
         toggleSelected();
         _selectEnabled = false;

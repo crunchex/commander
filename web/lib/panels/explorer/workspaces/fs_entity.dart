@@ -85,7 +85,7 @@ class FolderEntity extends FileSystemEntity {
 
     view.container.onClick.listen((e) {
       if (_selectEnabled) {
-        if (!e.shiftKey) deselectAllEntities();
+        if (!e.ctrlKey) deselectAllEntities();
 
         toggleSelected();
         _selectEnabled = false;
@@ -144,7 +144,7 @@ class FileEntity extends FileSystemEntity {
 
     view.container.onClick.listen((e) {
       if (_selectEnabled) {
-        if (!e.shiftKey) deselectAllEntities();
+        if (!e.ctrlKey) deselectAllEntities();
 
         toggleSelected();
         _selectEnabled = false;

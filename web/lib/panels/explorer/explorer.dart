@@ -22,15 +22,15 @@ class UpDroidExplorer extends PanelController {
 //        {'type': 'toggle', 'title': 'Delete Workspace'},
 //        {'type': 'toggle', 'title': 'Close Panel'}]},
       {'title': 'Actions', 'items': [
-        {'type': 'divider', 'title': 'Workspaces'},
+        {'type': 'divider', 'title': 'Workspace'},
         {'type': 'toggle', 'title': 'Build Packages'},
         {'type': 'toggle', 'title': 'Clean Workspace'},
 //        {'type': 'toggle', 'title': 'Upload with Git'},
-        {'type': 'divider', 'title': 'Nodes'},
+        {'type': 'divider', 'title': 'Launchers'},
         {'type': 'toggle', 'title': 'Run Nodes'}]},
       {'title': 'View', 'items': [
-        {'type': 'toggle', 'title': 'Workspaces'},
-        {'type': 'toggle', 'title': 'Nodes'}]}
+        {'type': 'toggle', 'title': 'Workspace'},
+        {'type': 'toggle', 'title': 'Launchers'}]}
     ];
     return menu;
   }
@@ -46,8 +46,8 @@ class UpDroidExplorer extends PanelController {
   AnchorElement _dropdown;
   AnchorElement _openWorkspaceButton;
 //  AnchorElement _deleteWorkspaceButton;
-  AnchorElement _workspacesButton;
-  AnchorElement _nodesButton;
+  AnchorElement _workspaceButton;
+  AnchorElement _launchersButton;
 
   StreamSubscription outsideClickListener;
   StreamSubscription controlLeave;
@@ -68,8 +68,8 @@ class UpDroidExplorer extends PanelController {
   Future setUpController() {
     _openWorkspaceButton = view.refMap['open-workspace'];
 //    _deleteWorkspaceButton = view.refMap['delete-workspace'];
-    _workspacesButton = view.refMap['workspaces'];
-    _nodesButton = view.refMap['nodes'];
+    _workspaceButton = view.refMap['workspace'];
+    _launchersButton = view.refMap['launchers'];
   }
 
   //\/\/ Mailbox Handlers /\/\//
@@ -84,8 +84,8 @@ class UpDroidExplorer extends PanelController {
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
 //    _deleteWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE')));
-    _workspacesButton.onClick.listen((e) => _showWorkspacesController());
-    _nodesButton.onClick.listen((e) => _showNodesController());
+    _workspaceButton.onClick.listen((e) => _showWorkspacesController());
+    _launchersButton.onClick.listen((e) => _showNodesController());
 //    _runButton.onClick.listen((e) => _runNode());
 //
 //    _workspacesButton.onClick.listen((e) {

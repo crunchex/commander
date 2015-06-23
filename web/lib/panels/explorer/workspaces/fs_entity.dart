@@ -105,7 +105,6 @@ class FileSystemEntity {
   }
 
   void build() {
-    print('$name $path');
     // Special case if workspace folder.
     if (name != path.split('/').last) {
       ws.send('[[WORKSPACE_BUILD]]');

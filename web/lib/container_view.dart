@@ -6,7 +6,7 @@ import 'dart:async';
 /// [ContainerView] contains methods to generate [Element]s that make up a tab/panel
 /// container with a menu bar in the UpDroid Commander GUI.
 abstract class ContainerView {
-  int num, col;
+  int id, col;
   String title;
   String shortName;
   Map refMap;
@@ -22,7 +22,7 @@ abstract class ContainerView {
   DivElement _tabContainer,_tabContent;
   List config;
 
-  ContainerView(this.num, this.col, this.title, this.shortName, this.config) {
+  ContainerView(this.id, this.col, this.title, this.shortName, this.config) {
     refMap = {};
 
     _setUpTabHandle();
@@ -93,7 +93,7 @@ abstract class ContainerView {
       ..classes.add('tab-handle')
       ..classes.add('active');
 
-    String id = title.toLowerCase().replaceAll(' ', '-');
+    String name = title.toLowerCase().replaceAll(' ', '-');
 
     closeControlHitbox = new DivElement()
       ..title = 'Close'
@@ -119,10 +119,10 @@ abstract class ContainerView {
     cloneControlHitbox.children.add(cloneControl);
 
     tabHandleButton = new AnchorElement()
-        ..id = 'button-$id-$num'
-        ..href = '#tab-$id-$num-container'
+        ..id = 'button-$name-$id'
+        ..href = '#tab-$name-$id-container'
         ..dataset['toggle'] = 'tab'
-        ..text = '$shortName-$num';
+        ..text = '$shortName-$id';
     tabHandleButton.onClick.listen((e) {
       e.preventDefault();
       //e.stopImmediatePropagation();
@@ -137,10 +137,10 @@ abstract class ContainerView {
   /// Takes a [num], [col], [title], [config], and [active] to generate the menu bar and menu items
   /// for a tab. Returns a [Map] of references to the new [Element]s as a [Future].
   void _setUpTabContainer() {
-    String id = title.toLowerCase().replaceAll(' ', '-');
+    String name = title.toLowerCase().replaceAll(' ', '-');
 
     _tabContainer = new DivElement()
-        ..id = 'tab-$id-$num-container'
+        ..id = 'tab-$name-$id-container'
         ..classes.add('tab-pane')
         ..classes.add('active');
 
@@ -162,7 +162,7 @@ abstract class ContainerView {
     _tabContainer.children.add(_tabContent);
 
     content = new DivElement()
-        ..classes.add(id);
+        ..classes.add(name);
     _tabContent.children.add(content);
     refMap['content'] = content;
 
@@ -186,7 +186,7 @@ abstract class ContainerView {
     dropdown.children.add(dropdownToggle);
 
     UListElement dropdownMenu = new UListElement()
-        ..id = '${shortName.toLowerCase()}-$num-${title.toLowerCase().replaceAll(' ', '-')}'
+        ..id = '${shortName.toLowerCase()}-$id-${title.toLowerCase().replaceAll(' ', '-')}'
         ..classes.add('dropdown-menu')
         ..attributes['role'] = 'menu';
     dropdown.children.add(dropdownMenu);
@@ -252,7 +252,7 @@ abstract class ContainerView {
     DivElement d = new DivElement()..style.display = 'inline-block';
     li.children.add(d);
 
-    String id = title.toLowerCase().replaceAll(' ', '-');
+    String name = title.toLowerCase().replaceAll(' ', '-');
 
     ParagraphElement p = new ParagraphElement()
         ..style.display = 'inline-block'
@@ -260,21 +260,21 @@ abstract class ContainerView {
     d.children.add(p);
 
     InputElement i = new InputElement()
-        ..id = '$id-input'
+        ..id = '$name-input'
         ..type = 'text';
     d.children.add(i);
-    refMap[id] = i;
+    refMap[name] = i;
 
     return li;
   }
 
   /// Generates a toggle item (button) and returns the new [LIElement].
   LIElement _createToggleItem(String title, [onClick, args]) {
-    String id = title.toLowerCase().replaceAll(' ', '-');
+    String name = title.toLowerCase().replaceAll(' ', '-');
 
     LIElement buttonList = new LIElement();
     AnchorElement button = new AnchorElement()
-        ..id = 'button-$id'
+        ..id = 'button-$name'
         ..href = '#'
         ..attributes['role'] = 'button'
         ..text = title;
@@ -288,7 +288,7 @@ abstract class ContainerView {
       });
     }
     buttonList.children.add(button);
-    refMap[id] = button;
+    refMap[name] = button;
 
     return buttonList;
   }

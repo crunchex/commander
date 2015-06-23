@@ -5,7 +5,7 @@ part of updroid_explorer_workspaces;
 /// in the file explorer that represent the filesystem.
 class FileSystemEntity {
   String path, workspacePath, name, parent;
-  bool isDirectory, selected;
+  bool isDirectory, isPackage, selected;
   WebSocket ws;
   FileSystemEntityView view;
 
@@ -23,7 +23,12 @@ class FileSystemEntity {
     name = getNameFromPath(path, workspacePath);
     parent = getParentFromPath(path, workspacePath);
 
-    isDirectory ? setUpFolderView() : setUpFileView();
+    if (isDirectory) {
+      isPackage = false;
+      setUpFolderView();
+    } else {
+      setUpFileView();
+    }
 
     //print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
   }
@@ -55,6 +60,11 @@ class FileSystemEntity {
         {'type': 'toggle', 'title': 'New Folder', 'handler': () => ws.send('[[NEW_FOLDER]]' + path + '/untitled')},
         {'type': 'toggle', 'title': 'Rename', 'handler': rename},
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[DELETE]]' + path)}];
+
+      if (isPackage) {
+        menu.add({'type': 'divider', 'title': ''});
+        menu.add({'type': 'toggle', 'title': 'Build', 'handler': build});
+      }
       ContextMenu.createContextMenu(e.page, menu);
     });
   }
@@ -92,6 +102,17 @@ class FileSystemEntity {
   void deselect() {
     view.deselect();
     selected = false;
+  }
+
+  void build() {
+    print('$name $path');
+    // Special case if workspace folder.
+    if (name != path.split('/').last) {
+      ws.send('[[WORKSPACE_BUILD]]');
+      return;
+    }
+
+    ws.send('[[BUILD_PACKAGE]]' + name);
   }
 
   void rename() {

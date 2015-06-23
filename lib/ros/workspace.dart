@@ -142,6 +142,13 @@ class Workspace {
     return Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_make && catkin_make install'], workingDirectory: path, runInShell: true);
   }
 
+  /// Builds a package..
+  ///
+  /// Equivalent to running 'catkin_make --pkg' and 'catkin_make --pkg install'.
+  Future<ProcessResult> buildPackage(String packageName) {
+    return Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_make --pkg $packageName && catkin_make install --pkg $packageName'], workingDirectory: path, runInShell: true);
+  }
+
   void runNode(String packageName, String nodeName, List args) {
     String launchArgs = '';
     args.forEach((List<String> arg) {

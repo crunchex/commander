@@ -127,6 +127,9 @@ class UpDroidWorkspaces implements ExplorerController {
       return;
     }
 
+    // If current file is a CMakeLists.txt, tell its parent that it's a package folder.
+    if (entity.name == 'CMakeLists.txt') entities[entity.parent].isPackage = true;
+
     FolderView parentFolder = entities[entity.parent].view;
     parentFolder.uElement.children.add(entity.view.element);
   }

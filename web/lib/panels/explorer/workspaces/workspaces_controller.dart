@@ -81,9 +81,9 @@ class UpDroidWorkspaces implements ExplorerController {
 
     FileSystemEntity entity;
     if (isDir) {
-      entity = new FolderEntity(path, workspacePath, _mailbox.ws);
+      entity = new FolderEntity(path, workspacePath, _mailbox.ws, _deselectAllEntities);
     } else {
-      entity = new FileEntity(path, workspacePath, _mailbox.ws);
+      entity = new FileEntity(path, workspacePath, _mailbox.ws, _deselectAllEntities);
     }
     entities[entity.path] = entity;
 
@@ -140,6 +140,9 @@ class UpDroidWorkspaces implements ExplorerController {
     }
   }
 
+  void _deselectAllEntities() {
+    entities.values.forEach((FileSystemEntity entity) => entity.deselect());
+  }
 
   void cleanUp() {
     entities.values.forEach((FileSystemEntity f) => f.cleanUp());

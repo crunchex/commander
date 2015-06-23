@@ -24,12 +24,13 @@ abstract class FileSystemEntity {
   bool isDirectory, isPackage, selected;
   WebSocket ws;
   FileSystemEntityView view;
+  var deselectAllEntities;
 
   bool get isWorkspace => testForWorkspace(path, workspacePath);
 
   bool _selectEnabled;
 
-  FileSystemEntity(String path, String workspacePath, bool isFolder, this.ws) {
+  FileSystemEntity(String path, String workspacePath, bool isFolder, this.ws, this.deselectAllEntities) {
     selected = false;
     _selectEnabled = true;
 
@@ -74,8 +75,8 @@ abstract class FileSystemEntity {
 }
 
 class FolderEntity extends FileSystemEntity {
-  FolderEntity(String path, String workspacePath, WebSocket ws) :
-  super(path, workspacePath, true, ws) {
+  FolderEntity(String path, String workspacePath, WebSocket ws, var deselectAllEntities) :
+  super(path, workspacePath, true, ws, deselectAllEntities) {
     setUpView();
   }
 
@@ -84,6 +85,8 @@ class FolderEntity extends FileSystemEntity {
 
     view.container.onClick.listen((e) {
       if (_selectEnabled) {
+        if (!e.shiftKey) deselectAllEntities();
+
         toggleSelected();
         _selectEnabled = false;
 
@@ -129,8 +132,8 @@ class FolderEntity extends FileSystemEntity {
 
 class FileEntity extends FileSystemEntity {
 
-  FileEntity(String path, String workspacePath, WebSocket ws) :
-  super(path, workspacePath, true, ws) {
+  FileEntity(String path, String workspacePath, WebSocket ws, var deselectAllEntities) :
+  super(path, workspacePath, true, ws, deselectAllEntities) {
     setUpView();
   }
 
@@ -139,6 +142,8 @@ class FileEntity extends FileSystemEntity {
 
     view.container.onClick.listen((e) {
       if (_selectEnabled) {
+        if (!e.shiftKey) deselectAllEntities();
+
         toggleSelected();
         _selectEnabled = false;
 

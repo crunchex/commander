@@ -112,7 +112,7 @@ class PackageView extends RosEntityView {
 }
 
 class NodeView extends RosEntityView {
-  final String fileClass = 'glyphicons-play-button';
+  final String fileClass = 'glyphicons-circle-arrow-right';
 
   UListElement uElement;
 

@@ -213,11 +213,17 @@ class Workspace {
   void runNode(String packageName, String nodeName, List args) {
     String launchArgs = '';
     args.forEach((List<String> arg) {
-      if (!arg[1].isEmpty) launchArgs += ' ${arg[0]}:=${arg[1]}';
+      String argString;
+      if (arg[1].startsWith('\'') && arg[1].endsWith('\'')) {
+        argString = arg[1];
+      } else {
+        argString = '\'${arg[1]}\'';
+      }
+      if (!arg[1].isEmpty) launchArgs += ' ${arg[0]}:=$argString';
     });
 
-    String runCommand = '$path/devel/setup.bash && roscd $packageName && roslaunch launch/$nodeName$launchArgs';
-    help.debug('running: roscd $packageName && roslaunch launch/$nodeName$launchArgs', 0);
+    String runCommand = '$path/devel/setup.bash && roslaunch $packageName $nodeName$launchArgs';
+    help.debug('running: $runCommand', 0);
     Process.start('bash', ['-c', '. $runCommand'], runInShell: true).then((process) {
       // TODO: pipe the output somewhere.
 //      stdout.addStream(process.stdout);

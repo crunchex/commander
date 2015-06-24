@@ -41,7 +41,7 @@ class CmdrExplorer {
 
       switch (um.header) {
         case "REQUEST_WORKSPACE_CONTENTS":
-          _sendWorkspace(ws);
+          _sendWorkspaceSync(ws);
           break;
 
         case 'REQUEST_WORKSPACE_PATH':
@@ -115,6 +115,16 @@ class CmdrExplorer {
     }
 
     _currentWorkspace.listContents().listen((String file) => s.add('[[ADD_UPDATE]]' + file));
+  }
+
+  void _sendWorkspaceSync(WebSocket s) {
+    if (_currentWatcher == null) {
+      _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
+      _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
+    }
+
+    List<String> files = _currentWorkspace.listContentsSync();
+    files.forEach((String file) => s.add('[[ADD_UPDATE]]' + file));
   }
 
   void _sendPath(WebSocket s) {

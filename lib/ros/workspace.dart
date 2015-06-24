@@ -67,6 +67,24 @@ class Workspace {
     return _delegate.list(recursive: true, followLinks: false).transform(toWorkspaceContents(path)).asBroadcastStream();
   }
 
+  List<String> listContentsSync() {
+    List<String> directories = [];
+    List<String> files = [];
+
+    List<FileSystemEntity> entityList = _delegate.listSync(recursive: true, followLinks: false);
+    entityList.forEach((FileSystemEntity entity) {
+      if (entity.path.contains('$path/src')) {
+        String fileString = FileSystemEntity.isFileSync(entity.path) ? 'F:${entity.path}' : 'D:${entity.path}';
+
+        fileString.startsWith('F:') ? files.add(fileString) : directories.add(fileString);
+      }
+    });
+
+    // Append all files together after all the directories.
+    directories.addAll(files);
+    return directories;
+  }
+
   Stream listNodes() {
     return src.list(recursive: true, followLinks: false).transform(toLaunchFiles()).asBroadcastStream();
   }

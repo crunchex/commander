@@ -2,10 +2,12 @@ part of updroid_explorer_nodes;
 
 class Package {
   String name, path;
+  List<Package> packages;
   List<Node> nodes;
   PackageView view;
 
   Package(this.name, this.path) {
+    packages = [];
     nodes = [];
 
     setUpPackageView();

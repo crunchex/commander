@@ -143,7 +143,6 @@ class Workspace {
         Directory package = file.parent.parent;
 
         sink.add({
-          'package': package.path.split('/').last,
           'package-path': package.path,
           'node': filename,
           'args': args

@@ -4,6 +4,8 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:path/path.dart' as pathLib;
+
 import '../../../context_menu.dart';
 import '../../../mailbox.dart';
 import '../../panel_controller.dart';
@@ -51,17 +53,37 @@ class UpDroidNodes implements ExplorerController {
 
   void addLaunch(UpDroidMessage um) {
     Map data = JSON.decode(um.body);
-    String packageName = data['package'];
     String packagePath = data['package-path'];
     String nodeName = data['node'];
     List args = data['args'];
 
-    Package package = packages.putIfAbsent(packageName, () => new Package(packageName, packagePath));
-    if (package != null) _nodesView.uList.children.add(package.view.element);
+    if (!packages.containsKey(packagePath)) _addPackage(packagePath);
 
+    String packageName = packagePath.split('/').last;
     Node node = new Node(nodeName, args, packageName, _mailbox.ws, _deselectAllNodes);
-    packages[packageName].nodes.add(node);
-    packages[packageName].view.uElement.children.add(node.view.element);
+    packages[packagePath].nodes.add(node);
+    packages[packagePath].view.uElement.children.add(node.view.element);
+  }
+
+  void _addPackage(String packagePath) {
+    List<String> split = packagePath.split('/');
+    String parentPath = '/';
+    parentPath += pathLib.joinAll(split.sublist(0, split.length - 1));
+
+    if (parentPath != '$workspacePath/src' && !packages.containsKey(parentPath)) {
+      _addPackage(parentPath);
+    }
+
+    String packageName = split.last;
+    Package package = new Package(packageName, packagePath);
+    packages.putIfAbsent(packagePath, () => package);
+
+    if (parentPath == '$workspacePath/src') {
+      _nodesView.uList.children.add(package.view.element);
+    } else {
+      packages[parentPath].view.uElement.children.add(package.view.element);
+    }
+
   }
 
   void _deselectAllNodes() {

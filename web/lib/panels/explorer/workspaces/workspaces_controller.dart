@@ -54,6 +54,7 @@ class UpDroidWorkspaces implements ExplorerController {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_CONTENTS', _workspaceContents);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'ADD_UPDATE', _addUpdate);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REMOVE_UPDATE', _removeUpdate);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'BUILD_COMPLETE', _buildComplete);
   }
 
   void registerEventHandlers() {
@@ -179,13 +180,24 @@ class UpDroidWorkspaces implements ExplorerController {
 
   void _buildPackages() {
     List<String> packageBuildList = [];
-    entities.values.forEach((FileSystemEntity entity) {
-      if (entity.isPackage && entity.selected) packageBuildList.add(entity.name);
+    entities.values.forEach((FolderEntity entity) {
+      if (entity.isPackage && entity.selected) {
+        entity.toggleBuildingIndicator();
+        packageBuildList.add(entity.path);
+      }
     });
 
     _mailbox.ws.send('[[BUILD_PACKAGES]]' + JSON.encode(packageBuildList));
 
 //    _mailbox.ws.send('[[WORKSPACE_BUILD]]');
+  }
+
+  void _buildComplete(UpDroidMessage um) {
+    List<String> entityPaths = JSON.decode(um.body);
+    entityPaths.forEach((String entityPath) {
+      FolderEntity package = entities[entityPath];
+      package.toggleBuildingIndicator();
+    });
   }
 
   void cleanUp() {

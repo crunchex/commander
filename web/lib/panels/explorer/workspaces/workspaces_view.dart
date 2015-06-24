@@ -129,6 +129,16 @@ class FolderView extends FileSystemEntityView {
       expanded = true;
     }
   }
+
+  void toggleBuildingIndicator() {
+    if (icon.classes.contains('glyphicons-refresh')) {
+      icon.classes.remove('glyphicons-refresh');
+      (expanded) ? icon.classes.add(openFolderClass) : icon.classes.add(closedFolderClass);
+    } else {
+      (expanded) ? icon.classes.remove(openFolderClass) : icon.classes.remove(closedFolderClass);
+      icon.classes.add('glyphicons-refresh');
+    }
+  }
 }
 
 class FileView extends FileSystemEntityView {

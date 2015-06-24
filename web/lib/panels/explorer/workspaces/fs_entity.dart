@@ -130,6 +130,11 @@ class FolderEntity extends FileSystemEntity {
 
     ws.send('[[BUILD_PACKAGE]]' + name);
   }
+
+  void toggleBuildingIndicator() {
+    FolderView folderView = view;
+    folderView.toggleBuildingIndicator();
+  }
 }
 
 class FileEntity extends FileSystemEntity {

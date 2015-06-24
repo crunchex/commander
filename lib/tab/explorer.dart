@@ -243,11 +243,16 @@ class CmdrExplorer {
   }
 
   void _buildPackages(String data, WebSocket s) {
-    List<String> packageNames = JSON.decode(data);
+    List<String> packagePaths = JSON.decode(data);
+
+    List<String> packageNames = [];
+    packagePaths.forEach((String packagePath) => packageNames.add(packagePath.split('/').last));
+
     _currentWorkspace.buildPackages(packageNames).then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
 //      s.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
+      s.add('[[BUILD_COMPLETE]]' + data);
     });
   }
 

@@ -80,6 +80,10 @@ class Workspace {
       }
     });
 
+    // Alphabetize each.
+    directories.sort();
+    files.sort();
+
     // Append all files together after all the directories.
     directories.addAll(files);
     return directories;

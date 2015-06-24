@@ -128,7 +128,8 @@ class FolderEntity extends FileSystemEntity {
       return;
     }
 
-    ws.send('[[BUILD_PACKAGE]]' + name);
+    toggleBuildingIndicator();
+    ws.send('[[BUILD_PACKAGES]]' + JSON.encode([path]));
   }
 
   void toggleBuildingIndicator() {

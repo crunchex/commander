@@ -231,14 +231,17 @@ class CmdrExplorer {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
 //      s.add('[[WORKSPACE_BUILD]]' + resultString);
+      s.add('[[BUILD_COMPLETE]]' + JSON.encode([_currentWorkspace.path]));
     });
   }
 
-  void _buildPackage(String packageName, WebSocket s) {
+  void _buildPackage(String packagePath, WebSocket s) {
+    String packageName = packagePath.split('/').last;
     _currentWorkspace.buildPackage(packageName).then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
 //      s.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
+      s.add('[[BUILD_COMPLETE]]' + JSON.encode([packagePath]));
     });
   }
 

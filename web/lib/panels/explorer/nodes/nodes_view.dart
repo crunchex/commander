@@ -78,8 +78,8 @@ abstract class RosEntityView {
 }
 
 class PackageView extends RosEntityView {
-  final String openFolderClass = 'glyphicons-package';
-  final String closedFolderClass = 'glyphicons-cargo';
+  final String openFolderClass = 'glyphicons-expand';
+  final String closedFolderClass = 'glyphicons-collapse';
 
   bool expanded = false;
   UListElement uElement;

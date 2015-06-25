@@ -156,15 +156,17 @@ class CmdrExplorer {
 
   void _newWorkspace(String data, WebSocket ws) {
     Workspace newWorkspace = new Workspace('${uproot.path}/$data');
-    newWorkspace.create().then((Workspace workspace) => workspace.initSync());
+    newWorkspace.create().then((Workspace workspace) {
+      workspace.initSync();
 
-    if (_currentWorkspace != null) return;
+      if (_currentWorkspace != null) return;
 
-    if (_currentWatcherStream != null) _currentWatcherStream.cancel();
-    _currentWorkspace = newWorkspace;
-    _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-    _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(ws, e));
-    _sendPath(ws);
+      if (_currentWatcherStream != null) _currentWatcherStream.cancel();
+      _currentWorkspace = newWorkspace;
+      _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
+      _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(ws, e));
+      _sendPath(ws);
+    });
   }
 
   /// Convenience method for adding a formatted filesystem update to the socket

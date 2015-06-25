@@ -5,6 +5,45 @@ import 'dart:async';
 
 import 'server_helper.dart' as help;
 
+CmdrPostOffice _postOffice;
+
+class CmdrPostOffice {
+  static createCmdrPostOffice() {
+    if (_postOffice != null) {
+      _postOffice = null;
+    }
+
+    _postOffice = new CmdrPostOffice();
+  }
+
+  static registerClass(String className, int id) {
+    if (!_postOffice.classRegistry.containsKey(className)) {
+      _postOffice.classRegistry[className] = [];
+    }
+
+    _postOffice.classRegistry[className].add(id);
+  }
+
+  static deregisterClass(String className, int id) {
+    _postOffice.classRegistry[className].remove(id);
+
+    if (_postOffice.classRegistry[className].isEmpty) {
+      _postOffice.classRegistry.remove(className);
+    }
+  }
+
+  static pushMessageToQueue(ServerMessage sm) {
+    _postOffice.messageQueue.add(sm);
+  }
+
+  Map<String, List<int>> classRegistry;
+  List<ServerMessage> messageQueue;
+
+  CmdrPostOffice() {
+    messageQueue = [];
+  }
+}
+
 class CmdrMailbox {
   String className;
   WebSocket ws;

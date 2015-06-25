@@ -17,23 +17,27 @@ class CmdrExplorer {
   Directory uproot;
 
   Workspace _currentWorkspace;
-  DirectoryWatcher _currentWatcher;
-  StreamSubscription _currentWatcherStream;
+  DirectoryWatcher _currentWatcher, _uprootWatcher;
+  StreamSubscription _currentWatcherStream, _uprootWatcherStream;
   WebSocket _ws;
 
   //TODO: make asynchroneous
   CmdrExplorer(this.expNum, this.uproot) {
     if (_currentWorkspace != null) return;
 
-    // Just pick the first workspace unless there's a better choice.
     // TODO: retrieve saved data for the most recently opened workspace.
-    uproot.list().first.then((Directory firstWorkspace) => _currentWorkspace = new Workspace(firstWorkspace.path));
+    // TODO: handle changes to uproot made on the server side.
+//    _uprootWatcher = new DirectoryWatcher(uproot.path);
+//    _uprootWatcherStream = _uprootWatcher.events.listen((WatchEvent w) {
+//      _ws.add('[[WORKSPACE_NAME]]' + w.path.replaceFirst('${uproot.path}/', '').split('/').first);
+//    });
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
   /// it receives or local events that it detects.
   void handleWebSocket(WebSocket ws) {
     help.debug('Explorer client connected.', 0);
+    _ws = ws;
 
     ws.listen((String s) {
       UpDroidMessage um = new UpDroidMessage.fromString(s);
@@ -133,7 +137,7 @@ class CmdrExplorer {
 
   void _sendWorkspaceNames(WebSocket ws) {
     uproot.list()
-      .where((Directory w) => w.path != _currentWorkspace.path)
+      .where((Directory w) => w.path.split('/').length == uproot.path.split('/').length + 1)
       .listen((Directory w) => ws.add('[[WORKSPACE_NAME]]' + w.path.split('/').last));
   }
 

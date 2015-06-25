@@ -88,7 +88,6 @@ class UpDroidExplorer extends PanelController {
   //\/\/ Mailbox Handlers /\/\//
 
   void registerMailbox() {
-    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'REQUEST_WORKSPACE_PATH', _requestWorkspacePath);
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'REQUEST_WORKSPACE_NAMES', _requestWorkspaceNames);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_PATH', _explorerDirPath);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_NAME', _addWorkspaceToMenu);
@@ -96,6 +95,8 @@ class UpDroidExplorer extends PanelController {
 
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
+    AnchorElement fileButton = view.refMap['file-dropdown'];
+    fileButton.onClick.listen((e) => _refreshWorkspaceNames());
 //    _deleteWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE')));
 //    _runButton.onClick.listen((e) => _runNode());
 //
@@ -161,7 +162,12 @@ class UpDroidExplorer extends PanelController {
   }
 
   void _requestWorkspacePath(UpDroidMessage um) => mailbox.ws.send('[[REQUEST_WORKSPACE_PATH]]');
-  void _requestWorkspaceNames(UpDroidMessage um) => mailbox.ws.send('[[REQUEST_WORKSPACE_NAMES]]');
+  void _requestWorkspaceNames(UpDroidMessage um) => _refreshWorkspaceNames();
+
+  void _refreshWorkspaceNames() {
+    querySelector('#${shortName.toLowerCase()}-$id-open-workspace').innerHtml = '';
+    mailbox.ws.send('[[REQUEST_WORKSPACE_NAMES]]');
+  }
 
   void _explorerDirPath(UpDroidMessage um) {
     workspacePath = um.body;

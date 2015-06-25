@@ -1,4 +1,4 @@
-library updroid_explorer_workspaces;
+library updroid_explorer_workspace;
 
 import 'dart:html';
 import 'dart:async';
@@ -15,9 +15,9 @@ import '../explorer.dart';
 part 'workspaces_view.dart';
 part 'fs_entity.dart';
 
-class UpDroidWorkspaces implements ExplorerController {
+class WorkspaceController implements ExplorerController {
   PanelView _view;
-  WorkspacesView _workspacesView;
+  WorkspaceView _workspaceView;
   Mailbox _mailbox;
 
   AnchorElement _buildPackagesButton;
@@ -30,7 +30,7 @@ class UpDroidWorkspaces implements ExplorerController {
   String workspacePath;
   Set<StreamSubscription> _listenersToCleanUp;
 
-  UpDroidWorkspaces(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons) {
+  WorkspaceController(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons) {
     _view = view;
     _mailbox = mailbox;
     _buildPackagesButton = actionButtons[0];
@@ -40,10 +40,10 @@ class UpDroidWorkspaces implements ExplorerController {
 
     _listenersToCleanUp = new Set<StreamSubscription>();
 
-    WorkspacesView.createWorkspacesView(id, _view.content).then((workspacesView) {
-      _workspacesView = workspacesView;
+    WorkspaceView.createWorkspaceView(id, _view.content).then((workspaceView) {
+      _workspaceView = workspaceView;
 
-      dzRecycle = new Dropzone(_workspacesView.recycle);
+      dzRecycle = new Dropzone(_workspaceView.recycle);
 
       _mailbox.ws.send('[[REQUEST_WORKSPACE_CONTENTS]]');
 
@@ -59,8 +59,8 @@ class UpDroidWorkspaces implements ExplorerController {
   }
 
   void registerEventHandlers() {
-    _listenersToCleanUp.add(_cleanButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_CLEAN]]')));
     _listenersToCleanUp.add(_buildPackagesButton.onClick.listen((e) => _buildPackages()));
+    _listenersToCleanUp.add(_cleanButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_CLEAN]]')));
 //    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
   }
 
@@ -99,7 +99,7 @@ class UpDroidWorkspaces implements ExplorerController {
 
     // Special case for the workspace src directory (root node).
     if (entity.parent == null) {
-      _workspacesView.uList.children.add(entity.view.element);
+      _workspaceView.uList.children.add(entity.view.element);
       FolderView folderView = entity.view;
       folderView.toggleExpansion();
       return;
@@ -176,7 +176,7 @@ class UpDroidWorkspaces implements ExplorerController {
   void _workspaceContents(UpDroidMessage um) {
     List<String> fileStrings = JSON.decode(um.body);
 
-    _workspacesView.uList.innerHtml = '';
+    _workspaceView.uList.innerHtml = '';
 
     for (String rawString in fileStrings) {
       _addFileSystemEntity(rawString);
@@ -216,7 +216,7 @@ class UpDroidWorkspaces implements ExplorerController {
     entities.values.forEach((FileSystemEntity f) => f.cleanUp());
     entities = null;
 
-    _workspacesView.cleanUp();
+    _workspaceView.cleanUp();
   }
 }
 

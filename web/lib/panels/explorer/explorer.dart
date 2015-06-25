@@ -186,7 +186,7 @@ class UpDroidExplorer extends PanelController {
     _launchersButtonListener = _launchersButton.onClick.listen((e) => _showNodesController());
 
     List<AnchorElement> actionButtons = [_buildPackagesButton, _cleanWorkspaceButton];
-    controller = new UpDroidWorkspaces(id, workspacePath, view, mailbox, actionButtons);
+    controller = new WorkspaceController(id, workspacePath, view, mailbox, actionButtons);
   }
 
   void _showNodesController() {

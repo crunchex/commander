@@ -1,4 +1,4 @@
-part of updroid_explorer_workspaces;
+part of updroid_explorer_workspace;
 
 /// Container class that extracts data from the raw file text passed in from
 /// the server over [WebSocket]. Primarily used for generating the HTML views

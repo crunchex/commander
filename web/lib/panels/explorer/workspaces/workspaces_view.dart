@@ -1,19 +1,19 @@
-part of updroid_explorer_workspaces;
+part of updroid_explorer_workspace;
 
-class WorkspacesView extends ExplorerView {
+class WorkspaceView extends ExplorerView {
   /// Returns an initialized [PanelView] as a [Future] given all normal constructors.
   ///
   /// Use this instead of calling the constructor directly.
-  static Future<WorkspacesView> createWorkspacesView(int id, DivElement content) {
+  static Future<WorkspaceView> createWorkspaceView(int id, DivElement content) {
     Completer c = new Completer();
-    c.complete(new WorkspacesView(id, content));
+    c.complete(new WorkspaceView(id, content));
     return c.future;
   }
 
   SpanElement recycle;
   UListElement uList;
 
-  WorkspacesView(int id, DivElement content) :
+  WorkspaceView(int id, DivElement content) :
   super(id, content) {
     this.content = content;
 

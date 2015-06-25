@@ -48,7 +48,7 @@ class LaunchersController implements ExplorerController {
   }
 
   void registerEventHandlers() {
-    _listenersToCleanUp.add(_runLaunchersButton.onClick.listen((e) => _runAllLaunchers));
+    _listenersToCleanUp.add(_runLaunchersButton.onClick.listen((e) => _runLaunchers()));
   }
 
   void addLaunch(UpDroidMessage um) {
@@ -86,7 +86,7 @@ class LaunchersController implements ExplorerController {
 
   }
 
-  void _runAllLaunchers() {
+  void _runLaunchers() {
     packages.values.forEach((Package p) => p.launchers.forEach((Launcher n) => n.runLauncher()));
   }
 
@@ -96,6 +96,7 @@ class LaunchersController implements ExplorerController {
 
   void cleanUp() {
     _listenersToCleanUp.forEach((StreamSubscription s) => s.cancel());
+    _listenersToCleanUp = null;
 
     packages.values.forEach((Package p) => p.cleanUp());
     packages = null;

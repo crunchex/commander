@@ -212,6 +212,7 @@ class WorkspaceController implements ExplorerController {
 
   void cleanUp() {
     _listenersToCleanUp.forEach((StreamSubscription s) => s.cancel());
+    _listenersToCleanUp = null;
 
     entities.values.forEach((FileSystemEntity f) => f.cleanUp());
     entities = null;

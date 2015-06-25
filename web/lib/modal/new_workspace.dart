@@ -22,7 +22,7 @@ class UpDroidWorkspaceModal extends UpDroidModal {
 
     // save input section
     HeadingElement askName = new HeadingElement.h3()
-      ..text = "WorkspacePath /";
+      ..text = "Enter name: ";
     input = new InputElement()
       ..id = "workspace-input"
       ..attributes['type'] = 'text';

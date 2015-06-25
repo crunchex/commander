@@ -3,6 +3,7 @@ library updroid_explorer;
 import 'dart:html';
 import 'dart:async';
 
+import '../../modal/modal.dart';
 import '../../mailbox.dart';
 import '../panel_controller.dart';
 import 'workspace/workspace_controller.dart';
@@ -18,6 +19,7 @@ class UpDroidExplorer extends PanelController {
   static List getMenuConfig() {
     List menu = [
       {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'New Workspace'},
         {'type': 'submenu', 'title': 'Open Workspace', 'items': []}]},
 //        {'type': 'toggle', 'title': 'Delete Workspace'},
 //        {'type': 'toggle', 'title': 'Close Panel'}]},
@@ -47,6 +49,7 @@ class UpDroidExplorer extends PanelController {
 
   AnchorElement _fileDropdown;
   AnchorElement _openWorkspaceButton;
+  AnchorElement _newWorkspaceButton;
 //  AnchorElement _deleteWorkspaceButton;
   AnchorElement _buildPackagesButton;
   AnchorElement _cleanWorkspaceButton;
@@ -62,7 +65,8 @@ class UpDroidExplorer extends PanelController {
   Map runParams = {};
 
   List recycleListeners = [];
-  StreamSubscription _fileDropdownListener, _workspaceButtonListener, _launchersButtonListener;
+  StreamSubscription _fileDropdownListener, _newWorkspaceListener;
+  StreamSubscription _workspaceButtonListener, _launchersButtonListener;
 
   ExplorerController controller;
   StreamController<CommanderMessage> cs;
@@ -75,6 +79,7 @@ class UpDroidExplorer extends PanelController {
   Future setUpController() {
     _fileDropdown = view.refMap['file-dropdown'];
 
+    _newWorkspaceButton = view.refMap['new-workspace'];
     _openWorkspaceButton = view.refMap['open-workspace'];
 //    _deleteWorkspaceButton = view.refMap['delete-workspace'];
 
@@ -98,6 +103,7 @@ class UpDroidExplorer extends PanelController {
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
     _fileDropdownListener = _fileDropdown.onClick.listen((e) => _refreshWorkspaceNames());
+    _newWorkspaceListener = _newWorkspaceButton.onClick.listen((e) => _newWorkspace());
   }
 
   //\/\/ UpDroidMessage Handlers /\/\//
@@ -107,6 +113,16 @@ class UpDroidExplorer extends PanelController {
     AnchorElement item = view.refMap[um.body];
     item.onClick.listen((e) {
       _openExistingWorkspace(um.body);
+    });
+  }
+
+  void _newWorkspace() {
+    UpDroidWorkspaceModal modal;
+    modal = new UpDroidWorkspaceModal(() {
+      String newWorkspaceName = modal.input.value;
+      if (newWorkspaceName != '') {
+        mailbox.ws.send('[[NEW_WORKSPACE]]' + newWorkspaceName);
+      }
     });
   }
 

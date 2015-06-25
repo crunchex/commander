@@ -56,6 +56,10 @@ class CmdrExplorer {
           _sendWorkspaceNames(ws);
           break;
 
+        case 'NEW_WORKSPACE':
+          _newWorkspace(um.body, ws);
+          break;
+
         case 'SET_CURRENT_WORKSPACE':
           _setCurrentWorkspace(um.body, ws);
           break;
@@ -145,6 +149,19 @@ class CmdrExplorer {
     if (_currentWatcherStream != null) _currentWatcherStream.cancel();
 
     _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');
+    _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
+    _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(ws, e));
+    _sendPath(ws);
+  }
+
+  void _newWorkspace(String data, WebSocket ws) {
+    Workspace newWorkspace = new Workspace('${uproot.path}/$data');
+    newWorkspace.create().then((Workspace workspace) => workspace.initSync());
+
+    if (_currentWorkspace != null) return;
+
+    if (_currentWatcherStream != null) _currentWatcherStream.cancel();
+    _currentWorkspace = newWorkspace;
     _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
     _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(ws, e));
     _sendPath(ws);

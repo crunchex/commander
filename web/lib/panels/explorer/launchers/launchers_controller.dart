@@ -48,9 +48,7 @@ class LaunchersController implements ExplorerController {
   }
 
   void registerEventHandlers() {
-    _listenersToCleanUp.add(_runLaunchersButton.onClick.listen((e) {
-      packages.values.forEach((Package p) => p.launchers.forEach((Launcher n) => n.runLauncher()));
-    }));
+    _listenersToCleanUp.add(_runLaunchersButton.onClick.listen((e) => _runAllLaunchers));
   }
 
   void addLaunch(UpDroidMessage um) {
@@ -86,6 +84,10 @@ class LaunchersController implements ExplorerController {
       packages[parentPath].view.uElement.children.add(package.view.element);
     }
 
+  }
+
+  void _runAllLaunchers() {
+    packages.values.forEach((Package p) => p.launchers.forEach((Launcher n) => n.runLauncher()));
   }
 
   void _deselectAllLaunchers() {

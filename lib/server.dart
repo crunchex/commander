@@ -9,6 +9,7 @@ import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
+import 'ros/ros.dart';
 import 'tab/pty.dart';
 import 'tab/camera/camera.dart';
 import 'tab/teleop.dart';
@@ -29,7 +30,7 @@ class CmdrServer {
 
   ArgResults _args;
 
-  Map _explorers = {};
+  Map _panels = {};
   Map _tabs = {};
   Map<int, CameraServer> _camServers = {};
   StreamController<UpDroidMessage> _serverStream;
@@ -100,13 +101,15 @@ class CmdrServer {
     int objectID = int.parse(request.uri.pathSegments[1]);
     String type = request.uri.pathSegments[0];
 
-    if (type == 'updroidexplorer') {
-      WebSocketTransformer.upgrade(request)
-      .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
-      return;
-    } else if (type == 'updroidclient') {
+    if (type == 'updroidclient') {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _mailbox.handleWebSocket(ws, request));
+      return;
+    }
+
+    if (type == 'updroidexplorer') {
+      WebSocketTransformer.upgrade(request)
+      .then((WebSocket ws) => _panels[type][objectID].handleWebSocket(ws));
       return;
     }
 
@@ -129,16 +132,16 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('GIT_PUSH', _gitPush);
     _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
-    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
-    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
+    _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
+//    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
+//    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
 
     _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
   }
 
   void _clientConfig(UpDroidMessage um) {
-    _initBackendClasses(dir).then((value) {
-      _mailbox.ws.add('[[CLIENT_SERVER_READY]]' + JSON.encode(value));
-    });
+    // TODO: send back some kind of saved config from the filesystem.
+    _mailbox.ws.add('[[SERVER_READY]]');
   }
 
   void _gitPush(UpDroidMessage um) {
@@ -173,7 +176,7 @@ class CmdrServer {
         }
         if (workspace == true) {
           names.add(pathLib.basename(folder.path));
-          _explorers[num] = new CmdrExplorer(folder, num);
+          _panels[num] = new CmdrExplorer(folder, num);
           num += 1;
         }
       }
@@ -183,33 +186,26 @@ class CmdrServer {
     return completer.future;
   }
 
-  void _newExplorerCmdr(UpDroidMessage um) {
-    List explorerInfo = JSON.decode(um.body);
-    int expNum = int.parse(explorerInfo[0]);
-    String name = explorerInfo[1];
-    Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + name));
-    Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
-    source.createSync(recursive: true);
-    Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: pathLib.normalize(newWorkspace.path + "/src"), runInShell: true);
-    _explorers[expNum] = (new CmdrExplorer(newWorkspace, expNum));
+  void _openPanel(UpDroidMessage um) {
+    String id = um.body;
+    List idList = id.split('-');
+    int num = int.parse(idList[1]);
+    String type = idList[2].toLowerCase();
 
-  }
+    help.debug('Open panel request received: $id', 0);
 
-  void _closeExplorerCmdr(UpDroidMessage um) {
-    int expNum = int.parse(um.body);
-    var toRemove;
+    if (!_panels.containsKey(type)) _panels[type] = {};
 
-    toRemove = _explorers[expNum];
-    Directory workspace = new Directory(toRemove.expPath);
-    _explorers.remove(expNum);
-    workspace.delete(recursive: true);
-    toRemove.killExplorer();
+    switch (type) {
+      case 'updroidexplorer':
+        _panels[type][num] = new CmdrExplorer(num, dir);
+        break;
+    }
   }
 
   void _openTab(UpDroidMessage um) {
     String id = um.body;
     List idList = id.split('-');
-    //int col = int.parse(idList[0]);
     int num = int.parse(idList[1]);
     String type = idList[2].toLowerCase();
 
@@ -251,7 +247,7 @@ class CmdrServer {
   void _cleanUpBackend() {
     help.debug('Client disconnected, cleaning up...', 0);
 
-    _explorers = {};
+    _panels = {};
 
     _tabs.values.forEach((Map<int, dynamic> tabMap) {
       tabMap.values.forEach((dynamic tab) {

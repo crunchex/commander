@@ -5,7 +5,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'panels/explorer/explorer.dart';
-import 'tabs/tab_controller.dart';
 import 'tabs/teleop/teleop.dart';
 import 'tabs/editor/editor.dart';
 import 'tabs/console/console.dart';
@@ -16,19 +15,11 @@ import 'mailbox.dart';
 class UpDroidClient {
   StreamController<CommanderMessage> _cs;
 
-  List<UpDroidExplorer> _explorers;
-  List<List<TabController>> _tabs;
+  List<List<dynamic>> _columns;
   String _config;
 
-  AnchorElement _addWorkspace;
-  AnchorElement _deleteWorkspace;
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
-  ButtonElement _cleanButton;
-  ButtonElement _buildButton;
-  ButtonElement _controlButton;
-  ButtonElement _runButton;
-  ButtonElement _uploadButton;
   DivElement _explorersDiv;
 
   bool disconnectAlert = false;
@@ -39,19 +30,11 @@ class UpDroidClient {
   UpDroidClient() {
     _config = _getConfig();
 
-    _explorers = [];
-    _tabs = [[], []];
+    _columns = [[], [], []];
 
     _explorersDiv = querySelector('#exp-container');
-    _addWorkspace = querySelector('#add-ws');
-    _deleteWorkspace = querySelector('#delete-ws');
-    _newButtonLeft = querySelector('#column-0-new');
-    _newButtonRight = querySelector('#column-1-new');
-    _cleanButton = querySelector('#clean-button');
-    _controlButton = querySelector('#control-toggle');
-    _buildButton = querySelector('#build-button');
-    _runButton = querySelector('#run-button');
-    _uploadButton = querySelector('#upload');
+    _newButtonLeft = querySelector('#column-1-new');
+    _newButtonRight = querySelector('#column-2-new');
 
     _controlButtonEnabled = true;
 
@@ -94,11 +77,10 @@ class UpDroidClient {
     if (strConfig != '') return strConfig;
 
     List listConfig = [
+      [{'id': 1, 'class': 'UpDroidExplorer'}],
       [{'id': 1, 'class': 'UpDroidEditor'}],
       [{'id': 1, 'class': 'UpDroidConsole'}]
     ];
-
-//    List listConfig = [[],[]];
 
     return JSON.encode(listConfig);
   }
@@ -107,8 +89,8 @@ class UpDroidClient {
     List ids = [];
 
     // Add all used ids for [className] to ids.
-    for (int i = 0; i <= 1; i++) {
-      _tabs[i].forEach((tab) {
+    for (int i = 1; i <= 2; i++) {
+      _columns[i].forEach((tab) {
 
         if (tab.tabType == className) ids.add(tab.id);
       });
@@ -126,20 +108,17 @@ class UpDroidClient {
   }
 
   /// Initializes all classes based on the loaded configuration in [_config].
-  /// TODO: create an abstract class [UpDroidTab] that all others implement.
-  /// TODO: call a generic UpDroidTab constructor instead of ifs or switches.
-  void _initializeTabs(String strConfig, List explorerPaths) {
-    List config = JSON.decode(strConfig);
-    int i = 1;
-    if(explorerPaths.isEmpty) {
-      _addWorkspace.click();
-    }
-    for (var name in explorerPaths) {
-      _openExplorer(i, name);
-      i += 1;
+  /// TODO: use isolates.
+  void _initializeClient(UpDroidMessage um) {
+    List config = JSON.decode(_config);
+
+    for (int i = 0; i < 1; i++) {
+      for (Map panel in config[i]) {
+        _openPanel(i, panel['id'], panel['class']);
+      }
     }
 
-    for (int i = 0; i < config.length; i++) {
+    for (int i = 1; i < config.length; i++) {
       for (Map tab in config[i]) {
         _openTab(i, tab['id'], tab['class']);
       }
@@ -153,38 +132,44 @@ class UpDroidClient {
     }
   }
 
-  void _openExplorer(int id, name) {
-    if (_explorers.isNotEmpty) {
-      for (var explorer in _explorers) {
-        explorer.hideExplorer();
+  void _openPanel(int column, int id, String className) {
+    if (_columns[column].length >= 1) return;
+
+    if (_columns[column].isNotEmpty) {
+      for (var panel in _columns[column]) {
+        panel.makeInactive();
       }
     }
-    _explorers.add(new UpDroidExplorer(_cs, id, name));
+
+    if (className == 'UpDroidExplorer') {
+      _mailbox.ws.send('[[OPEN_PANEL]]' + '$column-$id-$className');
+       _columns[column].add(new UpDroidExplorer(id, column, _cs));
+    }
   }
 
-  void _openTab (int column, int id, String className) {
-    if (_tabs[column].length >= 4) return;
+  void _openTab(int column, int id, String className) {
+    if (_columns[column].length >= 4) return;
 
-    if (_tabs[column].isNotEmpty) {
-      for (var tab in _tabs[column]) {
+    if (_columns[column].isNotEmpty) {
+      for (var tab in _columns[column]) {
         tab.makeInactive();
       }
     }
 
     if (className == 'UpDroidEditor') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _tabs[column].add(new UpDroidEditor(id, column, _cs));
+      _columns[column].add(new UpDroidEditor(id, column, _cs));
     } else if (className == 'UpDroidCamera') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _tabs[column].add(new UpDroidCamera(id, column));
+      _columns[column].add(new UpDroidCamera(id, column));
     } else if (className == 'UpDroidTeleop') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _tabs[column].add(new UpDroidTeleop(id, column));
+      _columns[column].add(new UpDroidTeleop(id, column));
     } else if (className == 'UpDroidConsole') {
       // TODO: initial size should not be hardcoded.
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className-25-80');
       //Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
-      _tabs[column].add(new UpDroidConsole(id, column, _cs));
+      _columns[column].add(new UpDroidConsole(id, column, _cs));
     }
   }
 
@@ -199,21 +184,21 @@ class UpDroidClient {
     // Find the tab to remove and remove it.
     // Also take note of the column it was found in.
     int col;
-    for (int i = 0; i <= 1; i++) {
-      for (int j = 0; j < _tabs[i].length; j++) {
-        if (_tabs[i][j].tabType == type && _tabs[i][j].id == num) {
-          _tabs[i].removeAt(j);
+    for (int i = 1; i <= 2; i++) {
+      for (int j = 0; j < _columns[i].length; j++) {
+        if (_columns[i][j].tabType == type && _columns[i][j].id == num) {
+          _columns[i].removeAt(j);
           col = i;
         }
       }
     }
 
     // Make all tabs in that column inactive except the last.
-    for (int j = 0; j < _tabs[col].length; j++) {
-      _tabs[col][j].makeInactive();
+    for (int j = 1; j < _columns[col].length; j++) {
+      _columns[col][j].makeInactive();
     }
 
-    if (_tabs[col].length > 0) _tabs[col].last.makeActive();
+    if (_columns[col].length > 0) _columns[col].last.makeActive();
 
     _mailbox.ws.send('[[CLOSE_TAB]]' + id);
   }
@@ -228,20 +213,20 @@ class UpDroidClient {
     // Also take note of the column it was found in.
     int col;
     for (int i = 0; i <= 1; i++) {
-      for (int j = 0; j < _tabs[i].length; j++) {
-        if (_tabs[i][j].tabType == type && _tabs[i][j].id == num) {
-          _tabs[i].removeAt(j);
+      for (int j = 0; j < _columns[i].length; j++) {
+        if (_columns[i][j].tabType == type && _columns[i][j].id == num) {
+          _columns[i].removeAt(j);
           col = i;
         }
       }
     }
 
     // Make all tabs in that column inactive except the last.
-    for (int j = 0; j < _tabs[col].length; j++) {
-      _tabs[col][j].makeInactive();
+    for (int j = 0; j < _columns[col].length; j++) {
+      _columns[col][j].makeInactive();
     }
 
-    if (_tabs[col].length > 0) _tabs[col].last.makeActive();
+    if (_columns[col].length > 0) _columns[col].last.makeActive();
   }
 
   void _openTabFromButton(CommanderMessage m) {
@@ -254,86 +239,59 @@ class UpDroidClient {
   }
 
   void _gitPassword(CommanderMessage m) {
-    _mailbox.ws.send('[[GIT_PUSH]]' + '${_explorers.first.currentSelectedPath}++${m.body}');
+    _mailbox.ws.send('[[GIT_PUSH]]' + '${_columns[0].first.currentSelectedPath}++${m.body}');
   }
 
-  void _workspaceClean(CommanderMessage m) {
-    _cleanButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
-    _cleanButton.children.first.classes.add('glyphicons-cleaning');
-  }
+  void _addWorkspace(CommanderMessage m) {
+    String name;
 
-  void _workspaceBuild(CommanderMessage m) {
-    // Success else failure.
-    if (m.body == '') {
-      _runButton.classes.remove('control-button-disabled');
-      _controlButton.classes.remove('control-button-disabled');
-      _controlButtonEnabled = true;
-    } else {
-      new UpDroidBuildResultsModal(m.body);
-    }
-
-    _buildButton.children.first.classes.removeAll(['glyphicons-refresh', 'glyph-progress']);
-    _buildButton.children.first.classes.add('glyphicons-classic-hammer');
-  }
-
-  void _sendClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
-  void _serverReady(UpDroidMessage um) => _initializeTabs(_config, JSON.decode(um.body));
-
-  void _registerMailbox() {
-    _mailbox.registerCommanderEvent('CLOSE_TAB', _closeTab);
-    _mailbox.registerCommanderEvent('OPEN_TAB', _openTabFromButton);
-    _mailbox.registerCommanderEvent('GIT_PASSWORD', _gitPassword);
-    _mailbox.registerCommanderEvent('WORKSPACE_CLEAN', _workspaceClean);
-    _mailbox.registerCommanderEvent('WORKSPACE_BUILD', _workspaceBuild);
-    _mailbox.registerCommanderEvent('SERVER_DISCONNECT', _alertDisconnect);
-
-    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'CLIENT_CONFIG', _sendClientConfig);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLIENT_SERVER_READY', _serverReady);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
-  }
-
-  /// Sets up external event handlers for the various Commander classes. These
-  /// are mostly listening events for [WebSocket] messages.
-  void _registerEventHandlers(String config) {
-
-    _addWorkspace.onClick.listen((e) {
-      String name;
-
-      void complete() {
-        var newNum = 1;
-        var nums = [];
-        var names = [];
-        for (var explorer in _explorers) {
-          nums.add(explorer.expNum);
-          names.add(explorer.name);
-        }
-        while(nums.contains(newNum)){
-          newNum ++;
-        }
-
-        if (names.contains(name)) {
-          var prefix = name;
-          num suffix = 1;
-          while (names.contains(name)) {
-            name = prefix + "_" + suffix.toString();
-            suffix ++;
-          }
-        }
-        _mailbox.ws.send('[[ADD_EXPLORER]]' + JSON.encode([newNum.toString(), name]));
-        _openExplorer(newNum, name);
-        _cs.add(new CommanderMessage('UPDROIDEDITOR', 'RESEND_DROP'));
-        if(_explorersDiv.classes.contains('hidden')) {
-          DivElement control = querySelector('#control');
-          _explorersDiv.classes.remove('hidden');
-          control.classes.add('hidden');
-        }
+    void complete() {
+      var newNum = 1;
+      var nums = [];
+      var names = [];
+      for (var explorer in _columns[0]) {
+        nums.add(explorer.expNum);
+        names.add(explorer.name);
+      }
+      while(nums.contains(newNum)){
+        newNum ++;
       }
 
-      var workspaceModal = new UpDroidWorkspaceModal();
-      List eles = workspaceModal.passRefs();
-      var input = eles[0];
-      var save = eles[1];
-      save.onClick.listen((e){
+      if (names.contains(name)) {
+        var prefix = name;
+        num suffix = 1;
+        while (names.contains(name)) {
+          name = prefix + "_" + suffix.toString();
+          suffix ++;
+        }
+      }
+      _mailbox.ws.send('[[ADD_EXPLORER]]' + JSON.encode([newNum.toString(), name]));
+//      _openExplorer(newNum, name);
+      _cs.add(new CommanderMessage('UPDROIDEDITOR', 'RESEND_DROP'));
+      if(_explorersDiv.classes.contains('hidden')) {
+        DivElement control = querySelector('#control');
+        _explorersDiv.classes.remove('hidden');
+        control.classes.add('hidden');
+      }
+    }
+
+    var workspaceModal = new UpDroidWorkspaceModal();
+    List eles = workspaceModal.passRefs();
+    var input = eles[0];
+    var save = eles[1];
+    save.onClick.listen((e){
+      if(input.value == "") {
+        name = "untitled";
+      }
+      else {
+        name = input.value;
+      }
+      complete();
+    });
+
+    input.onKeyUp.listen((e) {
+      var keyEvent = new KeyEvent.wrap(e);
+      if (keyEvent.keyCode == KeyCode.ENTER) {
         if(input.value == "") {
           name = "untitled";
         }
@@ -341,110 +299,82 @@ class UpDroidClient {
           name = input.value;
         }
         complete();
-      });
-
-      input.onKeyUp.listen((e) {
-        var keyEvent = new KeyEvent.wrap(e);
-        if (keyEvent.keyCode == KeyCode.ENTER) {
-          if(input.value == "") {
-            name = "untitled";
-          }
-          else {
-            name = input.value;
-          }
-          complete();
-        }
-      });
-
-    });
-
-    // TODO: need to find better way for client to track active explorer
-    _deleteWorkspace.onClick.listen((e) {
-      var modal = new UpDroidDeleteWorkspaceModal();
-      ButtonElement commit = modal.passRefs();
-
-      void complete() {
-        String activeNum;
-        for(var explorer in _explorersDiv.children) {
-          if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
-            if(!explorer.classes.contains('hidden')) {
-              activeNum = explorer.dataset['num'];
-              // remove dom element
-              explorer.remove();
-              // remove corresponding list item
-              querySelector("#exp-li-$activeNum").remove();
-              // remove from list of updroid explorers
-              var toRemove;
-              for(var upExp in _explorers) {
-                if (int.parse(activeNum) == upExp.expNum) {
-                  toRemove = upExp;
-                }
-              }
-              _explorers.remove(toRemove);
-              toRemove.destroyRecycleListeners();
-              toRemove.destroyEditorListeners();
-              // Destroy UpDroid Explorer
-              _destroyExplorer(toRemove);
-            }
-          }
-        }
-        // make first explorer visible
-        if (_explorersDiv.children.length > 2) {
-          _explorersDiv.children[0].classes.remove('hidden');
-        }
-        // Destroy cmdr explorer
-        _mailbox.ws.send('[[CLOSE_EXPLORER]]' + activeNum);
       }
-
-      commit.onClick.listen((e) {
-        complete();
-      });
     });
+  }
 
+  void _deleteWorkspace(CommanderMessage m) {
+    var modal = new UpDroidDeleteWorkspaceModal();
+    ButtonElement commit = modal.passRefs();
+
+    void complete() {
+      String activeNum;
+      for(var explorer in _explorersDiv.children) {
+        if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
+          if(!explorer.classes.contains('hidden')) {
+            activeNum = explorer.dataset['num'];
+            // remove dom element
+            explorer.remove();
+            // remove corresponding list item
+            querySelector("#exp-li-$activeNum").remove();
+            // remove from list of updroid explorers
+            var toRemove;
+            for(var upExp in _columns[0]) {
+              if (int.parse(activeNum) == upExp.expNum) {
+                toRemove = upExp;
+              }
+            }
+            _columns[0].remove(toRemove);
+            toRemove.destroyRecycleListeners();
+            toRemove.destroyEditorListeners();
+            // Destroy UpDroid Explorer
+            _destroyExplorer(toRemove);
+          }
+        }
+      }
+      // make first explorer visible
+      if (_explorersDiv.children.length > 2) {
+        _explorersDiv.children[0].classes.remove('hidden');
+      }
+      // Destroy cmdr explorer
+      _mailbox.ws.send('[[CLOSE_EXPLORER]]' + activeNum);
+    }
+
+    commit.onClick.listen((e) {
+      complete();
+    });
+  }
+
+  void _getClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
+
+  void _registerMailbox() {
+    _mailbox.registerCommanderEvent('CLOSE_TAB', _closeTab);
+    _mailbox.registerCommanderEvent('OPEN_TAB', _openTabFromButton);
+    _mailbox.registerCommanderEvent('GIT_PASSWORD', _gitPassword);
+    _mailbox.registerCommanderEvent('SERVER_DISCONNECT', _alertDisconnect);
+    _mailbox.registerCommanderEvent('ADD_WORKSPACE', _addWorkspace);
+    _mailbox.registerCommanderEvent('DELETE_WORKSPACE', _deleteWorkspace);
+
+    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
+  }
+
+  /// Sets up external event handlers for the various Commander classes. These
+  /// are mostly listening events for [WebSocket] messages.
+  void _registerEventHandlers(String config) {
     _newButtonLeft.onClick.listen((e) {
       e.preventDefault();
-      if (_tabs[0].length >= 4) return;
-
-      new UpDroidOpenTabModal(0, _cs);
-    });
-
-    _newButtonRight.onClick.listen((e) {
-      e.preventDefault();
-      if (_tabs[1].length >= 4) return;
+      if (_columns[1].length >= 4) return;
 
       new UpDroidOpenTabModal(1, _cs);
     });
 
-    _cleanButton.onClick.listen((e) {
-      _cleanButton.children.first.classes.remove('glyphicons-cleaning');
-      _cleanButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
+    _newButtonRight.onClick.listen((e) {
+      e.preventDefault();
+      if (_columns[2].length >= 4) return;
 
-      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_CLEAN'));
-
-      _controlButton.classes.add('control-button-disabled');
-      _runButton.classes.add('control-button-disabled');
-      _controlButtonEnabled = false;
-    });
-
-    _buildButton.onClick.listen((e) {
-      _buildButton.children.first.classes.remove('glyphicons-classic-hammer');
-      _buildButton.children.first.classes.addAll(['glyphicons-refresh', 'glyph-progress']);
-
-      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'WORKSPACE_BUILD'));
-    });
-
-    _controlButton.onClick.listen((e) {
-      if (!_controlButtonEnabled) return;
-      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'CATKIN_NODE_LIST'));
-    });
-
-    _runButton.onClick.listen((e) {
-      if (!_controlButtonEnabled) return;
-      _cs.add(new CommanderMessage('UPDROIDEXPLORER', 'RUN_NODE'));
-    });
-
-    _uploadButton.onClick.listen((e) {
-      new UpDroidGitPassModal(_cs);
+      new UpDroidOpenTabModal(2, _cs);
     });
   }
 

@@ -1,3 +1,5 @@
+library updroid_console;
+
 import 'dart:html';
 import 'dart:async';
 import 'dart:typed_data';

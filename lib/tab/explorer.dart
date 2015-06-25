@@ -1,6 +1,8 @@
 library cmdr_explorer;
 
+import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as pathLib;
 
@@ -11,24 +13,21 @@ import '../server_helper.dart' as help;
 class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';
 
-  Directory _dir;
-  DirectoryWatcher watcher;
-  Workspace workspace;
   int expNum;
-  String expPath;
+  Directory uproot;
+
+  Workspace _currentWorkspace;
+  DirectoryWatcher _currentWatcher;
+  StreamSubscription _currentWatcherStream;
+  WebSocket _ws;
 
   //TODO: make asynchroneous
-  CmdrExplorer(Directory dir, num) {
-    this.workspace = new Workspace(dir.path);
-    this.expPath = dir.path;
-    this.expNum = num;
+  CmdrExplorer(this.expNum, this.uproot) {
+    if (_currentWorkspace != null) return;
 
-    for (var item in dir.listSync()) {
-      if(pathLib.basename(item.path) == 'src') {
-        _dir = item;
-        this.watcher = new DirectoryWatcher(pathLib.normalize(item.path));
-      }
-    }
+    // Just pick the first workspace unless there's a better choice.
+    // TODO: retrieve saved data for the most recently opened workspace.
+    uproot.list().first.then((Directory firstWorkspace) => _currentWorkspace = new Workspace(firstWorkspace.path));
   }
 
   /// Handler for the [WebSocket]. Performs various actions depending on requests
@@ -41,60 +40,59 @@ class CmdrExplorer {
       help.debug('Explorer incoming: ' + s, 0);
 
       switch (um.header) {
-        case "INITIAL_DIRECTORY_LIST":
-          _sendInitial(ws);
+        case "REQUEST_WORKSPACE_CONTENTS":
+          _sendWorkspaceSync(ws);
           break;
 
-        case 'EXPLORER_DIRECTORY_PATH':
+        case 'REQUEST_WORKSPACE_PATH':
           _sendPath(ws);
           break;
 
-        case 'EXPLORER_DIRECTORY_LIST':
-          _sendDirectory(ws);
+        case 'REQUEST_WORKSPACE_NAMES':
+          _sendWorkspaceNames(ws);
           break;
 
-        case 'EXPLORER_DIRECTORY_REFRESH':
-          _refreshDirectory(ws);
+        case 'SET_CURRENT_WORKSPACE':
+          _setCurrentWorkspace(um.body, ws);
           break;
 
-        case 'EXPLORER_NEW_FILE':
+        case 'NEW_FILE':
           _fsNewFile(um.body);
           break;
 
-        case 'EXPLORER_NEW_FOLDER':
+        case 'NEW_FOLDER':
           _fsNewFolder(um.body);
-          // Empty folders don't trigger an incremental update, so we need to
-          // refresh the entire workspace.
-          _sendDirectory(ws);
           break;
 
-        case 'EXPLORER_RENAME':
-          _fsRename(um.body);
+        case 'RENAME':
+          _fsRename(um.body, ws);
           break;
 
-        case 'EXPLORER_MOVE':
-          // Currently implemented in the same way as RENAME as there is no
-          // direct API for MOVE.
-          _fsRename(um.body);
-          break;
-
-        case 'EXPLORER_DELETE':
+        case 'DELETE':
           _fsDelete(um.body, ws);
           break;
 
-        case 'EXPLORER_WORKSPACE_CLEAN':
+        case 'WORKSPACE_CLEAN':
           _workspaceClean(ws);
           break;
 
-        case 'EXPLORER_WORKSPACE_BUILD':
-          _workspaceBuild(ws);
+        case 'WORKSPACE_BUILD':
+          _buildWorkspace(ws);
           break;
 
-        case 'CATKIN_NODE_LIST':
+        case 'BUILD_PACKAGE':
+          _buildPackage(um.body, ws);
+          break;
+
+        case 'BUILD_PACKAGES':
+          _buildPackages(um.body, ws);
+          break;
+
+        case 'REQUEST_NODE_LIST':
           _nodeList(ws);
           break;
 
-        case 'CATKIN_RUN':
+        case 'RUN_NODE':
           _runNode(um.body);
           break;
 
@@ -103,36 +101,65 @@ class CmdrExplorer {
       }
 
     });
-    watcher.events.listen((e) => help.formattedFsUpdate(ws, e));
   }
 
   void killExplorer() {
-    this.workspace = null;
-    this.expPath = null;
     this.expNum = null;
-    this.watcher = null;
+    this._currentWatcher = null;
   }
 
-  void _sendInitial(WebSocket s) {
-    help.getDirectory(_dir).then((files) {
-      s.add('[[INITIAL_DIRECTORY_LIST]]' + files.toString());
-    });
+  void _sendWorkspace(WebSocket s) {
+    if (_currentWatcher == null) {
+      _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
+      _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
+    }
+
+    _currentWorkspace.listContents().listen((String file) => s.add('[[ADD_UPDATE]]' + file));
   }
 
-  void _sendDirectory(WebSocket s) {
-    help.getDirectory(_dir).then((files) {
-      s.add('[[EXPLORER_DIRECTORY_LIST]]' + files.toString());
-    });
-  }
+  void _sendWorkspaceSync(WebSocket s) {
+    if (_currentWatcher == null) {
+      _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
+      _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
+    }
 
-  void _refreshDirectory(WebSocket s) {
-    help.getDirectory(_dir).then((files) {
-      s.add('[[EXPLORER_DIRECTORY_REFRESH]]' + files.toString());
-    });
+    List<String> files = _currentWorkspace.listContentsSync();
+    files.forEach((String file) => s.add('[[ADD_UPDATE]]' + file));
   }
 
   void _sendPath(WebSocket s) {
-    help.formattedMessage(s, 'EXPLORER_DIRECTORY_PATH', _dir.path);
+    help.formattedMessage(s, 'EXPLORER_DIRECTORY_PATH', _currentWorkspace.path);
+  }
+
+  void _sendWorkspaceNames(WebSocket ws) {
+    uproot.list()
+      .where((Directory w) => w.path != _currentWorkspace.path)
+      .listen((Directory w) => ws.add('[[WORKSPACE_NAME]]' + w.path.split('/').last));
+  }
+
+  void _setCurrentWorkspace(String newWorkspaceName, WebSocket ws) {
+    _currentWatcherStream.cancel();
+
+    _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');
+    _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
+    _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(ws, e));
+    _sendPath(ws);
+  }
+
+  /// Convenience method for adding a formatted filesystem update to the socket
+  /// stream.
+  ///   ex. add /home/user/tmp => [[ADD]]/home/user/tmp
+  Future formattedFsUpdate(WebSocket socket, WatchEvent e) async {
+    List<String> split = e.toString().split(' ');
+    String header = split[0].toUpperCase();
+    String path = split[1];
+
+    bool isFile = await FileSystemEntity.isFile(path);
+    String fileString = isFile ? 'F:${path}' : 'D:${path}';
+
+    var formatted = '[[${header}_UPDATE]]' + fileString;
+    help.debug('Outgoing: ' + formatted, 0);
+    if (header != 'MODIFY') socket.add(formatted);
   }
 
   void _fsNewFile(String path) {
@@ -163,51 +190,92 @@ class CmdrExplorer {
     newFolder.createSync();
   }
 
-  void _fsRename(String rename) {
-    List<String> renameList = rename.split(':divider:');
+  void _fsRename(String data, WebSocket ws) {
+    List<String> split = data.split(':');
+    String oldPath = split[0];
+    String newPath = split[1];
 
-    if (!FileSystemEntity.isDirectorySync(renameList[0])) {
-      var fileToRename = new File(renameList[0]);
-      fileToRename.rename(renameList[1]);
-    } else {
-      var dirToRename = new Directory(renameList[0]);
-      dirToRename.rename(renameList[1]);
-    }
+    FileSystemEntity.type(oldPath).then((FileSystemEntityType type) {
+      if (type == FileSystemEntityType.NOT_FOUND) return;
+
+      bool isDir = FileSystemEntity.isDirectorySync(oldPath);
+      FileSystemEntity entity = isDir ? new Directory(oldPath) : new File(oldPath);
+      entity.rename(newPath);
+
+      // Force a remove update on the top level folder as
+      // watcher issue workaround.
+      if (isDir) ws.add('[[REMOVE_UPDATE]]D:$oldPath');
+    });
   }
 
   void _fsDelete(String path, WebSocket socket) {
-    // Can't simply just create a FileSystemEntity and delete it, since
-    // it is an abstract class. This is a dumb way to create the proper
-    // entity class.
-    try {
-      var dirToDelete = new Directory(path);
-      dirToDelete.delete(recursive:true).then((path){
-      //  sendDirectory(socket, dir);
-      });
-    } catch (e) {
-      var fileToDelete = new File(path);
-      fileToDelete.delete();
-    }
+    FileSystemEntity entity;
+    bool isDir = FileSystemEntity.isDirectorySync(path);
+
+    entity = isDir ? new Directory(path) : new File(path);
+    entity.delete(recursive: true);
+
+    // Force a remove update on the top level folder as
+    // watcher issue workaround.
+    if (isDir) socket.add('[[REMOVE_UPDATE]]D:$path');
   }
 
   void _workspaceClean(WebSocket s) {
-    workspace.clean().then((result) {
+    _currentWorkspace.clean().then((result) {
       s.add('[[WORKSPACE_CLEAN]]');
     });
   }
 
-  void _workspaceBuild(WebSocket s) {
-    workspace.build().then((result) {
+  void _buildWorkspace(WebSocket s) {
+    _currentWorkspace.buildWorkspace().then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
-      s.add('[[WORKSPACE_BUILD]]' + resultString);
+      help.debug(resultString, 0);
+//      s.add('[[WORKSPACE_BUILD]]' + resultString);
+      s.add('[[BUILD_COMPLETE]]' + JSON.encode([_currentWorkspace.path]));
+    });
+  }
+
+  void _buildPackage(String packagePath, WebSocket s) {
+    String packageName = packagePath.split('/').last;
+    _currentWorkspace.buildPackage(packageName).then((result) {
+      String resultString = result.exitCode == 0 ? '' : result.stderr;
+      help.debug(resultString, 0);
+//      s.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
+      s.add('[[BUILD_COMPLETE]]' + JSON.encode([packagePath]));
+    });
+  }
+
+  void _buildPackages(String data, WebSocket s) {
+    List<String> packagePaths = JSON.decode(data);
+
+    List<String> packageNames = [];
+    packagePaths.forEach((String packagePath) => packageNames.add(packagePath.split('/').last));
+
+    _currentWorkspace.buildPackages(packageNames).then((result) {
+      String resultString = result.exitCode == 0 ? '' : result.stderr;
+      help.debug(resultString, 0);
+//      s.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
+      s.add('[[BUILD_COMPLETE]]' + data);
     });
   }
 
   void _nodeList(WebSocket s) {
-    Ros.nodeList(workspace, s);
+    _currentWorkspace.listNodes().listen((Map package) {
+      String data = JSON.encode(package);
+      s.add('[[LAUNCH]]' + data);
+    });
   }
 
-  void _runNode(String runCommand) {
-    Ros.runNode(workspace, runCommand);
+  void _runNode(String data) {
+    List decodedData = JSON.decode(data);
+    String packageName = decodedData[0];
+    String nodeName = decodedData[1];
+    List nodeArgs = decodedData.sublist(2);
+
+    _currentWorkspace.runNode(packageName, nodeName, nodeArgs);
+  }
+
+  void cleanup() {
+    _currentWatcherStream.cancel();
   }
 }

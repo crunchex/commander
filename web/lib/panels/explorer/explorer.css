@@ -1,0 +1,123 @@
+.updroidexplorer {
+    height: 100%;
+}
+
+.exp-container {
+    background-color: #eaecec;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: none;
+}
+
+.explorer-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.explorer-li {
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+.exp-container > .explorer-ul {
+    padding: 5px;
+    height: calc(100% - 32px);
+}
+
+.exp-container > .explorer-ul > .explorer-li {
+    margin-left: 0;
+}
+
+.explorer-fs-container,
+.explorer-ros-container {
+    padding: 2px;
+    color: #0c0c0c;
+}
+
+.explorer-fs-container {
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+}
+
+.explorer-ros-container.explorer-node {
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+}
+
+.explorer-ros-container.explorer-arg-container {
+    padding: 0;
+    margin-left: 2px;
+}
+
+.explorer-fs-container.selected,
+.explorer-ros-container.selected {
+    background-color: #ff2919;
+    color: #ffffff;
+}
+
+.explorer-arg-name {
+    position: relative;
+    bottom: -2px;
+    left: 6px;
+    font-family: "Avenir Next LT Pro Regular";
+    font-size: 10px;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+}
+
+.explorer-arg-input {
+    width: 100%;
+    margin-left: 0;
+    font-family: "Avenir Next LT Pro Regular";
+    font-size: 12px;
+}
+
+.explorer-icon {
+    display: inline;
+    position: relative;
+    top: 2px;
+    margin-right: 3px;
+}
+
+.explorer-fs-name,
+.explorer-ros-name {
+    display: inline;
+    font-family: "Avenir Next LT Pro Regular";
+    font-size: 12px;
+    margin-left: 3px;
+}
+
+.toolbar {
+    padding: 5px;
+    width: 100%;
+    vertical-align: middle;
+    border-top: 1px solid #e3e3e3;
+}
+
+.recycle {
+    color: #0c0c0c;
+}
+
+.recycle .recycle-ondrag {
+    color: #ff2919;
+    border-color: #ff2919;
+}
+
+.recycle .recycle-entered {
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+/* Animation */
+
+.glyphicons-refresh {
+    -webkit-animation:spin 1.5s linear infinite;
+    -moz-animation:spin 1.5s linear infinite;
+    animation:spin 1.5s linear infinite;
+}
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }

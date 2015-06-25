@@ -6,6 +6,8 @@ import 'package:watcher/watcher.dart';
 import 'package:logging/logging.dart';
 import 'package:logging_handlers/server_logging_handlers.dart';
 
+import 'ros/ros.dart';
+
 Logger log;
 bool debugFlag;
 String logFileDir = '/var/log/updroid';
@@ -78,27 +80,16 @@ String fNameGrabber(List<String> split){
   return fName;
 }
 
-/// Convenience method for adding a formatted filesystem update to the socket
-/// stream.
-///   ex. add /home/user/tmp => [[ADD]]/home/user/tmp
-void formattedFsUpdate(WebSocket socket, WatchEvent e) {
-  var split = e.toString().split(' ');
-  var header = split[0].toUpperCase();
-  var formatted = '[[EXPLORER_$header]]' + fNameGrabber(split);
-  debug('Outgoing: ' + formatted, 0);
-  if(header != 'MODIFY') socket.add(formatted);
-}
-
 /// Recursively traverses the given directory path and asynchronously
 /// returns a list of filesystem entities.
 Future<List<FileSystemEntity>> getDirectory(Directory dir) {
-var files = <FileSystemEntity>[];
-var completer = new Completer();
-var lister = dir.list(recursive: true);
-lister.listen (
-    (file) => files.add(file),
-    // Should also register onError.
-    onDone:   () => completer.complete(files)
-    );
-return completer.future;
+  var files = <FileSystemEntity>[];
+  var completer = new Completer();
+  var lister = dir.list(recursive: true);
+  lister.listen (
+      (file) => files.add(file),
+      // Should also register onError.
+      onDone:   () => completer.complete(files)
+      );
+  return completer.future;
 }

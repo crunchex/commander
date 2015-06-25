@@ -11,7 +11,7 @@ import '../../../mailbox.dart';
 import '../../panel_controller.dart';
 import '../explorer.dart';
 
-part 'nodes_view.dart';
+part 'launchers_view.dart';
 part 'ros_entity.dart';
 
 class UpDroidNodes implements ExplorerController {

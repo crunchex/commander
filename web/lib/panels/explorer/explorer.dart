@@ -6,7 +6,7 @@ import 'dart:async';
 import '../../mailbox.dart';
 import '../panel_controller.dart';
 import 'workspace/workspace_controller.dart';
-import 'nodes/nodes_controller.dart';
+import 'nodes/launchers_controller.dart';
 
 part 'explorer_view.dart';
 

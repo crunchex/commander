@@ -97,45 +97,6 @@ class UpDroidExplorer extends PanelController {
   void registerEventHandlers() {
     AnchorElement fileButton = view.refMap['file-dropdown'];
     fileButton.onClick.listen((e) => _refreshWorkspaceNames());
-//    _deleteWorkspaceButton.onClick.listen((e) => cs.add(new CommanderMessage('UPDROIDCLIENT', 'DELETE_WORKSPACE')));
-//    _runButton.onClick.listen((e) => _runNode());
-//
-//    _workspacesButton.onClick.listen((e) {
-//      for(var explorer in _workspacesView.explorersDiv.children) {
-//        if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
-//          if(!explorer.classes.contains('hidden') && int.parse(explorer.dataset['num']) != num) {
-//            explorer.classes.add('hidden');
-//          }
-//          if(int.parse(explorer.dataset['num']) == num) {
-//            explorer.classes.remove('hidden');
-//          }
-//        }
-//      }
-//    });
-
-    // TODO: cancel when inactive
-
-//    var recycleDrag = dzRecycle.onDragEnter.listen((e) => _workspacesView.recycle.classes.add('recycle-entered'));
-//    var recycleLeave = dzRecycle.onDragLeave.listen((e) => _workspacesView.recycle.classes.remove('recycle-entered'));
-//
-//    var recycleDrop = dzRecycle.onDrop.listen((e) {
-//      if (!_workspacesView._explorer.classes.contains('hidden')) {
-//        var path = getPath(e.draggableElement);
-//
-//        // Draggable is an empty folder
-//        if (e.draggableElement.dataset['isDir'] == 'true') {
-//          LIElement selectedFolder = pathToFile[path];
-//          selectedFolder.remove();
-//          removeFileData(selectedFolder, path);
-//          if (checkContents(selectedFolder) == true) {
-//            removeSubFolders(selectedFolder);
-//          }
-//        }
-//
-//        mailbox.ws.send('[[EXPLORER_DELETE]]' + path);
-//      }
-//    });
-//    recycleListeners.addAll([recycleDrag, recycleLeave, recycleDrop]);
   }
 
   //\/\/ UpDroidMessage Handlers /\/\//

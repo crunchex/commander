@@ -38,7 +38,6 @@ class UpDroidExplorer extends PanelController {
   }
 
   AnchorElement _fileDropdown;
-  AnchorElement _openWorkspaceButton;
   AnchorElement _newWorkspaceButton;
   AnchorElement _closeWorkspaceButton;
 //  AnchorElement _deleteWorkspaceButton;
@@ -71,7 +70,6 @@ class UpDroidExplorer extends PanelController {
     _fileDropdown = view.refMap['file-dropdown'];
 
     _newWorkspaceButton = view.refMap['new-workspace'];
-    _openWorkspaceButton = view.refMap['open-workspace'];
     _closeWorkspaceButton = view.refMap['close-workspace'];
 //    _deleteWorkspaceButton = view.refMap['delete-workspace'];
 
@@ -207,6 +205,8 @@ class UpDroidExplorer extends PanelController {
 
   void cleanUp() {
     _fileDropdownListener.cancel();
+    _newWorkspaceListener.cancel();
+    _closeWorkspaceListener.cancel();
     _workspaceButtonListener.cancel();
     _launchersButtonListener.cancel();
   }

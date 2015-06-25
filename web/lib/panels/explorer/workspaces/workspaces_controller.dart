@@ -196,9 +196,10 @@ class UpDroidWorkspaces implements ExplorerController {
       }
     });
 
-    _mailbox.ws.send('[[BUILD_PACKAGES]]' + JSON.encode(packageBuildList));
-
-//    _mailbox.ws.send('[[WORKSPACE_BUILD]]');
+    if (packageBuildList.isNotEmpty) {
+      _deselectAllEntities();
+      _mailbox.ws.send('[[BUILD_PACKAGES]]' + JSON.encode(packageBuildList));
+    }
   }
 
   void _buildComplete(UpDroidMessage um) {

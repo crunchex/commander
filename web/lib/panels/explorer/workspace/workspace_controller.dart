@@ -12,7 +12,7 @@ import '../../../mailbox.dart';
 import '../../panel_controller.dart';
 import '../explorer.dart';
 
-part 'workspaces_view.dart';
+part 'workspace_view.dart';
 part 'fs_entity.dart';
 
 class WorkspaceController implements ExplorerController {

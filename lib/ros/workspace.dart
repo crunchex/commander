@@ -89,7 +89,7 @@ class Workspace {
     return directories;
   }
 
-  Stream listNodes() {
+  Stream listLaunchers() {
     return src.list(recursive: true, followLinks: false).transform(toLaunchFiles()).asBroadcastStream();
   }
 

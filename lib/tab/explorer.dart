@@ -51,22 +51,8 @@ class CmdrExplorer {
     mailbox.registerWebSocketEvent('WORKSPACE_BUILD', _buildWorkspace);
     mailbox.registerWebSocketEvent('BUILD_PACKAGE', _buildPackage);
     mailbox.registerWebSocketEvent('BUILD_PACKAGES', _buildPackages);
-    mailbox.registerWebSocketEvent('REQUEST_NODE_LIST', _nodeList);
-    mailbox.registerWebSocketEvent('RUN_NODE', _runNode);
-  }
-
-  void killExplorer() {
-    this.expNum = null;
-    this._currentWatcher = null;
-  }
-
-  void _sendWorkspace(UpDroidMessage um) {
-    if (_currentWatcher == null) {
-      _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-      _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
-    }
-
-    _currentWorkspace.listContents().listen((String file) => mailbox.ws.add('[[ADD_UPDATE]]' + file));
+    mailbox.registerWebSocketEvent('REQUEST_NODE_LIST', _launcherList);
+    mailbox.registerWebSocketEvent('RUN_NODE', _runLauncher);
   }
 
   void _sendWorkspaceSync(UpDroidMessage um) {
@@ -89,16 +75,6 @@ class CmdrExplorer {
       .listen((Directory w) => mailbox.ws.add('[[WORKSPACE_NAME]]' + w.path.split('/').last));
   }
 
-  void _setCurrentWorkspace(UpDroidMessage um) {
-    String newWorkspaceName = um.body;
-    if (_currentWatcherStream != null) _currentWatcherStream.cancel();
-
-    _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');
-    _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-    _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
-    _sendPath(um);
-  }
-
   void _newWorkspace(UpDroidMessage um) {
     String data = um.body;
     Workspace newWorkspace = new Workspace('${uproot.path}/$data');
@@ -115,20 +91,14 @@ class CmdrExplorer {
     });
   }
 
-  /// Convenience method for adding a formatted filesystem update to the socket
-  /// stream.
-  ///   ex. add /home/user/tmp => [[ADD]]/home/user/tmp
-  Future _formattedFsUpdate(WatchEvent e) async {
-    List<String> split = e.toString().split(' ');
-    String header = split[0].toUpperCase();
-    String path = split[1];
+  void _setCurrentWorkspace(UpDroidMessage um) {
+    String newWorkspaceName = um.body;
+    if (_currentWatcherStream != null) _currentWatcherStream.cancel();
 
-    bool isFile = await FileSystemEntity.isFile(path);
-    String fileString = isFile ? 'F:${path}' : 'D:${path}';
-
-    var formatted = '[[${header}_UPDATE]]' + fileString;
-    help.debug('Outgoing: ' + formatted, 0);
-    if (header != 'MODIFY') mailbox.ws.add(formatted);
+    _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');
+    _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
+    _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
+    _sendPath(um);
   }
 
   void _fsNewFile(UpDroidMessage um) {
@@ -234,14 +204,14 @@ class CmdrExplorer {
     });
   }
 
-  void _nodeList(UpDroidMessage um) {
-    _currentWorkspace.listNodes().listen((Map package) {
-      String data = JSON.encode(package);
+  void _launcherList(UpDroidMessage um) {
+    _currentWorkspace.listLaunchers().listen((Map launcher) {
+      String data = JSON.encode(launcher);
       mailbox.ws.add('[[LAUNCH]]' + data);
     });
   }
 
-  void _runNode(UpDroidMessage um) {
+  void _runLauncher(UpDroidMessage um) {
     String data = um.body;
     List decodedData = JSON.decode(data);
     String packageName = decodedData[0];
@@ -249,6 +219,22 @@ class CmdrExplorer {
     List nodeArgs = decodedData.sublist(2);
 
     _currentWorkspace.runNode(packageName, nodeName, nodeArgs);
+  }
+
+  /// Convenience method for adding a formatted filesystem update to the socket
+  /// stream.
+  ///   ex. add /home/user/tmp => [[ADD]]/home/user/tmp
+  Future _formattedFsUpdate(WatchEvent e) async {
+    List<String> split = e.toString().split(' ');
+    String header = split[0].toUpperCase();
+    String path = split[1];
+
+    bool isFile = await FileSystemEntity.isFile(path);
+    String fileString = isFile ? 'F:${path}' : 'D:${path}';
+
+    var formatted = '[[${header}_UPDATE]]' + fileString;
+    help.debug('Outgoing: ' + formatted, 0);
+    if (header != 'MODIFY') mailbox.ws.add(formatted);
   }
 
   void cleanup() {

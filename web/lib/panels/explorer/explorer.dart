@@ -20,8 +20,8 @@ class UpDroidExplorer extends PanelController {
     List menu = [
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'New Workspace'},
-        {'type': 'submenu', 'title': 'Open Workspace', 'items': []}]},
-//        {'type': 'toggle', 'title': 'Delete Workspace'},
+        {'type': 'submenu', 'title': 'Open Workspace', 'items': []},
+        {'type': 'toggle', 'title': 'Close Workspace'}]},
 //        {'type': 'toggle', 'title': 'Close Panel'}]},
       {'title': 'Actions', 'items': [
         {'type': 'divider', 'title': 'Workspace'},
@@ -50,6 +50,7 @@ class UpDroidExplorer extends PanelController {
   AnchorElement _fileDropdown;
   AnchorElement _openWorkspaceButton;
   AnchorElement _newWorkspaceButton;
+  AnchorElement _closeWorkspaceButton;
 //  AnchorElement _deleteWorkspaceButton;
   AnchorElement _buildPackagesButton;
   AnchorElement _cleanWorkspaceButton;
@@ -65,7 +66,7 @@ class UpDroidExplorer extends PanelController {
   Map runParams = {};
 
   List recycleListeners = [];
-  StreamSubscription _fileDropdownListener, _newWorkspaceListener;
+  StreamSubscription _fileDropdownListener, _newWorkspaceListener, _closeWorkspaceListener;
   StreamSubscription _workspaceButtonListener, _launchersButtonListener;
 
   ExplorerController controller;
@@ -81,6 +82,7 @@ class UpDroidExplorer extends PanelController {
 
     _newWorkspaceButton = view.refMap['new-workspace'];
     _openWorkspaceButton = view.refMap['open-workspace'];
+    _closeWorkspaceButton = view.refMap['close-workspace'];
 //    _deleteWorkspaceButton = view.refMap['delete-workspace'];
 
     _cleanWorkspaceButton = view.refMap['clean-workspace'];
@@ -104,6 +106,7 @@ class UpDroidExplorer extends PanelController {
   void registerEventHandlers() {
     _fileDropdownListener = _fileDropdown.onClick.listen((e) => _refreshWorkspaceNames());
     _newWorkspaceListener = _newWorkspaceButton.onClick.listen((e) => _newWorkspace());
+    _closeWorkspaceListener = _closeWorkspaceButton.onClick.listen((e) => _closeWorkspace());
   }
 
   //\/\/ UpDroidMessage Handlers /\/\//
@@ -150,6 +153,22 @@ class UpDroidExplorer extends PanelController {
   void _explorerDirPath(UpDroidMessage um) {
     workspacePath = um.body;
     _showWorkspacesController();
+  }
+
+  void _closeWorkspace() {
+    _buildPackagesButton.classes.add('disabled');
+    _cleanWorkspaceButton.classes.add('disabled');
+    _runLaunchersButton.classes.add('disabled');
+    _launchersButton.classes.add('disabled');
+    _workspaceButton.classes.add('disabled');
+
+    if (_launchersButtonListener != null) _launchersButtonListener.cancel();
+    if (_workspaceButtonListener != null) _workspaceButtonListener.cancel();
+
+    if (controller == null) return;
+
+    controller.cleanUp();
+    controller = null;
   }
 
   void _showWorkspacesController() {

@@ -45,6 +45,7 @@ class UpDroidExplorer extends PanelController {
 
   AnchorElement _dropdown;
 
+  AnchorElement _fileDropdown;
   AnchorElement _openWorkspaceButton;
 //  AnchorElement _deleteWorkspaceButton;
   AnchorElement _buildPackagesButton;
@@ -61,8 +62,7 @@ class UpDroidExplorer extends PanelController {
   Map runParams = {};
 
   List recycleListeners = [];
-  StreamSubscription _workspaceButtonListener;
-  StreamSubscription _launchersButtonListener;
+  StreamSubscription _fileDropdownListener, _workspaceButtonListener, _launchersButtonListener;
 
   ExplorerController controller;
   StreamController<CommanderMessage> cs;
@@ -73,6 +73,8 @@ class UpDroidExplorer extends PanelController {
   }
 
   Future setUpController() {
+    _fileDropdown = view.refMap['file-dropdown'];
+
     _openWorkspaceButton = view.refMap['open-workspace'];
 //    _deleteWorkspaceButton = view.refMap['delete-workspace'];
 
@@ -95,8 +97,7 @@ class UpDroidExplorer extends PanelController {
 
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
-    AnchorElement fileButton = view.refMap['file-dropdown'];
-    fileButton.onClick.listen((e) => _refreshWorkspaceNames());
+    _fileDropdownListener = _fileDropdown.onClick.listen((e) => _refreshWorkspaceNames());
   }
 
   //\/\/ UpDroidMessage Handlers /\/\//
@@ -179,9 +180,10 @@ class UpDroidExplorer extends PanelController {
 
   //\/\/ Handler Helpers /\/\//
 
-
   void cleanUp() {
-
+    _fileDropdownListener.cancel();
+    _workspaceButtonListener.cancel();
+    _launchersButtonListener.cancel();
   }
 }
 

@@ -125,11 +125,7 @@ class Workspace {
         }
 
         node.attributes.forEach((XmlAttribute attribute) {
-          if (attribute.name.toString() == 'default') {
-            String defaultValue = attribute.value;
-            // TODO: figure out how to handle arg substitution.
-            if (!defaultValue.contains('\$(')) singleArg[1] = defaultValue;
-          }
+          if (attribute.name.toString() == 'default') singleArg[1] = attribute.value;
         });
 
         // Only add an arg if the first attribute is the name.

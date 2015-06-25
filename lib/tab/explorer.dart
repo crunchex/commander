@@ -39,10 +39,10 @@ class CmdrExplorer {
 
   void _registerMailbox() {
     mailbox.registerWebSocketEvent('REQUEST_WORKSPACE_CONTENTS', _sendWorkspaceSync);
-    mailbox.registerWebSocketEvent('REQUEST_WORKSPACE_PATH', _sendPath);
+    mailbox.registerWebSocketEvent('REQUEST_WORKSPACE_PATH', _getPath);
     mailbox.registerWebSocketEvent('REQUEST_WORKSPACE_NAMES', _sendWorkspaceNames);
     mailbox.registerWebSocketEvent('NEW_WORKSPACE', _newWorkspace);
-    mailbox.registerWebSocketEvent('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);
+    mailbox.registerWebSocketEvent('SET_CURRENT_WORKSPACE', _setWorkspace);
     mailbox.registerWebSocketEvent('NEW_FILE', _fsNewFile);
     mailbox.registerWebSocketEvent('NEW_FOLDER', _fsNewFolder);
     mailbox.registerWebSocketEvent('RENAME', _fsRename);
@@ -65,9 +65,7 @@ class CmdrExplorer {
     files.forEach((String file) => mailbox.ws.add('[[ADD_UPDATE]]' + file));
   }
 
-  void _sendPath(UpDroidMessage um) {
-    mailbox.ws.add('[[EXPLORER_DIRECTORY_PATH]]' + _currentWorkspace.path);
-  }
+  void _getPath(UpDroidMessage um) => _sendPath();
 
   void _sendWorkspaceNames(UpDroidMessage um) {
     uproot.list()
@@ -80,26 +78,11 @@ class CmdrExplorer {
     Workspace newWorkspace = new Workspace('${uproot.path}/$data');
     newWorkspace.create().then((Workspace workspace) {
       workspace.initSync();
-
-      if (_currentWorkspace != null) return;
-
-      if (_currentWatcherStream != null) _currentWatcherStream.cancel();
-      _currentWorkspace = newWorkspace;
-      _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-      _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
-      _sendPath(um);
+      _setCurrentWorkspace(data);
     });
   }
 
-  void _setCurrentWorkspace(UpDroidMessage um) {
-    String newWorkspaceName = um.body;
-    if (_currentWatcherStream != null) _currentWatcherStream.cancel();
-
-    _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');
-    _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-    _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
-    _sendPath(um);
-  }
+  void _setWorkspace(UpDroidMessage um) => _setCurrentWorkspace(um.body);
 
   void _fsNewFile(UpDroidMessage um) {
     String path = um.body;
@@ -235,6 +218,19 @@ class CmdrExplorer {
     var formatted = '[[${header}_UPDATE]]' + fileString;
     help.debug('Outgoing: ' + formatted, 0);
     if (header != 'MODIFY') mailbox.ws.add(formatted);
+  }
+
+  void _setCurrentWorkspace(String newWorkspaceName) {
+    if (_currentWatcherStream != null) _currentWatcherStream.cancel();
+
+    _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');
+    _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
+    _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
+    _sendPath();
+  }
+
+  void _sendPath() {
+    mailbox.ws.add('[[EXPLORER_DIRECTORY_PATH]]' + _currentWorkspace.path);
   }
 
   void cleanup() {

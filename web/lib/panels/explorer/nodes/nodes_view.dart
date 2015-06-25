@@ -114,13 +114,17 @@ class PackageView extends RosEntityView {
 class NodeView extends RosEntityView {
   final String fileClass = 'glyphicons-circle-arrow-right';
 
+  bool expanded = false;
   UListElement uElement;
 
-  NodeView(String name, List<List<String>> args) : super(name) {
+  NodeView(String name, List<List<String>> args, [bool expanded]) : super(name) {
+    this.expanded = expanded;
+
     container.classes.add('explorer-node');
     icon.classes.add(fileClass);
 
     uElement = new UListElement()
+      ..hidden = true
       ..classes.add('explorer-ul');
     element.children.add(uElement);
 
@@ -144,5 +148,25 @@ class NodeView extends RosEntityView {
       if (argument[1] != null) argValue.placeholder = argument[1];
       container.children.add(argValue);
     });
+  }
+
+  void toggleExpansion() {
+    if (expanded) {
+      uElement.hidden = true;
+      expanded = false;
+    } else {
+      uElement.hidden = false;
+      expanded = true;
+    }
+  }
+
+  void expand() {
+    uElement.hidden = false;
+    expanded = true;
+  }
+
+  void collapse() {
+    uElement.hidden = true;
+    expanded = false;
   }
 }

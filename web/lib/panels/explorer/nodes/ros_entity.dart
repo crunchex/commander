@@ -97,11 +97,13 @@ class Node {
 
   void select() {
     view.select();
+    view.expand();
     _selected = true;
   }
 
   void deselect() {
     view.deselect();
+    view.collapse();
     _selected = false;
   }
 

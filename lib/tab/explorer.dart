@@ -14,6 +14,7 @@ class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';
 
   int expNum;
+  CmdrMailbox mailbox;
   Directory uproot;
 
   Workspace _currentWorkspace;
@@ -25,6 +26,9 @@ class CmdrExplorer {
   CmdrExplorer(this.expNum, this.uproot) {
     if (_currentWorkspace != null) return;
 
+    mailbox = new CmdrMailbox(guiName);
+    _registerMailbox();
+
     // TODO: retrieve saved data for the most recently opened workspace.
     // TODO: handle changes to uproot made on the server side.
 //    _uprootWatcher = new DirectoryWatcher(uproot.path);
@@ -33,82 +37,22 @@ class CmdrExplorer {
 //    });
   }
 
-  /// Handler for the [WebSocket]. Performs various actions depending on requests
-  /// it receives or local events that it detects.
-  void handleWebSocket(WebSocket ws) {
-    help.debug('Explorer client connected.', 0);
-    _ws = ws;
-
-    ws.listen((String s) {
-      UpDroidMessage um = new UpDroidMessage.fromString(s);
-      help.debug('Explorer incoming: ' + s, 0);
-
-      switch (um.header) {
-        case "REQUEST_WORKSPACE_CONTENTS":
-          _sendWorkspaceSync(ws);
-          break;
-
-        case 'REQUEST_WORKSPACE_PATH':
-          _sendPath(ws);
-          break;
-
-        case 'REQUEST_WORKSPACE_NAMES':
-          _sendWorkspaceNames(ws);
-          break;
-
-        case 'NEW_WORKSPACE':
-          _newWorkspace(um.body, ws);
-          break;
-
-        case 'SET_CURRENT_WORKSPACE':
-          _setCurrentWorkspace(um.body, ws);
-          break;
-
-        case 'NEW_FILE':
-          _fsNewFile(um.body);
-          break;
-
-        case 'NEW_FOLDER':
-          _fsNewFolder(um.body);
-          break;
-
-        case 'RENAME':
-          _fsRename(um.body, ws);
-          break;
-
-        case 'DELETE':
-          _fsDelete(um.body, ws);
-          break;
-
-        case 'WORKSPACE_CLEAN':
-          _workspaceClean(ws);
-          break;
-
-        case 'WORKSPACE_BUILD':
-          _buildWorkspace(ws);
-          break;
-
-        case 'BUILD_PACKAGE':
-          _buildPackage(um.body, ws);
-          break;
-
-        case 'BUILD_PACKAGES':
-          _buildPackages(um.body, ws);
-          break;
-
-        case 'REQUEST_NODE_LIST':
-          _nodeList(ws);
-          break;
-
-        case 'RUN_NODE':
-          _runNode(um.body);
-          break;
-
-        default:
-          help.debug('Explorer: message received without updroid header.', 1);
-      }
-
-    });
+  void _registerMailbox() {
+    mailbox.registerWebSocketEvent('REQUEST_WORKSPACE_CONTENTS', _sendWorkspaceSync);
+    mailbox.registerWebSocketEvent('REQUEST_WORKSPACE_PATH', _sendPath);
+    mailbox.registerWebSocketEvent('REQUEST_WORKSPACE_NAMES', _sendWorkspaceNames);
+    mailbox.registerWebSocketEvent('NEW_WORKSPACE', _newWorkspace);
+    mailbox.registerWebSocketEvent('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);
+    mailbox.registerWebSocketEvent('NEW_FILE', _fsNewFile);
+    mailbox.registerWebSocketEvent('NEW_FOLDER', _fsNewFolder);
+    mailbox.registerWebSocketEvent('RENAME', _fsRename);
+    mailbox.registerWebSocketEvent('DELETE', _fsDelete);
+    mailbox.registerWebSocketEvent('WORKSPACE_CLEAN', _workspaceClean);
+    mailbox.registerWebSocketEvent('WORKSPACE_BUILD', _buildWorkspace);
+    mailbox.registerWebSocketEvent('BUILD_PACKAGE', _buildPackage);
+    mailbox.registerWebSocketEvent('BUILD_PACKAGES', _buildPackages);
+    mailbox.registerWebSocketEvent('REQUEST_NODE_LIST', _nodeList);
+    mailbox.registerWebSocketEvent('RUN_NODE', _runNode);
   }
 
   void killExplorer() {
@@ -116,45 +60,47 @@ class CmdrExplorer {
     this._currentWatcher = null;
   }
 
-  void _sendWorkspace(WebSocket s) {
+  void _sendWorkspace(UpDroidMessage um) {
     if (_currentWatcher == null) {
       _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-      _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
+      _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
     }
 
-    _currentWorkspace.listContents().listen((String file) => s.add('[[ADD_UPDATE]]' + file));
+    _currentWorkspace.listContents().listen((String file) => mailbox.ws.add('[[ADD_UPDATE]]' + file));
   }
 
-  void _sendWorkspaceSync(WebSocket s) {
+  void _sendWorkspaceSync(UpDroidMessage um) {
     if (_currentWatcher == null) {
       _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-      _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(s, e));
+      _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
     }
 
     List<String> files = _currentWorkspace.listContentsSync();
-    files.forEach((String file) => s.add('[[ADD_UPDATE]]' + file));
+    files.forEach((String file) => mailbox.ws.add('[[ADD_UPDATE]]' + file));
   }
 
-  void _sendPath(WebSocket s) {
-    help.formattedMessage(s, 'EXPLORER_DIRECTORY_PATH', _currentWorkspace.path);
+  void _sendPath(UpDroidMessage um) {
+    mailbox.ws.add('[[EXPLORER_DIRECTORY_PATH]]' + _currentWorkspace.path);
   }
 
-  void _sendWorkspaceNames(WebSocket ws) {
+  void _sendWorkspaceNames(UpDroidMessage um) {
     uproot.list()
       .where((Directory w) => w.path.split('/').length == uproot.path.split('/').length + 1)
-      .listen((Directory w) => ws.add('[[WORKSPACE_NAME]]' + w.path.split('/').last));
+      .listen((Directory w) => mailbox.ws.add('[[WORKSPACE_NAME]]' + w.path.split('/').last));
   }
 
-  void _setCurrentWorkspace(String newWorkspaceName, WebSocket ws) {
+  void _setCurrentWorkspace(UpDroidMessage um) {
+    String newWorkspaceName = um.body;
     if (_currentWatcherStream != null) _currentWatcherStream.cancel();
 
     _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');
     _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-    _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(ws, e));
-    _sendPath(ws);
+    _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
+    _sendPath(um);
   }
 
-  void _newWorkspace(String data, WebSocket ws) {
+  void _newWorkspace(UpDroidMessage um) {
+    String data = um.body;
     Workspace newWorkspace = new Workspace('${uproot.path}/$data');
     newWorkspace.create().then((Workspace workspace) {
       workspace.initSync();
@@ -164,15 +110,15 @@ class CmdrExplorer {
       if (_currentWatcherStream != null) _currentWatcherStream.cancel();
       _currentWorkspace = newWorkspace;
       _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
-      _currentWatcherStream = _currentWatcher.events.listen((e) => formattedFsUpdate(ws, e));
-      _sendPath(ws);
+      _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
+      _sendPath(um);
     });
   }
 
   /// Convenience method for adding a formatted filesystem update to the socket
   /// stream.
   ///   ex. add /home/user/tmp => [[ADD]]/home/user/tmp
-  Future formattedFsUpdate(WebSocket socket, WatchEvent e) async {
+  Future _formattedFsUpdate(WatchEvent e) async {
     List<String> split = e.toString().split(' ');
     String header = split[0].toUpperCase();
     String path = split[1];
@@ -182,10 +128,11 @@ class CmdrExplorer {
 
     var formatted = '[[${header}_UPDATE]]' + fileString;
     help.debug('Outgoing: ' + formatted, 0);
-    if (header != 'MODIFY') socket.add(formatted);
+    if (header != 'MODIFY') mailbox.ws.add(formatted);
   }
 
-  void _fsNewFile(String path) {
+  void _fsNewFile(UpDroidMessage um) {
+    String path = um.body;
     String fullPath = pathLib.join(path + '/untitled.py');
     File newFile = new File(fullPath);
 
@@ -199,7 +146,8 @@ class CmdrExplorer {
     newFile.create();
   }
 
-  void _fsNewFolder(String path) {
+  void _fsNewFolder(UpDroidMessage um) {
+    String path = um.body;
     String fullPath = path;
     Directory newFolder = new Directory(fullPath);
 
@@ -213,7 +161,8 @@ class CmdrExplorer {
     newFolder.createSync();
   }
 
-  void _fsRename(String data, WebSocket ws) {
+  void _fsRename(UpDroidMessage um) {
+    String data = um.body;
     List<String> split = data.split(':');
     String oldPath = split[0];
     String newPath = split[1];
@@ -227,11 +176,12 @@ class CmdrExplorer {
 
       // Force a remove update on the top level folder as
       // watcher issue workaround.
-      if (isDir) ws.add('[[REMOVE_UPDATE]]D:$oldPath');
+      if (isDir) mailbox.ws.add('[[REMOVE_UPDATE]]D:$oldPath');
     });
   }
 
-  void _fsDelete(String path, WebSocket socket) {
+  void _fsDelete(UpDroidMessage um) {
+    String path = um.body;
     FileSystemEntity entity;
     bool isDir = FileSystemEntity.isDirectorySync(path);
 
@@ -240,35 +190,37 @@ class CmdrExplorer {
 
     // Force a remove update on the top level folder as
     // watcher issue workaround.
-    if (isDir) socket.add('[[REMOVE_UPDATE]]D:$path');
+    if (isDir) mailbox.ws.add('[[REMOVE_UPDATE]]D:$path');
   }
 
-  void _workspaceClean(WebSocket s) {
+  void _workspaceClean(UpDroidMessage um) {
     _currentWorkspace.clean().then((result) {
-      s.add('[[WORKSPACE_CLEAN]]');
+      mailbox.ws.add('[[WORKSPACE_CLEAN]]');
     });
   }
 
-  void _buildWorkspace(WebSocket s) {
+  void _buildWorkspace(UpDroidMessage um) {
     _currentWorkspace.buildWorkspace().then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
-//      s.add('[[WORKSPACE_BUILD]]' + resultString);
-      s.add('[[BUILD_COMPLETE]]' + JSON.encode([_currentWorkspace.path]));
+//      mailbox.ws.add('[[WORKSPACE_BUILD]]' + resultString);
+      mailbox.ws.add('[[BUILD_COMPLETE]]' + JSON.encode([_currentWorkspace.path]));
     });
   }
 
-  void _buildPackage(String packagePath, WebSocket s) {
+  void _buildPackage(UpDroidMessage um) {
+    String packagePath = um.body;
     String packageName = packagePath.split('/').last;
     _currentWorkspace.buildPackage(packageName).then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
-//      s.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
-      s.add('[[BUILD_COMPLETE]]' + JSON.encode([packagePath]));
+//      mailbox.ws.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
+      mailbox.ws.add('[[BUILD_COMPLETE]]' + JSON.encode([packagePath]));
     });
   }
 
-  void _buildPackages(String data, WebSocket s) {
+  void _buildPackages(UpDroidMessage um) {
+    String data = um.body;
     List<String> packagePaths = JSON.decode(data);
 
     List<String> packageNames = [];
@@ -277,19 +229,20 @@ class CmdrExplorer {
     _currentWorkspace.buildPackages(packageNames).then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
-//      s.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
-      s.add('[[BUILD_COMPLETE]]' + data);
+//      mailbox.ws.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
+      mailbox.ws.add('[[BUILD_COMPLETE]]' + data);
     });
   }
 
-  void _nodeList(WebSocket s) {
+  void _nodeList(UpDroidMessage um) {
     _currentWorkspace.listNodes().listen((Map package) {
       String data = JSON.encode(package);
-      s.add('[[LAUNCH]]' + data);
+      mailbox.ws.add('[[LAUNCH]]' + data);
     });
   }
 
-  void _runNode(String data) {
+  void _runNode(UpDroidMessage um) {
+    String data = um.body;
     List decodedData = JSON.decode(data);
     String packageName = decodedData[0];
     String nodeName = decodedData[1];

@@ -109,7 +109,7 @@ class CmdrServer {
 
     if (type == 'updroidexplorer') {
       WebSocketTransformer.upgrade(request)
-      .then((WebSocket ws) => _panels[type][objectID].handleWebSocket(ws));
+      .then((WebSocket ws) => _panels[type][objectID].mailbox.handleWebSocket(ws, request));
       return;
     }
 
@@ -176,7 +176,7 @@ class CmdrServer {
         }
         if (workspace == true) {
           names.add(pathLib.basename(folder.path));
-          _panels[num] = new CmdrExplorer(folder, num);
+          _panels[num] = new CmdrExplorer(num, folder);
           num += 1;
         }
       }

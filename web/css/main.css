@@ -164,20 +164,18 @@ html, body {
 
 body>.navbar.navbar-inverse {
   background-color: #eaecec;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  border-bottom-width: 1px;
-  border-bottom-color: #e3e3e3;
+  margin-bottom: 10px;
+  border: none;
+  min-height: 0;
 }
 
 .navbar-inverse .navbar-nav>li>a,
 .navbar-inverse .navbar-nav>li>a:focus {
+  padding-top: 10px;
+  padding-bottom: 10px;
   color: #0c0c0c;
   background-color: #eaecec;
   font-family: "Avenir Next LT Pro Bold";
-  border-color: #0c0c0c;
-  border-width: 1px;
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
   -o-transition: all 0.25s ease;
@@ -188,8 +186,6 @@ body>.navbar.navbar-inverse {
   color: #ffffff;
   background-color: #ff2919;
   font-family: "Avenir Next LT Pro Bold";
-  border-color: #0c0c0c;
-  border-width: 1px;
 }
 
 .navbar-inverse .navbar-nav>li>a.feedback-bold,
@@ -374,8 +370,8 @@ li div input {
 }
 
 .navbar-left {
-  margin-top: 5px !important;
-  margin-bottom: 5px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   margin-left: 10px !important;
 }
 
@@ -388,9 +384,9 @@ li div input {
   float: right !important;
 }
 
-#updroid {
-  height: 36px;
-  margin-top: 2px;
+.upcom-logo {
+  margin-top: 6px;
+  height: 30px;
   margin-left: 15px;
 }
 
@@ -412,10 +408,6 @@ li div input {
 
 .span-entered {
   color: #ffffff;
-}
-
-#navbar {
-  margin-bottom: 10px;
 }
 
 .col-xs-2, .col-xs-5 {

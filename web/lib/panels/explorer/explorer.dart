@@ -102,14 +102,12 @@ class UpDroidExplorer extends PanelController {
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_NAME', _addWorkspaceToMenu);
   }
 
-  /// Sets up the event handlers for the console.
-  void registerEventHandlers() {
-    _fileDropdownListener = _fileDropdown.onClick.listen((e) => _refreshWorkspaceNames());
-    _newWorkspaceListener = _newWorkspaceButton.onClick.listen((e) => _newWorkspace());
-    _closeWorkspaceListener = _closeWorkspaceButton.onClick.listen((e) => _closeWorkspace());
-  }
+  void _requestWorkspaceNames(UpDroidMessage um) => _refreshWorkspaceNames();
 
-  //\/\/ UpDroidMessage Handlers /\/\//
+  void _explorerDirPath(UpDroidMessage um) {
+    workspacePath = um.body;
+    _showWorkspacesController();
+  }
 
   void _addWorkspaceToMenu(UpDroidMessage um) {
     view.addMenuItem({'type': 'toggle', 'title': um.body}, '#${shortName.toLowerCase()}-$id-open-workspace');
@@ -117,6 +115,19 @@ class UpDroidExplorer extends PanelController {
     item.onClick.listen((e) {
       _openExistingWorkspace(um.body);
     });
+  }
+
+  //\/\/ Event Handlers /\/\//
+
+  void registerEventHandlers() {
+    _fileDropdownListener = _fileDropdown.onClick.listen((e) => _refreshWorkspaceNames());
+    _newWorkspaceListener = _newWorkspaceButton.onClick.listen((e) => _newWorkspace());
+    _closeWorkspaceListener = _closeWorkspaceButton.onClick.listen((e) => _closeWorkspace());
+  }
+
+  void _refreshWorkspaceNames() {
+    querySelector('#${shortName.toLowerCase()}-$id-open-workspace').innerHtml = '';
+    mailbox.ws.send('[[REQUEST_WORKSPACE_NAMES]]');
   }
 
   void _newWorkspace() {
@@ -127,32 +138,6 @@ class UpDroidExplorer extends PanelController {
         mailbox.ws.send('[[NEW_WORKSPACE]]' + newWorkspaceName);
       }
     });
-  }
-
-  void _openExistingWorkspace(String name) {
-    if (controller != null) {
-      controller.cleanUp();
-      controller = null;
-    }
-
-    mailbox.ws.send('[[SET_CURRENT_WORKSPACE]]' + name);
-
-    // TODO: make sure all the inner nodes (and listeners) get cleaned up properly.
-    querySelector('#${shortName.toLowerCase()}-$id-open-workspace').innerHtml = '';
-    mailbox.ws.send('[[REQUEST_WORKSPACE_NAMES]]');
-  }
-
-  void _requestWorkspacePath(UpDroidMessage um) => mailbox.ws.send('[[REQUEST_WORKSPACE_PATH]]');
-  void _requestWorkspaceNames(UpDroidMessage um) => _refreshWorkspaceNames();
-
-  void _refreshWorkspaceNames() {
-    querySelector('#${shortName.toLowerCase()}-$id-open-workspace').innerHtml = '';
-    mailbox.ws.send('[[REQUEST_WORKSPACE_NAMES]]');
-  }
-
-  void _explorerDirPath(UpDroidMessage um) {
-    workspacePath = um.body;
-    _showWorkspacesController();
   }
 
   void _closeWorkspace() {
@@ -169,6 +154,21 @@ class UpDroidExplorer extends PanelController {
 
     controller.cleanUp();
     controller = null;
+  }
+
+  //\/\/ Misc Methods /\/\//
+
+  void _openExistingWorkspace(String name) {
+    if (controller != null) {
+      controller.cleanUp();
+      controller = null;
+    }
+
+    mailbox.ws.send('[[SET_CURRENT_WORKSPACE]]' + name);
+
+    // TODO: make sure all the inner nodes (and listeners) get cleaned up properly.
+    querySelector('#${shortName.toLowerCase()}-$id-open-workspace').innerHtml = '';
+    mailbox.ws.send('[[REQUEST_WORKSPACE_NAMES]]');
   }
 
   void _showWorkspacesController() {

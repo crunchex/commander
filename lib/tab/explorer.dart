@@ -142,7 +142,7 @@ class CmdrExplorer {
   }
 
   void _setCurrentWorkspace(String newWorkspaceName, WebSocket ws) {
-    _currentWatcherStream.cancel();
+    if (_currentWatcherStream != null) _currentWatcherStream.cancel();
 
     _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');
     _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);

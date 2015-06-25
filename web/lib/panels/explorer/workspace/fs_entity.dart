@@ -161,6 +161,12 @@ class FileEntity extends FileSystemEntity {
       }
     });
 
+    view.container.onDoubleClick.listen((e) {
+      deselectAllEntities();
+      ws.send('[[OPEN_FILE]]' + path);
+      select();
+    });
+
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
       deselectAllEntities();

@@ -1,14 +1,14 @@
-part of updroid_explorer_nodes;
+part of updroid_explorer_launchers;
 
 class Package {
   String name, path;
   List<Package> packages;
-  List<Node> nodes;
+  List<Launcher> launchers;
   PackageView view;
 
   Package(this.name, this.path) {
     packages = [];
-    nodes = [];
+    launchers = [];
 
     setUpPackageView();
   }
@@ -22,32 +22,32 @@ class Package {
   }
 
   void cleanUp() {
-    nodes.forEach((Node n) => n.cleanUp());
+    launchers.forEach((Launcher n) => n.cleanUp());
     view.cleanUp();
   }
 }
 
-class Node {
+class Launcher {
   String name, packageName;
   List args;
-  NodeView view;
-  var deselectAllNodes;
+  LauncherView view;
+  var deselectAllLaunchers;
 
   WebSocket _ws;
 
   bool _selectEnabled, _selected;
 
-  Node(this.name, this.args, this.packageName, WebSocket ws, this.deselectAllNodes) {
+  Launcher(this.name, this.args, this.packageName, WebSocket ws, this.deselectAllLaunchers) {
     _ws = ws;
     _selected = false;
     _selectEnabled = true;
 
-    _setUpNodeView();
+    _setUpLauncherView();
 
     //print('workspacePath: $workspacePath, path: $path, name: $name, parent: $parent');
   }
 
-  void runNode() {
+  void runLauncher() {
     if (!_selected) return;
 
     List runCommand = [];
@@ -67,12 +67,12 @@ class Node {
   }
 
 
-  void _setUpNodeView() {
-    view = new NodeView(name, args);
+  void _setUpLauncherView() {
+    view = new LauncherView(name, args);
 
     view.container.onClick.listen((e) {
       if (_selectEnabled) {
-        if (!e.ctrlKey) deselectAllNodes();
+        if (!e.ctrlKey) deselectAllLaunchers();
 
         toggleSelected();
         _selectEnabled = false;
@@ -85,10 +85,10 @@ class Node {
 
     view.container.onContextMenu.listen((e) {
       e.preventDefault();
-      deselectAllNodes();
+      deselectAllLaunchers();
       select();
       List menu = [
-        {'type': 'toggle', 'title': 'Run', 'handler': runNode}];
+        {'type': 'toggle', 'title': 'Run', 'handler': runLauncher}];
       ContextMenu.createContextMenu(e.page, menu);
     });
   }

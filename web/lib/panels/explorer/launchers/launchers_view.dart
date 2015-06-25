@@ -1,18 +1,18 @@
-part of updroid_explorer_nodes;
+part of updroid_explorer_launchers;
 
-class NodesView extends ExplorerView {
+class LaunchersView extends ExplorerView {
   /// Returns an initialized [PanelView] as a [Future] given all normal constructors.
   ///
   /// Use this instead of calling the constructor directly.
-  static Future<NodesView> createNodesView(int id, DivElement content) {
+  static Future<LaunchersView> createLaunchersView(int id, DivElement content) {
     Completer c = new Completer();
-    c.complete(new NodesView(id, content));
+    c.complete(new LaunchersView(id, content));
     return c.future;
   }
 
   UListElement uList;
 
-  NodesView(int id, DivElement content) :
+  LaunchersView(int id, DivElement content) :
   super(id, content) {
     this.content = content;
 
@@ -111,13 +111,13 @@ class PackageView extends RosEntityView {
   }
 }
 
-class NodeView extends RosEntityView {
+class LauncherView extends RosEntityView {
   final String fileClass = 'glyphicons-circle-arrow-right';
 
   bool expanded = false;
   UListElement uElement;
 
-  NodeView(String name, List<List<String>> args, [bool expanded]) : super(name) {
+  LauncherView(String name, List<List<String>> args, [bool expanded]) : super(name) {
     this.expanded = expanded;
 
     container.classes.add('explorer-node');

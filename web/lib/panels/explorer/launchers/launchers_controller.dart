@@ -1,4 +1,4 @@
-library updroid_explorer_nodes;
+library updroid_explorer_launchers;
 
 import 'dart:html';
 import 'dart:async';
@@ -14,28 +14,28 @@ import '../explorer.dart';
 part 'launchers_view.dart';
 part 'ros_entity.dart';
 
-class UpDroidNodes implements ExplorerController {
+class LaunchersController implements ExplorerController {
   PanelView _view;
-  NodesView _nodesView;
+  LaunchersView _launchersView;
   Mailbox _mailbox;
 
-  AnchorElement _runNodesButton;
+  AnchorElement _runLaunchersButton;
 
   Map<String, Package> packages = {};
   String workspacePath;
   Set<StreamSubscription> _listenersToCleanUp;
 
-  UpDroidNodes(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons) {
+  LaunchersController(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons) {
     _view = view;
     _mailbox = mailbox;
-    _runNodesButton = actionButtons[0];
+    _runLaunchersButton = actionButtons[0];
 
     registerMailbox();
 
     _listenersToCleanUp = new Set<StreamSubscription>();
 
-    NodesView.createNodesView(id, _view.content).then((nodesView) {
-      _nodesView = nodesView;
+    LaunchersView.createLaunchersView(id, _view.content).then((launchersView) {
+      _launchersView = launchersView;
 
       _mailbox.ws.send('[[REQUEST_NODE_LIST]]');
 
@@ -48,23 +48,23 @@ class UpDroidNodes implements ExplorerController {
   }
 
   void registerEventHandlers() {
-    _listenersToCleanUp.add(_runNodesButton.onClick.listen((e) {
-      packages.values.forEach((Package p) => p.nodes.forEach((Node n) => n.runNode()));
+    _listenersToCleanUp.add(_runLaunchersButton.onClick.listen((e) {
+      packages.values.forEach((Package p) => p.launchers.forEach((Launcher n) => n.runLauncher()));
     }));
   }
 
   void addLaunch(UpDroidMessage um) {
     Map data = JSON.decode(um.body);
     String packagePath = data['package-path'];
-    String nodeName = data['node'];
+    String launcherName = data['node'];
     List args = data['args'];
 
     if (!packages.containsKey(packagePath)) _addPackage(packagePath);
 
     String packageName = packagePath.split('/').last;
-    Node node = new Node(nodeName, args, packageName, _mailbox.ws, _deselectAllNodes);
-    packages[packagePath].nodes.add(node);
-    packages[packagePath].view.uElement.children.add(node.view.element);
+    Launcher launcher = new Launcher(launcherName, args, packageName, _mailbox.ws, _deselectAllLaunchers);
+    packages[packagePath].launchers.add(launcher);
+    packages[packagePath].view.uElement.children.add(launcher.view.element);
   }
 
   void _addPackage(String packagePath) {
@@ -81,15 +81,15 @@ class UpDroidNodes implements ExplorerController {
     packages.putIfAbsent(packagePath, () => package);
 
     if (parentPath == '$workspacePath/src') {
-      _nodesView.uList.children.add(package.view.element);
+      _launchersView.uList.children.add(package.view.element);
     } else {
       packages[parentPath].view.uElement.children.add(package.view.element);
     }
 
   }
 
-  void _deselectAllNodes() {
-    packages.values.forEach((Package p) => p.nodes.forEach((Node n) => n.deselect()));
+  void _deselectAllLaunchers() {
+    packages.values.forEach((Package p) => p.launchers.forEach((Launcher n) => n.deselect()));
   }
 
   void cleanUp() {
@@ -98,6 +98,6 @@ class UpDroidNodes implements ExplorerController {
     packages.values.forEach((Package p) => p.cleanUp());
     packages = null;
 
-    _nodesView.cleanUp();
+    _launchersView.cleanUp();
   }
 }

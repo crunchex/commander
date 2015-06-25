@@ -23,10 +23,10 @@ class CmdrExplorer {
   WebSocket _ws;
 
   //TODO: make asynchroneous
-  CmdrExplorer(this.expNum, this.uproot) {
+  CmdrExplorer(this.expNum, this.uproot, StreamController<ServerMessage> serverStream) {
     if (_currentWorkspace != null) return;
 
-    mailbox = new CmdrMailbox(guiName);
+    mailbox = new CmdrMailbox(guiName, serverStream);
     _registerMailbox();
 
     // TODO: retrieve saved data for the most recently opened workspace.
@@ -47,6 +47,7 @@ class CmdrExplorer {
     mailbox.registerWebSocketEvent('NEW_FOLDER', _fsNewFolder);
     mailbox.registerWebSocketEvent('RENAME', _fsRename);
     mailbox.registerWebSocketEvent('DELETE', _fsDelete);
+    mailbox.registerWebSocketEvent('OPEN_FILE', _openFile);
     mailbox.registerWebSocketEvent('WORKSPACE_CLEAN', _workspaceClean);
     mailbox.registerWebSocketEvent('WORKSPACE_BUILD', _buildWorkspace);
     mailbox.registerWebSocketEvent('BUILD_PACKAGE', _buildPackage);
@@ -145,6 +146,8 @@ class CmdrExplorer {
     // watcher issue workaround.
     if (isDir) mailbox.ws.add('[[REMOVE_UPDATE]]D:$path');
   }
+
+  void _openFile(UpDroidMessage um) => mailbox.serverStream.add(new ServerMessage('UpDroidEditor', um));
 
   void _workspaceClean(UpDroidMessage um) {
     _currentWorkspace.clean().then((result) {

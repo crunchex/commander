@@ -1,6 +1,7 @@
 library cmdr_editor;
 
 import 'dart:io';
+import 'dart:async';
 import 'dart:convert';
 
 import '../server_mailbox.dart';
@@ -13,10 +14,10 @@ class CmdrEditor {
   CmdrMailbox mailbox;
   Directory _dir;
 
-  CmdrEditor(Directory dir) {
+  CmdrEditor(Directory dir, StreamController<ServerMessage> serverStream) {
     help.debug('Spawning $guiName ($editorNum)', 0);
 
-    mailbox = new CmdrMailbox(guiName);
+    mailbox = new CmdrMailbox(guiName, serverStream);
     _registerMailbox();
 
     _dir = dir;
@@ -63,5 +64,7 @@ class CmdrEditor {
     mailbox.registerWebSocketEvent('EDITOR_REQUEST_LIST', _sendEditorList);
     mailbox.registerWebSocketEvent('EDITOR_OPEN', _sendFileContents);
     mailbox.registerWebSocketEvent('EDITOR_SAVE', _saveFile);
+
+    mailbox.registerServerMessageHandler('OPEN_FILE', _sendFileContents);
   }
 }

@@ -17,12 +17,12 @@ class CmdrPty {
   String _workspacePath;
   Socket _ptySocket;
 
-  CmdrPty(this.ptyNum, String workspacePath, String numRows, String numCols) {
+  CmdrPty(this.ptyNum, String workspacePath, String numRows, String numCols, StreamController<ServerMessage> serverStream) {
     help.debug('Spawning UpDroidPty ($ptyNum)', 0);
 
     _workspacePath = workspacePath;
 
-    mailbox = new CmdrMailbox(guiName);
+    mailbox = new CmdrMailbox(guiName, serverStream);
     _registerMailbox();
   }
 

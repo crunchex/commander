@@ -33,7 +33,6 @@ class CmdrServer {
   Map _panels = {};
   Map _tabs = {};
   Map<int, CameraServer> _camServers = {};
-  StreamController<UpDroidMessage> _serverStream;
   CmdrMailbox _mailbox;
   Directory dir;
 
@@ -44,15 +43,11 @@ class CmdrServer {
     dir.create();
     _initServer(_getVirDir());
 
-    _mailbox = new CmdrMailbox('UpDroidClient');
+    StreamController<ServerMessage> serverStream = new StreamController<ServerMessage>.broadcast();
+    _mailbox = new CmdrMailbox('UpDroidClient', serverStream);
     _registerMailbox();
 
     // A stream that pushes anything it receives onto the main websocket to the client.
-    _serverStream = new StreamController<UpDroidMessage>.broadcast();
-    _serverStream.stream.listen((UpDroidMessage um) {
-      //print('received message: ${um.header} ${um.body}');
-      _mailbox.ws.add(um.s);
-    });
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
@@ -137,6 +132,8 @@ class CmdrServer {
 //    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
 
     _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
+
+    _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
   }
 
   void _clientConfig(UpDroidMessage um) {
@@ -176,7 +173,7 @@ class CmdrServer {
         }
         if (workspace == true) {
           names.add(pathLib.basename(folder.path));
-          _panels[num] = new CmdrExplorer(num, folder);
+          _panels[num] = new CmdrExplorer(num, folder, _mailbox.serverStream);
           num += 1;
         }
       }
@@ -198,7 +195,7 @@ class CmdrServer {
 
     switch (type) {
       case 'updroidexplorer':
-        _panels[type][num] = new CmdrExplorer(num, dir);
+        _panels[type][num] = new CmdrExplorer(num, dir, _mailbox.serverStream);
         break;
     }
   }
@@ -215,21 +212,23 @@ class CmdrServer {
 
     switch (type) {
       case 'updroideditor':
-        _tabs[type][num] = new CmdrEditor(dir);
+        _tabs[type][num] = new CmdrEditor(dir, _mailbox.serverStream);
         break;
       case 'updroidcamera':
-        _tabs[type][num] = new CmdrCamera(num, _camServers, _serverStream);
+        _tabs[type][num] = new CmdrCamera(num, _camServers, _mailbox.serverStream);
         break;
       case 'updroidteleop':
-        _tabs[type][num] = new CmdrTeleop(num, dir.path, _serverStream);
+        _tabs[type][num] = new CmdrTeleop(num, dir.path, _mailbox.serverStream);
         break;
       case 'updroidconsole':
         String numRows = idList[3];
         String numCols = idList[4];
-        _tabs[type][num] = new CmdrPty(num, dir.path, numRows, numCols);
+        _tabs[type][num] = new CmdrPty(num, dir.path, numRows, numCols, _mailbox.serverStream);
         break;
     }
   }
+
+  void _openTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[OPEN_TAB]]' + um.body);
 
   void _closeTab(UpDroidMessage um) {
     List idList = um.body.split('_');

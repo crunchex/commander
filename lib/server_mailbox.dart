@@ -1,22 +1,30 @@
 library server_mailbox;
 
 import 'dart:io';
+import 'dart:async';
 
 import 'server_helper.dart' as help;
 
 class CmdrMailbox {
   String className;
   WebSocket ws;
+  StreamController<ServerMessage> serverStream;
 
   Map _wsRegistry;
   List<Function> _wsCloseRegistry;
   Map _endpointRegistry;
+  Map _serverStreamRegistry;
 
-  CmdrMailbox(String className) {
-    this.className = className;
+  CmdrMailbox(this.className,  this.serverStream) {
     _wsRegistry = {};
     _wsCloseRegistry = [];
     _endpointRegistry = {};
+    _serverStreamRegistry = {};
+
+    serverStream.stream.where((ServerMessage sm) => sm.receiver == className).listen((ServerMessage sm) {
+      help.debug('[${className}\'s Server Mailbox] UpDroid Message received with header: ${sm.um.header}', 0);
+      _serverStreamRegistry[sm.um.header](sm.um);
+    });
   }
 
   void handleWebSocket(WebSocket ws, HttpRequest request) {
@@ -50,6 +58,19 @@ class CmdrMailbox {
   void registerEndpointHandler(String uri, function(HttpRequest request)) {
     _endpointRegistry[uri] = function;
   }
+
+  /// Registers a [function] to be called on a received [UpDroidMessage] with [msg]
+  /// as the header.
+  void registerServerMessageHandler(String msg, function(UpDroidMessage um)) {
+    _serverStreamRegistry[msg] = function;
+  }
+}
+
+class ServerMessage {
+  String receiver;
+  UpDroidMessage um;
+
+  ServerMessage(this.receiver, this.um);
 }
 
 /// Container class that extracts the header (denoted with double brackets)

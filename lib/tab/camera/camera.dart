@@ -17,14 +17,12 @@ class CmdrCamera {
   Map<int, CameraServer> servers;
   CmdrMailbox mailbox;
 
-  StreamController<UpDroidMessage> _serverStream;
   StreamSubscription _currentDeviceSub;
 
-  CmdrCamera(this.cameraNum, this.servers, StreamController<UpDroidMessage> serverStream) {
+  CmdrCamera(this.cameraNum, this.servers, StreamController<ServerMessage> serverStream) {
     help.debug('Spawning UpDroidCamera ($cameraNum)', 0);
 
-    _serverStream = serverStream;
-    mailbox = new CmdrMailbox(guiName);
+    mailbox = new CmdrMailbox(guiName, serverStream);
     _registerMailbox();
   }
 
@@ -33,7 +31,7 @@ class CmdrCamera {
   }
 
   void _closeTab(UpDroidMessage um) {
-    _serverStream.add(um);
+    mailbox.serverStream.add(new ServerMessage('UpDroidClient', um));
   }
 
   void _handleInputStream(HttpRequest request) {

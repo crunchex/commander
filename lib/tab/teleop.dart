@@ -14,15 +14,12 @@ class CmdrTeleop {
   int id;
   CmdrMailbox mailbox;
 
-  StreamController<UpDroidMessage> _serverStream;
   Process _shell;
 
-  CmdrTeleop(this.id, String workspacePath, StreamController<UpDroidMessage> serverStream) {
+  CmdrTeleop(this.id, String workspacePath, StreamController<ServerMessage> serverStream) {
     help.debug('Spawning UpDroidTeleop ($id)', 0);
 
-    _serverStream = serverStream;
-
-    mailbox = new CmdrMailbox(guiName);
+    mailbox = new CmdrMailbox(guiName, serverStream);
     _registerMailbox();
 
     Workspace workspace = new Workspace(workspacePath);
@@ -36,7 +33,7 @@ class CmdrTeleop {
   }
 
   void _closeTab(UpDroidMessage um) {
-    _serverStream.add(um);
+    mailbox.serverStream.add(new ServerMessage('UpDroidClient', um));
   }
 
   void _handleGamepadInput(HttpRequest request) {

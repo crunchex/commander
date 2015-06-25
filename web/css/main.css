@@ -327,6 +327,12 @@ body>.navbar.navbar-inverse {
   font-family: "Avenir Next LT Pro Demi";
 }
 
+.dropdown-menu>li>a.disabled,
+.dropdown-menu>li>a.disabled:hover {
+  background-color: #ffffff;
+  color: #e3e3e3;
+}
+
 .dropdown.open>.dropdown-menu {
   border-width: 1px;
   border-color: #e3e3e3;

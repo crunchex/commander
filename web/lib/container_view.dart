@@ -156,6 +156,7 @@ abstract class ContainerView {
         ..classes.add('dropdown-toggle')
         ..dataset['toggle'] = 'dropdown'
         ..text = title;
+    refMap['${title.toLowerCase().replaceAll(' ', '-')}-dropdown'] = dropdownToggle;
     dropdown.children.add(dropdownToggle);
 
     UListElement dropdownMenu = new UListElement()

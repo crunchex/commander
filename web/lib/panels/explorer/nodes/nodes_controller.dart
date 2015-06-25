@@ -23,17 +23,19 @@ class UpDroidNodes implements ExplorerController {
 
   Map<String, Package> packages = {};
   String workspacePath;
+  Set<StreamSubscription> _listenersToCleanUp;
 
-  UpDroidNodes(int id, this.workspacePath, PanelView view, Mailbox mailbox) {
+  UpDroidNodes(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons) {
     _view = view;
     _mailbox = mailbox;
+    _runNodesButton = actionButtons[0];
 
     registerMailbox();
 
+    _listenersToCleanUp = new Set<StreamSubscription>();
+
     NodesView.createNodesView(id, _view.content).then((nodesView) {
       _nodesView = nodesView;
-
-      _runNodesButton = _view.refMap['run-nodes'];
 
       _mailbox.ws.send('[[REQUEST_NODE_LIST]]');
 
@@ -46,9 +48,9 @@ class UpDroidNodes implements ExplorerController {
   }
 
   void registerEventHandlers() {
-    _runNodesButton.onClick.listen((e) {
+    _listenersToCleanUp.add(_runNodesButton.onClick.listen((e) {
       packages.values.forEach((Package p) => p.nodes.forEach((Node n) => n.runNode()));
-    });
+    }));
   }
 
   void addLaunch(UpDroidMessage um) {
@@ -91,8 +93,11 @@ class UpDroidNodes implements ExplorerController {
   }
 
   void cleanUp() {
+    _listenersToCleanUp.forEach((StreamSubscription s) => s.cancel());
+
     packages.values.forEach((Package p) => p.cleanUp());
     packages = null;
+
     _nodesView.cleanUp();
   }
 }

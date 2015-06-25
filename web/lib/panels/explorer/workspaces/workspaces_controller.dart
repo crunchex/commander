@@ -20,27 +20,28 @@ class UpDroidWorkspaces implements ExplorerController {
   WorkspacesView _workspacesView;
   Mailbox _mailbox;
 
-  AnchorElement _cleanButton;
   AnchorElement _buildPackagesButton;
+  AnchorElement _cleanButton;
 //  AnchorElement _uploadButton;
 
   Dropzone dzRecycle;
 
   Map<String, FileSystemEntity> entities = {};
   String workspacePath;
+  Set<StreamSubscription> _listenersToCleanUp;
 
-  UpDroidWorkspaces(int id, this.workspacePath, PanelView view, Mailbox mailbox) {
+  UpDroidWorkspaces(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons) {
     _view = view;
     _mailbox = mailbox;
+    _buildPackagesButton = actionButtons[0];
+    _cleanButton = actionButtons[1];
 
     registerMailbox();
 
+    _listenersToCleanUp = new Set<StreamSubscription>();
+
     WorkspacesView.createWorkspacesView(id, _view.content).then((workspacesView) {
       _workspacesView = workspacesView;
-
-      _cleanButton = _view.refMap['clean-workspace'];
-      _buildPackagesButton = _view.refMap['build-packages'];
-//      _uploadButton = _view.refMap['upload-with-git'];
 
       dzRecycle = new Dropzone(_workspacesView.recycle);
 
@@ -58,8 +59,8 @@ class UpDroidWorkspaces implements ExplorerController {
   }
 
   void registerEventHandlers() {
-    _cleanButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_CLEAN]]'));
-    _buildPackagesButton.onClick.listen((e) => _buildPackages());
+    _listenersToCleanUp.add(_cleanButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_CLEAN]]')));
+    _listenersToCleanUp.add(_buildPackagesButton.onClick.listen((e) => _buildPackages()));
 //    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
   }
 
@@ -209,8 +210,11 @@ class UpDroidWorkspaces implements ExplorerController {
   }
 
   void cleanUp() {
+    _listenersToCleanUp.forEach((StreamSubscription s) => s.cancel());
+
     entities.values.forEach((FileSystemEntity f) => f.cleanUp());
     entities = null;
+
     _workspacesView.cleanUp();
   }
 }

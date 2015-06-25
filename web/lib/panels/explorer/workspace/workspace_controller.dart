@@ -116,34 +116,34 @@ class WorkspaceController implements ExplorerController {
 
   /// TODO: fix this... not working.
   /// Inserts a view into the DOM based on path alphabetical ordering.
-  void _insertView(FolderEntity parentFolder, FileSystemEntity entity) {
-    List<String> siblingKeys = entities.keys.where((String key) => key.contains(parentFolder.path));
-    List<String> siblingPaths = new List<String>.from(siblingKeys);
-    siblingPaths.sort();
-
-    String olderSiblingPath;
-    for (String siblingPath in siblingPaths) {
-      olderSiblingPath = siblingPath;
-      if (siblingPath.compareTo(entity.path) > 0) break;
-    }
-
-    String olderSiblingName = olderSiblingPath.split('/').last;
-    LIElement olderSiblingView;
-
-    FolderView parentView = parentFolder.view;
-    print('looking for $olderSiblingName');
-    parentView.uElement.children.forEach((LIElement childLi) {
-      String childName = childLi.firstChild.lastChild.text;
-      print('$childName');
-      if (childName == olderSiblingName) {
-        print('found view by name $olderSiblingName');
-        olderSiblingView = childLi;
-        return;
-      }
-    });
-
-    parentView.uElement.insertBefore(entity.view.element, olderSiblingView);
-  }
+//  void _insertView(FolderEntity parentFolder, FileSystemEntity entity) {
+//    List<String> siblingKeys = entities.keys.where((String key) => key.contains(parentFolder.path));
+//    List<String> siblingPaths = new List<String>.from(siblingKeys);
+//    siblingPaths.sort();
+//
+//    String olderSiblingPath;
+//    for (String siblingPath in siblingPaths) {
+//      olderSiblingPath = siblingPath;
+//      if (siblingPath.compareTo(entity.path) > 0) break;
+//    }
+//
+//    String olderSiblingName = olderSiblingPath.split('/').last;
+//    LIElement olderSiblingView;
+//
+//    FolderView parentView = parentFolder.view;
+//    print('looking for $olderSiblingName');
+//    parentView.uElement.children.forEach((LIElement childLi) {
+//      String childName = childLi.firstChild.lastChild.text;
+//      print('$childName');
+//      if (childName == olderSiblingName) {
+//        print('found view by name $olderSiblingName');
+//        olderSiblingView = childLi;
+//        return;
+//      }
+//    });
+//
+//    parentView.uElement.insertBefore(entity.view.element, olderSiblingView);
+//  }
 
   /// Handles an Explorer remove update for a single file.
   void _removeUpdate(UpDroidMessage um) => _removeFileSystemEntity(um.body);

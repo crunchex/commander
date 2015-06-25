@@ -20,23 +20,18 @@ class UpDroidClient {
 
   AnchorElement _newButtonLeft;
   AnchorElement _newButtonRight;
-  DivElement _explorersDiv;
 
   bool disconnectAlert = false;
 
   Mailbox _mailbox;
-  bool _controlButtonEnabled;
 
   UpDroidClient() {
     _config = _getConfig();
 
     _columns = [[], [], []];
 
-    _explorersDiv = querySelector('#exp-container');
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
-
-    _controlButtonEnabled = true;
 
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.

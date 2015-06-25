@@ -5,7 +5,7 @@ import 'dart:html';
 ContextMenu _singleton;
 
 class ContextMenu {
-  static ContextMenu createContextMenu(Point origin, List<Map> config) {
+  static createContextMenu(Point origin, List<Map> config) {
     if (_singleton != null) {
       _singleton.cleanup();
       _singleton = null;

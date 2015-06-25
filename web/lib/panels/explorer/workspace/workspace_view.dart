@@ -43,9 +43,11 @@ abstract class FileSystemEntityView {
   DivElement container;
   SpanElement icon, filename;
 
-  bool _selected = false;
+  bool _selected;
 
   FileSystemEntityView(this.name) {
+    _selected = false;
+
     element = new LIElement()
       ..classes.add('explorer-li');
 

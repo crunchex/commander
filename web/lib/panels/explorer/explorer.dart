@@ -37,16 +37,6 @@ class UpDroidExplorer extends PanelController {
     return menu;
   }
 
-  // Make dynamic
-  bool closed;
-
-  DivElement currentSelected;
-  LIElement currentSelectedNode;
-  String currentSelectedPath;
-  InputElement nodeArgs;
-
-  AnchorElement _dropdown;
-
   AnchorElement _fileDropdown;
   AnchorElement _openWorkspaceButton;
   AnchorElement _newWorkspaceButton;
@@ -77,7 +67,7 @@ class UpDroidExplorer extends PanelController {
 
   }
 
-  Future setUpController() {
+  void setUpController() {
     _fileDropdown = view.refMap['file-dropdown'];
 
     _newWorkspaceButton = view.refMap['new-workspace'];

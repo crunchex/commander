@@ -1,6 +1,5 @@
 library panel_controller;
 
-import 'dart:html';
 import 'dart:async';
 
 import '../mailbox.dart';
@@ -17,7 +16,7 @@ abstract class PanelController {
   PanelView view;
   Mailbox mailbox;
 
-  AnchorElement _closePanelButton;
+//  AnchorElement _closePanelButton;
 
   PanelController(this.id, this.col, this.panelType, this.shortName, List menuConfig, [StreamController<CommanderMessage> cs, bool externalCss=false]) {
     if (cs == null) {
@@ -43,29 +42,29 @@ abstract class PanelController {
   void makeInactive() => view.makeInactive();
 
   void registerMailbox();
-  Future setUpController();
+  void setUpController();
   void registerEventHandlers();
   void cleanUp();
 
-  void _closePanel() {
-    view.destroy();
-    cleanUp();
+//  void _closePanel() {
+//    view.destroy();
+//    cleanUp();
+//
+//    if (cs != null) {
+//      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${panelType}_$id'));
+//    } else {
+//      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${panelType}_$id');
+//      mailbox.ws.send(um.s);
+//    }
+//  }
 
-    if (cs != null) {
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${panelType}_$id'));
-    } else {
-      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${panelType}_$id');
-      mailbox.ws.send(um.s);
-    }
-  }
-
-  void _clonePanel(Event e) {
-    e.preventDefault();
-    if (cs != null) {
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${panelType}'));
-    } else {
-      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${panelType}_$id');
-      mailbox.ws.send(um.s);
-    }
-  }
+//  void _clonePanel(Event e) {
+//    e.preventDefault();
+//    if (cs != null) {
+//      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${panelType}'));
+//    } else {
+//      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${panelType}_$id');
+//      mailbox.ws.send(um.s);
+//    }
+//  }
 }

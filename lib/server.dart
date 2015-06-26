@@ -173,7 +173,7 @@ class CmdrServer {
         }
         if (workspace == true) {
           names.add(pathLib.basename(folder.path));
-          _panels[num] = new CmdrExplorer(num, folder, _mailbox.serverStream);
+          _panels[num] = new CmdrExplorer(num, folder);
           num += 1;
         }
       }
@@ -195,7 +195,7 @@ class CmdrServer {
 
     switch (type) {
       case 'updroidexplorer':
-        _panels[type][num] = new CmdrExplorer(num, dir, _mailbox.serverStream);
+        _panels[type][num] = new CmdrExplorer(num, dir);
         break;
     }
   }
@@ -212,18 +212,18 @@ class CmdrServer {
 
     switch (type) {
       case 'updroideditor':
-        _tabs[type][num] = new CmdrEditor(dir, _mailbox.serverStream);
+        _tabs[type][num] = new CmdrEditor(dir);
         break;
       case 'updroidcamera':
-        _tabs[type][num] = new CmdrCamera(num, _camServers, _mailbox.serverStream);
+        _tabs[type][num] = new CmdrCamera(num, _camServers);
         break;
       case 'updroidteleop':
-        _tabs[type][num] = new CmdrTeleop(num, dir.path, _mailbox.serverStream);
+        _tabs[type][num] = new CmdrTeleop(num, dir.path);
         break;
       case 'updroidconsole':
         String numRows = idList[3];
         String numCols = idList[4];
-        _tabs[type][num] = new CmdrPty(num, dir.path, numRows, numCols, _mailbox.serverStream);
+        _tabs[type][num] = new CmdrPty(num, dir.path, numRows, numCols);
         break;
     }
   }

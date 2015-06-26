@@ -14,10 +14,10 @@ class CmdrEditor {
   CmdrMailbox mailbox;
   Directory _dir;
 
-  CmdrEditor(Directory dir, StreamController<ServerMessage> serverStream) {
+  CmdrEditor(Directory dir) {
     help.debug('Spawning $guiName ($editorNum)', 0);
 
-    mailbox = new CmdrMailbox(guiName, serverStream);
+    mailbox = new CmdrMailbox(guiName, editorNum);
     _registerMailbox();
 
     _dir = dir;

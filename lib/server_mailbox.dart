@@ -17,6 +17,8 @@ class CmdrPostOffice {
     return _postOffice;
   }
 
+  static void send(ServerMessage sm) => postOffice.postOfficeStream.add(sm);
+
   static Stream registerClass(String receiverClass, int id) {
     // Set up the stream controller for the outgoing stream.
     if (!postOffice.outboxes.containsKey(receiverClass)) {
@@ -35,20 +37,20 @@ class CmdrPostOffice {
 //  }
 
   StreamController<ServerMessage> postOfficeStream;
-  Map<String, Map<int, StreamController<UpDroidMessage>>> outboxes;
-  List<ServerMessage> messageQueue;
+  Map<String, Map<int, StreamController<UpDroidMessage>>> outboxes = {};
 
-  PostOffice() {
+  CmdrPostOffice() {
     postOfficeStream = new StreamController<ServerMessage>.broadcast();
+    print('stream ready');
     postOfficeStream.stream.listen((ServerMessage sm) => _dispatch(sm));
-
-    outboxes = {};
-    messageQueue = [];
   }
 
   void _dispatch(ServerMessage sm) {
     // TODO: set up some buffer or queue for currently undeliverable messages.
-    if (!postOffice.outboxes.containsKey(sm.receiverClass)) return;
+    if (!postOffice.outboxes.containsKey(sm.receiverClass)) {
+      help.debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.id} with header ${sm.um.header}', 0);
+      return;
+    }
 
     // Dispatch message to registered receiver with lowest ID.
     if (sm.id < 0) {
@@ -64,6 +66,9 @@ class CmdrPostOffice {
       boxes.values.forEach((StreamController<UpDroidMessage> s) => s.add(sm.um));
       return;
     }
+
+    // Dispatch message to registered receiver with matching class and specific ID.
+    outboxes[sm.receiverClass][sm.id].add(sm.um);
   }
 }
 
@@ -71,7 +76,6 @@ class CmdrMailbox {
   String className;
   int id;
   WebSocket ws;
-  StreamController<ServerMessage> mailStream;
   Stream<UpDroidMessage> inbox;
 
   Map _wsRegistry;
@@ -85,8 +89,7 @@ class CmdrMailbox {
     _endpointRegistry = {};
     _serverStreamRegistry = {};
 
-    mailStream = new StreamController<ServerMessage>();
-    inbox = CmdrPostOffice.registerStream('$className-${id.toString()}', mailStream.stream);
+    inbox = CmdrPostOffice.registerClass(className, id);
 
     inbox.listen((UpDroidMessage um) {
       help.debug('[${className}\'s Server Mailbox] UpDroid Message received with header: ${um.header}', 0);

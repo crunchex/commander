@@ -50,7 +50,6 @@ class CmdrPostOffice {
 
   CmdrPostOffice() {
     postOfficeStream = new StreamController<ServerMessage>.broadcast();
-    print('stream ready');
     postOfficeStream.stream.listen((ServerMessage sm) => _dispatch(sm));
   }
 

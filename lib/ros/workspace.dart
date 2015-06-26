@@ -210,6 +210,13 @@ class Workspace {
     return c.future;
   }
 
+  void createPackage(String name, List<String> dependencies) {
+    String dependenciestring = '';
+    dependencies.forEach((String dependency) => dependenciestring += ' $dependency');
+    String createPackageCommand = '$path/devel/setup.bash && catkin_create_pkg $name$dependenciestring';
+    Process.run('bash', ['-c', '. $createPackageCommand'], workingDirectory: path, runInShell: true);
+  }
+
   void runNode(String packageName, String nodeName, List args) {
     String launchArgs = '';
     args.forEach((List<String> arg) {

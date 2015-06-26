@@ -10,17 +10,17 @@ import '../server_helper.dart' as help;
 class CmdrEditor {
   static const String guiName = 'UpDroidEditor';
 
-  int editorNum = 1;
+  int editorNum;
   CmdrMailbox mailbox;
   Directory _dir;
 
-  CmdrEditor(Directory dir) {
+  CmdrEditor(Directory dir, this.editorNum) {
     help.debug('Spawning $guiName ($editorNum)', 0);
+
+    _dir = dir;
 
     mailbox = new CmdrMailbox(guiName, editorNum);
     _registerMailbox();
-
-    _dir = dir;
   }
 
   void _sendPath(UpDroidMessage um) {

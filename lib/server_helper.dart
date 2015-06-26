@@ -58,28 +58,6 @@ void debug(String logstring, int level) {
   }
 }
 
-/// Convenience method for a formatted socket message.
-void formattedMessage(WebSocket socket, String header, String body) {
-  socket.add('[[$header]]$body');
-}
-
-/// Helper method to grab file name in case of spaces.
-String fNameGrabber(List<String> split){
-  var fName = "";
-  if(split.length > 2){
-    for(var i = 1; i < split.length; i++){
-      fName += split[i];
-      if(i != (split.length - 1)){
-        fName += " ";
-      }
-    }
-  }
-  else{
-    fName = split[1];
-  }
-  return fName;
-}
-
 /// Recursively traverses the given directory path and asynchronously
 /// returns a list of filesystem entities.
 Future<List<FileSystemEntity>> getDirectory(Directory dir) {

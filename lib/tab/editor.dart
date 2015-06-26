@@ -23,7 +23,7 @@ class CmdrEditor {
   }
 
   void _sendPath(UpDroidMessage um) {
-    help.formattedMessage(mailbox.ws, 'EDITOR_DIRECTORY_PATH', _dir.path);
+    mailbox.ws.add('[[EDITOR_DIRECTORY_PATH]]' + _dir.path);
   }
 
   void _sendFileContents(UpDroidMessage um) {

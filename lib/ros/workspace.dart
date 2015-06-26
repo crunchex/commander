@@ -8,6 +8,10 @@ class Workspace {
   /// Creates a directory object pointing to the current working directory.
   static Directory get current => Directory.current;
 
+  static bool isWorkspace(String path) {
+    return FileSystemEntity.isFileSync('$path/src/CMakeLists.txt');
+  }
+
   final Directory _delegate;
 
   bool _building;

@@ -13,16 +13,14 @@ part 'camera_server.dart';
 class CmdrCamera {
   static const String guiName = 'UpDroidCamera';
 
-  int cameraNum;
+  int id;
   Map<int, CameraServer> servers;
   CmdrMailbox mailbox;
 
   StreamSubscription _currentDeviceSub;
 
-  CmdrCamera(this.cameraNum, this.servers) {
-    help.debug('Spawning UpDroidCamera ($cameraNum)', 0);
-
-    mailbox = new CmdrMailbox(guiName, cameraNum);
+  CmdrCamera(this.id, this.servers) {
+    mailbox = new CmdrMailbox(guiName, id);
     _registerMailbox();
   }
 
@@ -31,7 +29,7 @@ class CmdrCamera {
   }
 
   void _closeTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', cameraNum, um));
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', id, um));
   }
 
   void _handleInputStream(HttpRequest request) {
@@ -64,11 +62,11 @@ class CmdrCamera {
     mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
 
     _getDeviceIds().forEach((int key) {
-      mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$cameraNum/input/$key', _handleInputStream);
+      mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/input/$key', _handleInputStream);
     });
   }
 
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, cameraNum);
+    CmdrPostOffice.deregisterStream(guiName, id);
   }
 }

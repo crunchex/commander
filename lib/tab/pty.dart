@@ -10,20 +10,18 @@ import '../server_helper.dart' as help;
 class CmdrPty {
   static const String guiName = 'UpDroidConsole';
 
-  int ptyNum = 1;
+  int id;
   CmdrMailbox mailbox;
 
   Process _shell;
   String _workspacePath;
   Socket _ptySocket;
 
-  CmdrPty(this.ptyNum, String workspacePath, String numRows, String numCols) {
-    help.debug('Spawning UpDroidPty ($ptyNum)', 0);
+  CmdrPty(this.id, String workspacePath, String numRows, String numCols) {
+    mailbox = new CmdrMailbox(guiName, id);
+    _registerMailbox();
 
     _workspacePath = workspacePath;
-
-    mailbox = new CmdrMailbox(guiName, ptyNum);
-    _registerMailbox();
   }
 
   void _startPty(UpDroidMessage um) {
@@ -46,25 +44,25 @@ class CmdrPty {
 
           Socket.connect('127.0.0.1', int.parse(port)).then((socket) {
             _ptySocket = socket;
-            help.debug('CmdrPty-$ptyNum connected to: ${socket.remoteAddress.address}:${socket.remotePort}', 0);
+            help.debug('CmdrPty-$id connected to: ${socket.remoteAddress.address}:${socket.remotePort}', 0);
             socket.listen((data) => mailbox.ws.add((data)));
           });
         }
       });
 
       // Log the rest of stdout/err for debug.
-      stdoutBroadcast.listen((data) => help.debug('pty[$ptyNum] stdout: ${UTF8.decode(data)}', 0));
-      shell.stderr.listen((data) => help.debug('pty[$ptyNum] stderr: ${UTF8.decode(data)}', 0));
+      stdoutBroadcast.listen((data) => help.debug('pty[$id] stdout: ${UTF8.decode(data)}', 0));
+      shell.stderr.listen((data) => help.debug('pty[$id] stderr: ${UTF8.decode(data)}', 0));
     }).catchError((error) {
       if (error is! ProcessException) throw error;
-      help.debug('cmdr-pty [$ptyNum]: run failed. Probably not installed', 1);
+      help.debug('cmdr-pty [$id]: run failed. Probably not installed', 1);
       return;
     });
   }
 
   void _handleIOStream(HttpRequest request) {
     mailbox.ws
-      .where((e) => request.uri.path == '/${guiName.toLowerCase()}/$ptyNum/cmdr-pty')
+      .where((e) => request.uri.path == '/${guiName.toLowerCase()}/$id/cmdr-pty')
       .listen((data) => _ptySocket.add(data));
   }
 
@@ -73,7 +71,7 @@ class CmdrPty {
   }
 
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, ptyNum);
+    CmdrPostOffice.deregisterStream(guiName, id);
     if (_ptySocket != null) _ptySocket.destroy();
     if (_shell != null) _shell.kill();
   }
@@ -82,6 +80,6 @@ class CmdrPty {
     mailbox.registerWebSocketEvent('START_PTY', _startPty);
     mailbox.registerWebSocketEvent('RESIZE', _resize);
 
-    mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$ptyNum/cmdr-pty', _handleIOStream);
+    mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/cmdr-pty', _handleIOStream);
   }
 }

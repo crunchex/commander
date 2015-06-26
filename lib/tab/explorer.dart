@@ -13,7 +13,7 @@ import '../server_helper.dart' as help;
 class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';
 
-  int expNum;
+  int id;
   CmdrMailbox mailbox;
   Directory uproot;
 
@@ -23,10 +23,8 @@ class CmdrExplorer {
   WebSocket _ws;
 
   //TODO: make asynchroneous
-  CmdrExplorer(this.expNum, this.uproot) {
-    if (_currentWorkspace != null) return;
-
-    mailbox = new CmdrMailbox(guiName, expNum);
+  CmdrExplorer(this.id, this.uproot) {
+    mailbox = new CmdrMailbox(guiName, id);
     _registerMailbox();
 
     // TODO: retrieve saved data for the most recently opened workspace.
@@ -239,7 +237,7 @@ class CmdrExplorer {
   }
 
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, expNum);
+    CmdrPostOffice.deregisterStream(guiName, id);
     _currentWatcherStream.cancel();
   }
 }

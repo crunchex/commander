@@ -17,8 +17,6 @@ class CmdrTeleop {
   Process _shell;
 
   CmdrTeleop(this.id, String workspacePath) {
-    help.debug('Spawning UpDroidTeleop ($id)', 0);
-
     mailbox = new CmdrMailbox(guiName, id);
     _registerMailbox();
 

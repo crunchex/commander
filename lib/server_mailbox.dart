@@ -20,6 +20,8 @@ class CmdrPostOffice {
   static void send(ServerMessage sm) => postOffice.postOfficeStream.add(sm);
 
   static Stream registerClass(String receiverClass, int id) {
+    help.debug('[CmdrPostOffice] Registering $receiverClass-$id', 0);
+
     // Set up the stream controller for the outgoing stream.
     if (!postOffice.outboxes.containsKey(receiverClass)) {
       postOffice.outboxes[receiverClass] = {};
@@ -31,6 +33,8 @@ class CmdrPostOffice {
 
   static Future<bool> deregisterStream(String receiverClass, int id) {
     Completer c = new Completer();
+
+    help.debug('[CmdrPostOffice] De-registering $receiverClass-$id', 0);
 
     if (!postOffice.outboxes.containsKey(receiverClass) || !postOffice.outboxes[receiverClass].containsKey(id)) {
       c.complete(false);

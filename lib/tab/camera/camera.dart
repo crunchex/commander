@@ -69,6 +69,6 @@ class CmdrCamera {
   }
 
   void cleanup() {
-
+    CmdrPostOffice.deregisterStream(guiName, cameraNum);
   }
 }

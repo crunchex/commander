@@ -73,6 +73,7 @@ class CmdrPty {
   }
 
   void cleanup() {
+    CmdrPostOffice.deregisterStream(guiName, ptyNum);
     if (_ptySocket != null) _ptySocket.destroy();
     if (_shell != null) _shell.kill();
   }

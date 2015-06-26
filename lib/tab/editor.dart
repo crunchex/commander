@@ -56,7 +56,7 @@ class CmdrEditor {
   }
 
   void cleanup() {
-
+    CmdrPostOffice.deregisterStream(guiName, editorNum);
   }
 
   void _registerMailbox() {

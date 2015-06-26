@@ -240,6 +240,7 @@ class CmdrExplorer {
   }
 
   void cleanup() {
+    CmdrPostOffice.deregisterStream(guiName, expNum);
     _currentWatcherStream.cancel();
   }
 }

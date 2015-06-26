@@ -29,12 +29,21 @@ class CmdrPostOffice {
     return postOffice.outboxes[receiverClass][id].stream;
   }
 
-//  static deregisterStream(String identifier) {
-//    postOffice.mailboxRegistry.remove(identifier);
-//    postOffice.outboxStreamControllers[identifier].close().then((_) {
-//      postOffice.outboxStreamControllers.remove(identifier);
-//    });
-//  }
+  static Future<bool> deregisterStream(String receiverClass, int id) {
+    Completer c = new Completer();
+
+    postOffice.outboxes[receiverClass][id].close().then((_) {
+      postOffice.outboxes[receiverClass].remove(id);
+
+      if (postOffice.outboxes[receiverClass].isEmpty) {
+        postOffice.outboxes.remove(receiverClass);
+      }
+
+      c.complete(true);
+    });
+
+    return c.future;
+  }
 
   StreamController<ServerMessage> postOfficeStream;
   Map<String, Map<int, StreamController<UpDroidMessage>>> outboxes = {};

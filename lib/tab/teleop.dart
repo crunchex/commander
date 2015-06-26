@@ -44,6 +44,7 @@ class CmdrTeleop {
   }
 
   void cleanup() {
+    CmdrPostOffice.deregisterStream(guiName, id);
     _shell.kill();
   }
 

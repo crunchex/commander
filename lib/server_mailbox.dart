@@ -55,7 +55,7 @@ class CmdrPostOffice {
 
   void _dispatch(ServerMessage sm) {
     // TODO: set up some buffer or queue for currently undeliverable messages.
-    if (!postOffice.outboxes.containsKey(sm.receiverClass) || !postOffice.outboxes[sm.receiverClass].containsKey(sm.id)) {
+    if (!postOffice.outboxes.containsKey(sm.receiverClass)) {
       help.debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.id} with header ${sm.um.header}', 0);
       return;
     }
@@ -76,6 +76,11 @@ class CmdrPostOffice {
     }
 
     // Dispatch message to registered receiver with matching class and specific ID.
+    // TODO: set up some buffer or queue for currently undeliverable messages.
+    if (!postOffice.outboxes[sm.receiverClass].containsKey(sm.id)) {
+      help.debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.id} with header ${sm.um.header}', 0);
+      return;
+    }
     outboxes[sm.receiverClass][sm.id].add(sm.um);
   }
 }

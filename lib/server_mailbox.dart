@@ -7,62 +7,90 @@ import 'server_helper.dart' as help;
 
 CmdrPostOffice _postOffice;
 
+/// Singleton class that facilitates intra-serverside communication.
 class CmdrPostOffice {
-  static createCmdrPostOffice() {
-    if (_postOffice != null) {
-      _postOffice = null;
+  static CmdrPostOffice get postOffice {
+    if (_postOffice == null) {
+      _postOffice = new CmdrPostOffice();
     }
 
-    _postOffice = new CmdrPostOffice();
+    return _postOffice;
   }
 
-  static registerClass(String className, int id) {
-    if (!_postOffice.classRegistry.containsKey(className)) {
-      _postOffice.classRegistry[className] = [];
+  static Stream registerClass(String receiverClass, int id) {
+    // Set up the stream controller for the outgoing stream.
+    if (!postOffice.outboxes.containsKey(receiverClass)) {
+      postOffice.outboxes[receiverClass] = {};
     }
 
-    _postOffice.classRegistry[className].add(id);
+    postOffice.outboxes[receiverClass][id] = new StreamController<UpDroidMessage>();
+    return postOffice.outboxes[receiverClass][id].stream;
   }
 
-  static deregisterClass(String className, int id) {
-    _postOffice.classRegistry[className].remove(id);
+//  static deregisterStream(String identifier) {
+//    postOffice.mailboxRegistry.remove(identifier);
+//    postOffice.outboxStreamControllers[identifier].close().then((_) {
+//      postOffice.outboxStreamControllers.remove(identifier);
+//    });
+//  }
 
-    if (_postOffice.classRegistry[className].isEmpty) {
-      _postOffice.classRegistry.remove(className);
-    }
-  }
-
-  static pushMessageToQueue(ServerMessage sm) {
-    _postOffice.messageQueue.add(sm);
-  }
-
-  Map<String, List<int>> classRegistry;
+  StreamController<ServerMessage> postOfficeStream;
+  Map<String, Map<int, StreamController<UpDroidMessage>>> outboxes;
   List<ServerMessage> messageQueue;
 
-  CmdrPostOffice() {
+  PostOffice() {
+    postOfficeStream = new StreamController<ServerMessage>.broadcast();
+    postOfficeStream.stream.listen((ServerMessage sm) => _dispatch(sm));
+
+    outboxes = {};
     messageQueue = [];
+  }
+
+  void _dispatch(ServerMessage sm) {
+    // TODO: set up some buffer or queue for currently undeliverable messages.
+    if (!postOffice.outboxes.containsKey(sm.receiverClass)) return;
+
+    // Dispatch message to registered receiver with lowest ID.
+    if (sm.id < 0) {
+      List<int> outboxIds = new List<int>.from(outboxes[sm.receiverClass].keys);
+      outboxIds.sort();
+      outboxes[sm.receiverClass][outboxIds.first].add(sm.um);
+      return;
+    }
+
+    // Dispatch message to all registered receivers with matching class.
+    if (sm.id == 0) {
+      Map<int, StreamController<UpDroidMessage>> boxes = outboxes[sm.receiverClass];
+      boxes.values.forEach((StreamController<UpDroidMessage> s) => s.add(sm.um));
+      return;
+    }
   }
 }
 
 class CmdrMailbox {
   String className;
+  int id;
   WebSocket ws;
-  StreamController<ServerMessage> serverStream;
+  StreamController<ServerMessage> mailStream;
+  Stream<UpDroidMessage> inbox;
 
   Map _wsRegistry;
   List<Function> _wsCloseRegistry;
   Map _endpointRegistry;
   Map _serverStreamRegistry;
 
-  CmdrMailbox(this.className,  this.serverStream) {
+  CmdrMailbox(this.className, this.id) {
     _wsRegistry = {};
     _wsCloseRegistry = [];
     _endpointRegistry = {};
     _serverStreamRegistry = {};
 
-    serverStream.stream.where((ServerMessage sm) => sm.receiver == className).listen((ServerMessage sm) {
-      help.debug('[${className}\'s Server Mailbox] UpDroid Message received with header: ${sm.um.header}', 0);
-      _serverStreamRegistry[sm.um.header](sm.um);
+    mailStream = new StreamController<ServerMessage>();
+    inbox = CmdrPostOffice.registerStream('$className-${id.toString()}', mailStream.stream);
+
+    inbox.listen((UpDroidMessage um) {
+      help.debug('[${className}\'s Server Mailbox] UpDroid Message received with header: ${um.header}', 0);
+      _serverStreamRegistry[um.header](um);
     });
   }
 
@@ -106,10 +134,15 @@ class CmdrMailbox {
 }
 
 class ServerMessage {
-  String receiver;
+  String receiverClass;
+  int id;
   UpDroidMessage um;
 
-  ServerMessage(this.receiver, this.um);
+  /// Constructs a new [ServerMessage] where [receiverClass] is a class type,
+  /// such as 'UpDroidClient'. [id] can be -1 for the destination with the lowest
+  /// registered id number, 0 for all destinations of type [receiverClass], or
+  /// any positive integer for one specific destination.
+  ServerMessage(this.receiverClass, this.id, this.um);
 }
 
 /// Container class that extracts the header (denoted with double brackets)

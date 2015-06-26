@@ -148,8 +148,7 @@ class CmdrExplorer {
   }
 
   void _openFile(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', 1, um));
-//    mailbox.serverStream.add(new ServerMessage('UpDroidEditor', um));
+    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', -1, um));
   }
 
   void _workspaceClean(UpDroidMessage um) {

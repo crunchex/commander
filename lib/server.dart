@@ -44,7 +44,7 @@ class CmdrServer {
     _initServer(_getVirDir());
 
     StreamController<ServerMessage> serverStream = new StreamController<ServerMessage>.broadcast();
-    _mailbox = new CmdrMailbox('UpDroidClient', serverStream);
+    _mailbox = new CmdrMailbox('UpDroidClient', 1);
     _registerMailbox();
 
     // A stream that pushes anything it receives onto the main websocket to the client.

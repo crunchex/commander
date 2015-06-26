@@ -50,6 +50,7 @@ class CmdrExplorer {
     mailbox.registerWebSocketEvent('WORKSPACE_BUILD', _buildWorkspace);
     mailbox.registerWebSocketEvent('BUILD_PACKAGE', _buildPackage);
     mailbox.registerWebSocketEvent('BUILD_PACKAGES', _buildPackages);
+    mailbox.registerWebSocketEvent('CREATE_PACKAGE', _createPackage);
     mailbox.registerWebSocketEvent('REQUEST_NODE_LIST', _launcherList);
     mailbox.registerWebSocketEvent('RUN_NODE', _runLauncher);
   }
@@ -188,6 +189,14 @@ class CmdrExplorer {
 //      mailbox.ws.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
       mailbox.ws.add('[[BUILD_COMPLETE]]' + data);
     });
+  }
+
+  void _createPackage(UpDroidMessage um) {
+    List<String> split = um.body.split(':');
+    String name = split[0];
+    List<String> dependencies = JSON.decode(split[1]);
+
+    _currentWorkspace.createPackage(name, dependencies);
   }
 
   void _launcherList(UpDroidMessage um) {

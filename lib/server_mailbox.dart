@@ -32,6 +32,10 @@ class CmdrPostOffice {
   static Future<bool> deregisterStream(String receiverClass, int id) {
     Completer c = new Completer();
 
+    if (!postOffice.outboxes.containsKey(receiverClass) || !postOffice.outboxes[receiverClass].containsKey(id)) {
+      c.complete(false);
+    }
+
     postOffice.outboxes[receiverClass][id].close().then((_) {
       postOffice.outboxes[receiverClass].remove(id);
 

@@ -56,7 +56,7 @@ class CmdrPostOffice {
 
   void _dispatch(ServerMessage sm) {
     // TODO: set up some buffer or queue for currently undeliverable messages.
-    if (!postOffice.outboxes.containsKey(sm.receiverClass)) {
+    if (!postOffice.outboxes.containsKey(sm.receiverClass) || !postOffice.outboxes[sm.receiverClass].containsKey(sm.id)) {
       help.debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.id} with header ${sm.um.header}', 0);
       return;
     }
@@ -101,7 +101,13 @@ class CmdrMailbox {
     inbox = CmdrPostOffice.registerClass(className, id);
 
     inbox.listen((UpDroidMessage um) {
-      help.debug('[${className}\'s Server Mailbox] UpDroid Message received with header: ${um.header}', 0);
+      help.debug('[${className}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
+
+      if (!_serverStreamRegistry.containsKey(um.header)) {
+        help.debug('[${className}\'s Mailbox] handler for header: ${um.header} not found', 0);
+        return;
+      }
+
       _serverStreamRegistry[um.header](um);
     });
   }

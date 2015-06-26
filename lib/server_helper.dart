@@ -21,7 +21,7 @@ void enableDebug(bool b) {
       logFile.createSync(recursive:true);
     } on FileSystemException {
       print('Debug mode (-d) requires write access to $logFileDir.');
-      print('Here\'s one way to enable:');
+      print('Here\'s one way to enable (only need to do once):');
       print('  \$ sudo groupadd var-updroid');
       print('  \$ sudo usermod -a -G var-updroid ${Platform.environment['USER']}');
       print('  \$ sudo mkdir -p $logFileDir');

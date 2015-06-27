@@ -25,6 +25,7 @@ class UpDroidExplorer extends PanelController {
 //        {'type': 'toggle', 'title': 'Close Panel'}]},
       {'title': 'Actions', 'items': [
         {'type': 'divider', 'title': 'Workspace'},
+        {'type': 'toggle', 'title': 'New Package'},
         {'type': 'toggle', 'title': 'Build Packages'},
         {'type': 'toggle', 'title': 'Clean Workspace'},
 //        {'type': 'toggle', 'title': 'Upload with Git'},
@@ -41,6 +42,7 @@ class UpDroidExplorer extends PanelController {
   AnchorElement _newWorkspaceButton;
   AnchorElement _closeWorkspaceButton;
 //  AnchorElement _deleteWorkspaceButton;
+  AnchorElement _newPackageButton;
   AnchorElement _buildPackagesButton;
   AnchorElement _cleanWorkspaceButton;
 //  AnchorElement _uploadButton;
@@ -73,8 +75,9 @@ class UpDroidExplorer extends PanelController {
     _closeWorkspaceButton = view.refMap['close-workspace'];
 //    _deleteWorkspaceButton = view.refMap['delete-workspace'];
 
-    _cleanWorkspaceButton = view.refMap['clean-workspace'];
+    _newPackageButton = view.refMap['new-package'];
     _buildPackagesButton = view.refMap['build-packages'];
+    _cleanWorkspaceButton = view.refMap['clean-workspace'];
 //      _uploadButton = _view.refMap['upload-with-git'];
     _runLaunchersButton = view.refMap['run-launchers'];
 
@@ -176,7 +179,7 @@ class UpDroidExplorer extends PanelController {
     _launchersButton.classes.remove('disabled');
     _launchersButtonListener = _launchersButton.onClick.listen((e) => _showLaunchersController());
 
-    List<AnchorElement> actionButtons = [_buildPackagesButton, _cleanWorkspaceButton];
+    List<AnchorElement> actionButtons = [_newPackageButton, _buildPackagesButton, _cleanWorkspaceButton];
     controller = new WorkspaceController(id, workspacePath, view, mailbox, actionButtons);
   }
 

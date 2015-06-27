@@ -24,6 +24,8 @@ class CmdrExplorer {
 
   //TODO: make asynchroneous
   CmdrExplorer(this.id, this.uproot) {
+    if (_currentWorkspace != null) return;
+
     mailbox = new CmdrMailbox(guiName, id);
     _registerMailbox();
 
@@ -194,6 +196,7 @@ class CmdrExplorer {
   void _createPackage(UpDroidMessage um) {
     List<String> split = um.body.split(':');
     String name = split[0];
+
     List<String> dependencies = JSON.decode(split[1]);
 
     _currentWorkspace.createPackage(name, dependencies);

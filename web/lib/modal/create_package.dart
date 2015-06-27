@@ -1,10 +1,11 @@
 part of updroid_modal;
 
 class UpDroidCreatePackageModal extends UpDroidModal {
-  List _refs = [];
-  var _doneHandler;
+  InputElement inputName, inputDependencies;
 
-  UpDroidCreatePackageModal(doneHandler) {
+  Function _doneHandler;
+
+  UpDroidCreatePackageModal(Function doneHandler) {
     _doneHandler = doneHandler;
 
     _setupHead('Create Package');
@@ -15,16 +16,31 @@ class UpDroidCreatePackageModal extends UpDroidModal {
   }
 
   void _setupBody() {
-    DivElement workspaceInput = new DivElement();
-    HeadingElement promptName = new HeadingElement.h3();
-    Input inputName = new InputElement();
+    DivElement name = new DivElement();
+    HeadingElement promptName = new HeadingElement.h3()
+      ..text = 'Package Name:';
+    inputName = new InputElement()
+      ..attributes['type'] = 'text';
+    name.children.addAll([promptName, inputName]);
+    _modalBody.children.add(name);
 
-//      ..attributes['type'] = 'text';
-
-    workspaceInput.children.addAll([promptName, inputName]);
-    _modalBody.children.add(workspaceInput);
+    DivElement dependencies = new DivElement();
+    HeadingElement promptDependencies = new HeadingElement.h3()
+      ..text = 'Package Dependencies:';
+    inputDependencies = new InputElement()
+      ..placeholder = 'dep1, dep2, ...'
+      ..attributes['type'] = 'text';
+    dependencies.children.addAll([promptDependencies, inputDependencies]);
+    _modalBody.children.add(dependencies);
 
     _buttonListeners.add(inputName.onKeyUp.listen((e) {
+      if (e.keyCode == KeyCode.ENTER) {
+        _doneHandler();
+        _destroyModal();
+      }
+    }));
+
+    _buttonListeners.add(inputDependencies.onKeyUp.listen((e) {
       if (e.keyCode == KeyCode.ENTER) {
         _doneHandler();
         _destroyModal();
@@ -47,11 +63,6 @@ class UpDroidCreatePackageModal extends UpDroidModal {
       _doneHandler();
       _destroyModal();
     });
-    _refs.add(save);
     _modalFooter.children.addAll([save, discard]);
-  }
-
-  List passRefs() {
-    return _refs;
   }
 }

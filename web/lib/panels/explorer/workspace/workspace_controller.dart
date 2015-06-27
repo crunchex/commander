@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:dnd/dnd.dart';
 import 'package:path/path.dart' as pathLib;
 
+import '../../../modal/modal.dart';
 import '../../../context_menu.dart';
 import '../../../mailbox.dart';
 import '../../panel_controller.dart';
@@ -20,6 +21,7 @@ class WorkspaceController implements ExplorerController {
   WorkspaceView _workspaceView;
   Mailbox _mailbox;
 
+  AnchorElement _newPackageButton;
   AnchorElement _buildPackagesButton;
   AnchorElement _cleanButton;
 //  AnchorElement _uploadButton;
@@ -33,8 +35,9 @@ class WorkspaceController implements ExplorerController {
   WorkspaceController(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons) {
     _view = view;
     _mailbox = mailbox;
-    _buildPackagesButton = actionButtons[0];
-    _cleanButton = actionButtons[1];
+    _newPackageButton = actionButtons[0];
+    _buildPackagesButton = actionButtons[1];
+    _cleanButton = actionButtons[2];
 
     registerMailbox();
 
@@ -59,6 +62,7 @@ class WorkspaceController implements ExplorerController {
   }
 
   void registerEventHandlers() {
+    _listenersToCleanUp.add(_newPackageButton.onClick.listen((e) => _newPackage()));
     _listenersToCleanUp.add(_buildPackagesButton.onClick.listen((e) => _buildPackages()));
     _listenersToCleanUp.add(_cleanButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_CLEAN]]')));
 //    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
@@ -185,6 +189,20 @@ class WorkspaceController implements ExplorerController {
 
   void _deselectAllEntities() {
     entities.values.forEach((FileSystemEntity entity) => entity.deselect());
+  }
+
+  void _newPackage() {
+    UpDroidCreatePackageModal modal;
+    modal = new UpDroidCreatePackageModal(() {
+      String packageName = modal.inputName.value;
+      String dependenciesString = modal.inputDependencies.value;
+
+      List<String> dependencies = dependenciesString.split(', ');
+
+      if (packageName != '') {
+        _mailbox.ws.send('[[CREATE_PACKAGE]]$packageName:${JSON.encode(dependencies)}');
+      }
+    });
   }
 
   void _buildPackages() {

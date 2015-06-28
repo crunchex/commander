@@ -132,6 +132,7 @@ class UpDroidExplorer extends PanelController {
   }
 
   void _closeWorkspace() {
+    _newPackageButton.classes.add('disabled');
     _buildPackagesButton.classes.add('disabled');
     _cleanWorkspaceButton.classes.add('disabled');
     _runLaunchersButton.classes.add('disabled');
@@ -174,6 +175,7 @@ class UpDroidExplorer extends PanelController {
     if (_workspaceButtonListener != null) _workspaceButtonListener.cancel();
 
     // Re-enable buttons for Workspace View.
+    _newPackageButton.classes.remove('disabled');
     _buildPackagesButton.classes.remove('disabled');
     _cleanWorkspaceButton.classes.remove('disabled');
     _launchersButton.classes.remove('disabled');
@@ -189,13 +191,14 @@ class UpDroidExplorer extends PanelController {
       controller = null;
     }
 
-    // Disable buttons not applicable for Nodes View.
+    // Disable buttons not applicable for Launchers View.
+    _newPackageButton.classes.add('disabled');
     _buildPackagesButton.classes.add('disabled');
     _cleanWorkspaceButton.classes.add('disabled');
     _launchersButton.classes.add('disabled');
     if (_launchersButtonListener != null) _launchersButtonListener.cancel();
 
-    // Re-enable buttons for Workspace View.
+    // Re-enable buttons for Launchers View.
     _runLaunchersButton.classes.remove('disabled');
     _workspaceButton.classes.remove('disabled');
     _workspaceButtonListener = _workspaceButton.onClick.listen((e) => _showWorkspacesController());
@@ -209,7 +212,7 @@ class UpDroidExplorer extends PanelController {
   void cleanUp() {
     _fileDropdownListener.cancel();
     _newWorkspaceListener.cancel();
-    _closeWorkspaceListener.cancel();
+//    _closeWorkspaceListener.cancel();
     _workspaceButtonListener.cancel();
     _launchersButtonListener.cancel();
   }

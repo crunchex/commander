@@ -20,8 +20,8 @@ class UpDroidExplorer extends PanelController {
     List menu = [
       {'title': 'File', 'items': [
         {'type': 'toggle', 'title': 'New Workspace'},
-        {'type': 'submenu', 'title': 'Open Workspace', 'items': []},
-        {'type': 'toggle', 'title': 'Close Workspace'}]},
+        {'type': 'submenu', 'title': 'Open Workspace', 'items': []}]},
+//        {'type': 'toggle', 'title': 'Close Workspace'}]},
 //        {'type': 'toggle', 'title': 'Close Panel'}]},
       {'title': 'Actions', 'items': [
         {'type': 'divider', 'title': 'Workspace'},
@@ -40,7 +40,7 @@ class UpDroidExplorer extends PanelController {
 
   AnchorElement _fileDropdown;
   AnchorElement _newWorkspaceButton;
-  AnchorElement _closeWorkspaceButton;
+//  AnchorElement _closeWorkspaceButton;
 //  AnchorElement _deleteWorkspaceButton;
   AnchorElement _newPackageButton;
   AnchorElement _buildPackagesButton;
@@ -72,7 +72,7 @@ class UpDroidExplorer extends PanelController {
     _fileDropdown = view.refMap['file-dropdown'];
 
     _newWorkspaceButton = view.refMap['new-workspace'];
-    _closeWorkspaceButton = view.refMap['close-workspace'];
+//    _closeWorkspaceButton = view.refMap['close-workspace'];
 //    _deleteWorkspaceButton = view.refMap['delete-workspace'];
 
     _newPackageButton = view.refMap['new-package'];
@@ -113,7 +113,7 @@ class UpDroidExplorer extends PanelController {
   void registerEventHandlers() {
     _fileDropdownListener = _fileDropdown.onClick.listen((e) => _refreshWorkspaceNames());
     _newWorkspaceListener = _newWorkspaceButton.onClick.listen((e) => _newWorkspace());
-    _closeWorkspaceListener = _closeWorkspaceButton.onClick.listen((e) => _closeWorkspace());
+//    _closeWorkspaceListener = _closeWorkspaceButton.onClick.listen((e) => _closeWorkspace());
   }
 
   void _refreshWorkspaceNames() {

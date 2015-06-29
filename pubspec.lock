@@ -120,7 +120,7 @@ packages:
   terminal:
     description: terminal
     source: hosted
-    version: "0.1.0"
+    version: "0.1.1"
   tokenizr:
     description: tokenizr
     source: hosted

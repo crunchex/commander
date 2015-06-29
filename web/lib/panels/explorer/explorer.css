@@ -3,6 +3,12 @@
     background-color: #eaecec;
 }
 
+.explorer-placeholder {
+    color: #7e7e7e;
+    padding: 100% 10px;
+    text-align: center;
+}
+
 .exp-container {
     background-color: #eaecec;
     height: 100%;

@@ -70,9 +70,11 @@ class CmdrExplorer {
   void _getPath(UpDroidMessage um) => _sendPath();
 
   void _sendWorkspaceNames(UpDroidMessage um) {
+    List<String> names = [];
     uproot.list()
-      .where((Directory w) => Workspace.isWorkspace(w.path))
-      .listen((Directory w) => mailbox.ws.add('[[WORKSPACE_NAME]]' + w.path.split('/').last));
+    .where((Directory w) => Workspace.isWorkspace(w.path))
+    .listen((Directory w) => names.add(w.path.split('/').last))
+    .onDone(() => mailbox.ws.add('[[WORKSPACE_NAMES]]' + JSON.encode(names)));
   }
 
   void _newWorkspace(UpDroidMessage um) {

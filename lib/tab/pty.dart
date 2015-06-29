@@ -27,7 +27,7 @@ class CmdrPty {
   void _startPty(UpDroidMessage um) {
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
     // See http://bitbucket.org/updroid/cmdr-pty
-    Process.start('cmdr-pty', ['-protocol', 'tcp', '-size', '${um.body}'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
+    Process.start('cmdr-pty', ['-p', 'tcp', '-s', '${um.body}'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
       _shell = shell;
 
       Stream stdoutBroadcast = shell.stdout.asBroadcastStream();

@@ -60,7 +60,8 @@ class UpDroidConsole extends TabController {
   }
 
   void _startPty(UpDroidMessage um) {
-    List<int> size = _term.currentSize();
+    List<int> size = _term.calculateSize();
+    _term.resize(size[0], size[1]);
     mailbox.ws.send('[[START_PTY]]${size[0]}x${size[1] - 1}');
   }
 

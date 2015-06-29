@@ -103,18 +103,16 @@
     border-top: 1px solid #e3e3e3;
 }
 
-.recycle {
-    color: #0c0c0c;
+.toolbar>span {
+    padding: 0 5px;
 }
 
-.recycle .recycle-ondrag {
-    color: #ff2919;
-    border-color: #ff2919;
+.toolbar>span.inactive {
+    color: #7e7e7e;
 }
 
-.recycle .recycle-entered {
-    color: #ffffff;
-    border-color: #ffffff;
+.toolbar>span.glyphicons-folder-open {
+    top: -0.5px;
 }
 
 /* Animation */

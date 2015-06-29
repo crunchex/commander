@@ -18,6 +18,7 @@ class LaunchersController implements ExplorerController {
   PanelView _view;
   LaunchersView _launchersView;
   Mailbox _mailbox;
+  Function _toggleView;
 
   AnchorElement _runLaunchersButton;
 
@@ -25,10 +26,11 @@ class LaunchersController implements ExplorerController {
   String workspacePath;
   Set<StreamSubscription> _listenersToCleanUp;
 
-  LaunchersController(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons) {
+  LaunchersController(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons, Function toggleView) {
     _view = view;
     _mailbox = mailbox;
     _runLaunchersButton = actionButtons[0];
+    _toggleView = toggleView;
 
     registerMailbox();
 
@@ -49,6 +51,7 @@ class LaunchersController implements ExplorerController {
 
   void registerEventHandlers() {
     _listenersToCleanUp.add(_runLaunchersButton.onClick.listen((e) => _runLaunchers()));
+    _listenersToCleanUp.add(_launchersView.viewWorkspace.onClick.listen((e) => _toggleView()));
   }
 
   void addLaunch(UpDroidMessage um) {

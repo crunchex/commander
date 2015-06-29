@@ -100,7 +100,7 @@ class UpDroidExplorer extends PanelController {
 
   void _explorerDirPath(UpDroidMessage um) {
     workspacePath = um.body;
-    _showWorkspacesController();
+    showWorkspacesController();
   }
 
   void _refreshOpenMenu(UpDroidMessage um) {
@@ -187,7 +187,7 @@ class UpDroidExplorer extends PanelController {
     mailbox.ws.send('[[REQUEST_WORKSPACE_NAMES]]');
   }
 
-  void _showWorkspacesController() {
+  void showWorkspacesController() {
     view.content.innerHtml = '';
 
     if (controller != null) {
@@ -205,13 +205,13 @@ class UpDroidExplorer extends PanelController {
     _buildPackagesButton.classes.remove('disabled');
     _cleanWorkspaceButton.classes.remove('disabled');
     _launchersButton.classes.remove('disabled');
-    _launchersButtonListener = _launchersButton.onClick.listen((e) => _showLaunchersController());
+    _launchersButtonListener = _launchersButton.onClick.listen((e) => showLaunchersController());
 
     List<AnchorElement> actionButtons = [_newPackageButton, _buildPackagesButton, _cleanWorkspaceButton];
-    controller = new WorkspaceController(id, workspacePath, view, mailbox, actionButtons);
+    controller = new WorkspaceController(id, workspacePath, view, mailbox, actionButtons, showLaunchersController);
   }
 
-  void _showLaunchersController() {
+  void showLaunchersController() {
     view.content.innerHtml = '';
 
     if (controller != null) {
@@ -229,10 +229,10 @@ class UpDroidExplorer extends PanelController {
     // Re-enable buttons for Launchers View.
     _runLaunchersButton.classes.remove('disabled');
     _workspaceButton.classes.remove('disabled');
-    _workspaceButtonListener = _workspaceButton.onClick.listen((e) => _showWorkspacesController());
+    _workspaceButtonListener = _workspaceButton.onClick.listen((e) => showWorkspacesController());
 
     List<AnchorElement> actionButtons = [_runLaunchersButton];
-    controller = new LaunchersController(id, workspacePath, view, mailbox, actionButtons);
+    controller = new LaunchersController(id, workspacePath, view, mailbox, actionButtons, showWorkspacesController);
   }
 
   //\/\/ Handler Helpers /\/\//

@@ -10,6 +10,8 @@ class LaunchersView extends ExplorerView {
     return c.future;
   }
 
+  SpanElement viewWorkspace;
+  SpanElement viewLaunchers;
   UListElement uList;
 
   LaunchersView(int id, DivElement content) :
@@ -23,6 +25,14 @@ class LaunchersView extends ExplorerView {
     DivElement toolbar = new DivElement()
       ..classes.add('toolbar');
     explorersDiv.children.add(toolbar);
+
+    viewWorkspace = new SpanElement()
+      ..title = 'Workspace View'
+      ..classes.addAll(['glyphicons', 'glyphicons-folder-closed', 'inactive']);
+    viewLaunchers = new SpanElement()
+      ..title = 'Launchers View'
+      ..classes.addAll(['glyphicons', 'glyphicons-circle-arrow-right']);
+    toolbar.children.addAll([viewWorkspace, viewLaunchers]);
   }
 
   void cleanUp() {

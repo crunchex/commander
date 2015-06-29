@@ -20,24 +20,24 @@ class WorkspaceController implements ExplorerController {
   PanelView _view;
   WorkspaceView _workspaceView;
   Mailbox _mailbox;
+  Function _toggleView;
 
   AnchorElement _newPackageButton;
   AnchorElement _buildPackagesButton;
   AnchorElement _cleanButton;
 //  AnchorElement _uploadButton;
 
-  Dropzone dzRecycle;
-
   Map<String, FileSystemEntity> entities = {};
   String workspacePath;
   Set<StreamSubscription> _listenersToCleanUp;
 
-  WorkspaceController(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons) {
+  WorkspaceController(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons, Function toggleView) {
     _view = view;
     _mailbox = mailbox;
     _newPackageButton = actionButtons[0];
     _buildPackagesButton = actionButtons[1];
     _cleanButton = actionButtons[2];
+    _toggleView = toggleView;
 
     registerMailbox();
 
@@ -45,8 +45,6 @@ class WorkspaceController implements ExplorerController {
 
     WorkspaceView.createWorkspaceView(id, _view.content).then((workspaceView) {
       _workspaceView = workspaceView;
-
-      dzRecycle = new Dropzone(_workspaceView.recycle);
 
       _mailbox.ws.send('[[REQUEST_WORKSPACE_CONTENTS]]');
 
@@ -65,6 +63,7 @@ class WorkspaceController implements ExplorerController {
     _listenersToCleanUp.add(_newPackageButton.onClick.listen((e) => _newPackage()));
     _listenersToCleanUp.add(_buildPackagesButton.onClick.listen((e) => _buildPackages()));
     _listenersToCleanUp.add(_cleanButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_CLEAN]]')));
+    _listenersToCleanUp.add(_workspaceView.viewLaunchers.onClick.listen((e) => _toggleView()));
 //    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
   }
 

@@ -9,29 +9,22 @@ import 'tabs/teleop/teleop.dart';
 import 'tabs/editor/editor.dart';
 import 'tabs/console/console.dart';
 import 'tabs/camera/camera.dart';
+import 'column_view.dart';
 import 'modal/modal.dart';
 import 'mailbox.dart';
 
 class UpDroidClient {
   StreamController<CommanderMessage> _cs;
 
-  List<List<dynamic>> _columns;
   String _config;
-
-  AnchorElement _newButtonLeft;
-  AnchorElement _newButtonRight;
+  List<List<dynamic>> _columns;
+  Mailbox _mailbox;
 
   bool disconnectAlert = false;
 
-  Mailbox _mailbox;
-
   UpDroidClient() {
     _config = _getConfig();
-
-    _columns = [[], [], []];
-
-    _newButtonLeft = querySelector('#column-1-new');
-    _newButtonRight = querySelector('#column-2-new');
+    _columns = [];
 
     // Create the intra-client message stream.
     // The classes use this to communicate with each other.
@@ -39,7 +32,6 @@ class UpDroidClient {
     _mailbox = new Mailbox('UpDroidClient', 1, _cs);
 
     _registerMailbox();
-    _registerEventHandlers(_getConfig());
 
     _pulseFeedback(querySelector('#feedback-button'));
   }
@@ -104,20 +96,25 @@ class UpDroidClient {
 
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: use isolates.
-  void _initializeClient(UpDroidMessage um) {
+  Future _initializeColumns(UpDroidMessage um) async {
     List config = JSON.decode(_config);
 
-    for (int i = 0; i < 1; i++) {
-      for (Map panel in config[i]) {
-        _openPanel(i, panel['id'], panel['class']);
-      }
+    for (int i = 0, i < 3; i++) {
+      int width = (i == 0) ? 2 : 5;
+      ColumnView.createColumnView(i, width).then((columnView) {
+        if (width == 2) {}
+      })
     }
 
-    for (int i = 1; i < config.length; i++) {
-      for (Map tab in config[i]) {
-        _openTab(i, tab['id'], tab['class']);
-      }
+    for (Map panel in config[i]) {
+      _openPanel(i, panel['id'], panel['class']);
     }
+
+    for (Map tab in config[i]) {
+      _openTab(i, tab['id'], tab['class']);
+    }
+
+    _registerEventHandlers(_getConfig());
   }
 
   void _alertDisconnect(CommanderMessage m) {
@@ -241,7 +238,7 @@ class UpDroidClient {
     _mailbox.registerCommanderEvent('SERVER_DISCONNECT', _alertDisconnect);
 
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeColumns);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
   }
 

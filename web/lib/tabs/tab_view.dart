@@ -36,7 +36,7 @@ class TabView extends ContainerView {
     tabHandle.children.insert(0, closeControlHitbox);
 
     DivElement closeControl = new DivElement()
-      ..classes.add('close-control');
+      ..classes.addAll(['close-control', 'glyphicons', 'glyphicons-remove-2']);
     closeControlHitbox.children.add(closeControl);
   }
 }

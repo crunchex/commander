@@ -213,23 +213,11 @@ body>.navbar.navbar-inverse {
   border-bottom: 1px;
 }
 
-.column-content>.nav-tabs>li>a {
-  color: #7e7e7e;
-  background-color: #eaecec;
-  padding-right: 20px;
-}
-
 .nav-tabs>li.active>a,
 .nav-tabs>li.active>a:hover,
 .nav-tabs>li.active>a:focus {
   color: #0c0c0c;
   background-color: #ffffff;
-  font-family: "Avenir Next LT Pro Demi";
-}
-
-.nav-tabs>li>a:hover {
-  color: #ffffff;
-  background-color: #ff2919;
   font-family: "Avenir Next LT Pro Demi";
 }
 
@@ -245,9 +233,17 @@ body>.navbar.navbar-inverse {
   width: auto;
 }
 
+.nav-tabs>.tab-handle>a {
+  color: #7e7e7e;
+  background-color: #eaecec;
+  padding-right: 20px;
+}
+
 .nav-tabs>.tab-handle>.close-control-hitbox {
+  cursor: pointer;
   position: relative;
   float: right;
+  height: 14px;
   right: 2px;
   padding: 1px;
   z-index: 2;
@@ -257,25 +253,12 @@ body>.navbar.navbar-inverse {
   position: relative;
   top: 0;
   font-size: 12px;
-  color: #dddddd;
+  color: #ffffff;
   z-index: 2;
 }
 
-.nav-tabs>.tab-handle>a {
-  border: 1px solid #e3e3e3;
-}
-
-.nav-tabs>.tab-handle>a:hover {
-  border: 1px solid #ff2919;
-}
-
-.nav-tabs>.tab-handle.editing>a {
-  padding-top: 7px;
-  padding-bottom: 7px;
-}
-
-.nav-tabs>.tab-handle.editing>a>input {
-  width: 100%;
+.nav-tabs>.tab-handle.active>.close-control-hitbox>.close-control {
+  color: #dddddd;
 }
 
 .dropdown-menu>li {
@@ -441,7 +424,7 @@ li div input {
   cursor: pointer;
   color: #ffffff;
   background-color: #ff2919;
-  font-family: "Avenir Next LT Pro Demi";
+  border-color: #ff2919;
 }
 
 

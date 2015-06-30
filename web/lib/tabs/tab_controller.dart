@@ -34,7 +34,6 @@ abstract class TabController {
       _closeTabButton = view.refMap['close-tab'];
       _closeTabButton.onClick.listen((e) => _closeTab());
       view.closeControlHitbox.onClick.listen((e) => _closeTab());
-      view.cloneControlHitbox.onClick.listen((e) => _cloneTab(e));
 
       setUpController();
       registerEventHandlers();
@@ -61,13 +60,13 @@ abstract class TabController {
     }
   }
 
-  void _cloneTab(Event e) {
-    e.preventDefault();
-    if (cs != null) {
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${tabType}'));
-    } else {
-      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${tabType}_$id');
-      mailbox.ws.send(um.s);
-    }
-  }
+//  void _cloneTab(Event e) {
+//    e.preventDefault();
+//    if (cs != null) {
+//      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${tabType}'));
+//    } else {
+//      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${tabType}_$id');
+//      mailbox.ws.send(um.s);
+//    }
+//  }
 }

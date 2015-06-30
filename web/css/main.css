@@ -244,51 +244,29 @@ body>.navbar.navbar-inverse {
   width: auto;
 }
 
-.nav-tabs>.tab-handle>.close-control-hitbox,
-.nav-tabs>.tab-handle>.clone-control-hitbox {
+.nav-tabs>.tab-handle>.close-control-hitbox {
   position: relative;
+  float: right;
+  right: 2px;
   width: 16px;
   height: 14px;
   background-color: transparent;
   z-index: 2;
 }
 
-.nav-tabs>.tab-handle>.close-control-hitbox {
-  float: right;
-  right: 2px;
-}
-
-.nav-tabs>.tab-handle>.clone-control-hitbox {
-  float: left;
-}
-
-.nav-tabs>.tab-handle>.close-control-hitbox>.close-control,
-.nav-tabs>.tab-handle>.clone-control-hitbox>.clone-control {
+.nav-tabs>.tab-handle>.close-control-hitbox>.close-control {
   position: relative;
+  float: right;
+  right: 0;
+  /*background-color: #ff948c;*/
+  background-color: #e3e3e3;
   width: 16px;
   height: 4px;
   z-index: 2;
 }
 
-.nav-tabs>.tab-handle>.close-control-hitbox>.close-control {
-  float: right;
-  right: 0;
-  /*background-color: #ff948c;*/
-  background-color: #e3e3e3;
-}
-
 .nav-tabs>.tab-handle.active>.close-control-hitbox>.close-control {
   /*background-color: #ff2919;*/
-  background-color: #7e7e7e;
-}
-
-.nav-tabs>.tab-handle>.clone-control-hitbox>.clone-control {
-  visibility: hidden;
-  float: left;
-  background-color: #e3e3e3;
-}
-
-.nav-tabs>.tab-handle.active>.clone-control-hitbox>.clone-control {
   background-color: #7e7e7e;
 }
 

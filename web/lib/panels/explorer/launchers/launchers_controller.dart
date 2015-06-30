@@ -25,6 +25,7 @@ class LaunchersController implements ExplorerController {
   Map<String, Package> packages = {};
   String workspacePath;
   Set<StreamSubscription> _listenersToCleanUp;
+  bool _launchersFound;
 
   LaunchersController(int id, this.workspacePath, PanelView view, Mailbox mailbox, List<AnchorElement> actionButtons, Function toggleView) {
     _view = view;
@@ -35,6 +36,7 @@ class LaunchersController implements ExplorerController {
     registerMailbox();
 
     _listenersToCleanUp = new Set<StreamSubscription>();
+    _launchersFound = false;
 
     LaunchersView.createLaunchersView(id, _view.content).then((launchersView) {
       _launchersView = launchersView;
@@ -55,6 +57,9 @@ class LaunchersController implements ExplorerController {
   }
 
   void addLaunch(UpDroidMessage um) {
+    if (!_launchersFound) _launchersView.placeholderText.replaceWith(_launchersView.uList);
+    _launchersFound = true;
+
     Map data = JSON.decode(um.body);
     String packagePath = data['package-path'];
     String launcherName = data['node'];

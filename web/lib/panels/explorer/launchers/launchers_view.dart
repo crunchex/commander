@@ -10,29 +10,25 @@ class LaunchersView extends ExplorerView {
     return c.future;
   }
 
-  SpanElement viewWorkspace;
-  SpanElement viewLaunchers;
+  ParagraphElement placeholderText;
   UListElement uList;
 
   LaunchersView(int id, DivElement content) :
   super(id, content) {
     this.content = content;
 
+    placeholderText = new ParagraphElement()
+      ..classes.add('explorer-placeholder')
+      ..text = 'No Launchers found. Create one!';
+    explorersDiv.children.add(placeholderText);
+
     uList = new UListElement()
       ..classes.add("explorer-ul");
-    explorersDiv.append(uList);
+//    explorersDiv.append(uList);
 
-    DivElement toolbar = new DivElement()
-      ..classes.add('toolbar');
-    explorersDiv.children.add(toolbar);
-
-    viewWorkspace = new SpanElement()
-      ..title = 'Workspace View'
-      ..classes.addAll(['glyphicons', 'glyphicons-folder-closed', 'inactive']);
-    viewLaunchers = new SpanElement()
-      ..title = 'Launchers View'
-      ..classes.addAll(['glyphicons', 'glyphicons-circle-arrow-right']);
-    toolbar.children.addAll([viewWorkspace, viewLaunchers]);
+    viewWorkspace.classes.remove('glyphicons-folder-open');
+    viewWorkspace.classes.addAll(['glyphicons-folder-closed', 'inactive']);
+    viewLaunchers.classes.remove('inactive');
   }
 
   void cleanUp() {

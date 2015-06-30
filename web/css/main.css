@@ -4,11 +4,6 @@
 }
 
 @font-face {
-  font-family: Avenir Next LT Pro Medium Condensed;
-  src: url(../fonts/AvenirNextLTPro-MediumCn.otf);
-}
-
-@font-face {
   font-family: Avenir Next LT Pro Regular;
   src: url(../fonts/AvenirNextLTPro-Regular.otf);
 }
@@ -21,15 +16,6 @@
 @font-face {
   font-family: Monosten A;
   src: url(../fonts/Monosten-A-webfont.ttf);
-}
-
-html {
-  /*position: relative;*/
-  height: 100%;
-}
-
-body {
-  /* Margin bottom by footer height */
 }
 
 html, body {
@@ -132,20 +118,13 @@ html, body {
 
 .row {
   height: 100%;
-  /*padding-bottom: 10px;*/
 }
 
 .fill {
-  /*min-height: 400px;*/
-  /* Height of navbar + navbar padding + footer */
   height: calc(100% - 91px);
 }
 
-.container-fluid {
-  /*height: 100%;*/
-}
-
-#column-0, #column-1, #column-2 {
+.column-content {
   list-style: none;
   height: 100%;
 }
@@ -359,14 +338,6 @@ li div input {
   font-size: 12px;
 }
 
-.span-ondrag {
-  color: #ff2919;
-}
-
-.span-entered {
-  color: #ffffff;
-}
-
 .col-xs-2, .col-xs-5 {
   padding-left: 10px;
   padding-right: 10px;
@@ -401,10 +372,6 @@ li div input {
   background-color: transparent;
 }
 
-.editing{
-  width: 200%;
-}
-
 .extra-menubar {
   font-family: "Monosten A", monospace;
   font-size: 13px;
@@ -427,21 +394,14 @@ li div input {
   border-color: #ff2919;
 }
 
-
 .column-content>.tab-content {
   border: 1px solid #e3e3e3;
-  /*min-height: 447px;*/
   /* Height of nav-tabs */
   height: calc(100% - 40px);
 }
 
 .tab-pane > .tab-content {
   height: calc(100% - 24px);
-}
-
-#col-1-tab-content, #col-2-tab-content {
-  /*height: 100%;*/
-  /*border-bottom: none;*/
 }
 
 .nav-tabs>li>a.new-tab-button {
@@ -520,10 +480,6 @@ li div input {
   border-width: 1px;
   border-color: #ff2919;
 }
-
-/*.modal-body p {
-  padding-left: 20px;
-}*/
 
 code, kbd, pre, samp {
   font-family: "Monosten A", monospace;

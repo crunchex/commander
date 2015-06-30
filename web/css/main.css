@@ -402,6 +402,7 @@ li div input {
 
 .tab-pane > .tab-content {
   height: calc(100% - 24px);
+  padding: 0 4px 4px 4px;
 }
 
 .nav-tabs>li>a.new-tab-button {

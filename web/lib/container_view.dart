@@ -200,6 +200,9 @@ abstract class ContainerView {
       ..href = '#'
       ..text = title;
     item.append(button);
+    SpanElement dropdownIndicator = new SpanElement()
+    ..classes.addAll(['glyphicons', 'glyphicons-chevron-right']);
+    button.children.add(dropdownIndicator);
     UListElement dropdown = new UListElement()
       ..id = '${shortName.toLowerCase()}-$id-${title.toLowerCase().replaceAll(' ', '-')}'
       ..classes.add('dropdown-menu');
@@ -224,7 +227,7 @@ abstract class ContainerView {
   LIElement _createInputItem(String title) {
     LIElement li = new LIElement();
 
-    DivElement d = new DivElement()..style.display = 'inline-block';
+    DivElement d = new DivElement();
     li.children.add(d);
 
     String name = title.toLowerCase().replaceAll(' ', '-');

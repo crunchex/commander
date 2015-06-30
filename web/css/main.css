@@ -213,6 +213,11 @@ body>.navbar.navbar-inverse {
   border-bottom: 1px;
 }
 
+.column-content>.nav-tabs>li>a {
+  color: #7e7e7e;
+  background-color: #eaecec;
+}
+
 .nav-tabs>li.active>a,
 .nav-tabs>li.active>a:hover,
 .nav-tabs>li.active>a:focus {
@@ -421,7 +426,7 @@ li div input {
 
 .inner-tabs .dropdown-toggle {
   border-width: 0 0 1px 0;
-  padding: 5px 10px 5px 10px;
+  padding: 2px 8px 2px 8px;
 }
 
 .inner-tabs .dropdown-toggle:hover {
@@ -479,7 +484,7 @@ li div input {
 }
 
 .tab-pane > .tab-content {
-  height: calc(100% - 30px);
+  height: calc(100% - 24px);
 }
 
 #col-1-tab-content, #col-2-tab-content {

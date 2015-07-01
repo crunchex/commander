@@ -87,7 +87,7 @@ class UpDroidEditor extends TabController {
     _fontSizeInput.placeholder = _fontSize.toString();
 
     _setUpEditor();
-    cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
+//    cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
   }
 
   void setUpUI() {

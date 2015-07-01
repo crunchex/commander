@@ -1,47 +1,55 @@
 library context_menu;
 
 import 'dart:html';
+import 'dart:async';
 
 ContextMenu _singleton;
 
 class ContextMenu {
-  static createContextMenu(Point origin, List<Map> config) {
+  static Future createContextMenu(Point origin, List<Map> config) {
+    Completer c = new Completer();
     if (_singleton != null) {
       _singleton.cleanup();
       _singleton = null;
     }
 
     _singleton = new ContextMenu(origin, config);
+    c.complete();
+    return c.future;
+  }
+
+  static addItem(Map itemConfig) {
+    _singleton.contextMenu.children.add(_singleton._addMenuItem(itemConfig));
   }
 
   List<Map> config;
+  UListElement contextMenu;
 
-  UListElement _contextMenu;
   bool _clean;
 
   ContextMenu(Point origin, this.config) {
-    _contextMenu = new UListElement()
+    contextMenu = new UListElement()
       ..style.position = 'absolute'
       ..style.left = origin.x.toString() + 'px'
       ..style.top = origin.y.toString() + 'px'
       ..classes.addAll(['dropdown-menu', 'context-menu'])
       ..attributes['role'] = 'menu';
-    document.body.append(_contextMenu);
+    document.body.append(contextMenu);
 
     _clean = false;
 
     LIElement item;
     for (Map i in config) {
-      item = addMenuItem(i);
-      _contextMenu.children.add(item);
+      item = _addMenuItem(i);
+      contextMenu.children.add(item);
     }
 
-    _contextMenu.parent.classes.toggle('open');
+    contextMenu.parent.classes.toggle('open');
 
     document.body.onClick.first.then((e) => cleanup());
   }
 
-  LIElement addMenuItem(Map itemConfig, [String dropdownMenuSelector]) {
+  LIElement _addMenuItem(Map itemConfig, [String dropdownMenuSelector]) {
     LIElement itemElement;
     if (itemConfig['type'] == 'toggle') {
       if (itemConfig.containsKey('handler')) {
@@ -140,8 +148,8 @@ class ContextMenu {
 
   void cleanup() {
     if (_clean) return;
-    _contextMenu.parent.classes.toggle('open');
-    _contextMenu.remove();
+    contextMenu.parent.classes.toggle('open');
+    contextMenu.remove();
     _clean = true;
   }
 }

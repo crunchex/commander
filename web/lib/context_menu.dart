@@ -54,7 +54,7 @@ class ContextMenu {
         itemElement = _createToggleItem(itemConfig['title']);
       }
     } else if (itemConfig['type'] == 'submenu') {
-      itemElement = _createSubMenu("Templates", ['Publisher', 'Subscriber', 'Hello World Talker', 'Hello World Listener', 'Basic Launch File']);
+      itemElement = _createSubMenu(itemConfig['title'], itemConfig['items']);
     } else if (itemConfig['type'] == 'divider') {
       itemElement = _createDivider(itemConfig['title']);
     }
@@ -95,6 +95,9 @@ class ContextMenu {
       ..href = '#'
       ..text = title;
     item.append(button);
+    SpanElement dropdownIndicator = new SpanElement()
+      ..classes.addAll(['glyphicons', 'glyphicons-chevron-right']);
+    button.children.add(dropdownIndicator);
     UListElement dropdown = new UListElement()
       ..classes.add('dropdown-menu');
     item.append(dropdown);

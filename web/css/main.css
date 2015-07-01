@@ -315,6 +315,7 @@ li div input {
   font-size: 12px;
   color: #0c0c0c;
 }
+/**fix here */
 .inner-tabs .dropdown-toggle:hover {
   border-color: #e3e3e3;
   background-color: #ffffff;

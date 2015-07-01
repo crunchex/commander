@@ -38,6 +38,12 @@
 
 /** Variables */
 
+@brand-red:  #ff2919;
+@upcom-grey: #eaecec;
+@upcom-black: #0c0c0c;
+
+
+
 html, body {
   min-width: 1200px;
   width: auto !important;
@@ -53,7 +59,7 @@ html, body {
   z-index: 10;
   width: 100%;
   height: 100%;
-  background-color: #ff2919;
+  background-color:@brand-red;
   opacity: 100;
 }
 
@@ -109,7 +115,7 @@ html, body {
   top: 50%;
   left: 50%;
   border: 5px solid #ffffff;
-  background-color: #ff2919;
+  background-color:@brand-red;
   padding: 2px;
   .font-monosten();
   color: #ffffff;
@@ -183,7 +189,7 @@ html, body {
 }
 
 body>.navbar.navbar-inverse {
-  background-color: #eaecec;
+  background-color: @upcom-grey;
   margin-bottom: 10px;
   border: none;
   min-height: 0;
@@ -193,8 +199,8 @@ body>.navbar.navbar-inverse {
 .navbar-inverse .navbar-nav>li>a:focus {
   padding-top: 10px;
   padding-bottom: 10px;
-  color: #0c0c0c;
-  background-color: #eaecec;
+  color: @upcom-black;
+  background-color: @upcom-grey;
   .font-avenir-bold();
   -webkit-transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
@@ -204,7 +210,7 @@ body>.navbar.navbar-inverse {
 
 .navbar-inverse .navbar-nav>li>a:hover {
   color: #ffffff;
-  background-color: #ff2919;
+  background-color:@brand-red;
   .font-avenir-bold();
 }
 
@@ -242,7 +248,7 @@ body>.navbar.navbar-inverse {
 .nav-tabs>li.active>a,
 .nav-tabs>li.active>a:hover,
 .nav-tabs>li.active>a:focus {
-  color: #0c0c0c;
+  color: @upcom-black;
   background-color: #ffffff;
   .font-avenir-demi();
 }
@@ -261,7 +267,7 @@ body>.navbar.navbar-inverse {
 
 .nav-tabs>.tab-handle>a {
   color: #7e7e7e;
-  background-color: #eaecec;
+  background-color: @upcom-grey;
   padding-right: 20px;
 }
 
@@ -305,12 +311,12 @@ body>.navbar.navbar-inverse {
   padding: 5px 2px 2px 15px;
   .font-avenir();
   font-size: 12px;
-  color: #0c0c0c;
+  color: @upcom-black;
   border-bottom: 1px;
 }
 
 .dropdown-menu>li>a:hover {
-  background-color: #ff2919;
+  background-color:@brand-red;
   .font-avenir();
 }
 
@@ -336,7 +342,7 @@ body>.navbar.navbar-inverse {
   margin: 0;
   margin-top: 7px;
   .font-avenir-demi();
-  color: #0c0c0c;
+  color: @upcom-black;
   font-size: 12px;
   line-height: 9px;
 }
@@ -390,7 +396,7 @@ li div input {
   padding: 5px 8px 3px 8px;
   .font-avenir();
   font-size: 12px;
-  color: #0c0c0c;
+  color: @upcom-black;
 }
 
 .inner-tabs .dropdown-toggle:hover {
@@ -431,8 +437,8 @@ li div input {
 .nav-tabs>li>a.new-tab-button:hover {
   cursor: pointer;
   color: #ffffff;
-  background-color: #ff2919;
-  border-color: #ff2919;
+  background-color:@brand-red;
+  border-color:@brand-red;
 }
 
 .column-content>.tab-content {
@@ -501,8 +507,8 @@ li div input {
 .btn-warning {
   box-shadow: none;
   width: 100%;
-  background-color: #eaecec;
-  color: #0c0c0c;
+  background-color: @upcom-grey;
+  color: @upcom-black;
   border-width: 1px;
   border-color: #e3e3e3;
   text-align: center;
@@ -517,10 +523,10 @@ li div input {
 
 .btn-primary:hover,
 .btn-warning:hover {
-  background-color: #ff2919;
+  background-color:@brand-red;
   color: #ffffff;
   border-width: 1px;
-  border-color: #ff2919;
+  border-color:@brand-red;
 }
 
 code, kbd, pre, samp {
@@ -567,15 +573,15 @@ code, kbd, pre, samp {
   width: 200px;
   height: 42px;
   text-align: center;
-  color: #0c0c0c;
+  color: @upcom-black;
   border-color: #e3e3e3;
   .font-avenir-demi();
   background-color: #ffffff;
 }
 
 .node-wrapper>button:hover {
-  background-color: #ff2919;
-  border-color: #ff2919;
+  background-color:@brand-red;
+  border-color:@brand-red;
   color: #ffffff;
 }
 

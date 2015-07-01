@@ -31,7 +31,7 @@ class CmdrServer {
   ArgResults _args;
 
   Map _panels = {};
-  Map _tabs = {};
+  Map<String, Map<int, dynamic>> _tabs = {};
   Map<int, CameraServer> _camServers = {};
   CmdrMailbox _mailbox;
   Directory dir;
@@ -134,6 +134,7 @@ class CmdrServer {
     _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
 
     _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
+    _mailbox.registerServerMessageHandler('REQUEST_EDITOR_LIST', _sendEditorList);
   }
 
   void _clientConfig(UpDroidMessage um) {
@@ -241,6 +242,16 @@ class CmdrServer {
       _tabs[type][id].cleanup();
       _tabs[type].remove(id);
     }
+  }
+
+  void _sendEditorList(UpDroidMessage um) {
+    String pathToOpen = um.body;
+    List<String> editorList = [];
+    _tabs['updroideditor'].keys.forEach((int id) => editorList.add(id.toString()));
+    UpDroidMessage newMessage = new UpDroidMessage('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
+    // TODO: need to able to reply back to exact sender in CmdrPostOffice.
+    // This is a hacky way to reply back to the requesting explorer.
+    CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', 0, newMessage));
   }
 
   void _cleanUpBackend() {

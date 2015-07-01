@@ -171,10 +171,13 @@ class FileEntity extends FileSystemEntity {
       e.preventDefault();
       deselectAllEntities();
       select();
+
       List menu = [
         {'type': 'toggle', 'title': 'Rename', 'handler': rename},
         {'type': 'toggle', 'title': 'Delete', 'handler': () => ws.send('[[DELETE]]' + path)}];
+
       ContextMenu.createContextMenu(e.page, menu);
+      ws.send('[[REQUEST_EDITOR_LIST]]' + path);
     });
   }
 }

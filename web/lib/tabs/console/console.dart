@@ -115,7 +115,7 @@ class UpDroidConsole extends TabController {
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
     _term.stdin.stream.listen((data) {
-      _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
+      if (_ws != null) _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
     });
 
     _themeButton.onClick.listen((e) {

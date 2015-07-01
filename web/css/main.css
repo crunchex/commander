@@ -23,6 +23,7 @@ body {
   height: 100%;
   min-height: 650px;
 }
+/** login */
 .login-overlay {
   position: absolute;
   display: none;
@@ -102,6 +103,7 @@ body {
   -o-transition: all 0.8s ease;
   transition: all 0.8s ease;
 }
+/** UpCom Body */
 .row {
   height: 100%;
 }
@@ -114,6 +116,19 @@ body {
 }
 .tab-pane {
   height: 100%;
+}
+/** Navbar */
+.navbar-left {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 10px !important;
+}
+.navbar-nav.navbar-right:last-child {
+  margin-right: 10px !important;
+  margin-bottom: 0 !important;
+}
+.navbar-right {
+  float: right !important;
 }
 .navbar-collapse.collapse {
   display: block !important;
@@ -159,6 +174,10 @@ body > .navbar.navbar-inverse {
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
+}
+/** Tabs */
+.column-content .nav-tabs {
+  border-bottom-width: 0;
 }
 .nav-tabs > li > a {
   color: #7e7e7e;
@@ -207,7 +226,8 @@ body > .navbar.navbar-inverse {
 .nav-tabs > .tab-handle.active > .close-control-hitbox > .close-control {
   color: #dddddd;
 }
-.dropdown.open > .dropdown-menu {
+/** Dropdown Menus */
+z .dropdown.open > .dropdown-menu {
   margin-top: 0;
   padding: 5px 0 5px 0;
   box-shadow: none;
@@ -251,6 +271,7 @@ body > .navbar.navbar-inverse {
   font-size: 12px;
   line-height: 9px;
 }
+/** Context Menu */
 .context-menu {
   margin: 0;
 }
@@ -266,18 +287,6 @@ li div input {
   border-color: #e3e3e3;
   padding-left: 5px;
   width: 50px;
-}
-.navbar-left {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  margin-left: 10px !important;
-}
-.navbar-nav.navbar-right:last-child {
-  margin-right: 10px !important;
-  margin-bottom: 0 !important;
-}
-.navbar-right {
-  float: right !important;
 }
 .upcom-logo {
   margin-top: 6px;
@@ -298,9 +307,6 @@ li div input {
 .col-xs-5 {
   padding-left: 10px;
   padding-right: 10px;
-}
-.column-content .nav-tabs {
-  border-bottom-width: 0;
 }
 .inner-tabs .dropdown-toggle {
   border-width: 0 0 1px 0;
@@ -440,41 +446,6 @@ samp {
 #workspace-input * {
   margin-left: 20px;
   display: inline-block;
-}
-#title-wrapper {
-  width: 50%;
-  text-align: center;
-  display: inline-block;
-  padding: 5px 0 0 5px;
-}
-#side-menu button {
-  padding: 5px 5px 0 5px;
-  background-color: #eaecec;
-  -webkit-transition: all 0.25s ease;
-  -moz-transition: all 0.25s ease;
-  -o-transition: all 0.25s ease;
-  transition: all 0.25s ease;
-}
-.shadow {
-  background-color: #dcd8d8;
-}
-#side-menu button.shadow {
-  background-color: #dcd8d8;
-}
-#side-menu button:focus {
-  color: #333333;
-}
-#side-menu button:hover {
-  color: #ffffff;
-  background-color: #ff2919;
-}
-#side-menu button.shadow:hover {
-  color: #ffffff;
-  background-color: #ff2919;
-}
-#side-menu {
-  display: inline-block;
-  float: right;
 }
 #selector-wrapper {
   padding-left: 50px;

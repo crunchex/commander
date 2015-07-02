@@ -213,7 +213,7 @@ class CmdrServer {
 
     switch (type) {
       case 'updroideditor':
-        _tabs[type][num] = new CmdrEditor(dir, num);
+        _tabs[type][num] = new CmdrEditor(num, dir);
         break;
       case 'updroidcamera':
         _tabs[type][num] = new CmdrCamera(num, _camServers);

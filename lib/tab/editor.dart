@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 
+import '../ros/ros.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 
@@ -11,19 +12,18 @@ class CmdrEditor {
   static const String guiName = 'UpDroidEditor';
 
   int id;
+  Directory uproot;
   CmdrMailbox mailbox;
 
-  Directory _dir;
+  Workspace _currentWorkspace;
 
-  CmdrEditor(Directory dir, this.id) {
+  CmdrEditor(this.id, this.uproot) {
     mailbox = new CmdrMailbox(guiName, id);
     _registerMailbox();
-
-    _dir = dir;
   }
 
   void _sendPath(UpDroidMessage um) {
-    mailbox.ws.add('[[EDITOR_DIRECTORY_PATH]]' + _dir.path);
+    mailbox.ws.add('[[EDITOR_DIRECTORY_PATH]]' + _currentWorkspace.path);
   }
 
   void _sendFileContents(UpDroidMessage um) {
@@ -34,7 +34,7 @@ class CmdrEditor {
   }
 
   void _sendEditorList(UpDroidMessage um) {
-    help.getDirectory(_dir).then((files) {
+    help.getDirectory(new Directory(uproot.path)).then((files) {
       mailbox.ws.add('[[PATH_LIST]]' + files.toString());
     });
   }
@@ -54,6 +54,10 @@ class CmdrEditor {
     }
   }
 
+  void _setCurrentWorkspace(UpDroidMessage um) {
+    _currentWorkspace = new Workspace('${uproot.path}/${um.body}');
+  }
+
   void cleanup() {
     CmdrPostOffice.deregisterStream(guiName, id);
   }
@@ -65,5 +69,6 @@ class CmdrEditor {
     mailbox.registerWebSocketEvent('EDITOR_SAVE', _saveFile);
 
     mailbox.registerServerMessageHandler('OPEN_FILE', _sendFileContents);
+    mailbox.registerServerMessageHandler('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);
   }
 }

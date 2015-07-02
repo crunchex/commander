@@ -257,6 +257,9 @@ class CmdrExplorer {
   }
 
   void _setCurrentWorkspace(String newWorkspaceName) {
+    UpDroidMessage um = new UpDroidMessage('SET_CURRENT_WORKSPACE', newWorkspaceName);
+    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', 0, um));
+
     if (_currentWatcherStream != null) _currentWatcherStream.cancel();
 
     _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');

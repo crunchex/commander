@@ -42,8 +42,6 @@
 @upcom-grey: #eaecec;
 @upcom-black: #0c0c0c;
 
-
-
 html, body {
   min-width: 1200px;
   width: auto !important;
@@ -293,7 +291,7 @@ body>.navbar.navbar-inverse {
   color: #dddddd;
 }
 
-/** Dropdown Menus */z
+/* Dropdown Menus */
 
 .dropdown.open>.dropdown-menu {
   margin-top: 0;
@@ -327,8 +325,7 @@ body>.navbar.navbar-inverse {
 }
 
 .dropdown.open>.dropdown-menu {
-  border-width: 1px;
-  border-color: #e3e3e3;
+  border: 1px #e3e3e3;
 }
 
 .menu-divider {
@@ -339,8 +336,7 @@ body>.navbar.navbar-inverse {
 .menu-divider-title {
   position: relative;
   left: 5px;
-  margin: 0;
-  margin-top: 7px;
+  margin: 7px 0 0 0;
   .font-avenir-demi();
   color: @upcom-black;
   font-size: 12px;
@@ -361,9 +357,7 @@ body>.navbar.navbar-inverse {
 
 li div input {
   margin-left: 10px;
-  border-style: solid;
-  border-width: 1px;
-  border-color: #e3e3e3;
+  border: 1px solid #e3e3e3;
   padding-left: 5px;
   width: 50px;
 }
@@ -421,8 +415,8 @@ li div input {
 
 .extra-menubar {
   .font-monosten();
-  font-size: 13px;
-  padding: 7px 20px 0 0;
+  font-size: 12px;
+  padding: 3px 8px 0 0;
   float: right !important;
 }
 
@@ -509,8 +503,7 @@ li div input {
   width: 100%;
   background-color: @upcom-grey;
   color: @upcom-black;
-  border-width: 1px;
-  border-color: #e3e3e3;
+  border: 1px #e3e3e3;
   text-align: center;
   .font-avenir-bold();
   margin-top: 5px;
@@ -525,8 +518,7 @@ li div input {
 .btn-warning:hover {
   background-color:@brand-red;
   color: #ffffff;
-  border-width: 1px;
-  border-color:@brand-red;
+  border: 1px @brand-red;
 }
 
 code, kbd, pre, samp {

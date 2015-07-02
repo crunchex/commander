@@ -24,7 +24,7 @@ class UpDroidEditor extends TabController {
     List menu = [
       {'title': 'File', 'items': [
         {'type': 'submenu', 'title': 'New...', 'items':
-        ['Blank', 'Publisher', 'Subscriber', 'Basic Launch File']},
+          ['Blank', 'Publisher', 'Subscriber', 'Basic Launch File']},
         {'type': 'submenu', 'title': 'Examples', 'items':
           ['Hello World Talker', 'Hello World Listener']},
         {'type': 'toggle', 'title': 'Save'},
@@ -286,82 +286,23 @@ class UpDroidEditor extends TabController {
     _curModal = new UpDroidSavedModal();
 
     //TODO: remove query selectors
-    var input = querySelector('#save-as-input');
-    var makeExec = querySelector('#make-exec');
+    InputElement input = querySelector('#save-as-input');
+    CheckboxInputElement makeExec = querySelector('#make-exec');
     _saveCommit = querySelector('#save-as-commit');
     _overwriteCommit = querySelector('#warning button');
     _warning = querySelector('#warning');
 
-    void completeSave() {
-      if (_exec == true) mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, true]));
-      else {
-        mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, false]));
-      }
-      view.extra.text = input.value;
-      _curModal.hide();
-      input.value = '';
-      _resetSavePoint();
-      _saveAsClickEnd.cancel();
-      _saveAsEnterEnd.cancel();
-      _openFilePath = saveAsPath;
-    }
-
     // Check to make sure that the supplied input doesn't conflict with existing files
     // on system.  Also determines what action to take depending on whether the file exists or not.
 
-    void _checkSave() {
 
-      // User enters no input
-      if (input.value == '') {
-        window.alert("Please enter a valid filename");
-      }
-
-      // Determining the save path
-      if (_openFilePath == null) {
-        if(_currentParPath == null) {
-          var activeFolderName = _checkActiveExplorer();
-          saveAsPath = pathLib.normalize(pathLib.normalize(_absolutePathPrefix + '/' + activeFolderName +'/src') + "/${input.value}");
-        }
-        else{
-          saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
-        }
-      }
-      else {
-        if(_currentParPath == null) saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
-        else {
-          saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
-        }
-      }
-
-      // Filename already exists on system
-      if (_pathMap.containsKey(saveAsPath)) {
-        if (_pathMap[saveAsPath] == 'directory') {
-          window.alert("That filename already exists as a directory");
-          input.value = "";
-        }
-
-        else if (_pathMap[saveAsPath] == 'file') {
-          _warning.classes.remove('hidden');
-          _overwrite = _overwriteCommit.onClick.listen((e){
-            completeSave();
-            _warning.classes.add('hidden');
-            _overwrite.cancel();
-          });
-        }
-      }
-
-      // Filename clear, continue with save
-      else {
-        completeSave();
-      }
-    }
 
     _saveAsClickEnd = _saveCommit.onClick.listen((e) {
 
       if (makeExec.checked == true) {
         _exec = true;
       }
-      _checkSave();
+      _checkSave(input, saveAsPath);
     });
 
     _saveAsEnterEnd = input.onKeyUp.listen((e) {
@@ -370,9 +311,70 @@ class UpDroidEditor extends TabController {
         if (makeExec.checked == true) {
           _exec = true;
         }
-        _checkSave();
+        _checkSave(input, saveAsPath);
       }
     });
+  }
+
+  void completeSave(InputElement input, String saveAsPath) {
+    if (_exec == true) mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, true]));
+    else {
+      mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, false]));
+    }
+    view.extra.text = input.value;
+    _curModal.hide();
+    input.value = '';
+    _resetSavePoint();
+    _saveAsClickEnd.cancel();
+    _saveAsEnterEnd.cancel();
+    _openFilePath = saveAsPath;
+  }
+
+  void _checkSave(InputElement input, String saveAsPath) {
+
+    // User enters no input
+    if (input.value == '') {
+      window.alert("Please enter a valid filename");
+    }
+
+    // Determining the save path
+    if (_openFilePath == null) {
+      if(_currentParPath == null) {
+        var activeFolderName = _checkActiveExplorer();
+        saveAsPath = pathLib.normalize(pathLib.normalize(_absolutePathPrefix + '/' + activeFolderName +'/src') + "/${input.value}");
+      }
+      else{
+        saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
+      }
+    }
+    else {
+      if(_currentParPath == null) saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
+      else {
+        saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
+      }
+    }
+
+    // Filename already exists on system
+    if (_pathMap.containsKey(saveAsPath)) {
+      if (_pathMap[saveAsPath] == 'directory') {
+        window.alert("That filename already exists as a directory");
+        input.value = "";
+      }
+
+      else if (_pathMap[saveAsPath] == 'file') {
+        _warning.classes.remove('hidden');
+        _overwrite = _overwriteCommit.onClick.listen((e){
+          completeSave(input, saveAsPath);
+          _warning.classes.add('hidden');
+          _overwrite.cancel();
+        });
+      }
+    }
+
+    // Filename clear, continue with save
+    else {
+      completeSave(input, saveAsPath);
+    }
   }
 
   void _loadNewText(String text) {
@@ -469,9 +471,9 @@ class UpDroidEditor extends TabController {
     raw = raw.replaceAll(new RegExp(r"(\[|\]|')"), '');
     pathList = raw.split(',');
     _pathMap = new Map.fromIterable(pathList,
-        key: (item) => item.replaceAll(new RegExp(r"(Directory: | File: |Directory: |File:)"), '').trim(),
-        value: (item) => item.contains("Directory:") ? "directory" : "file"
-        );
+    key: (item) => item.replaceAll(new RegExp(r"(Directory: | File: |Directory: |File:)"), '').trim(),
+    value: (item) => item.contains("Directory:") ? "directory" : "file"
+    );
 
     _saveFile();
   }

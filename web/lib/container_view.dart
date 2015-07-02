@@ -193,6 +193,9 @@ abstract class ContainerView {
 
   ///Create a submenu within a dropdown
   LIElement _createSubMenu(String title, List<String> items) {
+    String sanitizedId = title.toLowerCase().replaceAll('.', '');
+    sanitizedId = '${shortName.toLowerCase()}-$id-${sanitizedId.replaceAll(' ', '-')}';
+
     LIElement item = new LIElement()
       ..classes.add('dropdown-submenu');
     AnchorElement button = new AnchorElement()
@@ -204,7 +207,7 @@ abstract class ContainerView {
     ..classes.addAll(['glyphicons', 'glyphicons-chevron-right']);
     button.children.add(dropdownIndicator);
     UListElement dropdown = new UListElement()
-      ..id = '${shortName.toLowerCase()}-$id-${title.toLowerCase().replaceAll(' ', '-')}'
+      ..id = sanitizedId
       ..classes.add('dropdown-menu');
     item.append(dropdown);
 
@@ -248,11 +251,12 @@ abstract class ContainerView {
 
   /// Generates a toggle item (button) and returns the new [LIElement].
   LIElement _createToggleItem(String title, [onClick, args]) {
-    String name = title.toLowerCase().replaceAll(' ', '-');
+    String sanitizedTitle = title.toLowerCase().replaceAll('.', '');
+    sanitizedTitle = '${sanitizedTitle.replaceAll(' ', '-')}';
 
     LIElement buttonList = new LIElement();
     AnchorElement button = new AnchorElement()
-        ..id = 'button-$name'
+        ..id = 'button-$sanitizedTitle'
         ..href = '#'
         ..attributes['role'] = 'button'
         ..text = title;
@@ -266,7 +270,7 @@ abstract class ContainerView {
       });
     }
     buttonList.children.add(button);
-    refMap[name] = button;
+    refMap[sanitizedTitle] = button;
 
     return buttonList;
   }

@@ -23,9 +23,10 @@ class UpDroidEditor extends TabController {
   static List getMenuConfig() {
     List menu = [
       {'title': 'File', 'items': [
-        {'type': 'toggle', 'title': 'New'},
-        {'type': 'submenu', 'title': 'Templates', 'items':
-          ['Publisher', 'Subscriber', 'Hello World Talker', 'Hello World Listener', 'Basic Launch File']},
+        {'type': 'submenu', 'title': 'New...', 'items':
+        ['Blank', 'Publisher', 'Subscriber', 'Basic Launch File']},
+        {'type': 'submenu', 'title': 'Examples', 'items':
+          ['Hello World Talker', 'Hello World Listener']},
         {'type': 'toggle', 'title': 'Save'},
         {'type': 'toggle', 'title': 'Save As'},
         {'type': 'toggle', 'title': 'Close Tab'}]},
@@ -40,7 +41,7 @@ class UpDroidEditor extends TabController {
   String _absolutePathPrefix;
   DivElement _content;
 
-  AnchorElement _newButton;
+  AnchorElement _blankButton;
   AnchorElement _launchButton;
   AnchorElement _talkerButton;
   AnchorElement _listenerButton;
@@ -91,12 +92,12 @@ class UpDroidEditor extends TabController {
   }
 
   void setUpUI() {
-    _newButton = view.refMap['new'];
-    _subButton = view.refMap['subscriber-button'];
+    _blankButton = view.refMap['blank-button'];
     _pubButton = view.refMap['publisher-button'];
+    _subButton = view.refMap['subscriber-button'];
+    _launchButton = view.refMap['basic-launch-file-button'];
     _talkerButton = view.refMap['hello-world-talker-button'];
     _listenerButton = view.refMap['hello-world-listener-button'];
-    _launchButton = view.refMap['basic-launch-file-button'];
     _saveButton = view.refMap['save'];
     _saveAsButton = view.refMap['save-as'];
     _themeButton = view.refMap['invert'];
@@ -226,7 +227,7 @@ class UpDroidEditor extends TabController {
       });
     });
 
-    _newButton.onClick.listen((e) {
+    _blankButton.onClick.listen((e) {
       _aceEditor.setOptions({'readOnly' : false});
       _openFilePath = null;
       if (_noUnsavedChanges()) {

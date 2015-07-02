@@ -55,6 +55,9 @@ class CmdrExplorer {
     mailbox.registerWebSocketEvent('CREATE_PACKAGE', _createPackage);
     mailbox.registerWebSocketEvent('REQUEST_NODE_LIST', _launcherList);
     mailbox.registerWebSocketEvent('RUN_NODE', _runLauncher);
+    mailbox.registerWebSocketEvent('REQUEST_EDITOR_LIST', _requestEditorList);
+
+    mailbox.registerServerMessageHandler('SEND_EDITOR_LIST', _sendEditorList);
   }
 
   void _sendWorkspaceSync(UpDroidMessage um) {
@@ -151,7 +154,17 @@ class CmdrExplorer {
   }
 
   void _openFile(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', -1, um));
+    int destinationId = -1;
+    UpDroidMessage newMessage = um;
+
+    // Need to tell a specific UpDroidEditor to open the path.
+    if (!um.body.startsWith('/')) {
+      List<String> split = um.body.split(':');
+      destinationId = int.parse(split[0]);
+      newMessage = new UpDroidMessage(um.header, split[1]);
+    }
+
+    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', destinationId, newMessage));
   }
 
   void _workspaceClean(UpDroidMessage um) {
@@ -220,6 +233,12 @@ class CmdrExplorer {
 
     _currentWorkspace.runNode(packageName, nodeName, nodeArgs);
   }
+
+  void _requestEditorList(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', 0, um));
+  }
+
+  void _sendEditorList(UpDroidMessage um) => mailbox.ws.add(um.toString());
 
   /// Convenience method for adding a formatted filesystem update to the socket
   /// stream.

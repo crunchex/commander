@@ -57,6 +57,7 @@ class WorkspaceController implements ExplorerController {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'ADD_UPDATE', _addUpdate);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REMOVE_UPDATE', _removeUpdate);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'BUILD_COMPLETE', _buildComplete);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SEND_EDITOR_LIST', _addEditorsToContextMenu);
   }
 
   void registerEventHandlers() {
@@ -224,6 +225,16 @@ class WorkspaceController implements ExplorerController {
     entityPaths.forEach((String entityPath) {
       FolderEntity package = entities[entityPath];
       package.toggleBuildingIndicator();
+    });
+  }
+
+  void _addEditorsToContextMenu(UpDroidMessage um) {
+    List<String> split = um.body.split(':');
+    String path = split[0];
+    List<String> editorList = JSON.decode(split[1]);
+    editorList.sort();
+    editorList.forEach((String editorName) {
+      ContextMenu.addItem({'type': 'toggle', 'title': 'Open in Editor-$editorName', 'handler': () => _mailbox.ws.send('[[OPEN_FILE]]$editorName:$path')});
     });
   }
 

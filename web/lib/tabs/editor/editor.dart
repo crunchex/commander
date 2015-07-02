@@ -87,7 +87,7 @@ class UpDroidEditor extends TabController {
     _fontSizeInput.placeholder = _fontSize.toString();
 
     _setUpEditor();
-    cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
+//    cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
   }
 
   void setUpUI() {
@@ -553,6 +553,7 @@ class UpDroidEditor extends TabController {
 
   /// Sets the Editor's text with [newText], updates [_openFilePath], and resets the save point.
   _setEditorText(String newPath, String newText) {
+    view.extra.text = newPath.split('/').last;
     _openFilePath = newPath;
     _aceEditor.setValue(newText, 1);
     _resetSavePoint();

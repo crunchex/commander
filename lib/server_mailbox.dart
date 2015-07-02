@@ -196,4 +196,6 @@ class UpDroidMessage {
   }
 
   String createBody() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
+
+  String toString() => s;
 }

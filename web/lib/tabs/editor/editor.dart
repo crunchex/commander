@@ -76,6 +76,7 @@ class UpDroidEditor extends TabController {
   String _openFilePath;
   String _originalContents;
   String _currentParPath;
+  bool _exec;
 
   UpDroidEditor(int id, int col, StreamController<CommanderMessage> cs) :
   super(id, col, className, 'Editor', getMenuConfig(), cs, true) {
@@ -159,7 +160,6 @@ class UpDroidEditor extends TabController {
     linkedDropzone = m.body[1];
   }
 
-  void _openDirPathHandler(UpDroidMessage um) => mailbox.ws.send('[[EDITOR_DIRECTORY_PATH]]');
   void _pathListHandler(UpDroidMessage um) => _pullPaths(um.body);
   void _editorDirPathHandler(UpDroidMessage um) { _absolutePathPrefix = um.body; }
 
@@ -169,6 +169,10 @@ class UpDroidEditor extends TabController {
     var newPath = returnedData[0];
     var newText = returnedData[1];
     _handleNewText(newPath, newText);
+  }
+
+  void _noCurrentWorkspaceAlert(UpDroidMessage um) {
+    window.alert("No workspace set. Please open one from Explorer.");
   }
 
   void _editorRenameHandler(CommanderMessage m) {
@@ -193,10 +197,10 @@ class UpDroidEditor extends TabController {
     mailbox.registerCommanderEvent('RESEND_DROP', _resendDrop);
     mailbox.registerCommanderEvent('FILE_UPDATE', _editorRenameHandler);
 
-    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'OPEN_DIRECTORY_PATH', _openDirPathHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_DIRECTORY_PATH', _editorDirPathHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_FILE_TEXT', _editorFileTextHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'NO_CURRENT_WORKSPACE', _noCurrentWorkspaceAlert);
   }
 
   /// Sets up event handlers for the editor's menu buttons.
@@ -261,102 +265,9 @@ class UpDroidEditor extends TabController {
 
     /// Save as click handler
     _saveAsButton.onClick.listen((e) {
-      bool exec = false;
+      _exec = false;
       cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
       mailbox.ws.send("[[EDITOR_REQUEST_LIST]]");
-      if (_curModal != null) _curModal.hide();
-
-      String saveAsPath = '';
-      _curModal = new UpDroidSavedModal();
-
-      //TODO: remove query selectors
-      var input = querySelector('#save-as-input');
-      var makeExec = querySelector('#make-exec');
-      _saveCommit = querySelector('#save-as-commit');
-      _overwriteCommit = querySelector('#warning button');
-      _warning = querySelector('#warning');
-
-      void completeSave() {
-        if (exec == true) mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, true]));
-        else {
-          mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, false]));
-        }
-          view.extra.text = input.value;
-          _curModal.hide();
-          input.value = '';
-          _resetSavePoint();
-          _saveAsClickEnd.cancel();
-          _saveAsEnterEnd.cancel();
-          _openFilePath = saveAsPath;
-      }
-
-      // Check to make sure that the supplied input doesn't conflict with existing files
-      // on system.  Also determines what action to take depending on whether the file exists or not.
-
-      void _checkSave() {
-
-        // User enters no input
-        if (input.value == '') {
-          window.alert("Please enter a valid filename");
-        }
-
-        // Determining the save path
-        if (_openFilePath == null) {
-          if(_currentParPath == null) {
-            var activeFolderName = _checkActiveExplorer();
-            saveAsPath = pathLib.normalize(pathLib.normalize(_absolutePathPrefix + '/' + activeFolderName +'/src') + "/${input.value}");
-          }
-          else{
-            saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
-          }
-        }
-        else {
-          if(_currentParPath == null) saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
-          else {
-            saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
-          }
-        }
-
-        // Filename already exists on system
-        if (_pathMap.containsKey(saveAsPath)) {
-          if (_pathMap[saveAsPath] == 'directory') {
-            window.alert("That filename already exists as a directory");
-            input.value = "";
-          }
-
-          else if (_pathMap[saveAsPath] == 'file') {
-            _warning.classes.remove('hidden');
-            _overwrite = _overwriteCommit.onClick.listen((e){
-              completeSave();
-              _warning.classes.add('hidden');
-              _overwrite.cancel();
-            });
-          }
-        }
-
-        // Filename clear, continue with save
-        else {
-          completeSave();
-        }
-      }
-
-      _saveAsClickEnd = _saveCommit.onClick.listen((e) {
-
-        if (makeExec.checked == true) {
-          exec = true;
-        }
-        _checkSave();
-      });
-
-      _saveAsEnterEnd = input.onKeyUp.listen((e) {
-        var keyEvent = new KeyEvent.wrap(e);
-        if (keyEvent.keyCode == KeyCode.ENTER) {
-          if (makeExec.checked == true) {
-            exec = true;
-          }
-          _checkSave();
-        }
-      });
     });
 
     _themeButton.onClick.listen((e) {
@@ -365,6 +276,102 @@ class UpDroidEditor extends TabController {
 
       // Stops the button from sending the page to the top (href=#).
       e.preventDefault();
+    });
+  }
+
+  void _saveFile() {
+    if (_curModal != null) _curModal.hide();
+
+    String saveAsPath = '';
+    _curModal = new UpDroidSavedModal();
+
+    //TODO: remove query selectors
+    var input = querySelector('#save-as-input');
+    var makeExec = querySelector('#make-exec');
+    _saveCommit = querySelector('#save-as-commit');
+    _overwriteCommit = querySelector('#warning button');
+    _warning = querySelector('#warning');
+
+    void completeSave() {
+      if (_exec == true) mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, true]));
+      else {
+        mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, false]));
+      }
+      view.extra.text = input.value;
+      _curModal.hide();
+      input.value = '';
+      _resetSavePoint();
+      _saveAsClickEnd.cancel();
+      _saveAsEnterEnd.cancel();
+      _openFilePath = saveAsPath;
+    }
+
+    // Check to make sure that the supplied input doesn't conflict with existing files
+    // on system.  Also determines what action to take depending on whether the file exists or not.
+
+    void _checkSave() {
+
+      // User enters no input
+      if (input.value == '') {
+        window.alert("Please enter a valid filename");
+      }
+
+      // Determining the save path
+      if (_openFilePath == null) {
+        if(_currentParPath == null) {
+          var activeFolderName = _checkActiveExplorer();
+          saveAsPath = pathLib.normalize(pathLib.normalize(_absolutePathPrefix + '/' + activeFolderName +'/src') + "/${input.value}");
+        }
+        else{
+          saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
+        }
+      }
+      else {
+        if(_currentParPath == null) saveAsPath = pathLib.dirname(_openFilePath)+  "/${input.value}";
+        else {
+          saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
+        }
+      }
+
+      // Filename already exists on system
+      if (_pathMap.containsKey(saveAsPath)) {
+        if (_pathMap[saveAsPath] == 'directory') {
+          window.alert("That filename already exists as a directory");
+          input.value = "";
+        }
+
+        else if (_pathMap[saveAsPath] == 'file') {
+          _warning.classes.remove('hidden');
+          _overwrite = _overwriteCommit.onClick.listen((e){
+            completeSave();
+            _warning.classes.add('hidden');
+            _overwrite.cancel();
+          });
+        }
+      }
+
+      // Filename clear, continue with save
+      else {
+        completeSave();
+      }
+    }
+
+    _saveAsClickEnd = _saveCommit.onClick.listen((e) {
+
+      if (makeExec.checked == true) {
+        _exec = true;
+      }
+      _checkSave();
+    });
+
+    _saveAsEnterEnd = input.onKeyUp.listen((e) {
+      var keyEvent = new KeyEvent.wrap(e);
+      if (keyEvent.keyCode == KeyCode.ENTER) {
+        if (makeExec.checked == true) {
+          _exec = true;
+        }
+        _checkSave();
+      }
     });
   }
 
@@ -465,6 +472,8 @@ class UpDroidEditor extends TabController {
         key: (item) => item.replaceAll(new RegExp(r"(Directory: | File: |Directory: |File:)"), '').trim(),
         value: (item) => item.contains("Directory:") ? "directory" : "file"
         );
+
+    _saveFile();
   }
 
   /// Compares the Editor's current text with text at the last save point.

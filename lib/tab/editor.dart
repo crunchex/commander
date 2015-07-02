@@ -23,6 +23,11 @@ class CmdrEditor {
   }
 
   void _sendPath(UpDroidMessage um) {
+    if (_currentWorkspace == null) {
+      mailbox.ws.add('[[NO_CURRENT_WORKSPACE]]');
+      return;
+    }
+
     mailbox.ws.add('[[EDITOR_DIRECTORY_PATH]]' + _currentWorkspace.path);
   }
 
@@ -34,6 +39,11 @@ class CmdrEditor {
   }
 
   void _sendEditorList(UpDroidMessage um) {
+    if (_currentWorkspace == null) {
+      mailbox.ws.add('[[NO_CURRENT_WORKSPACE]]');
+      return;
+    }
+
     help.getDirectory(new Directory(uproot.path)).then((files) {
       mailbox.ws.add('[[PATH_LIST]]' + files.toString());
     });

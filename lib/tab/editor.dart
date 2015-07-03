@@ -1,7 +1,6 @@
 library cmdr_editor;
 
 import 'dart:io';
-import 'dart:async';
 import 'dart:convert';
 
 import '../ros/ros.dart';

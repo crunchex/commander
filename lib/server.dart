@@ -2,14 +2,12 @@ library cmdr;
 
 import 'dart:io';
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 
-import 'ros/ros.dart';
 import 'tab/pty.dart';
 import 'tab/camera/camera.dart';
 import 'tab/teleop.dart';

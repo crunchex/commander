@@ -113,8 +113,7 @@ class UpDroidEditor extends TabController {
     ace.BindKey ctrlS = new ace.BindKey(win: "Ctrl-S", mac: "Command-S");
     ace.Command save = new ace.Command('save', ctrlS, sendSave);
 
-    _aceEditor = ace.edit(view.content);
-    _aceEditor
+    _aceEditor = ace.edit(view.content)
       ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
       ..fontSize = _fontSize
       ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
@@ -129,6 +128,74 @@ class UpDroidEditor extends TabController {
     // TODO: should this listener be cancelled at some point? If not, remove var.
     _fileChangesListener = _aceEditor.onChange.listen((e) {
       if (_openFilePath != null && _noUnsavedChanges() == false) view.extra.text = pathLib.basename(_openFilePath) + '*';
+    });
+  }
+
+  void registerMailbox() {
+    mailbox.registerCommanderEvent('CLASS_ADD', _classAddHandler);
+    mailbox.registerCommanderEvent('CLASS_REMOVE', _classRemoveHandler);
+    mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
+    mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
+    mailbox.registerCommanderEvent('PASS_EDITOR_INFO', _passEditorHandler);
+    mailbox.registerCommanderEvent('RESEND_DROP', _resendDrop);
+    mailbox.registerCommanderEvent('FILE_UPDATE', _editorRenameHandler);
+
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_DIRECTORY_PATH', _editorDirPathHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_FILE_TEXT', _editorFileTextHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'NO_CURRENT_WORKSPACE', _noCurrentWorkspaceAlert);
+  }
+
+  /// Sets up event handlers for the editor's menu buttons.
+  void registerEventHandlers() {
+    _fontSizeInput.onClick.listen((e) {
+      // Keeps bootjack dropdown from closing
+      e.stopPropagation();
+
+      _fontInputListener = _fontSizeInput.onKeyUp.listen((e) {
+        if (e.keyCode != KeyCode.ENTER) return;
+
+        var fontVal;
+        try {
+          fontVal = int.parse(_fontSizeInput.value);
+          assert(fontVal is int);
+          if(fontVal >= 1 && fontVal <= 60){
+            _aceEditor.fontSize = fontVal;
+            _fontSizeInput.placeholder = fontVal.toString();
+          }
+        }
+        finally {
+          _fontSizeInput.value = "";
+          _content.click();
+          _aceEditor.focus();
+          _fontInputListener.cancel();
+        }
+      });
+    });
+
+    _blankButton.onClick.listen((e) => _handleNewFileButton(e, ''));
+    _talkerButton.onClick.listen((e) => _handleNewFileButton(e, RosTemplates.talkerTemplate));
+    _listenerButton.onClick.listen((e) => _handleNewFileButton(e, RosTemplates.listenerTemplate));
+    _launchButton.onClick.listen((e) => _handleNewFileButton(e, RosTemplates.launchTemplate));
+    _pubButton.onClick.listen((e) => _handleNewFileButton(e, RosTemplates.pubTemplate));
+    _subButton.onClick.listen((e) => _handleNewFileButton(e, RosTemplates.subTemplate));
+
+    _saveButton.onClick.listen((e) => _saveText());
+
+    /// Save as click handler
+    _saveAsButton.onClick.listen((e) {
+      _exec = false;
+      cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
+      mailbox.ws.send("[[EDITOR_REQUEST_LIST]]");
+    });
+
+    _themeButton.onClick.listen((e) {
+      bool dark = _aceEditor.theme.name == 'solarized_dark';
+      String newTheme = dark ? ace.Theme.SOLARIZED_LIGHT : ace.Theme.SOLARIZED_DARK;
+      _aceEditor.theme = new ace.Theme.named(newTheme);
+
+      // Stops the button from sending the page to the top (href=#).
+      e.preventDefault();
     });
   }
 
@@ -188,97 +255,6 @@ class UpDroidEditor extends TabController {
     cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [id, view.content]));
   }
 
-  void registerMailbox() {
-    mailbox.registerCommanderEvent('CLASS_ADD', _classAddHandler);
-    mailbox.registerCommanderEvent('CLASS_REMOVE', _classRemoveHandler);
-    mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
-    mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
-    mailbox.registerCommanderEvent('PASS_EDITOR_INFO', _passEditorHandler);
-    mailbox.registerCommanderEvent('RESEND_DROP', _resendDrop);
-    mailbox.registerCommanderEvent('FILE_UPDATE', _editorRenameHandler);
-
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_DIRECTORY_PATH', _editorDirPathHandler);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_FILE_TEXT', _editorFileTextHandler);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'NO_CURRENT_WORKSPACE', _noCurrentWorkspaceAlert);
-  }
-
-  /// Sets up event handlers for the editor's menu buttons.
-  void registerEventHandlers() {
-    _fontSizeInput.onClick.listen((e) {
-      // Keeps bootjack dropdown from closing
-      e.stopPropagation();
-
-      _fontInputListener = _fontSizeInput.onKeyUp.listen((e) {
-        var keyEvent = new KeyEvent.wrap(e);
-        if (keyEvent.keyCode == KeyCode.ENTER) {
-          var fontVal;
-          try {
-            fontVal = int.parse(_fontSizeInput.value);
-            assert(fontVal is int);
-            if(fontVal >= 1 && fontVal <= 60){
-              _aceEditor.fontSize = fontVal;
-              _fontSizeInput.placeholder = fontVal.toString();
-            }
-          }
-          finally {
-            _fontSizeInput.value = "";
-            _content.click();
-            _aceEditor.focus();
-            _fontInputListener.cancel();
-          }
-        }
-      });
-    });
-
-    _blankButton.onClick.listen((e) {
-      e.preventDefault();
-      _loadNewText('');
-    });
-
-    _talkerButton.onClick.listen((e) {
-      e.preventDefault();
-      _loadNewText(RosTemplates.talkerTemplate);
-    });
-
-    _listenerButton.onClick.listen((e) {
-      e.preventDefault();
-      _loadNewText(RosTemplates.listenerTemplate);
-    });
-
-    _launchButton.onClick.listen((e) {
-      e.preventDefault();
-      _loadNewText(RosTemplates.launchTemplate);
-    });
-
-    _pubButton.onClick.listen((e) {
-      e.preventDefault();
-      _loadNewText(RosTemplates.pubTemplate);
-    });
-
-    _subButton.onClick.listen((e) {
-      e.preventDefault();
-      _loadNewText(RosTemplates.subTemplate);
-    });
-
-    _saveButton.onClick.listen((e) => _saveText());
-
-    /// Save as click handler
-    _saveAsButton.onClick.listen((e) {
-      _exec = false;
-      cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
-      mailbox.ws.send("[[EDITOR_REQUEST_LIST]]");
-    });
-
-    _themeButton.onClick.listen((e) {
-      String newTheme = (_aceEditor.theme.name == 'solarized_dark') ? ace.Theme.SOLARIZED_LIGHT : ace.Theme.SOLARIZED_DARK;
-      _aceEditor.theme = new ace.Theme.named(newTheme);
-
-      // Stops the button from sending the page to the top (href=#).
-      e.preventDefault();
-    });
-  }
-
   void _saveFile() {
     if (_curModal != null) _curModal.hide();
 
@@ -298,29 +274,21 @@ class UpDroidEditor extends TabController {
 
 
     _saveAsClickEnd = _saveCommit.onClick.listen((e) {
-
-      if (makeExec.checked == true) {
-        _exec = true;
-      }
+      if (makeExec.checked == true) _exec = true;
       _checkSave(input, saveAsPath);
     });
 
     _saveAsEnterEnd = input.onKeyUp.listen((e) {
-      var keyEvent = new KeyEvent.wrap(e);
-      if (keyEvent.keyCode == KeyCode.ENTER) {
-        if (makeExec.checked == true) {
-          _exec = true;
-        }
-        _checkSave(input, saveAsPath);
-      }
+      if (e.keyCode != KeyCode.ENTER) return;
+
+      if (makeExec.checked == true) _exec = true;
+      _checkSave(input, saveAsPath);
     });
   }
 
-  void completeSave(InputElement input, String saveAsPath) {
-    if (_exec == true) mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, true]));
-    else {
-      mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, false]));
-    }
+  void _completeSave(InputElement input, String saveAsPath) {
+    mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, _exec]));
+
     view.extra.text = input.value;
     _curModal.hide();
     input.value = '';
@@ -331,19 +299,15 @@ class UpDroidEditor extends TabController {
   }
 
   void _checkSave(InputElement input, String saveAsPath) {
-
     // User enters no input
-    if (input.value == '') {
-      window.alert("Please enter a valid filename");
-    }
+    if (input.value == '') window.alert("Please enter a valid filename");
 
     // Determining the save path
     if (_openFilePath == null) {
       if(_currentParPath == null) {
         var activeFolderName = _checkActiveExplorer();
         saveAsPath = pathLib.normalize(pathLib.normalize(_absolutePathPrefix + '/' + activeFolderName +'/src') + "/${input.value}");
-      }
-      else{
+      } else{
         saveAsPath = pathLib.normalize(_currentParPath + "/${input.value}");
       }
     }
@@ -359,12 +323,10 @@ class UpDroidEditor extends TabController {
       if (_pathMap[saveAsPath] == 'directory') {
         window.alert("That filename already exists as a directory");
         input.value = "";
-      }
-
-      else if (_pathMap[saveAsPath] == 'file') {
+      } else if (_pathMap[saveAsPath] == 'file') {
         _warning.classes.remove('hidden');
         _overwrite = _overwriteCommit.onClick.listen((e){
-          completeSave(input, saveAsPath);
+          _completeSave(input, saveAsPath);
           _warning.classes.add('hidden');
           _overwrite.cancel();
         });
@@ -373,11 +335,13 @@ class UpDroidEditor extends TabController {
 
     // Filename clear, continue with save
     else {
-      completeSave(input, saveAsPath);
+      _completeSave(input, saveAsPath);
     }
   }
 
-  void _loadNewText(String text) {
+  void _handleNewFileButton(Event e, String text) {
+    e.preventDefault();
+
     _aceEditor.setOptions({'readOnly' : false});
     _openFilePath = null;
 
@@ -412,21 +376,22 @@ class UpDroidEditor extends TabController {
   _handleNewText(String newPath, String newText) {
     if (_noUnsavedChanges()) {
       _setEditorText(newPath, newText);
-    } else {
-      new UpDroidUnsavedModal();
-      _modalSaveButton = querySelector('.modal-save');
-      _modalDiscardButton = querySelector('.modal-discard');
-
-      _unsavedSave = _modalSaveButton.onClick.listen((e) {
-        _saveText();
-        _setEditorText(newPath, newText);
-        _unsavedSave.cancel();
-      });
-      _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
-        _setEditorText(newPath, newText);
-        _unsavedDiscard.cancel();
-      });
+      return;
     }
+
+    new UpDroidUnsavedModal();
+    _modalSaveButton = querySelector('.modal-save');
+    _modalDiscardButton = querySelector('.modal-discard');
+
+    _unsavedSave = _modalSaveButton.onClick.listen((e) {
+      _saveText();
+      _setEditorText(newPath, newText);
+      _unsavedSave.cancel();
+    });
+    _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
+      _setEditorText(newPath, newText);
+      _unsavedDiscard.cancel();
+    });
   }
 
   /// Sets the Editor's text with [newText], updates [_openFilePath], and resets the save point.
@@ -445,7 +410,7 @@ class UpDroidEditor extends TabController {
   String _checkActiveExplorer() {
     String activeName;
     for (var explorer in _explorersDiv.children) {
-      if(explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
+      if (explorer.id != 'recycle' && !explorer.classes.contains('control-buttons')) {
         if (!explorer.classes.contains('hidden')) {
           activeName = explorer.dataset['name'];
         }
@@ -458,8 +423,10 @@ class UpDroidEditor extends TabController {
   void _saveText() {
     if (_openFilePath == null) {
       _saveAsButton.click();
+      return;
     }
-    else if (pathLib.basename(_openFilePath) != 'CMakeLists.txt') {
+
+    if (pathLib.basename(_openFilePath) != 'CMakeLists.txt') {
       mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, _openFilePath, false]));
       _resetSavePoint();
       view.extra.text = pathLib.basename(_openFilePath);
@@ -467,9 +434,8 @@ class UpDroidEditor extends TabController {
   }
 
   void _pullPaths(String raw) {
-    var pathList;
     raw = raw.replaceAll(new RegExp(r"(\[|\]|')"), '');
-    pathList = raw.split(',');
+    List<String> pathList = raw.split(',');
     _pathMap = new Map.fromIterable(pathList,
     key: (item) => item.replaceAll(new RegExp(r"(Directory: | File: |Directory: |File:)"), '').trim(),
     value: (item) => item.contains("Directory:") ? "directory" : "file"
@@ -484,5 +450,7 @@ class UpDroidEditor extends TabController {
   /// Resets the save point based on the Editor's current text.
   String _resetSavePoint() => _originalContents = _aceEditor.value;
 
-  void cleanUp() {}
+  void cleanUp() {
+
+  }
 }

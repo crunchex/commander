@@ -4,7 +4,6 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:dnd/dnd.dart';
 import 'package:path/path.dart' as pathLib;
 
 import '../../../modal/modal.dart';

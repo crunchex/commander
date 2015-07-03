@@ -40,7 +40,7 @@ class CameraServer {
 
   void _runFFMpeg() {
     // Only one camera per USB controller (check lsusb -> bus00x), or bump size down to 320x240 to avoid bus saturation.
-    // ffmpeg -s 640x480 -f video4linux2 -input_format mjpeg -i /dev/video${cameraNum - 1} -f mpeg1video -b 800k -r 20 http://127.0.0.1:12060/video/$cameraNum/640/480
+    // ffmpeg -s 320x240 -f video4linux2 -input_format mjpeg -i /dev/video0 -f mpeg1video -b 800k -r 20 udp://127.0.0.1:13020
     List<String> options = ['-s', '320x240', '-f', 'video4linux2', '-input_format', 'mjpeg', '-i', '/dev/video${videoId}', '-f', 'mpeg1video', '-b', '800k', '-r', '20', 'udp://127.0.0.1:1302${videoId}'];
     Process.start('ffmpeg', options).then((shell) {
       _shell = shell;

@@ -221,11 +221,7 @@ class UpDroidClient {
     if (_columns[col].length > 0) _columns[col].last.makeActive();
   }
 
-  void _openTabFromButton(CommanderMessage m) {
-    List idList = m.body.split('_');
-    int column = int.parse(idList[0]);
-    String className = idList[1];
-
+  void _openTabFromButton(int column, String className) {
     int id = _getAvailableId(className);
     _openTab(column, id, className);
   }
@@ -234,7 +230,6 @@ class UpDroidClient {
 
   void _registerMailbox() {
     _mailbox.registerCommanderEvent('CLOSE_TAB', _closeTab);
-    _mailbox.registerCommanderEvent('OPEN_TAB', _openTabFromButton);
     _mailbox.registerCommanderEvent('SERVER_DISCONNECT', _alertDisconnect);
 
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
@@ -249,14 +244,14 @@ class UpDroidClient {
       e.preventDefault();
       if (_columns[1].length >= 4) return;
 
-      new UpDroidOpenTabModal(1, _cs);
+      new UpDroidOpenTabModal(1, _openTabFromButton);
     });
 
     _newButtonRight.onClick.listen((e) {
       e.preventDefault();
       if (_columns[2].length >= 4) return;
 
-      new UpDroidOpenTabModal(2, _cs);
+      new UpDroidOpenTabModal(2, _openTabFromButton);
     });
   }
 }

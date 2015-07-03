@@ -20,7 +20,6 @@ class CmdrExplorer {
   Workspace _currentWorkspace;
   DirectoryWatcher _currentWatcher, _uprootWatcher;
   StreamSubscription _currentWatcherStream, _uprootWatcherStream;
-  WebSocket _ws;
 
   //TODO: make asynchroneous
   CmdrExplorer(this.id, this.uproot) {
@@ -33,7 +32,7 @@ class CmdrExplorer {
     // TODO: handle changes to uproot made on the server side.
 //    _uprootWatcher = new DirectoryWatcher(uproot.path);
 //    _uprootWatcherStream = _uprootWatcher.events.listen((WatchEvent w) {
-//      _ws.add('[[WORKSPACE_NAME]]' + w.path.replaceFirst('${uproot.path}/', '').split('/').first);
+//      mailbox.ws.add('[[WORKSPACE_NAME]]' + w.path.replaceFirst('${uproot.path}/', '').split('/').first);
 //    });
   }
 
@@ -257,6 +256,9 @@ class CmdrExplorer {
   }
 
   void _setCurrentWorkspace(String newWorkspaceName) {
+    UpDroidMessage um = new UpDroidMessage('SET_CURRENT_WORKSPACE', newWorkspaceName);
+    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', 0, um));
+
     if (_currentWatcherStream != null) _currentWatcherStream.cancel();
 
     _currentWorkspace = new Workspace('${uproot.path}/$newWorkspaceName');

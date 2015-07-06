@@ -52,7 +52,7 @@ class CmdrEditor {
   }
 
   void _registerMailbox() {
-    mailbox.registerWebSocketEvent('EDITOR_SAVE', _saveFile);
+    mailbox.registerWebSocketEvent('SAVE_FILE', _saveFile);
 
     mailbox.registerServerMessageHandler('OPEN_FILE', _openFile);
     mailbox.registerServerMessageHandler('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);

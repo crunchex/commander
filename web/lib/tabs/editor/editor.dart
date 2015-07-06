@@ -159,7 +159,7 @@ class UpDroidEditor extends TabController {
 
     if (pathLib.basename(_openFilePath) == 'CMakeLists.txt') return;
 
-    mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, _openFilePath, false]));
+    mailbox.ws.send('[[SAVE_FILE]]' + JSON.encode([_aceEditor.value, _openFilePath, false]));
     _resetSavePoint();
     view.extra.text = pathLib.basename(_openFilePath);
   }
@@ -234,7 +234,7 @@ class UpDroidEditor extends TabController {
   }
 
   void _completeSave(InputElement input, String saveAsPath) {
-    mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, saveAsPath, _exec]));
+    mailbox.ws.send('[[SAVE_FILE]]' + JSON.encode([_aceEditor.value, saveAsPath, _exec]));
 
     view.extra.text = input.value;
     _curModal.hide();

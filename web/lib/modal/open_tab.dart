@@ -20,10 +20,10 @@ class UpDroidOpenTabModal extends UpDroidModal {
       ..id = "selector-wrapper";
     _modalBody.children.add(selectorWrap);
 
-    ButtonElement sEditor = _createButton('default', 'Editor', method: _openTab(_side, 'UpDroidEditor'));
-    ButtonElement sConsole = _createButton('default', 'Console', method: _openTab(_side, 'UpDroidConsole'));
-    ButtonElement sCamera = _createButton('default', 'Camera', method: _openTab(_side, 'UpDroidCamera'));
-    ButtonElement sTeleop = _createButton('default', 'Teleop', method: _openTab(_side, 'UpDroidTeleop'));
+    ButtonElement sEditor = _createButton('default', 'Editor')..onClick.listen((_) => _openTab(_side, 'UpDroidEditor'));
+    ButtonElement sConsole = _createButton('default', 'Console')..onClick.listen((_) => _openTab(_side, 'UpDroidConsole'));
+    ButtonElement sCamera = _createButton('default', 'Camera')..onClick.listen((_) => _openTab(_side, 'UpDroidCamera'));
+    ButtonElement sTeleop = _createButton('default', 'Teleop')..onClick.listen((_) => _openTab(_side, 'UpDroidTeleop'));
     selectorWrap.children.addAll([sEditor, sConsole, sCamera, sTeleop]);
   }
 

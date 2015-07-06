@@ -113,10 +113,7 @@ class UpDroidEditor extends TabController {
   }
 
   void registerMailbox() {
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_DIRECTORY_PATH', _editorDirPathHandler);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_FILE_TEXT', _editorFileTextHandler);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'NO_CURRENT_WORKSPACE', _noCurrentWorkspaceAlert);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'OPEN_FILE', _openFileHandler);
   }
 
   void registerEventHandlers() {
@@ -143,19 +140,12 @@ class UpDroidEditor extends TabController {
 
   // Mailbox Handlers
 
-  void _pathListHandler(UpDroidMessage um) => _pullPaths(um.body);
-  void _editorDirPathHandler(UpDroidMessage um) { _absolutePathPrefix = um.body; }
-
-  // Editor receives the open file contents from the server.
-  void _editorFileTextHandler(UpDroidMessage um) {
+  /// Editor receives the open file contents from the server.
+  void _openFileHandler(UpDroidMessage um) {
     var returnedData = um.body.split('[[CONTENTS]]');
     var newPath = returnedData[0];
     var newText = returnedData[1];
     _handleNewText(newPath, newText);
-  }
-
-  void _noCurrentWorkspaceAlert(UpDroidMessage um) {
-    window.alert("No workspace set. Please open one from Explorer.");
   }
 
   // Event Handlers
@@ -373,17 +363,6 @@ class UpDroidEditor extends TabController {
       }
     }
     return activeName;
-  }
-
-  void _pullPaths(String raw) {
-    raw = raw.replaceAll(new RegExp(r"(\[|\]|')"), '');
-    List<String> pathList = raw.split(',');
-    _pathMap = new Map.fromIterable(pathList,
-    key: (item) => item.replaceAll(new RegExp(r"(Directory: | File: |Directory: |File:)"), '').trim(),
-    value: (item) => item.contains("Directory:") ? "directory" : "file"
-    );
-
-    _saveFile();
   }
 
   /// Compares the Editor's current text with text at the last save point.

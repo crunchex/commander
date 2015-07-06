@@ -127,13 +127,6 @@ class UpDroidEditor extends TabController {
   }
 
   void registerMailbox() {
-    mailbox.registerCommanderEvent('CLASS_ADD', _classAddHandler);
-    mailbox.registerCommanderEvent('CLASS_REMOVE', _classRemoveHandler);
-    mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
-    mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
-    mailbox.registerCommanderEvent('RESEND_DROP', _resendDrop);
-    mailbox.registerCommanderEvent('FILE_UPDATE', _editorRenameHandler);
-
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PATH_LIST', _pathListHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_DIRECTORY_PATH', _editorDirPathHandler);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EDITOR_FILE_TEXT', _editorFileTextHandler);
@@ -199,25 +192,6 @@ class UpDroidEditor extends TabController {
     _saveButton.click();
   }
 
-  //\/\/ Mailbox Handlers /\/\//
-
-  bool _classAddHandler(CommanderMessage m) => view.content.classes.add(m.body);
-  bool _classRemoveHandler(CommanderMessage m) => view.content.classes.remove(m.body);
-  void _currentPathHandler(CommanderMessage m) => _currentParPath = m.body;
-
-  void _openFileHandler(CommanderMessage m) {
-    if (id != m.body[0]) return;
-    mailbox.ws.send('[[EDITOR_OPEN]]' + m.body[1]);
-    if (pathLib.basename(m.body[1]) == 'CMakeLists.txt'){
-      view.extra.text = pathLib.basename(m.body[1]) + ' (Read Only)';
-      _aceEditor.setOptions({'readOnly': true});
-    }
-    else {
-      view.extra.text = pathLib.basename(m.body[1]);
-      _aceEditor.setOptions({'readOnly': false});
-    }
-  }
-
   void _pathListHandler(UpDroidMessage um) => _pullPaths(um.body);
   void _editorDirPathHandler(UpDroidMessage um) { _absolutePathPrefix = um.body; }
 
@@ -231,19 +205,6 @@ class UpDroidEditor extends TabController {
 
   void _noCurrentWorkspaceAlert(UpDroidMessage um) {
     window.alert("No workspace set. Please open one from Explorer.");
-  }
-
-  void _editorRenameHandler(CommanderMessage m) {
-    if (_openFilePath != null) {
-      if (_openFilePath == m.body[0]) {
-        _openFilePath = m.body[1];
-        view.extra.text = pathLib.basename(m.body[1]);
-      }
-    }
-  }
-
-  void _resendDrop(CommanderMessage m) {
-    cs.add(new CommanderMessage('EXPLORER', 'EDITOR_READY', body: [id, view.content]));
   }
 
   void _saveFile() {

@@ -344,7 +344,7 @@ class UpDroidEditor extends TabController {
 
   /// Sets the Editor's text with [newText], updates [_openFilePath], and resets the save point.
   void _setEditorText(String newPath, String newText) {
-    view.extra.text = newPath.split('/').last;
+    view.extra.text = pathLib.basename(newPath);
     _openFilePath = newPath;
     _aceEditor.setValue(newText, 1);
     _resetSavePoint();

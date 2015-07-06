@@ -120,9 +120,10 @@ class UpDroidEditor extends TabController {
     _resetSavePoint();
 
     // Create listener to indicate that there are unsaved changes when file is altered
-    // TODO: should this listener be cancelled at some point? If not, remove var.
     _fileChangesListener = _aceEditor.onChange.listen((e) {
-      if (_openFilePath != null && _noUnsavedChanges() == false) view.extra.text = pathLib.basename(_openFilePath) + '*';
+      if (_openFilePath != null && _noUnsavedChanges() == false) {
+        view.extra.text = pathLib.basename(_openFilePath) + '*';
+      }
     });
   }
 
@@ -425,6 +426,6 @@ class UpDroidEditor extends TabController {
   }
 
   void cleanUp() {
-
+    _fileChangesListener.cancel();
   }
 }

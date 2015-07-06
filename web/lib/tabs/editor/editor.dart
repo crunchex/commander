@@ -450,6 +450,32 @@ class UpDroidEditor extends TabController {
   /// Resets the save point based on the Editor's current text.
   String _resetSavePoint() => _originalContents = _aceEditor.value;
 
+  Future<bool> preClose() async {
+    Completer c = new Completer();
+
+    if (_noUnsavedChanges()) {
+      c.complete(true);
+    } else {
+      new UpDroidUnsavedModal();
+
+      _modalSaveButton = querySelector('.modal-save');
+      _modalDiscardButton = querySelector('.modal-discard');
+
+      _unsavedSave = _modalSaveButton.onClick.listen((e) {
+        _saveText();
+        _unsavedSave.cancel();
+        c.complete(true);
+      });
+
+      _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
+        _unsavedDiscard.cancel();
+        c.complete(true);
+      });
+    }
+
+    return c.future;
+  }
+
   void cleanUp() {
 
   }

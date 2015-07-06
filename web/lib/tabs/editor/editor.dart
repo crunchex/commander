@@ -148,31 +148,6 @@ class UpDroidEditor extends TabController {
 
   /// Sets up event handlers for the editor's menu buttons.
   void registerEventHandlers() {
-    _fontSizeInput.onClick.listen((e) {
-      // Keeps bootjack dropdown from closing
-      e.stopPropagation();
-
-      _fontInputListener = _fontSizeInput.onKeyUp.listen((e) {
-        if (e.keyCode != KeyCode.ENTER) return;
-
-        var fontVal;
-        try {
-          fontVal = int.parse(_fontSizeInput.value);
-          assert(fontVal is int);
-          if(fontVal >= 1 && fontVal <= 60){
-            _aceEditor.fontSize = fontVal;
-            _fontSizeInput.placeholder = fontVal.toString();
-          }
-        }
-        finally {
-          _fontSizeInput.value = "";
-          _content.click();
-          _aceEditor.focus();
-          _fontInputListener.cancel();
-        }
-      });
-    });
-
     _blankButton.onClick.listen((e) => _handleNewFileButton(e, ''));
     _talkerButton.onClick.listen((e) => _handleNewFileButton(e, RosTemplates.talkerTemplate));
     _listenerButton.onClick.listen((e) => _handleNewFileButton(e, RosTemplates.listenerTemplate));
@@ -189,13 +164,41 @@ class UpDroidEditor extends TabController {
       mailbox.ws.send("[[EDITOR_REQUEST_LIST]]");
     });
 
-    _themeButton.onClick.listen((e) {
-      bool dark = _aceEditor.theme.name == 'solarized_dark';
-      String newTheme = dark ? ace.Theme.SOLARIZED_LIGHT : ace.Theme.SOLARIZED_DARK;
-      _aceEditor.theme = new ace.Theme.named(newTheme);
+    _themeButton.onClick.listen((e) => _updateTheme(e));
+    _fontSizeInput.onClick.listen((e) => _updateFontSize(e));
+  }
 
-      // Stops the button from sending the page to the top (href=#).
-      e.preventDefault();
+  void _updateTheme(Event e) {
+    // Stops the button from sending the page to the top (href=#).
+    e.preventDefault();
+
+    bool dark = _aceEditor.theme.name == 'solarized_dark';
+    String newTheme = dark ? ace.Theme.SOLARIZED_LIGHT : ace.Theme.SOLARIZED_DARK;
+    _aceEditor.theme = new ace.Theme.named(newTheme);
+  }
+
+  void _updateFontSize(Event e) {
+    // Keeps bootjack dropdown from closing
+    e.stopPropagation();
+
+    _fontInputListener = _fontSizeInput.onKeyUp.listen((e) {
+      if (e.keyCode != KeyCode.ENTER) return;
+
+      var fontVal;
+      try {
+        fontVal = int.parse(_fontSizeInput.value);
+        assert(fontVal is int);
+        if(fontVal >= 1 && fontVal <= 60){
+          _aceEditor.fontSize = fontVal;
+          _fontSizeInput.placeholder = fontVal.toString();
+        }
+      }
+      finally {
+        _fontSizeInput.value = "";
+        _content.click();
+        _aceEditor.focus();
+        _fontInputListener.cancel();
+      }
     });
   }
 

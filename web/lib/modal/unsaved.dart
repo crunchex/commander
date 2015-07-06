@@ -1,6 +1,9 @@
 part of updroid_modal;
 
 class UpDroidUnsavedModal extends UpDroidModal {
+  ButtonElement discardButton;
+  ButtonElement saveButton;
+
   UpDroidUnsavedModal() {
     _setupHead('Save Changes?');
     _setupBody();
@@ -16,10 +19,10 @@ class UpDroidUnsavedModal extends UpDroidModal {
   }
 
   void _setupFooter() {
-    ButtonElement discard = _createButton('warning', 'Discard');
-    discard.classes.add('modal-discard');
-    ButtonElement save = _createButton('primary', 'Save');
-    save.classes.add('modal-save');
-    _modalFooter.children.addAll([save, discard]);
+    discardButton = _createButton('warning', 'Discard');
+    discardButton.classes.add('modal-discard');
+    saveButton = _createButton('primary', 'Save');
+    saveButton.classes.add('modal-save');
+    _modalFooter.children.addAll([saveButton, discardButton]);
   }
 }

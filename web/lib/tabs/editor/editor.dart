@@ -373,7 +373,7 @@ class UpDroidEditor extends TabController {
   }
 
   /// Handles changes to the Editor model, new files and opening files.
-  _handleNewText(String newPath, String newText) {
+  void _handleNewText(String newPath, String newText) {
     if (_noUnsavedChanges()) {
       _setEditorText(newPath, newText);
       return;
@@ -395,7 +395,7 @@ class UpDroidEditor extends TabController {
   }
 
   /// Sets the Editor's text with [newText], updates [_openFilePath], and resets the save point.
-  _setEditorText(String newPath, String newText) {
+  void _setEditorText(String newPath, String newText) {
     view.extra.text = newPath.split('/').last;
     _openFilePath = newPath;
     _aceEditor.setValue(newText, 1);

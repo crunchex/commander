@@ -67,6 +67,7 @@ cd $TOPDIR/
 
 echo -n "Building (minifying) gui........"
 WEB=$TOPDIR/web
+rm $WEB/css/main.css
 lessc $WEB/css/main.less > $WEB/css/main.css
 cat $WEB/css/glyphicons.css $WEB/css/cosmos-bootstrap.min.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
 pub build > /dev/null

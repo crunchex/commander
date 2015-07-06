@@ -46,12 +46,13 @@ abstract class TabController {
   void registerMailbox();
   void setUpController();
   void registerEventHandlers();
-  bool preClose();
+  Future<bool> preClose();
   void cleanUp();
 
-  void _closeTab() {
+  Future _closeTab() async {
     // Cancel closing if preClose returns false for some reason.
-    if (!preClose()) return;
+    bool canClose = await preClose();
+    if (!canClose) return;
 
     view.destroy();
     cleanUp();

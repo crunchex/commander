@@ -57,6 +57,7 @@ class WorkspaceController implements ExplorerController {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REMOVE_UPDATE', _removeUpdate);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'BUILD_COMPLETE', _buildComplete);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SEND_EDITOR_LIST', _addEditorsToContextMenu);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REQUEST_SELECTED', _returnSelected);
   }
 
   void registerEventHandlers() {
@@ -235,6 +236,15 @@ class WorkspaceController implements ExplorerController {
     editorList.forEach((String editorName) {
       ContextMenu.addItem({'type': 'toggle', 'title': 'Open in Editor-$editorName', 'handler': () => _mailbox.ws.send('[[OPEN_FILE]]$editorName:$path')});
     });
+  }
+
+  void _returnSelected(UpDroidMessage um) {
+    List pathsOfSelected = [];
+    entities.values.forEach((FileSystemEntity entity) {
+      if (entity.selected) pathsOfSelected.add(entity.path);
+    });
+
+    _mailbox.ws.send('[[RETURN_SELECTED]]' + '${um.body}:' + JSON.encode(pathsOfSelected));
   }
 
   void cleanUp() {

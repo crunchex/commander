@@ -55,8 +55,10 @@ class CmdrExplorer {
     mailbox.registerWebSocketEvent('REQUEST_NODE_LIST', _launcherList);
     mailbox.registerWebSocketEvent('RUN_NODE', _runLauncher);
     mailbox.registerWebSocketEvent('REQUEST_EDITOR_LIST', _requestEditorList);
+    mailbox.registerWebSocketEvent('RETURN_SELECTED', _returnSelected);
 
     mailbox.registerServerMessageHandler('SEND_EDITOR_LIST', _sendEditorList);
+    mailbox.registerServerMessageHandler('REQUEST_SELECTED', _getSelected);
   }
 
   void _sendWorkspaceSync(UpDroidMessage um) {
@@ -237,7 +239,17 @@ class CmdrExplorer {
     CmdrPostOffice.send(new ServerMessage('UpDroidClient', 0, um));
   }
 
+  void _returnSelected(UpDroidMessage um) {
+    List<String> split = um.body.split(':');
+    int editorId = int.parse(split[0]);
+    String selectedList = split[1];
+
+    UpDroidMessage newMessage = new UpDroidMessage(um.header, selectedList);
+    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', editorId, newMessage));
+  }
+
   void _sendEditorList(UpDroidMessage um) => mailbox.ws.add(um.toString());
+  void _getSelected(UpDroidMessage um) => mailbox.ws.add(um.toString());
 
   /// Convenience method for adding a formatted filesystem update to the socket
   /// stream.

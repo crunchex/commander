@@ -81,6 +81,7 @@ class UpDroidEditor extends TabController {
   }
 
   void setUpController() {
+    _explorersDiv = querySelector('#exp-container');
     _blankButton = view.refMap['blank-button'];
     _pubButton = view.refMap['publisher-button'];
     _subButton = view.refMap['subscriber-button'];
@@ -91,40 +92,24 @@ class UpDroidEditor extends TabController {
     _saveAsButton = view.refMap['save-as'];
     _themeButton = view.refMap['invert'];
     _fontSizeInput = view.refMap['font-size'];
-    _explorersDiv = querySelector('#exp-container');
-
-
     _fontSizeInput.placeholder = _fontSize.toString();
 
-    _setUpEditor();
-//    cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
-  }
-
-  /// Sets up the editor and styles.
-  void _setUpEditor() {
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
     ace.BindKey ctrlS = new ace.BindKey(win: "Ctrl-S", mac: "Command-S");
     ace.Command save = new ace.Command('save', ctrlS, (d) => _saveFile());
 
     DivElement aceDiv = new DivElement()
     // Necessary to allow our styling (in main.css) to override Ace's.
-    ..classes.add('updroid_editor');
+      ..classes.add('updroid_editor');
     view.content.children.add(aceDiv);
 
     _aceEditor = ace.edit(aceDiv)
-    ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
-    ..fontSize = _fontSize
-    ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
-    ..commands.addCommand(save);
+      ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
+      ..fontSize = _fontSize
+      ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
+      ..commands.addCommand(save);
 
     _resetSavePoint();
-
-    // Create listener to indicate that there are unsaved changes when file is altered
-    _fileChangesListener = _aceEditor.onChange.listen((e) {
-      if (_openFilePath != null && _noUnsavedChanges() == false) {
-        view.extra.text = pathLib.basename(_openFilePath) + '*';
-      }
-    });
   }
 
   void registerMailbox() {
@@ -148,12 +133,18 @@ class UpDroidEditor extends TabController {
     /// Save as click handler
     _saveAsButton.onClick.listen((e) {
       _exec = false;
-      cs.add(new CommanderMessage('EXPLORER', 'REQUEST_PARENT_PATH'));
       mailbox.ws.send("[[EDITOR_REQUEST_LIST]]");
     });
 
     _themeButton.onClick.listen((e) => _updateTheme(e));
     _fontSizeInput.onClick.listen((e) => _updateFontSize(e));
+
+    // Create listener to indicate that there are unsaved changes when file is altered
+    _fileChangesListener = _aceEditor.onChange.listen((e) {
+      if (_openFilePath != null && _noUnsavedChanges() == false) {
+        view.extra.text = pathLib.basename(_openFilePath) + '*';
+      }
+    });
   }
 
   void _updateTheme(Event e) {

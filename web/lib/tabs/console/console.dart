@@ -140,6 +140,12 @@ class UpDroidConsole extends TabController {
     });
   }
 
+  Future<bool> preClose() {
+    Completer c = new Completer();
+    c.complete(true);
+    return c.future;
+  }
+
   void cleanUp() {
     _ws.close();
   }

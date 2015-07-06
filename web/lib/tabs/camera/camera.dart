@@ -1,5 +1,6 @@
 library updroid_camera;
 
+import 'dart:async';
 import 'dart:html';
 import 'dart:convert';
 import 'dart:js' as js;
@@ -129,6 +130,12 @@ class UpDroidCamera extends TabController {
     window.onResize.listen((e) {
       setDimensions();
     });
+  }
+
+  Future<bool> preClose() {
+    Completer c = new Completer();
+    c.complete(true);
+    return c.future;
   }
 
   void cleanUp() {}

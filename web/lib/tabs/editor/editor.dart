@@ -145,7 +145,8 @@ class UpDroidEditor extends TabController {
     var returnedData = um.body.split('[[CONTENTS]]');
     var newPath = returnedData[0];
     var newText = returnedData[1];
-    _handleNewText(newPath, newText);
+
+    _dealWithUnsavedChanges().then((_) => _setEditorText(newPath, newText));
   }
 
   // Event Handlers
@@ -319,25 +320,28 @@ class UpDroidEditor extends TabController {
   }
 
   /// Handles changes to the Editor model, new files and opening files.
-  void _handleNewText(String newPath, String newText) {
+  Future _dealWithUnsavedChanges() {
+    Completer c = new Completer();
+
     if (_noUnsavedChanges()) {
-      _setEditorText(newPath, newText);
-      return;
+      c.complete();
+    } else {
+      List<StreamSubscription> subs = [];
+      UpDroidUnsavedModal modal = new UpDroidUnsavedModal();
+
+      subs.add(modal.saveButton.onClick.listen((e) {
+        subs.forEach((StreamSubscription sub) => sub.cancel());
+        _saveHandler();
+        c.complete();
+      }));
+
+      subs.add(modal.discardButton.onClick.listen((e) {
+        subs.forEach((StreamSubscription sub) => sub.cancel());
+        c.complete();
+      }));
     }
 
-    new UpDroidUnsavedModal();
-    _modalSaveButton = querySelector('.modal-save');
-    _modalDiscardButton = querySelector('.modal-discard');
-
-    _unsavedSave = _modalSaveButton.onClick.listen((e) {
-      _saveHandler();
-      _setEditorText(newPath, newText);
-      _unsavedSave.cancel();
-    });
-    _unsavedDiscard = _modalDiscardButton.onClick.listen((e) {
-      _setEditorText(newPath, newText);
-      _unsavedDiscard.cancel();
-    });
+    return c.future;
   }
 
   /// Sets the Editor's text with [newText], updates [_openFilePath], and resets the save point.

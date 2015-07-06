@@ -107,7 +107,7 @@ class UpDroidExplorer extends PanelController {
     _workspaceNames = JSON.decode(um.body);
     _workspaceNames.forEach((String name) => _addWorkspaceToMenu(name));
 
-    if (controller != null) return;
+    if (controller != null || view.content.children.isNotEmpty) return;
 
     ParagraphElement placeholderText = new ParagraphElement()
       ..classes.add('explorer-placeholder');

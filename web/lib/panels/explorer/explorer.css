@@ -7,6 +7,8 @@
     color: #7e7e7e;
     padding: 100% 10px;
     text-align: center;
+    height: 100%;
+    margin: 0;
 }
 
 .exp-container {

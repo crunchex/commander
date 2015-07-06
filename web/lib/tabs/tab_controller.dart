@@ -52,7 +52,7 @@ abstract class TabController {
   Future _closeTab() async {
     // Cancel closing if preClose returns false for some reason.
     bool canClose = await preClose();
-    if (!canClose) return;
+    if (!canClose) return new Future.value(true);
 
     view.destroy();
     cleanUp();

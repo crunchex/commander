@@ -96,7 +96,7 @@ class UpDroidEditor extends TabController {
 
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
     ace.BindKey ctrlS = new ace.BindKey(win: "Ctrl-S", mac: "Command-S");
-    ace.Command save = new ace.Command('save', ctrlS, (d) => _saveText());
+    ace.Command save = new ace.Command('save', ctrlS, (d) => _saveHandler());
 
     DivElement aceDiv = new DivElement()
     // Necessary to allow our styling (in main.css) to override Ace's.
@@ -127,15 +127,10 @@ class UpDroidEditor extends TabController {
     _pubButton.onClick.listen((e) => _handleNewFileButton(e, RosTemplates.pubTemplate));
     _subButton.onClick.listen((e) => _handleNewFileButton(e, RosTemplates.subTemplate));
 
-    _saveButton.onClick.listen((e) => _saveText());
+    _saveButton.onClick.listen((e) => _saveHandler());
+    _saveAsButton.onClick.listen((e) => _saveAsHandler());
 
-    /// Save as click handler
-    _saveAsButton.onClick.listen((e) {
-      _exec = false;
-      mailbox.ws.send("[[EDITOR_REQUEST_LIST]]");
-    });
-
-    _themeButton.onClick.listen((e) => _updateTheme(e));
+    _themeButton.onClick.listen((e) => _invertTheme(e));
     _fontSizeInput.onClick.listen((e) => _updateFontSize(e));
 
     // Create listener to indicate that there are unsaved changes when file is altered
@@ -165,21 +160,25 @@ class UpDroidEditor extends TabController {
 
   // Event Handlers
 
-  /// Sends the file path and contents to the server to be saved to disk.
-  void _saveText() {
+  void _saveHandler() {
     if (_openFilePath == null) {
-      _saveAsButton.click();
+      _saveAsHandler();
       return;
     }
 
-    if (pathLib.basename(_openFilePath) != 'CMakeLists.txt') {
-      mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, _openFilePath, false]));
-      _resetSavePoint();
-      view.extra.text = pathLib.basename(_openFilePath);
-    }
+    if (pathLib.basename(_openFilePath) == 'CMakeLists.txt') return;
+
+    mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, _openFilePath, false]));
+    _resetSavePoint();
+    view.extra.text = pathLib.basename(_openFilePath);
   }
 
-  void _updateTheme(Event e) {
+  void _saveAsHandler() {
+    _exec = false;
+    mailbox.ws.send("[[EDITOR_REQUEST_LIST]]");
+  }
+
+  void _invertTheme(Event e) {
     // Stops the button from sending the page to the top (href=#).
     e.preventDefault();
 
@@ -229,8 +228,6 @@ class UpDroidEditor extends TabController {
 
     // Check to make sure that the supplied input doesn't conflict with existing files
     // on system.  Also determines what action to take depending on whether the file exists or not.
-
-
 
     _saveAsClickEnd = _saveCommit.onClick.listen((e) {
       if (makeExec.checked == true) _exec = true;
@@ -318,7 +315,7 @@ class UpDroidEditor extends TabController {
     _modalDiscardButton = querySelector('.modal-discard');
 
     _unsavedSave = _modalSaveButton.onClick.listen((e) {
-      _saveText();
+      _saveHandler();
       _aceEditor.setValue(text, 1);
       view.extra.text = "untitled*";
       _unsavedSave.cancel();
@@ -343,7 +340,7 @@ class UpDroidEditor extends TabController {
     _modalDiscardButton = querySelector('.modal-discard');
 
     _unsavedSave = _modalSaveButton.onClick.listen((e) {
-      _saveText();
+      _saveHandler();
       _setEditorText(newPath, newText);
       _unsavedSave.cancel();
     });
@@ -407,7 +404,7 @@ class UpDroidEditor extends TabController {
       _modalDiscardButton = querySelector('.modal-discard');
 
       _unsavedSave = _modalSaveButton.onClick.listen((e) {
-        _saveText();
+        _saveHandler();
         _unsavedSave.cancel();
         c.complete(true);
       });

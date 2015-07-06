@@ -39,7 +39,6 @@ class UpDroidEditor extends TabController {
 
   Map _pathMap;
   String _absolutePathPrefix;
-  DivElement _content;
 
   AnchorElement _blankButton;
   AnchorElement _launchButton;
@@ -59,8 +58,6 @@ class UpDroidEditor extends TabController {
   Element _overwriteCommit;
   DivElement _explorersDiv;
   var _curModal;
-  Dropzone linkedDropzone;
-
   int _fontSize = 12;
 
   // Stream Subscriptions.
@@ -84,15 +81,6 @@ class UpDroidEditor extends TabController {
   }
 
   void setUpController() {
-    setUpUI();
-
-    _fontSizeInput.placeholder = _fontSize.toString();
-
-    _setUpEditor();
-//    cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
-  }
-
-  void setUpUI() {
     _blankButton = view.refMap['blank-button'];
     _pubButton = view.refMap['publisher-button'];
     _subButton = view.refMap['subscriber-button'];
@@ -103,8 +91,13 @@ class UpDroidEditor extends TabController {
     _saveAsButton = view.refMap['save-as'];
     _themeButton = view.refMap['invert'];
     _fontSizeInput = view.refMap['font-size'];
-    _content = view.refMap['content'];
     _explorersDiv = querySelector('#exp-container');
+
+
+    _fontSizeInput.placeholder = _fontSize.toString();
+
+    _setUpEditor();
+//    cs.add(new CommanderMessage('UPDROIDEXPLORER', 'EDITOR_READY', body: [id, view.content]));
   }
 
   /// Sets up the editor and styles.
@@ -113,14 +106,16 @@ class UpDroidEditor extends TabController {
     ace.BindKey ctrlS = new ace.BindKey(win: "Ctrl-S", mac: "Command-S");
     ace.Command save = new ace.Command('save', ctrlS, sendSave);
 
-    _aceEditor = ace.edit(view.content)
-      ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
-      ..fontSize = _fontSize
-      ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
-      ..commands.addCommand(save);
-
+    DivElement aceDiv = new DivElement()
     // Necessary to allow our styling (in main.css) to override Ace's.
-    view.content.classes.add('updroid_editor');
+    ..classes.add('updroid_editor');
+    view.content.children.add(aceDiv);
+
+    _aceEditor = ace.edit(aceDiv)
+    ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
+    ..fontSize = _fontSize
+    ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
+    ..commands.addCommand(save);
 
     _resetSavePoint();
 
@@ -136,7 +131,6 @@ class UpDroidEditor extends TabController {
     mailbox.registerCommanderEvent('CLASS_REMOVE', _classRemoveHandler);
     mailbox.registerCommanderEvent('OPEN_FILE', _openFileHandler);
     mailbox.registerCommanderEvent('PARENT_PATH', _currentPathHandler);
-    mailbox.registerCommanderEvent('PASS_EDITOR_INFO', _passEditorHandler);
     mailbox.registerCommanderEvent('RESEND_DROP', _resendDrop);
     mailbox.registerCommanderEvent('FILE_UPDATE', _editorRenameHandler);
 
@@ -195,7 +189,6 @@ class UpDroidEditor extends TabController {
       }
       finally {
         _fontSizeInput.value = "";
-        _content.click();
         _aceEditor.focus();
         _fontInputListener.cancel();
       }
@@ -223,11 +216,6 @@ class UpDroidEditor extends TabController {
       view.extra.text = pathLib.basename(m.body[1]);
       _aceEditor.setOptions({'readOnly': false});
     }
-  }
-
-  void _passEditorHandler(CommanderMessage m) {
-    if (id != m.body[0]) return;
-    linkedDropzone = m.body[1];
   }
 
   void _pathListHandler(UpDroidMessage um) => _pullPaths(um.body);

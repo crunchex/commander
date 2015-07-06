@@ -96,7 +96,7 @@ class UpDroidEditor extends TabController {
 
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
     ace.BindKey ctrlS = new ace.BindKey(win: "Ctrl-S", mac: "Command-S");
-    ace.Command save = new ace.Command('save', ctrlS, (d) => _saveFile());
+    ace.Command save = new ace.Command('save', ctrlS, (d) => _saveText());
 
     DivElement aceDiv = new DivElement()
     // Necessary to allow our styling (in main.css) to override Ace's.
@@ -119,7 +119,6 @@ class UpDroidEditor extends TabController {
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'NO_CURRENT_WORKSPACE', _noCurrentWorkspaceAlert);
   }
 
-  /// Sets up event handlers for the editor's menu buttons.
   void registerEventHandlers() {
     _blankButton.onClick.listen((e) => _handleNewFileButton(e, ''));
     _talkerButton.onClick.listen((e) => _handleNewFileButton(e, RosTemplates.talkerTemplate));
@@ -145,6 +144,39 @@ class UpDroidEditor extends TabController {
         view.extra.text = pathLib.basename(_openFilePath) + '*';
       }
     });
+  }
+
+  // Mailbox Handlers
+
+  void _pathListHandler(UpDroidMessage um) => _pullPaths(um.body);
+  void _editorDirPathHandler(UpDroidMessage um) { _absolutePathPrefix = um.body; }
+
+  // Editor receives the open file contents from the server.
+  void _editorFileTextHandler(UpDroidMessage um) {
+    var returnedData = um.body.split('[[CONTENTS]]');
+    var newPath = returnedData[0];
+    var newText = returnedData[1];
+    _handleNewText(newPath, newText);
+  }
+
+  void _noCurrentWorkspaceAlert(UpDroidMessage um) {
+    window.alert("No workspace set. Please open one from Explorer.");
+  }
+
+  // Event Handlers
+
+  /// Sends the file path and contents to the server to be saved to disk.
+  void _saveText() {
+    if (_openFilePath == null) {
+      _saveAsButton.click();
+      return;
+    }
+
+    if (pathLib.basename(_openFilePath) != 'CMakeLists.txt') {
+      mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, _openFilePath, false]));
+      _resetSavePoint();
+      view.extra.text = pathLib.basename(_openFilePath);
+    }
   }
 
   void _updateTheme(Event e) {
@@ -180,20 +212,7 @@ class UpDroidEditor extends TabController {
     });
   }
 
-  void _pathListHandler(UpDroidMessage um) => _pullPaths(um.body);
-  void _editorDirPathHandler(UpDroidMessage um) { _absolutePathPrefix = um.body; }
-
-  // Editor receives the open file contents from the server.
-  void _editorFileTextHandler(UpDroidMessage um) {
-    var returnedData = um.body.split('[[CONTENTS]]');
-    var newPath = returnedData[0];
-    var newText = returnedData[1];
-    _handleNewText(newPath, newText);
-  }
-
-  void _noCurrentWorkspaceAlert(UpDroidMessage um) {
-    window.alert("No workspace set. Please open one from Explorer.");
-  }
+  // Misc Private Methods
 
   void _saveFile() {
     if (_curModal != null) _curModal.hide();
@@ -357,20 +376,6 @@ class UpDroidEditor extends TabController {
       }
     }
     return activeName;
-  }
-
-  /// Sends the file path and contents to the server to be saved to disk.
-  void _saveText() {
-    if (_openFilePath == null) {
-      _saveAsButton.click();
-      return;
-    }
-
-    if (pathLib.basename(_openFilePath) != 'CMakeLists.txt') {
-      mailbox.ws.send('[[EDITOR_SAVE]]' + JSON.encode([_aceEditor.value, _openFilePath, false]));
-      _resetSavePoint();
-      view.extra.text = pathLib.basename(_openFilePath);
-    }
   }
 
   void _pullPaths(String raw) {

@@ -104,7 +104,7 @@ class UpDroidEditor extends TabController {
   void _setUpEditor() {
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
     ace.BindKey ctrlS = new ace.BindKey(win: "Ctrl-S", mac: "Command-S");
-    ace.Command save = new ace.Command('save', ctrlS, sendSave);
+    ace.Command save = new ace.Command('save', ctrlS, (d) => _saveFile());
 
     DivElement aceDiv = new DivElement()
     // Necessary to allow our styling (in main.css) to override Ace's.
@@ -186,10 +186,6 @@ class UpDroidEditor extends TabController {
         _fontInputListener.cancel();
       }
     });
-  }
-
-  void sendSave(d) {
-    _saveButton.click();
   }
 
   void _pathListHandler(UpDroidMessage um) => _pullPaths(um.body);

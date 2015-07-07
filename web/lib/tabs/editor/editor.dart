@@ -93,7 +93,7 @@ class UpDroidEditor extends TabController {
 
     _fontSizeInput.placeholder = _defaultFontSize.toString();
 
-    _openFilePath = null;
+    _updateOpenFilePath(null);
     _exec = false;
     _resetSavePoint();
   }

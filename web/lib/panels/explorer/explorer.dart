@@ -94,6 +94,7 @@ class UpDroidExplorer extends PanelController {
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'REQUEST_WORKSPACE_NAMES', _requestWorkspaceNames);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_PATH', _explorerDirPath);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_NAMES', _refreshOpenMenu);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REQUEST_SELECTED', _requestSelected);
   }
 
   void _requestWorkspaceNames(UpDroidMessage um) => _refreshWorkspaceNames();
@@ -118,6 +119,14 @@ class UpDroidExplorer extends PanelController {
       placeholderText.text = 'Create a new workspace or open an existing one from [File] menu.';
     }
     view.content.children.add(placeholderText);
+  }
+
+  /// Returns an empty list to the server to let it know that there is no [WorkspaceController]
+  /// that consequently nothing is selected.
+  void _requestSelected(UpDroidMessage um) {
+    if (controller != null && controller.type == 'workspace') return;
+
+    mailbox.ws.send('[[RETURN_SELECTED]]' + '${um.body}:' + JSON.encode([]));
   }
 
   void _addWorkspaceToMenu(String name) {
@@ -247,6 +256,8 @@ class UpDroidExplorer extends PanelController {
 }
 
 abstract class ExplorerController {
+  String type;
+
   void registerMailbox();
   void registerEventHandlers();
   void cleanUp();

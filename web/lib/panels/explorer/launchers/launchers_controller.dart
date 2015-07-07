@@ -15,6 +15,8 @@ part 'launchers_view.dart';
 part 'ros_entity.dart';
 
 class LaunchersController implements ExplorerController {
+  String type = 'launchers';
+
   PanelView _view;
   LaunchersView _launchersView;
   Mailbox _mailbox;

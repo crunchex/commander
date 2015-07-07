@@ -16,6 +16,8 @@ part 'workspace_view.dart';
 part 'fs_entity.dart';
 
 class WorkspaceController implements ExplorerController {
+  String type = 'workspace';
+
   PanelView _view;
   WorkspaceView _workspaceView;
   Mailbox _mailbox;
@@ -241,7 +243,7 @@ class WorkspaceController implements ExplorerController {
   void _returnSelected(UpDroidMessage um) {
     List pathsOfSelected = [];
     entities.values.forEach((FileSystemEntity entity) {
-      if (entity.selected) pathsOfSelected.add(entity.path);
+      if (entity.selected && entity.isDirectory) pathsOfSelected.add(entity.path);
     });
 
     _mailbox.ws.send('[[RETURN_SELECTED]]' + '${um.body}:' + JSON.encode(pathsOfSelected));

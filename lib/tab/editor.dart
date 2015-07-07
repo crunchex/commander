@@ -43,8 +43,17 @@ class CmdrEditor {
     }
   }
 
+  void _requestSelected(UpDroidMessage um) {
+    UpDroidMessage newMessage = new UpDroidMessage(um.header, id.toString());
+    CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', -1, newMessage));
+  }
+
   void _setCurrentWorkspace(UpDroidMessage um) {
     _currentWorkspace = new Workspace('${uproot.path}/${um.body}');
+  }
+
+  void _returnSelected(UpDroidMessage um) {
+    mailbox.ws.add('[[REQUEST_SELECTED]]' + um.body);
   }
 
   void cleanup() {
@@ -53,8 +62,10 @@ class CmdrEditor {
 
   void _registerMailbox() {
     mailbox.registerWebSocketEvent('SAVE_FILE', _saveFile);
+    mailbox.registerWebSocketEvent('REQUEST_SELECTED', _requestSelected);
 
     mailbox.registerServerMessageHandler('OPEN_FILE', _openFile);
     mailbox.registerServerMessageHandler('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);
+    mailbox.registerServerMessageHandler('RETURN_SELECTED', _returnSelected);
   }
 }

@@ -361,6 +361,8 @@ class UpDroidEditor extends TabController {
     } else {
       view.extra.text = pathLib.basename(_openFilePath);
     }
+
+    view.tabHandleButton.title = view.extra.text;
   }
 
   Future<bool> preClose() {

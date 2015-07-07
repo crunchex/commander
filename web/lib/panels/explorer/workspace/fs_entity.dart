@@ -77,6 +77,7 @@ abstract class FileSystemEntity {
 class FolderEntity extends FileSystemEntity {
   FolderEntity(String path, String workspacePath, WebSocket ws, var deselectAllEntities) :
   super(path, workspacePath, true, ws, deselectAllEntities) {
+    isDirectory = true;
     setUpView();
   }
 

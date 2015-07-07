@@ -3,7 +3,6 @@ library updroid_editor;
 import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
-import 'package:dnd/dnd.dart';
 
 import 'package:ace/ace.dart' as ace;
 import 'package:ace/proxy.dart';
@@ -37,9 +36,6 @@ class UpDroidEditor extends TabController {
     return menu;
   }
 
-  Map _pathMap;
-  String _absolutePathPrefix;
-
   AnchorElement _blankButton;
   AnchorElement _launchButton;
   AnchorElement _talkerButton;
@@ -51,26 +47,15 @@ class UpDroidEditor extends TabController {
   AnchorElement _themeButton;
   InputElement _fontSizeInput;
 
-  ButtonElement _modalSaveButton;
-  ButtonElement _modalDiscardButton;
-  Element _warning;
-  Element _overwriteCommit;
-  DivElement _explorersDiv;
-  var _curModal;
-  int _fontSize = 12;
-
   // Stream Subscriptions.
-  StreamSubscription _saveAsClickEnd;
-  StreamSubscription _saveAsEnterEnd;
-  StreamSubscription _unsavedSave;
-  StreamSubscription _unsavedDiscard;
-  StreamSubscription _overwrite;
   StreamSubscription _fontInputListener;
   StreamSubscription _fileChangesListener;
 
   ace.Editor _aceEditor;
   String _openFilePath;
   bool _exec;
+  var _curModal;
+  int _fontSize = 12;
   String _originalContents;
 
   UpDroidEditor(int id, int col, StreamController<CommanderMessage> cs) :
@@ -79,7 +64,6 @@ class UpDroidEditor extends TabController {
   }
 
   void setUpController() {
-    _explorersDiv = querySelector('#exp-container');
     _blankButton = view.refMap['blank-button'];
     _pubButton = view.refMap['publisher-button'];
     _subButton = view.refMap['subscriber-button'];

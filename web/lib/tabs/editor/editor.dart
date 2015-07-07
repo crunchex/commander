@@ -201,58 +201,51 @@ class UpDroidEditor extends TabController {
 
   /// Detects if there are any unsaved changes and if there are, goes through
   /// the modals and handles them.
-  Future _handleAnyChanges() {
+  Future _handleAnyChanges() async {
     Completer c = new Completer();
 
     if (_noUnsavedChanges()) {
       c.complete();
     } else {
-      _presentUnsavedChangesModal().then((bool continueSave) {
-        if (!continueSave) {
-          c.complete();
-        } else {
-          _updatePathAndExec().then((bool completeSave) {
-            if (completeSave) _saveFile();
-            c.complete();
-          });
-        }
-      });
+      bool continueSave = await _presentUnsavedChangesModal();
+      if (!continueSave) {
+        c.complete();
+      } else {
+        bool completeSave = await _updatePathAndExec();
+        if (completeSave) _saveFile();
+        c.complete();
+      }
     }
 
     return c.future;
   }
 
   /// Updates the open file path and exec globals based on user input.
-  Future<bool> _updatePathAndExec() {
+  Future<bool> _updatePathAndExec() async {
     Completer c = new Completer();
 
-    _getSelectedPath().then((String path) {
-      if (path == null) {
-        window.alert('Please choose one directory from Explorer and retry.');
-        c.complete(false);
-      } else {
-        _presentSaveAsModal(path).then((bool completeSave) {
-          c.complete(completeSave);
-        });
-      }
-    });
+    String path = await _getSelectedPath();
+    if (path == null) {
+      window.alert('Please choose one directory from Explorer and retry.');
+      c.complete(false);
+    } else {
+      c.complete(await _presentSaveAsModal(path));
+    }
 
     return c.future;
   }
 
   /// Queries an open Explorer for a selected directory (for saving to).
-  Future<String> _getSelectedPath() {
+  Future<String> _getSelectedPath() async {
     Completer c = new Completer();
 
-    mailbox.waitFor(new UpDroidMessage('REQUEST_SELECTED', '')).then((UpDroidMessage um) {
-      print(um.body);
-      List<String> selectedPaths = JSON.decode(um.body);
-      if (selectedPaths.length != 1) {
-        c.complete(null);
-      } else {
-        c.complete(pathLib.normalize(selectedPaths[0]));
-      }
-    });
+    UpDroidMessage um = await mailbox.waitFor(new UpDroidMessage('REQUEST_SELECTED', ''));
+    List<String> selectedPaths = JSON.decode(um.body);
+    if (selectedPaths.length != 1) {
+      c.complete(null);
+    } else {
+      c.complete(pathLib.normalize(selectedPaths[0]));
+    }
 
     return c.future;
   }

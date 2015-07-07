@@ -130,11 +130,7 @@ class UpDroidEditor extends TabController {
     _themeButton.onClick.listen((e) => _invertTheme(e));
     _fontSizeInput.onClick.listen((e) => _updateFontSize(e));
 
-    // Create listener to indicate that there are unsaved changes when file is altered.
-    _fileChangesListener = _aceEditor.onChange.listen((e) {
-      if (_noUnsavedChanges()) return;
-      if (!view.extra.text.contains('*')) view.extra.text = view.extra.text + '*';
-    });
+    _fileChangesListener = _aceEditor.onChange.listen((e) => _updateUnsavedChangesIndicator());
   }
 
   // Mailbox Handlers
@@ -213,6 +209,13 @@ class UpDroidEditor extends TabController {
         _fontInputListener.cancel();
       }
     });
+  }
+
+  /// Adds an asterisk to the displayed filename if there are any unsaved changes.
+  void _updateUnsavedChangesIndicator() {
+    if (_noUnsavedChanges()) return;
+
+    if (!view.extra.text.contains('*')) view.extra.text = view.extra.text + '*';
   }
 
   // Misc Private Methods

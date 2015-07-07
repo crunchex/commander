@@ -59,7 +59,6 @@ class WorkspaceController implements ExplorerController {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REMOVE_UPDATE', _removeUpdate);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'BUILD_COMPLETE', _buildComplete);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SEND_EDITOR_LIST', _addEditorsToContextMenu);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REQUEST_SELECTED', _returnSelected);
   }
 
   void registerEventHandlers() {
@@ -68,6 +67,19 @@ class WorkspaceController implements ExplorerController {
     _listenersToCleanUp.add(_cleanButton.onClick.listen((e) => _mailbox.ws.send('[[WORKSPACE_CLEAN]]')));
     _listenersToCleanUp.add(_workspaceView.viewLaunchers.onClick.listen((e) => _toggleView()));
 //    _uploadButton.onClick.listen((e) => new UpDroidGitPassModal(cs));
+  }
+
+  String returnSelected() {
+    List pathsOfSelected = [];
+    entities.values.forEach((FileSystemEntity entity) {
+      print(entity.path + ' ' + entity.selected.toString() + ' ' + entity.isDirectory.toString());
+      if (entity.selected && entity.isDirectory) {
+//        print(entity.path);
+        pathsOfSelected.add(entity.path);
+      }
+    });
+
+    return JSON.encode(pathsOfSelected);
   }
 
   /// Handles an Explorer add update for a single file.
@@ -238,15 +250,6 @@ class WorkspaceController implements ExplorerController {
     editorList.forEach((String editorName) {
       ContextMenu.addItem({'type': 'toggle', 'title': 'Open in Editor-$editorName', 'handler': () => _mailbox.ws.send('[[OPEN_FILE]]$editorName:$path')});
     });
-  }
-
-  void _returnSelected(UpDroidMessage um) {
-    List pathsOfSelected = [];
-    entities.values.forEach((FileSystemEntity entity) {
-      if (entity.selected && entity.isDirectory) pathsOfSelected.add(entity.path);
-    });
-
-    _mailbox.ws.send('[[RETURN_SELECTED]]' + '${um.body}:' + JSON.encode(pathsOfSelected));
   }
 
   void cleanUp() {

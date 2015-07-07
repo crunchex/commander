@@ -25,4 +25,8 @@ class UpDroidUnsavedModal extends UpDroidModal {
     saveButton.classes.add('modal-save');
     _modalFooter.children.addAll([saveButton, discardButton]);
   }
+
+  void hide() {
+    this._destroyModal();
+  }
 }

@@ -72,11 +72,7 @@ class WorkspaceController implements ExplorerController {
   String returnSelected() {
     List pathsOfSelected = [];
     entities.values.forEach((FileSystemEntity entity) {
-      print(entity.path + ' ' + entity.selected.toString() + ' ' + entity.isDirectory.toString());
-      if (entity.selected && entity.isDirectory) {
-//        print(entity.path);
-        pathsOfSelected.add(entity.path);
-      }
+      if (entity.selected && entity.isDirectory) pathsOfSelected.add(entity.path);
     });
 
     return JSON.encode(pathsOfSelected);

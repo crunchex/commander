@@ -124,15 +124,13 @@ class UpDroidExplorer extends PanelController {
   /// Returns an empty list to the server to let it know that there is no [WorkspaceController]
   /// that consequently nothing is selected.
   void _requestSelected(UpDroidMessage um) {
-    String selected;
+    String selected = JSON.encode([]);
+
     if (controller != null && controller.type == 'workspace') {
       WorkspaceController workspaceController = controller;
       selected = workspaceController.returnSelected();
-    } else {
-      selected = JSON.encode([]);
     }
 
-    print('selected: $selected');
     mailbox.ws.send('[[RETURN_SELECTED]]' + '${um.body}:' + selected);
   }
 

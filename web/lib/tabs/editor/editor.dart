@@ -36,6 +36,8 @@ class UpDroidEditor extends TabController {
     return menu;
   }
 
+  static const int _defaultFontSize = 12;
+
   AnchorElement _blankButton;
   AnchorElement _launchButton;
   AnchorElement _talkerButton;
@@ -55,7 +57,6 @@ class UpDroidEditor extends TabController {
   String _openFilePath;
   bool _exec;
   var _curModal;
-  int _fontSize = 12;
   String _originalContents;
 
   UpDroidEditor(int id, int col, StreamController<CommanderMessage> cs) :
@@ -74,7 +75,6 @@ class UpDroidEditor extends TabController {
     _saveAsButton = view.refMap['save-as'];
     _themeButton = view.refMap['invert'];
     _fontSizeInput = view.refMap['font-size'];
-    _fontSizeInput.placeholder = _fontSize.toString();
 
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
     ace.BindKey ctrlS = new ace.BindKey(win: "Ctrl-S", mac: "Command-S");
@@ -87,9 +87,11 @@ class UpDroidEditor extends TabController {
 
     _aceEditor = ace.edit(aceDiv)
       ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
-      ..fontSize = _fontSize
+      ..fontSize = _defaultFontSize
       ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
       ..commands.addCommand(save);
+
+    _fontSizeInput.placeholder = _defaultFontSize.toString();
 
     _openFilePath = null;
     _exec = false;
@@ -180,16 +182,14 @@ class UpDroidEditor extends TabController {
     _fontInputListener = _fontSizeInput.onKeyUp.listen((e) {
       if (e.keyCode != KeyCode.ENTER) return;
 
-      var fontVal;
       try {
-        fontVal = int.parse(_fontSizeInput.value);
+        var fontVal = int.parse(_fontSizeInput.value);
         assert(fontVal is int);
-        if(fontVal >= 1 && fontVal <= 60){
+        if (fontVal >= 1 && fontVal <= 60) {
           _aceEditor.fontSize = fontVal;
           _fontSizeInput.placeholder = fontVal.toString();
         }
-      }
-      finally {
+      } finally {
         _fontSizeInput.value = "";
         _aceEditor.focus();
         _fontInputListener.cancel();

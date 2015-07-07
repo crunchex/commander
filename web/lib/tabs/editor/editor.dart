@@ -48,8 +48,8 @@ class UpDroidEditor extends TabController {
   InputElement _fontSizeInput;
 
   // Stream Subscriptions.
+  List<StreamSubscription> _subs;
   StreamSubscription _fontInputListener;
-  StreamSubscription _fileChangesListener;
 
   ace.Editor _aceEditor;
   String _openFilePath;
@@ -101,20 +101,22 @@ class UpDroidEditor extends TabController {
   }
 
   void registerEventHandlers() {
-    _blankButton.onClick.listen((e) => _newFileHandler(e, ''));
-    _talkerButton.onClick.listen((e) => _newFileHandler(e, RosTemplates.talkerTemplate));
-    _listenerButton.onClick.listen((e) => _newFileHandler(e, RosTemplates.listenerTemplate));
-    _launchButton.onClick.listen((e) => _newFileHandler(e, RosTemplates.launchTemplate));
-    _pubButton.onClick.listen((e) => _newFileHandler(e, RosTemplates.pubTemplate));
-    _subButton.onClick.listen((e) => _newFileHandler(e, RosTemplates.subTemplate));
+    _subs = [];
 
-    _saveButton.onClick.listen((e) => _saveHandler());
-    _saveAsButton.onClick.listen((e) => _saveAsHandler());
+    _subs.add(_blankButton.onClick.listen((e) => _newFileHandler(e, '')));
+    _subs.add(_talkerButton.onClick.listen((e) => _newFileHandler(e, RosTemplates.talkerTemplate)));
+    _subs.add(_listenerButton.onClick.listen((e) => _newFileHandler(e, RosTemplates.listenerTemplate)));
+    _subs.add(_launchButton.onClick.listen((e) => _newFileHandler(e, RosTemplates.launchTemplate)));
+    _subs.add(_pubButton.onClick.listen((e) => _newFileHandler(e, RosTemplates.pubTemplate)));
+    _subs.add(_subButton.onClick.listen((e) => _newFileHandler(e, RosTemplates.subTemplate)));
 
-    _themeButton.onClick.listen((e) => _invertTheme(e));
-    _fontSizeInput.onClick.listen((e) => _updateFontSize(e));
+    _subs.add(_saveButton.onClick.listen((e) => _saveHandler()));
+    _subs.add(_saveAsButton.onClick.listen((e) => _saveAsHandler()));
 
-    _fileChangesListener = _aceEditor.onChange.listen((e) => _updateUnsavedChangesIndicator());
+    _subs.add(_themeButton.onClick.listen((e) => _invertTheme(e)));
+    _subs.add(_fontSizeInput.onClick.listen((e) => _updateFontSize(e)));
+
+    _subs.add(_aceEditor.onChange.listen((e) => _updateUnsavedChangesIndicator()));
   }
 
   // Mailbox Handlers
@@ -357,6 +359,7 @@ class UpDroidEditor extends TabController {
   }
 
   void cleanUp() {
-    _fileChangesListener.cancel();
+    _subs.forEach((StreamSubscription sub) => sub.cancel());
+    _fontInputListener.cancel();
   }
 }

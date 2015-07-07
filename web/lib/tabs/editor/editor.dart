@@ -38,14 +38,8 @@ class UpDroidEditor extends TabController {
 
   static const int _defaultFontSize = 12;
 
-  AnchorElement _blankButton;
-  AnchorElement _launchButton;
-  AnchorElement _talkerButton;
-  AnchorElement _listenerButton;
-  AnchorElement _pubButton;
-  AnchorElement _subButton;
-  AnchorElement _saveButton;
-  AnchorElement _saveAsButton;
+  AnchorElement _blankButton, _launchButton, _talkerButton, _listenerButton, _pubButton, _subButton;
+  AnchorElement _saveButton, _saveAsButton;
   AnchorElement _themeButton;
   InputElement _fontSizeInput;
 
@@ -54,10 +48,9 @@ class UpDroidEditor extends TabController {
   StreamSubscription _fontInputListener;
 
   ace.Editor _aceEditor;
-  String _openFilePath;
-  bool _exec;
   var _curModal;
-  String _originalContents;
+  String _openFilePath, _originalContents;
+  bool _exec;
 
   UpDroidEditor(int id, int col, StreamController<CommanderMessage> cs) :
   super(id, col, className, 'Editor', getMenuConfig(), cs, true) {

@@ -328,8 +328,6 @@ class UpDroidEditor extends TabController {
     if (_openFilePath == null || _openFilePath == '') return;
 
     mailbox.ws.send('[[SAVE_FILE]]' + JSON.encode([_aceEditor.value, _openFilePath, _exec]));
-
-    view.extra.text = pathLib.basename(_openFilePath);
     _resetSavePoint();
   }
 

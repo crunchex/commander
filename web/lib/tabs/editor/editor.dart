@@ -206,6 +206,8 @@ class UpDroidEditor extends TabController {
 
   // Misc Private Methods
 
+  /// Detects if there are any unsaved changes and if there are, goes through
+  /// the modals and handles them.
   Future _handleAnyChanges() {
     Completer c = new Completer();
 
@@ -227,6 +229,7 @@ class UpDroidEditor extends TabController {
     return c.future;
   }
 
+  /// Updates the open file path and exec globals based on user input.
   Future<bool> _updatePathAndExec() {
     Completer c = new Completer();
 
@@ -244,6 +247,7 @@ class UpDroidEditor extends TabController {
     return c.future;
   }
 
+  /// Queries an open Explorer for a selected directory (for saving to).
   Future<String> _getSelectedPath() {
     Completer c = new Completer();
 
@@ -260,6 +264,7 @@ class UpDroidEditor extends TabController {
     return c.future;
   }
 
+  /// Presents the Modal that asks the user what to do with unsaved changes.
   Future<bool> _presentUnsavedChangesModal() {
     Completer c = new Completer();
 
@@ -286,6 +291,7 @@ class UpDroidEditor extends TabController {
     return c.future;
   }
 
+  /// Presents a modal to get a new filename and make-executable option from the user.
   Future<bool> _presentSaveAsModal(path) {
     Completer c = new Completer();
 
@@ -316,6 +322,8 @@ class UpDroidEditor extends TabController {
     return c.future;
   }
 
+  /// Saves the file to disk and optionally makes it executable, based on the current values
+  /// of the global variables. Also updates the save point and displayed filename.
   void _saveFile() {
     if (_openFilePath == null || _openFilePath == '') return;
 
@@ -325,7 +333,7 @@ class UpDroidEditor extends TabController {
     _resetSavePoint();
   }
 
-  /// Sets the Editor's text with [newText], updates [_openFilePath], and resets the save point.
+  /// Sets the Editor's text with [newText], and resets other stuff.
   void _setEditorText(String newText) {
     _aceEditor.setValue(newText, 1);
     _exec = false;
@@ -342,6 +350,7 @@ class UpDroidEditor extends TabController {
   /// Resets the save point based on the Editor's current text.
   String _resetSavePoint() => _originalContents = _aceEditor.value;
 
+  /// Keeps the displayed filename in sync with the current open file.
   void _updateOpenFilePath(String newPath) {
     _openFilePath = newPath;
 

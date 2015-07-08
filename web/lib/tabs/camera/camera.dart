@@ -36,7 +36,7 @@ class UpDroidCamera extends TabController {
   AspectType _aspect;
 
   UpDroidCamera(int id, int col) :
-  super(id, col, className, 'Camera', getMenuConfig(), null, true) {
+  super(id, col, className, 'Camera', getMenuConfig(), true) {
 
   }
 

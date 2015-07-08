@@ -14,8 +14,6 @@ import 'modal/modal.dart';
 import 'mailbox.dart';
 
 class UpDroidClient {
-  StreamController<CommanderMessage> _cs;
-
   List<List<dynamic>> _columns;
   String _config;
 
@@ -34,10 +32,7 @@ class UpDroidClient {
     _newButtonLeft = querySelector('#column-1-new');
     _newButtonRight = querySelector('#column-2-new');
 
-    // Create the intra-client message stream.
-    // The classes use this to communicate with each other.
-    _cs = new StreamController<CommanderMessage>.broadcast();
-    _mailbox = new Mailbox('UpDroidClient', 1, _cs);
+    _mailbox = new Mailbox('UpDroidClient', 1);
 
     _registerMailbox();
     _registerEventHandlers(_getConfig());
@@ -121,13 +116,6 @@ class UpDroidClient {
     }
   }
 
-  void _alertDisconnect(CommanderMessage m) {
-    if (disconnectAlert == false) {
-      window.alert("UpDroid Commander has lost connection to the server.");
-      disconnectAlert = true;
-    }
-  }
-
   void _openPanel(int column, int id, String className) {
     if (_columns[column].length >= 1) return;
 
@@ -139,7 +127,7 @@ class UpDroidClient {
 
     if (className == 'UpDroidExplorer') {
       _mailbox.ws.send('[[OPEN_PANEL]]' + '$column-$id-$className');
-       _columns[column].add(new UpDroidExplorer(id, column, _cs));
+       _columns[column].add(new UpDroidExplorer(id, column));
     }
   }
 
@@ -154,7 +142,7 @@ class UpDroidClient {
 
     if (className == 'UpDroidEditor') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _columns[column].add(new UpDroidEditor(id, column, _cs));
+      _columns[column].add(new UpDroidEditor(id, column));
     } else if (className == 'UpDroidCamera') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
       _columns[column].add(new UpDroidCamera(id, column));
@@ -165,7 +153,7 @@ class UpDroidClient {
       // TODO: initial size should not be hardcoded.
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className-25-80');
       //Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
-      _columns[column].add(new UpDroidConsole(id, column, _cs));
+      _columns[column].add(new UpDroidConsole(id, column));
     }
   }
 
@@ -206,8 +194,6 @@ class UpDroidClient {
   void _getClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
 
   void _registerMailbox() {
-    _mailbox.registerCommanderEvent('SERVER_DISCONNECT', _alertDisconnect);
-
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);

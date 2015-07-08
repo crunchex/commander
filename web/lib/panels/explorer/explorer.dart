@@ -66,8 +66,8 @@ class UpDroidExplorer extends PanelController {
 
   List<String> _workspaceNames;
 
-  UpDroidExplorer(int id, int col, StreamController<CommanderMessage> cs) :
-  super(id, col, className, 'Explorer', getMenuConfig(), cs, true) {
+  UpDroidExplorer(int id, int col) :
+  super(id, col, className, 'Explorer', getMenuConfig(), true) {
 
   }
 

@@ -18,8 +18,8 @@ class CmdrExplorer {
   Directory uproot;
 
   Workspace _currentWorkspace;
-  DirectoryWatcher _currentWatcher, _uprootWatcher;
-  StreamSubscription _currentWatcherStream, _uprootWatcherStream;
+  DirectoryWatcher _currentWatcher;
+  StreamSubscription _currentWatcherStream;
 
   //TODO: make asynchroneous
   CmdrExplorer(this.id, this.uproot) {

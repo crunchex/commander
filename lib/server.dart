@@ -41,7 +41,6 @@ class CmdrServer {
     dir.create();
     _initServer(_getVirDir());
 
-    StreamController<ServerMessage> serverStream = new StreamController<ServerMessage>.broadcast();
     _mailbox = new CmdrMailbox('UpDroidClient', 1);
     _registerMailbox();
 

@@ -1,12 +1,10 @@
 library cmdr;
 
 import 'dart:io';
-import 'dart:async';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
-import 'package:path/path.dart' as pathLib;
 
 import 'tab/pty.dart';
 import 'tab/camera/camera.dart';
@@ -146,40 +144,6 @@ class CmdrServer {
     String password = runArgs[1];
     //help.debug('dirPath: $dirPath, password: $password', 0);
     Git.push(dirPath, password);
-  }
-
-  // TODO: foldername passed but not used
-  Future _initBackendClasses(Directory dir) {
-    var completer = new Completer();
-
-    Directory srcDir = new Directory('${pathLib.normalize(dir.path)}');
-    srcDir.list().toList().then((folderList) {
-      var result = [];
-      var names = [];
-      bool workspace;
-      for(FileSystemEntity item in folderList) {
-        if(item.runtimeType.toString() == "_Directory") {
-          result.add(item);
-        }
-      }
-      folderList = result;
-
-      int num = 1;
-      for(var folder in folderList) {
-        workspace = false;
-        for (var subFolder in folder.listSync()) {
-          if(pathLib.basename(subFolder.path) == 'src') workspace = true;
-        }
-        if (workspace == true) {
-          names.add(pathLib.basename(folder.path));
-          _panels[num] = new CmdrExplorer(num, folder);
-          num += 1;
-        }
-      }
-      completer.complete(names);
-    });
-
-    return completer.future;
   }
 
   void _openPanel(UpDroidMessage um) {

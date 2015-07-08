@@ -353,6 +353,6 @@ class UpDroidEditor extends TabController {
 
   void cleanUp() {
     _subs.forEach((StreamSubscription sub) => sub.cancel());
-    _fontInputListener.cancel();
+    if (_fontInputListener != null) _fontInputListener.cancel();
   }
 }

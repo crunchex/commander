@@ -80,9 +80,14 @@ class UpDroidConsole extends TabController {
     _ws = new WebSocket(url);
     _ws.binaryType = "arraybuffer";
 
-    _ws.onMessage.listen((e) {
-      ByteBuffer buf = e.data;
-      _term.stdout.add(buf.asUint8List());
+    _ws.onMessage.listen((MessageEvent event) {
+      try {
+        ByteBuffer buf = event.data;
+        _term.stdout.add(buf.asUint8List());
+      } catch(e) {
+        // A websocket event from the server side.
+        _resizeHandler(new UpDroidMessage.fromString(event.data));
+      }
     });
 
     _ws.onError.listen((e) {
@@ -94,22 +99,20 @@ class UpDroidConsole extends TabController {
     });
   }
 
-  void _resizeEvent(CommanderMessage m) {
-    List newSize = m.body.split('x');
+  /// Handle an incoming resize event, originating from either this [UpDroidConsole] or another.
+  void _resizeHandler(UpDroidMessage um) {
+    List newSize = um.body.split('x');
     int newRow = int.parse(newSize[0]);
     int newCol = int.parse(newSize[1]);
     _term.resize(newRow, newCol);
-    // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
-    mailbox.ws.send('[[RESIZE]]' + '${newRow}x${newCol - 1}');
   }
 
   //\/\/ Mailbox Handlers /\/\//
 
   void registerMailbox() {
-    mailbox.registerCommanderEvent('RESIZE', _resizeEvent);
-
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'START_PTY', _startPty);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PTY_READY', _initWebSocket);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'RESIZE', _resizeHandler);
   }
 
   /// Sets up the event handlers for the console.
@@ -129,12 +132,12 @@ class UpDroidConsole extends TabController {
     });
 
     window.onResize.listen((e) {
-      if (view.content.parent.classes.contains('active')) {
+      if (view.content.parent.parent.classes.contains('active')) {
         // Timer prevents a flood of resize events slowing down the system and allows the window to settle.
         if (_resizeTimer != null) _resizeTimer.cancel();
         _resizeTimer = new Timer(new Duration(milliseconds: 500), () {
           List<int> newSize = _term.calculateSize();
-          cs.add(new CommanderMessage('UPDROIDCONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
+          mailbox.ws.send('[[RESIZE]]' + '${newSize[0]}x${newSize[1]}');
         });
       }
     });

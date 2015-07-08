@@ -29,7 +29,7 @@ class CmdrCamera {
   }
 
   void _closeTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', id, um));
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
   }
 
   void _handleInputStream(HttpRequest request) {

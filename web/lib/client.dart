@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
+import 'tabs/tab_controller.dart';
 import 'panels/explorer/explorer.dart';
 import 'tabs/teleop/teleop.dart';
 import 'tabs/editor/editor.dart';
@@ -87,7 +88,7 @@ class UpDroidClient {
     for (int i = 1; i <= 2; i++) {
       _columns[i].forEach((tab) {
 
-        if (tab.tabType == className) ids.add(tab.id);
+        if (tab.fullName == className) ids.add(tab.id);
       });
     }
 
@@ -170,34 +171,6 @@ class UpDroidClient {
 
   //\/\/ Mailbox Handlers /\/\//
 
-  void _closeTab(CommanderMessage m) {
-    String id = m.body;
-    List idList = id.split('_');
-    String type = idList[0];
-    int num = int.parse(idList[1]);
-
-    // Find the tab to remove and remove it.
-    // Also take note of the column it was found in.
-    int col;
-    for (int i = 1; i <= 2; i++) {
-      for (int j = 0; j < _columns[i].length; j++) {
-        if (_columns[i][j].tabType == type && _columns[i][j].id == num) {
-          _columns[i].removeAt(j);
-          col = i;
-        }
-      }
-    }
-
-    // Make all tabs in that column inactive except the last.
-    for (int j = 1; j < _columns[col].length; j++) {
-      _columns[col][j].makeInactive();
-    }
-
-    if (_columns[col].length > 0) _columns[col].last.makeActive();
-
-    _mailbox.ws.send('[[CLOSE_TAB]]' + id);
-  }
-
   void _closeTabFromServer(UpDroidMessage um) {
     String id = um.body;
     List idList = id.split('_');
@@ -207,21 +180,22 @@ class UpDroidClient {
     // Find the tab to remove and remove it.
     // Also take note of the column it was found in.
     int col;
-    for (int i = 0; i <= 1; i++) {
-      for (int j = 0; j < _columns[i].length; j++) {
-        if (_columns[i][j].tabType == type && _columns[i][j].id == num) {
-          _columns[i].removeAt(j);
-          col = i;
+    for (int currColumn = 0; currColumn < 3; currColumn++) {
+      for (int currContainer = 0; currContainer < _columns[currColumn].length; currContainer++) {
+        if (_columns[currColumn][currContainer].fullName == type && _columns[currColumn][currContainer].id == num) {
+          _columns[currColumn].removeAt(currContainer);
+          col = currColumn;
         }
       }
     }
 
     // Make all tabs in that column inactive except the last.
-    for (int j = 0; j < _columns[col].length; j++) {
-      _columns[col][j].makeInactive();
-    }
+    _columns[col].forEach((TabController tab) => tab.makeInactive());
 
+    // If there's at least one tab left, make the last one active.
     if (_columns[col].length > 0) _columns[col].last.makeActive();
+
+    _mailbox.ws.send('[[CLOSE_TAB]]' + id);
   }
 
   void _openTabFromButton(int column, String className) {
@@ -232,7 +206,6 @@ class UpDroidClient {
   void _getClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
 
   void _registerMailbox() {
-    _mailbox.registerCommanderEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerCommanderEvent('SERVER_DISCONNECT', _alertDisconnect);
 
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);

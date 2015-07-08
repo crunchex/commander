@@ -11,23 +11,23 @@ abstract class PanelController {
   int id, col;
   StreamController<CommanderMessage> cs;
   bool active;
-  String panelType, shortName;
+  String fullName, shortName;
 
   PanelView view;
   Mailbox mailbox;
 
 //  AnchorElement _closePanelButton;
 
-  PanelController(this.id, this.col, this.panelType, this.shortName, List menuConfig, [StreamController<CommanderMessage> cs, bool externalCss=false]) {
+  PanelController(this.id, this.col, this.fullName, this.shortName, List menuConfig, [StreamController<CommanderMessage> cs, bool externalCss=false]) {
     if (cs == null) {
-      mailbox = new Mailbox(panelType, id);
+      mailbox = new Mailbox(fullName, id);
     } else {
       this.cs = cs;
-      mailbox = new Mailbox(panelType, id, this.cs);
+      mailbox = new Mailbox(fullName, id, this.cs);
     }
     registerMailbox();
 
-    PanelView.createPanelView(id, col, panelType, shortName, menuConfig, externalCss).then((tabView) async {
+    PanelView.createPanelView(id, col, fullName, shortName, menuConfig, externalCss).then((tabView) async {
       view = tabView;
 
 //      _closePanelButton = view.refMap['close-panel'];

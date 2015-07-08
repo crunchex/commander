@@ -12,23 +12,23 @@ abstract class TabController {
   int id, col;
   StreamController<CommanderMessage> cs;
   bool active;
-  String tabType, shortName;
+  String fullName, shortName;
 
   TabView view;
   Mailbox mailbox;
 
   AnchorElement _closeTabButton;
 
-  TabController(this.id, this.col, this.tabType, this.shortName, List menuConfig, [StreamController<CommanderMessage> cs, bool externalCss=false]) {
+  TabController(this.id, this.col, this.fullName, this.shortName, List menuConfig, [StreamController<CommanderMessage> cs, bool externalCss=false]) {
     if (cs == null) {
-      mailbox = new Mailbox(tabType, id);
+      mailbox = new Mailbox(fullName, id);
     } else {
       this.cs = cs;
-      mailbox = new Mailbox(tabType, id, this.cs);
+      mailbox = new Mailbox(fullName, id, this.cs);
     }
     registerMailbox();
 
-    TabView.createTabView(id, col, tabType, shortName, menuConfig, externalCss).then((tabView) {
+    TabView.createTabView(id, col, fullName, shortName, menuConfig, externalCss).then((tabView) {
       view = tabView;
 
       _closeTabButton = view.refMap['close-tab'];
@@ -57,12 +57,8 @@ abstract class TabController {
     view.destroy();
     cleanUp();
 
-    if (cs != null) {
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${tabType}_$id'));
-    } else {
-      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${tabType}_$id');
-      mailbox.ws.send(um.s);
-    }
+    UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${fullName}_$id');
+    mailbox.ws.send(um.s);
   }
 
 //  void _cloneTab(Event e) {

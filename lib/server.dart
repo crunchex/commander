@@ -122,8 +122,8 @@ class CmdrServer {
   void _registerMailbox() {
     _mailbox.registerWebSocketEvent('CLIENT_CONFIG', _clientConfig);
     _mailbox.registerWebSocketEvent('GIT_PUSH', _gitPush);
-    _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
+    _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
 //    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
 //    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
@@ -131,6 +131,7 @@ class CmdrServer {
     _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
 
     _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
+    _mailbox.registerServerMessageHandler('CLOSE_TAB', _closeTabFromServer);
     _mailbox.registerServerMessageHandler('REQUEST_EDITOR_LIST', _sendEditorList);
   }
 
@@ -233,13 +234,15 @@ class CmdrServer {
     String type = idList[0].toLowerCase();
     int id = int.parse(idList[1]);
 
-    help.debug('Close tab request received: $id', 0);
+    help.debug('Close tab request received: ${idList.toString()}', 0);
 
     if (_tabs[type][id] != null) {
       _tabs[type][id].cleanup();
       _tabs[type].remove(id);
     }
   }
+
+  void _closeTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[CLOSE_TAB]]' + um.body);
 
   void _sendEditorList(UpDroidMessage um) {
     String pathToOpen = um.body;

@@ -4,6 +4,38 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOPDIR=$DIR/..
 
+function usage {
+    echo "usage: build_cmdr [[[-n onlycss ] | [-h]]"
+}
+
+# process args
+onlycss=0
+while [ "$1" != "" ]; do
+    case $1 in
+        -o | --onlycss )        shift
+                                onlycss=1
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+
+if [ $onlycss == 1 ]; then
+	cd $TOPDIR/
+
+	echo -n "Compiling less to css......."
+	WEB=$TOPDIR/web
+	rm -f $WEB/css/main.css
+	lessc $WEB/css/main.less > $WEB/css/main.css
+
+	echo "OK"
+	exit 0
+fi
+
 ### start build ###
 echo ""
 echo "##### Building Commander... ######"

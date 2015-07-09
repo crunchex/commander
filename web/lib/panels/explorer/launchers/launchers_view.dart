@@ -62,8 +62,8 @@ abstract class RosEntityView {
 
     filename = new SpanElement()
       ..classes.add('explorer-ros-name')
-      ..text = this.name
-      ..title = this.name;
+      ..text = this.name.replaceAll('.launch', '')
+      ..title = this.name.replaceAll('.launch', '');
     container.children.add(filename);
   }
 

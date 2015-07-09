@@ -100,11 +100,15 @@ class UpDroidCamera extends TabController {
     new js.JsObject(js.context['jsmpeg'], [client, options]);
   }
 
+  //\/\/ Mailbox Handlers /\/\//
+
   void _signalReady(UpDroidMessage um) {
     mailbox.ws.send('[[SIGNAL_READY]]');
   }
 
-  //\/\/ Mailbox Handlers /\/\//
+  void _throwAlert(UpDroidMessage um) {
+    window.alert('Camera won\'t work without ffmpeg. Please install it!');
+  }
 
   void _postReadySetup(UpDroidMessage um) {
     List<int> sortedIds = _setDevices(um.body);
@@ -115,6 +119,7 @@ class UpDroidCamera extends TabController {
 
   void registerMailbox() {
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SIGNAL_READY', _signalReady);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'NO_FFMPEG', _throwAlert);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CAMERA_READY', _postReadySetup);
   }
 

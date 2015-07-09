@@ -25,6 +25,12 @@ class CmdrCamera {
   }
 
   void _signalReady(UpDroidMessage) {
+    ProcessResult result = Process.runSync('bash', ['-c', 'ffmpeg --help']);
+    if (result.exitCode == 127) {
+      mailbox.ws.add('[[NO_FFMPEG]]');
+      return;
+    }
+
     mailbox.ws.add('[[CAMERA_READY]]' + JSON.encode(_getDeviceIds()));
   }
 

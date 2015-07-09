@@ -46,7 +46,7 @@ class UpDroidConsole extends TabController {
     _term = new Terminal(view.content)
       ..scrollSpeed = 3
       ..cursorBlink = true
-      ..theme = new Theme.UpDroidDark();
+      ..theme = new Theme.UpDroidLight();
   }
 
   /// Toggles between a Solarized dark and light theme.

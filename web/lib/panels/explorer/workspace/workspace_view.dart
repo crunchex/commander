@@ -49,7 +49,6 @@ abstract class FileSystemEntityView {
     container = new DivElement()
       ..classes.add('explorer-fs-container')
       ..style.userSelect = 'none';
-    element.children.add(container);
 
     icon = new SpanElement()
       ..classes.addAll(['glyphicons', 'explorer-icon']);
@@ -95,17 +94,30 @@ abstract class FileSystemEntityView {
 }
 
 class FolderView extends FileSystemEntityView {
-  final String openFolderClass = 'glyphicons-folder-open';
-  final String closedFolderClass = 'glyphicons-folder-closed';
+  final String openFolderClass = 'glyphicons-expand';
+  final String closedFolderClass = 'glyphicons-collapse';
+  final String iconClass = 'glyphicons-folder-closed';
 
   bool expanded = false;
+  DivElement outerContainer;
+  SpanElement expanderIcon;
   UListElement uElement;
 
   FolderView(String name, [bool expanded]) : super(name) {
     this.expanded = expanded;
 
+    outerContainer = new DivElement()
+    ..classes.add('explorer-fs-outer-container');
+    element.children.add(outerContainer);
+
+    expanderIcon = new SpanElement()
+    ..classes.addAll(['glyphicons', 'explorer-expander-icon']);
+    this.expanded ? expanderIcon.classes.add(openFolderClass) : expanderIcon.classes.add(closedFolderClass);
+    outerContainer.children.add(expanderIcon);
+
     container.classes.add('explorer-folder');
-    this.expanded ? icon.classes.add(openFolderClass) : icon.classes.add(closedFolderClass);
+    icon.classes.add(iconClass);
+    outerContainer.children.add(container);
 
     uElement = new UListElement()
       ..hidden = true
@@ -115,13 +127,13 @@ class FolderView extends FileSystemEntityView {
 
   void toggleExpansion() {
     if (expanded) {
-      icon.classes.remove(openFolderClass);
-      icon.classes.add(closedFolderClass);
+      expanderIcon.classes.remove(openFolderClass);
+      expanderIcon.classes.add(closedFolderClass);
       uElement.hidden = true;
       expanded = false;
     } else {
-      icon.classes.remove(closedFolderClass);
-      icon.classes.add(openFolderClass);
+      expanderIcon.classes.remove(closedFolderClass);
+      expanderIcon.classes.add(openFolderClass);
       uElement.hidden = false;
       expanded = true;
     }
@@ -130,9 +142,9 @@ class FolderView extends FileSystemEntityView {
   void toggleBuildingIndicator() {
     if (icon.classes.contains('glyphicons-refresh')) {
       icon.classes.remove('glyphicons-refresh');
-      (expanded) ? icon.classes.add(openFolderClass) : icon.classes.add(closedFolderClass);
+      icon.classes.add(iconClass);
     } else {
-      (expanded) ? icon.classes.remove(openFolderClass) : icon.classes.remove(closedFolderClass);
+      icon.classes.remove(iconClass);
       icon.classes.add('glyphicons-refresh');
     }
   }
@@ -144,5 +156,6 @@ class FileView extends FileSystemEntityView {
   FileView(String name) : super(name) {
     container.classes.add('explorer-file');
     icon.classes.add(fileClass);
+    element.children.add(container);
   }
 }

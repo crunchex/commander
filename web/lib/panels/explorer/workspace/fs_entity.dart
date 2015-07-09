@@ -97,11 +97,11 @@ class FolderEntity extends FileSystemEntity {
       }
     });
 
-    view.container.onDoubleClick.listen((e) {
-      deselectAllEntities();
-      FolderView folderView = view;
+    FolderView folderView = view;
+    folderView.expanderIcon.onClick.listen((e) {
+//      deselectAllEntities();
       folderView.toggleExpansion();
-      select();
+//      select();
     });
 
     view.container.onContextMenu.listen((e) {

@@ -16,7 +16,8 @@ class Package {
   void setUpPackageView() {
     view = new PackageView(name);
 
-    view.container.onDoubleClick.listen((e) {
+    PackageView packageView = view;
+    packageView.expanderIcon.onClick.listen((e) {
       view.toggleExpansion();
     });
   }

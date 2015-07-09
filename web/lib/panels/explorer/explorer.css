@@ -26,7 +26,7 @@
 }
 
 .explorer-li {
-    margin-left: 8px;
+    margin-left: 15px;
     cursor: pointer;
 }
 
@@ -39,25 +39,27 @@
     margin-left: 0;
 }
 
-.explorer-fs-container,
+.explorer-fs-outer-container,
+.explorer-fs-container {
+    padding: 2px;
+    color: #0c0c0c;
+}
+
+.explorer-ros-outer-container,
 .explorer-ros-container {
     padding: 2px;
     color: #0c0c0c;
 }
 
-.explorer-fs-container {
-    text-overflow: ellipsis;
-    overflow-x: hidden;
+.explorer-fs-container.explorer-folder,
+.explorer-ros-container.explorer-package {
+    display: inline;
 }
 
-.explorer-ros-container.explorer-node {
+.explorer-fs-container,
+.explorer-ros-container {
     text-overflow: ellipsis;
     overflow-x: hidden;
-}
-
-.explorer-ros-container.explorer-arg-container {
-    padding: 0;
-    margin-left: 2px;
 }
 
 .explorer-fs-container.selected,
@@ -83,11 +85,16 @@
     font-size: 12px;
 }
 
+.explorer-expander-icon,
 .explorer-icon {
     display: inline;
     position: relative;
     top: 2px;
     margin-right: 3px;
+}
+
+.explorer-fs-container.explorer-file {
+    margin-left: 19px;
 }
 
 .explorer-fs-name,

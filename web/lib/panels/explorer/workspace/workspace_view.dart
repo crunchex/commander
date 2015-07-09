@@ -56,7 +56,8 @@ abstract class FileSystemEntityView {
 
     filename = new SpanElement()
       ..classes.add('explorer-fs-name')
-      ..text = this.name;
+      ..text = this.name
+      ..title = this.name;
     container.children.add(filename);
   }
 

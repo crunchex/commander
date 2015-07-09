@@ -77,6 +77,8 @@ class UpDroidCamera extends TabController {
   }
 
   List<int> _setDevices(String devices) {
+    if (devices == '[]') return [];
+
     List<int> deviceIds = JSON.decode(devices);
     deviceIds.sort((a, b) => a.compareTo(b));
     deviceIds.forEach((int i) {
@@ -106,6 +108,8 @@ class UpDroidCamera extends TabController {
 
   void _postReadySetup(UpDroidMessage um) {
     List<int> sortedIds = _setDevices(um.body);
+    if (sortedIds.isEmpty) return;
+
     _startPlayer(id % sortedIds.length);
   }
 

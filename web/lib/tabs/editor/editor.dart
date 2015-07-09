@@ -19,6 +19,12 @@ part 'templates.dart';
 class UpDroidEditor extends TabController {
   static String className = 'UpDroidEditor';
 
+  static List<String> prettyThemeNames() {
+    List<String> themes = [];
+    ace.Theme.THEMES.forEach((String s) => themes.add(s.toLowerCase().replaceAll('_', ' ')));
+    return themes;
+  }
+
   static List getMenuConfig() {
     List menu = [
       {'title': 'File', 'items': [
@@ -30,7 +36,7 @@ class UpDroidEditor extends TabController {
         {'type': 'toggle', 'title': 'Save As'},
         {'type': 'toggle', 'title': 'Close Tab'}]},
       {'title': 'Settings', 'items': [
-        {'type': 'toggle', 'title': 'Invert'},
+        {'type': 'submenu', 'title': 'Theme...', 'items': prettyThemeNames()},
         {'type': 'input', 'title': 'Font Size'}]}
     ];
     return menu;
@@ -40,7 +46,6 @@ class UpDroidEditor extends TabController {
 
   AnchorElement _blankButton, _launchButton, _talkerButton, _listenerButton, _pubButton, _subButton;
   AnchorElement _saveButton, _saveAsButton;
-  AnchorElement _themeButton;
   InputElement _fontSizeInput;
 
   // Stream Subscriptions.
@@ -66,7 +71,6 @@ class UpDroidEditor extends TabController {
     _listenerButton = view.refMap['hello-world-listener-button'];
     _saveButton = view.refMap['save'];
     _saveAsButton = view.refMap['save-as'];
-    _themeButton = view.refMap['invert'];
     _fontSizeInput = view.refMap['font-size'];
 
     ace.implementation = ACE_PROXY_IMPLEMENTATION;
@@ -108,10 +112,16 @@ class UpDroidEditor extends TabController {
     _subs.add(_saveButton.onClick.listen((e) => _saveHandler()));
     _subs.add(_saveAsButton.onClick.listen((e) => _saveAsHandler()));
 
-    _subs.add(_themeButton.onClick.listen((e) => _invertTheme(e)));
+//    _subs.add(_themeButton.onClick.listen((e) => _invertTheme(e)));
     _subs.add(_fontSizeInput.onClick.listen((e) => _updateFontSize(e)));
 
     _subs.add(_aceEditor.onChange.listen((e) => _updateUnsavedChangesIndicator()));
+
+    ace.Theme.THEMES.forEach((String fontName) {
+      String mapName = fontName.toLowerCase().replaceAll('_', '-');
+      Element fontButton = view.refMap['$mapName-button'];
+      _subs.add(fontButton.onClick.listen((e) => _setTheme(e, fontName)));
+    });
   }
 
   // Mailbox Handlers
@@ -159,13 +169,10 @@ class UpDroidEditor extends TabController {
     });
   }
 
-  void _invertTheme(Event e) {
+  void _setTheme(Event e, String themeName) {
     // Stops the button from sending the page to the top (href=#).
     e.preventDefault();
-
-    bool dark = _aceEditor.theme.name == 'solarized_dark';
-    String newTheme = dark ? ace.Theme.SOLARIZED_LIGHT : ace.Theme.SOLARIZED_DARK;
-    _aceEditor.theme = new ace.Theme.named(newTheme);
+    _aceEditor.theme = new ace.Theme.named(themeName);
   }
 
   void _updateFontSize(Event e) {

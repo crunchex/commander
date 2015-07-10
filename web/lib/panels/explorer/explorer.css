@@ -9,6 +9,8 @@
     text-align: center;
     height: 100%;
     margin: 0;
+    /*font-family: "Avenir Next LT Pro Regular";*/
+    font-family:  "Monosten A", monospace;
 }
 
 .exp-container {

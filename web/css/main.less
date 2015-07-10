@@ -149,15 +149,19 @@ html, body {
 
 .fill {
   height: ~"calc(100% - 30px)";
+  padding: 0 5px 0 5px;
 }
 
 .row {
   height: 100%;
+  margin: 0;
 }
 
 .column-content {
   list-style: none;
   height: ~"calc(100% - 27px)";
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .column-content.col-xs-5 {
@@ -192,11 +196,6 @@ html, body {
 
 .tab-pane {
   height: 100%;
-}
-
-.col-xs-2, .col-xs-5 {
-  padding-left: 10px;
-  padding-right: 10px;
 }
 
 /* Tab Handles */
@@ -247,6 +246,7 @@ html, body {
   color: @upcom-dark-grey;
   background-color: @upcom-light-grey;
   padding: 4px 18px 4px 8px;
+  border-radius: 0;
 }
 
 .col-xs-2 .nav-tabs>.tab-handle>a {
@@ -322,6 +322,7 @@ html, body {
 
 .dropdown-menu>li>a:hover {
   background-color: @brand-red;
+  color: @upcom-white;
   .font-avenir();
 }
 

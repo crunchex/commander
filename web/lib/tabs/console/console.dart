@@ -46,12 +46,12 @@ class UpDroidConsole extends TabController {
     _term = new Terminal(view.content)
       ..scrollSpeed = 3
       ..cursorBlink = true
-      ..theme = new Theme.UpDroidLight();
+      ..theme = customLightTheme();
   }
 
   /// Toggles between a Solarized dark and light theme.
   void _toggleTheme() {
-    _term.theme = _term.theme.name == 'updroid-light' ? new Theme.UpDroidDark() : new Theme.UpDroidLight();
+    _term.theme = _term.theme.name == 'updroid-light' ? customDarkTheme() : customLightTheme();
   }
 
   /// Toggles cursor blink on/off.
@@ -105,6 +105,44 @@ class UpDroidConsole extends TabController {
     int newRow = int.parse(newSize[0]);
     int newCol = int.parse(newSize[1]);
     _term.resize(newRow, newCol);
+  }
+
+  Theme customDarkTheme() {
+    String name = 'updroid-dark';
+    Map<String, String> colors = {
+      'black'   : 'rgb(74, 74, 74)',
+      'red'     : '#ff2919',
+      'green'   : '#ff2919',
+      'yellow'  : '#ff2919',
+      'blue'    : '#0c0c0c',
+      'magenta' : '#0c0c0c',
+      'cyan'    : '#0c0c0c',
+      'white'   : '#eaecec'
+    };
+
+    String foregroundColor = colors['white'];
+    String backgroundColor = colors['black'];
+
+    return new Theme(name, colors, foregroundColor, backgroundColor);
+  }
+
+  Theme customLightTheme() {
+    String name = 'updroid-light';
+    Map<String, String> colors = {
+      'black'   : '#eaecec',
+      'red'     : '#ff2919',
+      'green'   : '#ff2919',
+      'yellow'  : '#ff2919',
+      'blue'    : '#7e7e7e',
+      'magenta' : '#7e7e7e',
+      'cyan'    : '#7e7e7e',
+      'white'   : '#1e1e1e'
+    };
+
+    String foregroundColor = colors['white'];
+    String backgroundColor = colors['black'];
+
+    return new Theme(name, colors, foregroundColor, backgroundColor);
   }
 
   //\/\/ Mailbox Handlers /\/\//

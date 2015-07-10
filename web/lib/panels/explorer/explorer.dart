@@ -20,13 +20,14 @@ class UpDroidExplorer extends PanelController {
   static List getMenuConfig() {
     List menu = [
       {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'New Package'},
+        {'type': 'divider', 'title': ''},
         {'type': 'toggle', 'title': 'New Workspace'},
         {'type': 'submenu', 'title': 'Open Workspace', 'items': []}]},
 //        {'type': 'toggle', 'title': 'Close Workspace'}]},
 //        {'type': 'toggle', 'title': 'Close Panel'}]},
       {'title': 'Actions', 'items': [
         {'type': 'divider', 'title': 'Workspace'},
-        {'type': 'toggle', 'title': 'New Package'},
         {'type': 'toggle', 'title': 'Build Packages'},
         {'type': 'toggle', 'title': 'Clean Workspace'},
 //        {'type': 'toggle', 'title': 'Upload with Git'},

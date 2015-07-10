@@ -482,6 +482,10 @@ li div input {
 
 /* Modal */
 
+h3, h5 {
+  .font-avenir-demi();
+}
+
 #save-input {
   margin-left: 10px;
 }
@@ -508,6 +512,7 @@ li div input {
 
 .modal-content {
   background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 0;
 }
 
 .modal-header {
@@ -529,7 +534,8 @@ li div input {
 }
 
 .btn-primary,
-.btn-warning {
+.btn-warning,
+.btn-default {
   box-shadow: none;
   width: 100%;
   background-color: @upcom-light-grey;
@@ -550,6 +556,11 @@ li div input {
   background-color:@brand-red;
   color: @upcom-white;
   border: 1px solid @brand-red;
+}
+
+.modal-footer .btn.btn-primary,
+.modal-footer .btn.btn-warning {
+  margin-left: 0;
 }
 
 code, kbd, pre, samp {

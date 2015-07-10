@@ -19,9 +19,17 @@ part 'templates.dart';
 class UpDroidEditor extends TabController {
   static String className = 'UpDroidEditor';
 
+  static List<String> getThemes() {
+    return ace.Theme.THEMES.where((String s) {
+      return s != 'chrome' && s != 'clouds' && s != 'dreamweaver' && s != 'xcode' && s != 'textmate'
+      && s != 'github' && s != 'eclipse' && s != 'crimson' && s != 'dawn' && s != 'vibrant_ink'
+      && s != 'github' && s != 'eclipse' && s != 'crimson' && s != 'dawn' && s != 'vibrant_ink';
+    });
+  }
+
   static List<String> prettyThemeNames() {
     List<String> themes = [];
-    ace.Theme.THEMES.forEach((String s) => themes.add(s.toLowerCase().replaceAll('_', ' ')));
+    getThemes().forEach((String s) => themes.add(s.toLowerCase().replaceAll('_', ' ')));
     return themes;
   }
 
@@ -85,7 +93,7 @@ class UpDroidEditor extends TabController {
     _aceEditor = ace.edit(aceDiv)
       ..session.mode = new ace.Mode.named(ace.Mode.PYTHON)
       ..fontSize = _defaultFontSize
-      ..theme = new ace.Theme.named(ace.Theme.SOLARIZED_DARK)
+      ..theme = new ace.Theme.named(ace.Theme.KUROIR)
       ..commands.addCommand(save);
 
     _fontSizeInput.placeholder = _defaultFontSize.toString();
@@ -117,7 +125,7 @@ class UpDroidEditor extends TabController {
 
     _subs.add(_aceEditor.onChange.listen((e) => _updateUnsavedChangesIndicator()));
 
-    ace.Theme.THEMES.forEach((String fontName) {
+    getThemes().forEach((String fontName) {
       String mapName = fontName.toLowerCase().replaceAll('_', '-');
       Element fontButton = view.refMap['$mapName-button'];
       _subs.add(fontButton.onClick.listen((e) => _setTheme(e, fontName)));

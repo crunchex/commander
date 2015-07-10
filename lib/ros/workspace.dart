@@ -210,7 +210,7 @@ class Workspace {
     return c.future;
   }
 
-  void createPackage(String name, List<String> dependencies) {
+  Future<ProcessResult> createPackage(String name, List<String> dependencies) {
     String dependenciestring = '';
 
     if (dependencies.isNotEmpty) {
@@ -218,7 +218,7 @@ class Workspace {
     }
 
     String createPackageCommand = '$path/devel/setup.bash && catkin_create_pkg $name$dependenciestring';
-    Process.run('bash', ['-c', '. $createPackageCommand'], workingDirectory: '$path/src/', runInShell: true);
+    return Process.run('bash', ['-c', '. $createPackageCommand'], workingDirectory: '$path/src/', runInShell: true);
   }
 
   void runNode(String packageName, String nodeName, List args) {

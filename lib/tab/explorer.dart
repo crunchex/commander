@@ -215,7 +215,13 @@ class CmdrExplorer {
 
     List<String> dependencies = JSON.decode(split[1]);
 
-    _currentWorkspace.createPackage(name, dependencies);
+    // A workspace that hasn't been built yet will cause problems.
+    _currentWorkspace.createPackage(name, dependencies).then((ProcessResult result) {
+      String stderr = result.stderr;
+      if (stderr.contains('devel/setup.bash: No such file or directory')) {
+        mailbox.ws.add('[[CREATE_PACKAGE_FAILED]]' + stderr);
+      }
+    });
   }
 
   void _launcherList(UpDroidMessage um) {

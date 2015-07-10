@@ -40,6 +40,7 @@
 
 @brand-red: #ff2919;
 @upcom-white: #ffffff;
+@upcom-off-white: #f1f4f4;
 @upcom-light-grey: #eaecec;
 @upcom-med-grey: #e3e3e3;
 @upcom-dark-grey: #7e7e7e;
@@ -177,18 +178,43 @@ html, body {
   top: 0;
 }
 
-.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a,
-.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a:hover {
+.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a {
   margin-right: 0;
-  border-bottom-right-radius: 0;
+  //border-bottom-right-radius: 0;
+  border: none;
   background-color: @brand-red;
-  border-color: @brand-red;
+  //border-color: @brand-red;
   height: 46px;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a:hover {
+  background-color: @upcom-light-grey;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 .upcom-logo {
   height: 100%;
   width: 100%;
+  fill: @upcom-white;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a:hover>.upcom-logo {
+  fill: @upcom-black;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
 /* Tabs */

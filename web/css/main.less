@@ -152,12 +152,16 @@ html, body {
 }
 
 .fill {
-  height: ~"calc(100% - 81px)";
+  height: ~"calc(100% - 30px)";
 }
 
 .column-content {
   list-style: none;
-  height: 100%;
+  height: ~"calc(100% - 27px)";
+}
+
+.column-content.col-xs-5 {
+  margin-top: 27px;
 }
 
 .tab-pane {
@@ -166,11 +170,24 @@ html, body {
 
 /** Navbar */
 
-.nav.navbar-nav .upcom-logo {
-  position: absolute;
-  margin-top: 6px;
-  height: 30px;
-  left: ~"calc(50% - 40px)";
+.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle {
+  float: left;
+  width: 100px;
+  margin-bottom: 10px;
+  top: 0;
+}
+
+.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a {
+  margin-right: 0;
+  border-bottom-right-radius: 2px;
+}
+
+.upcom-logo {
+  //position: absolute;
+  //margin-top: 6px;
+  height: auto;
+  width: 100%;
+  //left: ~"calc(50% - 40px)";
 }
 
 ul.nav.navbar-nav.navbar-left,
@@ -250,6 +267,7 @@ body>.navbar.navbar-inverse {
 
 .col-xs-2>.nav-tabs>li.tab-handle {
   float: right;
+  top: 27px;
 }
 
 .col-xs-2>.nav-tabs>li.tab-handle>a {

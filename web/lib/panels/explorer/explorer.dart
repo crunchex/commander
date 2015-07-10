@@ -86,6 +86,8 @@ class UpDroidExplorer extends PanelController {
 
     _workspaceButton = view.refMap['workspace'];
     _launchersButton = view.refMap['launchers'];
+
+    _closeWorkspace();
   }
 
   //\/\/ Mailbox Handlers /\/\//
@@ -181,9 +183,8 @@ class UpDroidExplorer extends PanelController {
     if (controller != null) {
       controller.cleanUp();
       controller = null;
+      _refreshWorkspaceNames();
     }
-
-    _refreshWorkspaceNames();
   }
 
   //\/\/ Misc Methods /\/\//

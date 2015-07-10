@@ -52,7 +52,7 @@ html, body {
   min-height: 650px;
 }
 
-/** login */
+/* Login */
 
 .login-overlay {
   position: absolute;
@@ -145,7 +145,7 @@ html, body {
   transition: all 0.8s ease;
 }
 
-/** UpCom Body */
+/* UpCom Body */
 
 .fill {
   height: ~"calc(100% - 30px)";
@@ -164,11 +164,7 @@ html, body {
   margin-top: 27px;
 }
 
-.tab-pane {
-  height: 100%;
-}
-
-/** Nav/Logo */
+/* Nav/Logo */
 
 .col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle {
   float: left;
@@ -192,7 +188,18 @@ html, body {
   width: 100%;
 }
 
-/** Tabs */
+/* Tabs */
+
+.tab-pane {
+  height: 100%;
+}
+
+.col-xs-2, .col-xs-5 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Tab Handles */
 
 .column-content .nav-tabs {
   border-bottom-width: 0;
@@ -277,6 +284,20 @@ html, body {
   color: @upcom-dark-grey;
 }
 
+.nav-tabs>li>a.new-tab-button {
+  padding: 4px 8px 4px 8px;
+  background-color: transparent;
+  border-bottom-width: 0;
+  .font-avenir-demi();
+}
+
+.nav-tabs>li>a.new-tab-button:hover {
+  cursor: pointer;
+  color: @upcom-white;
+  background-color:@brand-red;
+  border-color:@brand-red;
+}
+
 /* Dropdown Menus */
 
 .dropdown.open>.dropdown-menu {
@@ -314,6 +335,14 @@ html, body {
   border: 1px solid @upcom-med-grey;
 }
 
+// Dropdown menu input item (see Editor > Settings > Font size)
+li div input {
+  margin-left: 10px;
+  border: 1px solid @upcom-med-grey;
+  padding-left: 5px;
+  width: 50px;
+}
+
 .menu-divider {
   margin-top: 5px;
   margin-bottom: 5px;
@@ -329,7 +358,7 @@ html, body {
   line-height: 9px;
 }
 
-/** Context Menu */
+/* Context Menu */
 
 .context-menu {
   margin: 0;
@@ -341,29 +370,31 @@ html, body {
   font-size: 12px;
 }
 
-li div input {
-  margin-left: 10px;
-  border: 1px solid @upcom-med-grey;
-  padding-left: 5px;
-  width: 50px;
+/* Submenu CSS */
+
+.dropdown-submenu {
+  position: relative;
 }
 
-.btn-default {
-  color: #333;
-  background-color: #dddddd;
-  border-color: #ccc;
+.dropdown-submenu>.dropdown-menu {
+  top: -1px;
+  left: 100%;
+  margin: 0;
+  /*-webkit-border-radius: 0;*/
+  /*-moz-border-radius: 0;*/
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.filename {
-  margin-left: 5px;
-  .font-avenir-demi();
-  font-size: 12px;
+.dropdown-submenu span {
+  float: right;
 }
 
-.col-xs-2, .col-xs-5 {
-  padding-left: 10px;
-  padding-right: 10px;
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
 }
+
+/* Tab Menus */
 
 .inner-tabs .dropdown-toggle {
   border-width: 0 0 1px 0;
@@ -400,19 +431,7 @@ li div input {
   float: right !important;
 }
 
-.nav-tabs>li>a.new-tab-button {
-  padding: 4px 8px 4px 8px;
-  background-color: transparent;
-  border-bottom-width: 0;
-  .font-avenir-demi();
-}
-
-.nav-tabs>li>a.new-tab-button:hover {
-  cursor: pointer;
-  color: @upcom-white;
-  background-color:@brand-red;
-  border-color:@brand-red;
-}
+/* Tab Content */
 
 .column-content>.tab-content {
   border: 1px solid @upcom-med-grey;
@@ -425,6 +444,8 @@ li div input {
   height: ~"calc(100% - 24px)";
   padding: 0 4px 4px 4px;
 }
+
+/* Modal */
 
 #save-input {
   margin-left: 10px;
@@ -516,7 +537,7 @@ code, kbd, pre, samp {
   padding: 5px;
 }
 
-/* workspace modal */
+/* Workspace Modal */
 
 #workspace-input *{
   margin-left: 20px;
@@ -561,9 +582,7 @@ code, kbd, pre, samp {
   padding: 10px;
 }
 
-.popover {
-  width: 500px;
-}
+/* Footer */
 
 .footer {
   width: 100%;
@@ -578,28 +597,4 @@ code, kbd, pre, samp {
   bottom: 0;
   right: 10px;
   font-size: 10px;
-}
-
-/* Submenu CSS */
-
-.dropdown-submenu {
-  position: relative;
-}
-
-.dropdown-submenu>.dropdown-menu {
-  top: -1px;
-  left: 100%;
-  margin: 0;
-  /*-webkit-border-radius: 0;*/
-  /*-moz-border-radius: 0;*/
-  border-radius: 0;
-  box-shadow: none;
-}
-
-.dropdown-submenu span {
-  float: right;
-}
-
-.dropdown-submenu:hover>.dropdown-menu {
-  display: block;
 }

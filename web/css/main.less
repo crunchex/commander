@@ -177,17 +177,23 @@ html, body {
   top: 0;
 }
 
-.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a {
+.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a,
+.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a:hover {
   margin-right: 0;
   border-bottom-right-radius: 2px;
+  background-color: @brand-red;
+  border-color: @brand-red;
 }
 
 .upcom-logo {
-  //position: absolute;
-  //margin-top: 6px;
+  position: relative;
+  top: 2px;
   height: auto;
   width: 100%;
-  //left: ~"calc(50% - 40px)";
+}
+
+svg {
+  fill: #ffffff;
 }
 
 ul.nav.navbar-nav.navbar-left,

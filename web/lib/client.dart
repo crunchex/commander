@@ -37,26 +37,26 @@ class UpDroidClient {
     _registerMailbox();
     _registerEventHandlers(_getConfig());
 
-    _pulseFeedback(querySelector('#feedback-button'));
+//    _pulseFeedback(querySelector('#feedback-button'));
   }
 
-  void _pulseFeedback(AnchorElement feedbackButton) {
-    // Initial pulse - 30 seconds in.
-    new Timer(new Duration(seconds: 30), () {
-      feedbackButton.classes.add('feedback-bold');
-      new Timer(new Duration(milliseconds: 500), () {
-        feedbackButton.classes.remove('feedback-bold');
-      });
-    });
-
-    // Every 5 minutes after.
-    new Timer.periodic(new Duration(minutes: 5), (timer) {
-      feedbackButton.classes.add('feedback-bold');
-      new Timer(new Duration(milliseconds: 500), () {
-        feedbackButton.classes.remove('feedback-bold');
-      });
-    });
-  }
+//  void _pulseFeedback(AnchorElement feedbackButton) {
+//    // Initial pulse - 30 seconds in.
+//    new Timer(new Duration(seconds: 30), () {
+//      feedbackButton.classes.add('feedback-bold');
+//      new Timer(new Duration(milliseconds: 500), () {
+//        feedbackButton.classes.remove('feedback-bold');
+//      });
+//    });
+//
+//    // Every 5 minutes after.
+//    new Timer.periodic(new Duration(minutes: 5), (timer) {
+//      feedbackButton.classes.add('feedback-bold');
+//      new Timer(new Duration(milliseconds: 500), () {
+//        feedbackButton.classes.remove('feedback-bold');
+//      });
+//    });
+//  }
 
   /// Returns a [Map] of all the tabs that [UpDroidClient] needs to spawn,
   /// where key = side|left|right| and value = a list of IDs and UpDroidTab.className.

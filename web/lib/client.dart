@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'tabs/tab_controller.dart';
+import 'panels/panel_controller.dart';
 import 'panels/explorer/explorer.dart';
 import 'tabs/teleop/teleop.dart';
 import 'tabs/editor/editor.dart';
@@ -15,9 +16,9 @@ import 'mailbox.dart';
 import 'column_view.dart';
 
 class UpDroidClient {
-  List<ColumnController> _columnControllers;
-  List<List<dynamic>> _columns;
   String _config;
+  List<PanelController> _panels;
+  List<ColumnController> _columnControllers;
 
   bool disconnectAlert = false;
 
@@ -26,8 +27,8 @@ class UpDroidClient {
   UpDroidClient() {
     _config = _getConfig();
 
-    // Column 0 is already added since it's special (uses panels and contains the logo).
-    _columns = [[]];
+    // TODO: figure out how to handle panels along with the logo.
+    _panels = [];
     _columnControllers = [];
 
     _mailbox = new Mailbox('UpDroidClient', 1);
@@ -127,17 +128,17 @@ class UpDroidClient {
   }
 
   void _openPanel(int column, int id, String className) {
-    if (_columns[column].length >= 1) return;
+    if (_panels.length >= 1) return;
 
-    if (_columns[column].isNotEmpty) {
-      for (var panel in _columns[column]) {
+    if (_panels.isNotEmpty) {
+      for (var panel in _panels) {
         panel.makeInactive();
       }
     }
 
     if (className == 'UpDroidExplorer') {
       _mailbox.ws.send('[[OPEN_PANEL]]' + '$column-$id-$className');
-      _columns[column].add(new UpDroidExplorer(id, column));
+      _panels.add(new UpDroidExplorer(id, column));
     }
   }
 

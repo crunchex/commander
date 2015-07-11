@@ -12,13 +12,11 @@ import 'tabs/console/console.dart';
 import 'tabs/camera/camera.dart';
 import 'modal/modal.dart';
 import 'mailbox.dart';
+import 'column_view.dart';
 
 class UpDroidClient {
   List<List<dynamic>> _columns;
   String _config;
-
-  AnchorElement _newButtonLeft;
-  AnchorElement _newButtonRight;
 
   bool disconnectAlert = false;
 
@@ -27,10 +25,8 @@ class UpDroidClient {
   UpDroidClient() {
     _config = _getConfig();
 
-    _columns = [[], [], []];
-
-    _newButtonLeft = querySelector('#column-1-new');
-    _newButtonRight = querySelector('#column-2-new');
+    // Column 0 is already added since it's special (uses panels and contains the logo).
+    _columns = [[]];
 
     _mailbox = new Mailbox('UpDroidClient', 1);
 
@@ -109,10 +105,27 @@ class UpDroidClient {
       }
     }
 
+    // Determine the column width for each tab column depending on how many
+    // there are in the config, minus 1 for the explorer panel.
+    const bootStrapColumnsForTabs = 10;
+    const numberOfPanels = 1;
+    int columnWidth = bootStrapColumnsForTabs ~/ (config.length - numberOfPanels);
+
     for (int i = 1; i < config.length; i++) {
-      for (Map tab in config[i]) {
-        _openTab(i, tab['id'], tab['class']);
-      }
+      ColumnView.createColumnView(i, columnWidth).then((ColumnView view) {
+        _columns.add([]);
+
+        view.controlButton.onClick.listen((e) {
+          e.preventDefault();
+          if (_columns[1].length >= 4) return;
+
+          new UpDroidOpenTabModal(1, _openTabFromButton);
+        });
+
+        for (Map tab in config[i]) {
+          _openTab(i, tab['id'], tab['class']);
+        }
+      });
     }
   }
 
@@ -202,18 +215,6 @@ class UpDroidClient {
   /// Sets up external event handlers for the various Commander classes. These
   /// are mostly listening events for [WebSocket] messages.
   void _registerEventHandlers(String config) {
-    _newButtonLeft.onClick.listen((e) {
-      e.preventDefault();
-      if (_columns[1].length >= 4) return;
 
-      new UpDroidOpenTabModal(1, _openTabFromButton);
-    });
-
-    _newButtonRight.onClick.listen((e) {
-      e.preventDefault();
-      if (_columns[2].length >= 4) return;
-
-      new UpDroidOpenTabModal(2, _openTabFromButton);
-    });
   }
 }

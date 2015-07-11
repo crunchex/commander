@@ -10,12 +10,13 @@ class ColumnView {
     return c.future;
   }
 
+  int id, width;
   DivElement columnContent;
   AnchorElement controlButton;
 
   DivElement _rowMain;
 
-  ColumnView(int id, int width) {
+  ColumnView(this.id, this.width) {
     _rowMain = querySelector('#row-main');
 
     columnContent = new DivElement()
@@ -43,6 +44,11 @@ class ColumnView {
       glyph.classes.addAll(['glyphicons', 'glyphicons-plus']);
     }
     controlLi.children.add(glyph);
+
+    DivElement tabContent = new DivElement()
+    ..id = 'col-$id-tab-content'
+    ..classes.add('tab-content');
+    columnContent.children.add(tabContent);
   }
 
   void cleanUp() {

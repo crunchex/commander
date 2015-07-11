@@ -217,6 +217,23 @@ html, body {
   transition: all 0.5s ease;
 }
 
+a.help-button,
+a.help-button:active,
+a.help-button:visited {
+  position: fixed;
+  right: 0;
+  margin: 5px 10px;
+  color: @brand-red;
+}
+
+a.help-button:hover {
+  color: @upcom-med-grey;
+}
+
+a.help-button>.glyphicons.glyphicons-circle-question-mark {
+  font-size: 18px;
+}
+
 /* Tabs */
 
 .tab-pane {

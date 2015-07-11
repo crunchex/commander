@@ -25,11 +25,17 @@ class CmdrCamera {
   }
 
   void _signalReady(UpDroidMessage) {
+    ProcessResult result = Process.runSync('bash', ['-c', 'ffmpeg --help']);
+    if (result.exitCode == 127) {
+      mailbox.ws.add('[[NO_FFMPEG]]');
+      return;
+    }
+
     mailbox.ws.add('[[CAMERA_READY]]' + JSON.encode(_getDeviceIds()));
   }
 
   void _closeTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', id, um));
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
   }
 
   void _handleInputStream(HttpRequest request) {

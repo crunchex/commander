@@ -66,8 +66,24 @@ class CmdrPty {
       .listen((data) => _ptySocket.add(data));
   }
 
-  void _resize(UpDroidMessage um) {
-    _shell.stdin.writeln(um.body);
+  void _resizeRelay(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidConsole', 0, um));
+  }
+
+  void _closeTab(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  }
+
+  void _resizeHandle(UpDroidMessage um) {
+    // Resize the shell.
+    List newSize = um.body.split('x');
+    int newRow = int.parse(newSize[0]);
+    int newCol = int.parse(newSize[1]) - 1;
+    _shell.stdin.writeln('${newRow}x${newCol}');
+
+    // Send the new size to all UpDroidConsoles (including this one) to be relayed
+    // back to their client side.
+    mailbox.ws.add(um.toString());
   }
 
   void cleanup() {
@@ -78,7 +94,10 @@ class CmdrPty {
 
   void _registerMailbox() {
     mailbox.registerWebSocketEvent('START_PTY', _startPty);
-    mailbox.registerWebSocketEvent('RESIZE', _resize);
+    mailbox.registerWebSocketEvent('RESIZE', _resizeRelay);
+    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
+
+    mailbox.registerServerMessageHandler('RESIZE', _resizeHandle);
 
     mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/cmdr-pty', _handleIOStream);
   }

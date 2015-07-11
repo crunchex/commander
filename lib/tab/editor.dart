@@ -21,30 +21,10 @@ class CmdrEditor {
     _registerMailbox();
   }
 
-  void _sendPath(UpDroidMessage um) {
-    if (_currentWorkspace == null) {
-      mailbox.ws.add('[[NO_CURRENT_WORKSPACE]]');
-      return;
-    }
-
-    mailbox.ws.add('[[EDITOR_DIRECTORY_PATH]]' + _currentWorkspace.path);
-  }
-
-  void _sendFileContents(UpDroidMessage um) {
+  void _openFile(UpDroidMessage um) {
     var fileToOpen = new File(um.body);
     fileToOpen.readAsString().then((String contents) {
-      mailbox.ws.add('[[EDITOR_FILE_TEXT]]' + um.body + '[[CONTENTS]]' + contents);
-    });
-  }
-
-  void _sendEditorList(UpDroidMessage um) {
-    if (_currentWorkspace == null) {
-      mailbox.ws.add('[[NO_CURRENT_WORKSPACE]]');
-      return;
-    }
-
-    help.getDirectory(new Directory(uproot.path)).then((files) {
-      mailbox.ws.add('[[PATH_LIST]]' + files.toString());
+      mailbox.ws.add('[[OPEN_FILE]]' + um.body + '[[CONTENTS]]' + contents);
     });
   }
 
@@ -63,8 +43,21 @@ class CmdrEditor {
     }
   }
 
+  void _requestSelected(UpDroidMessage um) {
+    UpDroidMessage newMessage = new UpDroidMessage(um.header, id.toString());
+    CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', -1, newMessage));
+  }
+
+  void _closeTab(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  }
+
   void _setCurrentWorkspace(UpDroidMessage um) {
     _currentWorkspace = new Workspace('${uproot.path}/${um.body}');
+  }
+
+  void _returnSelected(UpDroidMessage um) {
+    mailbox.ws.add('[[REQUEST_SELECTED]]' + um.body);
   }
 
   void cleanup() {
@@ -72,12 +65,12 @@ class CmdrEditor {
   }
 
   void _registerMailbox() {
-    mailbox.registerWebSocketEvent('EDITOR_DIRECTORY_PATH', _sendPath);
-    mailbox.registerWebSocketEvent('EDITOR_REQUEST_LIST', _sendEditorList);
-    mailbox.registerWebSocketEvent('EDITOR_OPEN', _sendFileContents);
-    mailbox.registerWebSocketEvent('EDITOR_SAVE', _saveFile);
+    mailbox.registerWebSocketEvent('SAVE_FILE', _saveFile);
+    mailbox.registerWebSocketEvent('REQUEST_SELECTED', _requestSelected);
+    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
 
-    mailbox.registerServerMessageHandler('OPEN_FILE', _sendFileContents);
+    mailbox.registerServerMessageHandler('OPEN_FILE', _openFile);
     mailbox.registerServerMessageHandler('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);
+    mailbox.registerServerMessageHandler('RETURN_SELECTED', _returnSelected);
   }
 }

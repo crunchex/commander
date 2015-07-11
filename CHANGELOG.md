@@ -1,5 +1,20 @@
 # Change Log
 
+## 0.5.0 - 2015-7-10
+
+### New
+	- Redesigned Explorer, bot visually and functionally.
+	- New look and color scheme (as always, a work in progress).
+
+### Changed
+	- Replaced all drag-and-drop interaction with right-click and dropdown menus where appropriate.
+	- Removed basic integration with git (temporary until we can do it right)!
+	- Window.alert gets more usage where appropriate.
+	- A temporary help-button is now in the top-right corner.
+
+### Fixed
+	- Numerous bug fixes... too many to count due to extensive rewrite.
+
 ## 0.4.8 - 2015-6-4
 
 ### New

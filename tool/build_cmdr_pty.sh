@@ -34,6 +34,7 @@ cd $GO_CMDRPTY_PATH
 go get github.com/gorilla/websocket
 go get github.com/creack/goterm/win
 go get github.com/kr/pty
+go get gopkg.in/alecthomas/kingpin.v2
 go clean -i
 go install
 echo "OK"

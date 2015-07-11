@@ -20,13 +20,14 @@ class UpDroidExplorer extends PanelController {
   static List getMenuConfig() {
     List menu = [
       {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'New Package'},
+        {'type': 'divider', 'title': ''},
         {'type': 'toggle', 'title': 'New Workspace'},
         {'type': 'submenu', 'title': 'Open Workspace', 'items': []}]},
 //        {'type': 'toggle', 'title': 'Close Workspace'}]},
 //        {'type': 'toggle', 'title': 'Close Panel'}]},
       {'title': 'Actions', 'items': [
         {'type': 'divider', 'title': 'Workspace'},
-        {'type': 'toggle', 'title': 'New Package'},
         {'type': 'toggle', 'title': 'Build Packages'},
         {'type': 'toggle', 'title': 'Clean Workspace'},
 //        {'type': 'toggle', 'title': 'Upload with Git'},
@@ -66,8 +67,8 @@ class UpDroidExplorer extends PanelController {
 
   List<String> _workspaceNames;
 
-  UpDroidExplorer(int id, int col, StreamController<CommanderMessage> cs) :
-  super(id, col, className, 'Explorer', getMenuConfig(), cs, true) {
+  UpDroidExplorer(int id, int col) :
+  super(id, col, className, 'Explorer', getMenuConfig(), true) {
 
   }
 
@@ -86,6 +87,8 @@ class UpDroidExplorer extends PanelController {
 
     _workspaceButton = view.refMap['workspace'];
     _launchersButton = view.refMap['launchers'];
+
+    _closeWorkspace();
   }
 
   //\/\/ Mailbox Handlers /\/\//
@@ -94,6 +97,7 @@ class UpDroidExplorer extends PanelController {
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'REQUEST_WORKSPACE_NAMES', _requestWorkspaceNames);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'EXPLORER_DIRECTORY_PATH', _explorerDirPath);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'WORKSPACE_NAMES', _refreshOpenMenu);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REQUEST_SELECTED', _requestSelected);
   }
 
   void _requestWorkspaceNames(UpDroidMessage um) => _refreshWorkspaceNames();
@@ -107,7 +111,7 @@ class UpDroidExplorer extends PanelController {
     _workspaceNames = JSON.decode(um.body);
     _workspaceNames.forEach((String name) => _addWorkspaceToMenu(name));
 
-    if (controller != null) return;
+    if (controller != null || view.content.children.isNotEmpty) return;
 
     ParagraphElement placeholderText = new ParagraphElement()
       ..classes.add('explorer-placeholder');
@@ -118,6 +122,19 @@ class UpDroidExplorer extends PanelController {
       placeholderText.text = 'Create a new workspace or open an existing one from [File] menu.';
     }
     view.content.children.add(placeholderText);
+  }
+
+  /// Returns an empty list to the server to let it know that there is no [WorkspaceController]
+  /// that consequently nothing is selected.
+  void _requestSelected(UpDroidMessage um) {
+    String selected = JSON.encode([]);
+
+    if (controller != null && controller.type == 'workspace') {
+      WorkspaceController workspaceController = controller;
+      selected = workspaceController.returnSelected();
+    }
+
+    mailbox.ws.send('[[RETURN_SELECTED]]' + '${um.body}:' + selected);
   }
 
   void _addWorkspaceToMenu(String name) {
@@ -167,9 +184,8 @@ class UpDroidExplorer extends PanelController {
     if (controller != null) {
       controller.cleanUp();
       controller = null;
+      _refreshWorkspaceNames();
     }
-
-    _refreshWorkspaceNames();
   }
 
   //\/\/ Misc Methods /\/\//
@@ -247,6 +263,8 @@ class UpDroidExplorer extends PanelController {
 }
 
 abstract class ExplorerController {
+  String type;
+
   void registerMailbox();
   void registerEventHandlers();
   void cleanUp();

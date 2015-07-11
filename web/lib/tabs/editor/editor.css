@@ -1,18 +1,11 @@
-.ace_editor.ace-solarized-dark.updroid_editor,
-.ace_editor.ace-solarized-light.updroid_editor {
-    font-family: "Monosten A", "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;
-}
-
 .updroideditor {
     width: 100%;
-    /*min-height: 100px;*/
     height: 100%;
 }
 
-.updroideditor.updroideditor-ondrag {
-    border: 10px solid #ff2919;
-}
-
-.updroideditor.updroideditor-entered {
-    border: 10px solid #ffffff;
+.ace_editor.updroid_editor,
+.ace_editor.updroid_editor {
+    width: 100%;
+    height: 100%;
+    font-family: "Monosten A", "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;
 }

@@ -13,27 +13,14 @@ enum EventType { ON_OPEN, ON_MESSAGE, ON_CLOSE }
 class Mailbox {
   String _name;
   int _id;
-  StreamController<CommanderMessage> _cs;
   WebSocket ws;
 
   Map _wsRegistry;
-  Map _csRegistry;
   Set<String> _waitForRegistry;
 
   Mailbox(String name, int num, [StreamController<CommanderMessage> cs]) {
     _name = name;
     _id = num;
-
-    if (cs != null) {
-      _cs = cs;
-      _csRegistry = {};
-
-      // Call the function registered to m.type.
-      _cs.stream.where((m) => m.dest == _name.toUpperCase()).listen((CommanderMessage m) {
-        //print('[${_name}\'s Mailbox] Commander Message received of type: ${m.type}');
-        _csRegistry[m.type](m);
-      });
-    }
 
     _wsRegistry = { EventType.ON_OPEN: [], EventType.ON_MESSAGE: {}, EventType.ON_CLOSE: [] };
     _waitForRegistry = new Set();
@@ -72,13 +59,6 @@ class Mailbox {
     _wsRegistry[type].add(function);
   }
 
-  /// Registers a [function] to be called on a received [CommanderMessage] with [msg]
-  /// as the type.
-  void registerCommanderEvent(String msg, function(CommanderMessage m)) {
-    if (_cs == null) return;
-    _csRegistry[msg] = function;
-  }
-
   void _initWebSocket(String url, [int retrySeconds = 2]) {
     bool encounteredError = false;
 
@@ -103,7 +83,7 @@ class Mailbox {
     ws.onClose.listen((e) {
       _wsRegistry[EventType.ON_CLOSE].forEach((f(e)) => f(e));
 
-      if (_cs != null) _cs.add(new CommanderMessage('UPDROIDCLIENT', 'SERVER_DISCONNECT'));
+      if (_name == 'UpDroidClient') window.alert("UpDroid Commander has lost connection to the server.");
 
       //print('$_name-$_id disconnected. Retrying...');
       if (!encounteredError) {

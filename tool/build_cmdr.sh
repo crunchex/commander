@@ -4,6 +4,38 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOPDIR=$DIR/..
 
+function usage {
+    echo "usage: build_cmdr [[[-n onlycss ] | [-h]]"
+}
+
+# process args
+onlycss=0
+while [ "$1" != "" ]; do
+    case $1 in
+        -o | --onlycss )        shift
+                                onlycss=1
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+
+if [ $onlycss == 1 ]; then
+	cd $TOPDIR/
+
+	echo -n "Compiling less to css......."
+	WEB=$TOPDIR/web
+	rm -f $WEB/css/main.css
+	lessc $WEB/css/main.less > $WEB/css/main.css
+
+	echo "OK"
+	exit 0
+fi
+
 ### start build ###
 echo ""
 echo "##### Building Commander... ######"
@@ -67,8 +99,9 @@ cd $TOPDIR/
 
 echo -n "Building (minifying) gui........"
 WEB=$TOPDIR/web
+rm $WEB/css/main.css
 lessc $WEB/css/main.less > $WEB/css/main.css
-cat $WEB/css/glyphicons.css $WEB/css/cosmos-bootstrap.min.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
+cat $WEB/css/glyphicons.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
 pub build > /dev/null
 echo "OK"
 
@@ -76,9 +109,9 @@ echo -n "Cleaning up gui................."
 BUILD=$TOPDIR/build/web
 mkdir -p $BUILD/fonts
 cp $WEB/packages/bootjack/fonts/glyphicons-halflings-regular.* $BUILD/fonts/
-rm $BUILD/css/cosmos-bootstrap.min.css $BUILD/css/main.css $BUILD/css/main.less $BUILD/css/glyphicons.css
+rm $BUILD/css/main.css $BUILD/css/main.less $BUILD/css/glyphicons.css
 sed -i '/glyphicons.css/d' $BUILD/index.html
-sed -i '/bootstrap.min.css/d' $BUILD/index.html
+# sed -i '/bootstrap.min.css/d' $BUILD/index.html
 sed -i 's/main.css/cmdr.css/g' $BUILD/index.html
 sed -i 's/main.dart/main.dart.js/g' $BUILD/index.html
 echo "OK"

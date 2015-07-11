@@ -1,5 +1,6 @@
 library updroid_camera;
 
+import 'dart:async';
 import 'dart:html';
 import 'dart:convert';
 import 'dart:js' as js;
@@ -35,7 +36,7 @@ class UpDroidCamera extends TabController {
   AspectType _aspect;
 
   UpDroidCamera(int id, int col) :
-  super(id, col, className, 'Camera', getMenuConfig(), null, true) {
+  super(id, col, className, 'Camera', getMenuConfig(), true) {
 
   }
 
@@ -76,6 +77,8 @@ class UpDroidCamera extends TabController {
   }
 
   List<int> _setDevices(String devices) {
+    if (devices == '[]') return [];
+
     List<int> deviceIds = JSON.decode(devices);
     deviceIds.sort((a, b) => a.compareTo(b));
     deviceIds.forEach((int i) {
@@ -97,19 +100,26 @@ class UpDroidCamera extends TabController {
     new js.JsObject(js.context['jsmpeg'], [client, options]);
   }
 
+  //\/\/ Mailbox Handlers /\/\//
+
   void _signalReady(UpDroidMessage um) {
     mailbox.ws.send('[[SIGNAL_READY]]');
   }
 
-  //\/\/ Mailbox Handlers /\/\//
+  void _throwAlert(UpDroidMessage um) {
+    window.alert('Camera won\'t work without ffmpeg. Please install it!');
+  }
 
   void _postReadySetup(UpDroidMessage um) {
     List<int> sortedIds = _setDevices(um.body);
+    if (sortedIds.isEmpty) return;
+
     _startPlayer(id % sortedIds.length);
   }
 
   void registerMailbox() {
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SIGNAL_READY', _signalReady);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'NO_FFMPEG', _throwAlert);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CAMERA_READY', _postReadySetup);
   }
 
@@ -129,6 +139,12 @@ class UpDroidCamera extends TabController {
     window.onResize.listen((e) {
       setDimensions();
     });
+  }
+
+  Future<bool> preClose() {
+    Completer c = new Completer();
+    c.complete(true);
+    return c.future;
   }
 
   void cleanUp() {}

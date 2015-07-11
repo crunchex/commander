@@ -44,16 +44,17 @@ abstract class RosEntityView {
   DivElement container;
   SpanElement icon, filename;
 
-  bool _selected = false;
+  bool _selected;
 
   RosEntityView(this.name) {
+    _selected = false;
+
     element = new LIElement()
       ..classes.add('explorer-li');
 
     container = new DivElement()
       ..classes.add('explorer-ros-container')
       ..style.userSelect = 'none';
-    element.children.add(container);
 
     icon = new SpanElement()
       ..classes.addAll(['glyphicons', 'explorer-icon']);
@@ -61,7 +62,8 @@ abstract class RosEntityView {
 
     filename = new SpanElement()
       ..classes.add('explorer-ros-name')
-      ..text = this.name;
+      ..text = this.name.replaceAll('.launch', '')
+      ..title = this.name.replaceAll('.launch', '');
     container.children.add(filename);
   }
 
@@ -86,15 +88,28 @@ abstract class RosEntityView {
 class PackageView extends RosEntityView {
   final String openFolderClass = 'glyphicons-expand';
   final String closedFolderClass = 'glyphicons-collapse';
+  final String iconClass = 'glyphicons-cluster';
 
   bool expanded = false;
+  DivElement outerContainer;
+  SpanElement expanderIcon;
   UListElement uElement;
 
   PackageView(String name, [bool expanded]) : super(name) {
     this.expanded = expanded;
 
+    outerContainer = new DivElement()
+      ..classes.add('explorer-ros-outer-container');
+    element.children.add(outerContainer);
+
+    expanderIcon = new SpanElement()
+      ..classes.addAll(['glyphicons', 'explorer-expander-icon']);
+    this.expanded ? expanderIcon.classes.add(openFolderClass) : expanderIcon.classes.add(closedFolderClass);
+    outerContainer.children.add(expanderIcon);
+
     container.classes.add('explorer-package');
-    this.expanded ? icon.classes.add(openFolderClass) : icon.classes.add(closedFolderClass);
+    icon.classes.add(iconClass);
+    outerContainer.children.add(container);
 
     uElement = new UListElement()
       ..hidden = true
@@ -128,6 +143,7 @@ class LauncherView extends RosEntityView {
 
     container.classes.add('explorer-node');
     icon.classes.add(fileClass);
+    element.children.add(container);
 
     uElement = new UListElement()
       ..hidden = true

@@ -30,14 +30,12 @@ abstract class ContainerView {
   void makeActive() {
     tabHandle.classes.add('active');
     _tabContainer.classes.add('active');
-    _tabContent.classes.add('active');
   }
 
   /// Removes the CSS classes to make a tab 'inactive'.
   void makeInactive() {
     tabHandle.classes.remove('active');
     _tabContainer.classes.remove('active');
-    _tabContent.classes.remove('active');
   }
 
   /// Removes the tab elements from the DOM.
@@ -96,11 +94,6 @@ abstract class ContainerView {
         ..id = 'button-$name-$id'
         ..href = '#tab-$name-$id-container'
         ..dataset['toggle'] = 'tab';
-    tabHandleButton.onClick.listen((e) {
-      e.preventDefault();
-      //e.stopImmediatePropagation();
-      //_renameEventHandler();
-    });
     tabHandle.children.add(tabHandleButton);
 
     DivElement column = querySelector('#column-$col');
@@ -130,8 +123,7 @@ abstract class ContainerView {
     }
 
     _tabContent = new DivElement()
-        ..classes.add('tab-content')
-        ..classes.add('active');
+        ..classes.add('tab-content');
     _tabContainer.children.add(_tabContent);
 
     content = new DivElement()

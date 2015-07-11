@@ -4,55 +4,59 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
+import 'tabs/tab_controller.dart';
 import 'panels/explorer/explorer.dart';
 import 'tabs/teleop/teleop.dart';
 import 'tabs/editor/editor.dart';
 import 'tabs/console/console.dart';
 import 'tabs/camera/camera.dart';
-import 'column_view.dart';
 import 'modal/modal.dart';
 import 'mailbox.dart';
 
 class UpDroidClient {
-  StreamController<CommanderMessage> _cs;
-
-  String _config;
   List<List<dynamic>> _columns;
-  Mailbox _mailbox;
+  String _config;
+
+  AnchorElement _newButtonLeft;
+  AnchorElement _newButtonRight;
 
   bool disconnectAlert = false;
 
+  Mailbox _mailbox;
+
   UpDroidClient() {
     _config = _getConfig();
-    _columns = [];
 
-    // Create the intra-client message stream.
-    // The classes use this to communicate with each other.
-    _cs = new StreamController<CommanderMessage>.broadcast();
-    _mailbox = new Mailbox('UpDroidClient', 1, _cs);
+    _columns = [[], [], []];
+
+    _newButtonLeft = querySelector('#column-1-new');
+    _newButtonRight = querySelector('#column-2-new');
+
+    _mailbox = new Mailbox('UpDroidClient', 1);
 
     _registerMailbox();
+    _registerEventHandlers(_getConfig());
 
-    _pulseFeedback(querySelector('#feedback-button'));
+//    _pulseFeedback(querySelector('#feedback-button'));
   }
 
-  void _pulseFeedback(AnchorElement feedbackButton) {
-    // Initial pulse - 30 seconds in.
-    new Timer(new Duration(seconds: 30), () {
-      feedbackButton.classes.add('feedback-bold');
-      new Timer(new Duration(milliseconds: 500), () {
-        feedbackButton.classes.remove('feedback-bold');
-      });
-    });
-
-    // Every 5 minutes after.
-    new Timer.periodic(new Duration(minutes: 5), (timer) {
-      feedbackButton.classes.add('feedback-bold');
-      new Timer(new Duration(milliseconds: 500), () {
-        feedbackButton.classes.remove('feedback-bold');
-      });
-    });
-  }
+//  void _pulseFeedback(AnchorElement feedbackButton) {
+//    // Initial pulse - 30 seconds in.
+//    new Timer(new Duration(seconds: 30), () {
+//      feedbackButton.classes.add('feedback-bold');
+//      new Timer(new Duration(milliseconds: 500), () {
+//        feedbackButton.classes.remove('feedback-bold');
+//      });
+//    });
+//
+//    // Every 5 minutes after.
+//    new Timer.periodic(new Duration(minutes: 5), (timer) {
+//      feedbackButton.classes.add('feedback-bold');
+//      new Timer(new Duration(milliseconds: 500), () {
+//        feedbackButton.classes.remove('feedback-bold');
+//      });
+//    });
+//  }
 
   /// Returns a [Map] of all the tabs that [UpDroidClient] needs to spawn,
   /// where key = side|left|right| and value = a list of IDs and UpDroidTab.className.
@@ -79,7 +83,7 @@ class UpDroidClient {
     for (int i = 1; i <= 2; i++) {
       _columns[i].forEach((tab) {
 
-        if (tab.tabType == className) ids.add(tab.id);
+        if (tab.fullName == className) ids.add(tab.id);
       });
     }
 
@@ -96,31 +100,19 @@ class UpDroidClient {
 
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: use isolates.
-  Future _initializeColumns(UpDroidMessage um) async {
+  void _initializeClient(UpDroidMessage um) {
     List config = JSON.decode(_config);
 
-    for (int i = 0, i < 3; i++) {
-      int width = (i == 0) ? 2 : 5;
-      ColumnView.createColumnView(i, width).then((columnView) {
-        if (width == 2) {}
-      })
+    for (int i = 0; i < 1; i++) {
+      for (Map panel in config[i]) {
+        _openPanel(i, panel['id'], panel['class']);
+      }
     }
 
-    for (Map panel in config[i]) {
-      _openPanel(i, panel['id'], panel['class']);
-    }
-
-    for (Map tab in config[i]) {
-      _openTab(i, tab['id'], tab['class']);
-    }
-
-    _registerEventHandlers(_getConfig());
-  }
-
-  void _alertDisconnect(CommanderMessage m) {
-    if (disconnectAlert == false) {
-      window.alert("UpDroid Commander has lost connection to the server.");
-      disconnectAlert = true;
+    for (int i = 1; i < config.length; i++) {
+      for (Map tab in config[i]) {
+        _openTab(i, tab['id'], tab['class']);
+      }
     }
   }
 
@@ -135,7 +127,7 @@ class UpDroidClient {
 
     if (className == 'UpDroidExplorer') {
       _mailbox.ws.send('[[OPEN_PANEL]]' + '$column-$id-$className');
-       _columns[column].add(new UpDroidExplorer(id, column, _cs));
+       _columns[column].add(new UpDroidExplorer(id, column));
     }
   }
 
@@ -150,7 +142,7 @@ class UpDroidClient {
 
     if (className == 'UpDroidEditor') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _columns[column].add(new UpDroidEditor(id, column, _cs));
+      _columns[column].add(new UpDroidEditor(id, column));
     } else if (className == 'UpDroidCamera') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
       _columns[column].add(new UpDroidCamera(id, column));
@@ -161,39 +153,11 @@ class UpDroidClient {
       // TODO: initial size should not be hardcoded.
       _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className-25-80');
       //Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
-      _columns[column].add(new UpDroidConsole(id, column, _cs));
+      _columns[column].add(new UpDroidConsole(id, column));
     }
   }
 
   //\/\/ Mailbox Handlers /\/\//
-
-  void _closeTab(CommanderMessage m) {
-    String id = m.body;
-    List idList = id.split('_');
-    String type = idList[0];
-    int num = int.parse(idList[1]);
-
-    // Find the tab to remove and remove it.
-    // Also take note of the column it was found in.
-    int col;
-    for (int i = 1; i <= 2; i++) {
-      for (int j = 0; j < _columns[i].length; j++) {
-        if (_columns[i][j].tabType == type && _columns[i][j].id == num) {
-          _columns[i].removeAt(j);
-          col = i;
-        }
-      }
-    }
-
-    // Make all tabs in that column inactive except the last.
-    for (int j = 1; j < _columns[col].length; j++) {
-      _columns[col][j].makeInactive();
-    }
-
-    if (_columns[col].length > 0) _columns[col].last.makeActive();
-
-    _mailbox.ws.send('[[CLOSE_TAB]]' + id);
-  }
 
   void _closeTabFromServer(UpDroidMessage um) {
     String id = um.body;
@@ -204,21 +168,22 @@ class UpDroidClient {
     // Find the tab to remove and remove it.
     // Also take note of the column it was found in.
     int col;
-    for (int i = 0; i <= 1; i++) {
-      for (int j = 0; j < _columns[i].length; j++) {
-        if (_columns[i][j].tabType == type && _columns[i][j].id == num) {
-          _columns[i].removeAt(j);
-          col = i;
+    for (int currColumn = 0; currColumn < 3; currColumn++) {
+      for (int currContainer = 0; currContainer < _columns[currColumn].length; currContainer++) {
+        if (_columns[currColumn][currContainer].fullName == type && _columns[currColumn][currContainer].id == num) {
+          _columns[currColumn].removeAt(currContainer);
+          col = currColumn;
         }
       }
     }
 
     // Make all tabs in that column inactive except the last.
-    for (int j = 0; j < _columns[col].length; j++) {
-      _columns[col][j].makeInactive();
-    }
+    _columns[col].forEach((TabController tab) => tab.makeInactive());
 
+    // If there's at least one tab left, make the last one active.
     if (_columns[col].length > 0) _columns[col].last.makeActive();
+
+    _mailbox.ws.send('[[CLOSE_TAB]]' + id);
   }
 
   void _openTabFromButton(int column, String className) {
@@ -229,11 +194,8 @@ class UpDroidClient {
   void _getClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
 
   void _registerMailbox() {
-    _mailbox.registerCommanderEvent('CLOSE_TAB', _closeTab);
-    _mailbox.registerCommanderEvent('SERVER_DISCONNECT', _alertDisconnect);
-
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeColumns);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
   }
 

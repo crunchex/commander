@@ -153,5 +153,11 @@ class UpDroidTeleop extends TabController {
 
   }
 
+  Future<bool> preClose() {
+    Completer c = new Completer();
+    c.complete(true);
+    return c.future;
+  }
+
   void cleanUp() {}
 }

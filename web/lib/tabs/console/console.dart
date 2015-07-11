@@ -34,8 +34,8 @@ class UpDroidConsole extends TabController {
 
   Timer _resizeTimer;
 
-  UpDroidConsole(int id, int col, StreamController<CommanderMessage> cs) :
-  super(id, col, className, 'Console', getMenuConfig(), cs, true) {
+  UpDroidConsole(int id, int col) :
+  super(id, col, className, 'Console', getMenuConfig(), true) {
 
   }
 
@@ -46,12 +46,12 @@ class UpDroidConsole extends TabController {
     _term = new Terminal(view.content)
       ..scrollSpeed = 3
       ..cursorBlink = true
-      ..theme = new Theme.SolarizedDark();
+      ..theme = customLightTheme();
   }
 
   /// Toggles between a Solarized dark and light theme.
   void _toggleTheme() {
-    _term.theme = _term.theme.name == 'solarized-light' ? new Theme.SolarizedDark() : new Theme.SolarizedLight();
+    _term.theme = _term.theme.name == 'updroid-light' ? customDarkTheme() : customLightTheme();
   }
 
   /// Toggles cursor blink on/off.
@@ -62,7 +62,7 @@ class UpDroidConsole extends TabController {
   void _startPty(UpDroidMessage um) {
     List<int> size = _term.calculateSize();
     _term.resize(size[0], size[1]);
-    mailbox.ws.send('[[START_PTY]]${size[0] - 1}x${size[1] - 1}');
+    mailbox.ws.send('[[START_PTY]]${size[0]}x${size[1] - 1}');
   }
 
   /// Starts a secondary WebSocket with direct access to the pty spawned by CmdrPty.
@@ -80,9 +80,14 @@ class UpDroidConsole extends TabController {
     _ws = new WebSocket(url);
     _ws.binaryType = "arraybuffer";
 
-    _ws.onMessage.listen((e) {
-      ByteBuffer buf = e.data;
-      _term.stdout.add(buf.asUint8List());
+    _ws.onMessage.listen((MessageEvent event) {
+      try {
+        ByteBuffer buf = event.data;
+        _term.stdout.add(buf.asUint8List());
+      } catch(e) {
+        // A websocket event from the server side.
+        _resizeHandler(new UpDroidMessage.fromString(event.data));
+      }
     });
 
     _ws.onError.listen((e) {
@@ -94,22 +99,58 @@ class UpDroidConsole extends TabController {
     });
   }
 
-  void _resizeEvent(CommanderMessage m) {
-    List newSize = m.body.split('x');
+  /// Handle an incoming resize event, originating from either this [UpDroidConsole] or another.
+  void _resizeHandler(UpDroidMessage um) {
+    List newSize = um.body.split('x');
     int newRow = int.parse(newSize[0]);
     int newCol = int.parse(newSize[1]);
     _term.resize(newRow, newCol);
-    // _cols must be $COLUMNS - 1 or we see some glitchy stuff. Also rows.
-    mailbox.ws.send('[[RESIZE]]' + '${newRow}x${newCol - 1}');
+  }
+
+  Theme customDarkTheme() {
+    String name = 'updroid-dark';
+    Map<String, String> colors = {
+      'black'   : 'rgb(74, 74, 74)',
+      'red'     : '#ff2919',
+      'green'   : '#ff2919',
+      'yellow'  : '#ff2919',
+      'blue'    : '#0c0c0c',
+      'magenta' : '#0c0c0c',
+      'cyan'    : '#0c0c0c',
+      'white'   : '#eaecec'
+    };
+
+    String foregroundColor = colors['white'];
+    String backgroundColor = colors['black'];
+
+    return new Theme(name, colors, foregroundColor, backgroundColor);
+  }
+
+  Theme customLightTheme() {
+    String name = 'updroid-light';
+    Map<String, String> colors = {
+      'black'   : '#eaecec',
+      'red'     : '#ff2919',
+      'green'   : '#ff2919',
+      'yellow'  : '#ff2919',
+      'blue'    : '#7e7e7e',
+      'magenta' : '#7e7e7e',
+      'cyan'    : '#7e7e7e',
+      'white'   : '#1e1e1e'
+    };
+
+    String foregroundColor = colors['white'];
+    String backgroundColor = colors['black'];
+
+    return new Theme(name, colors, foregroundColor, backgroundColor);
   }
 
   //\/\/ Mailbox Handlers /\/\//
 
   void registerMailbox() {
-    mailbox.registerCommanderEvent('RESIZE', _resizeEvent);
-
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'START_PTY', _startPty);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PTY_READY', _initWebSocket);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'RESIZE', _resizeHandler);
   }
 
   /// Sets up the event handlers for the console.
@@ -129,15 +170,21 @@ class UpDroidConsole extends TabController {
     });
 
     window.onResize.listen((e) {
-      if (view.content.parent.classes.contains('active')) {
+      if (view.content.parent.parent.classes.contains('active')) {
         // Timer prevents a flood of resize events slowing down the system and allows the window to settle.
         if (_resizeTimer != null) _resizeTimer.cancel();
         _resizeTimer = new Timer(new Duration(milliseconds: 500), () {
           List<int> newSize = _term.calculateSize();
-          cs.add(new CommanderMessage('UPDROIDCONSOLE', 'RESIZE', body: '${newSize[0]}x${newSize[1]}'));
+          mailbox.ws.send('[[RESIZE]]' + '${newSize[0]}x${newSize[1]}');
         });
       }
     });
+  }
+
+  Future<bool> preClose() {
+    Completer c = new Completer();
+    c.complete(true);
+    return c.future;
   }
 
   void cleanUp() {

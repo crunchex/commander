@@ -18,8 +18,8 @@ class CmdrExplorer {
   Directory uproot;
 
   Workspace _currentWorkspace;
-  DirectoryWatcher _currentWatcher, _uprootWatcher;
-  StreamSubscription _currentWatcherStream, _uprootWatcherStream;
+  DirectoryWatcher _currentWatcher;
+  StreamSubscription _currentWatcherStream;
 
   //TODO: make asynchroneous
   CmdrExplorer(this.id, this.uproot) {
@@ -55,8 +55,10 @@ class CmdrExplorer {
     mailbox.registerWebSocketEvent('REQUEST_NODE_LIST', _launcherList);
     mailbox.registerWebSocketEvent('RUN_NODE', _runLauncher);
     mailbox.registerWebSocketEvent('REQUEST_EDITOR_LIST', _requestEditorList);
+    mailbox.registerWebSocketEvent('RETURN_SELECTED', _returnSelected);
 
     mailbox.registerServerMessageHandler('SEND_EDITOR_LIST', _sendEditorList);
+    mailbox.registerServerMessageHandler('REQUEST_SELECTED', _getSelected);
   }
 
   void _sendWorkspaceSync(UpDroidMessage um) {
@@ -213,7 +215,13 @@ class CmdrExplorer {
 
     List<String> dependencies = JSON.decode(split[1]);
 
-    _currentWorkspace.createPackage(name, dependencies);
+    // A workspace that hasn't been built yet will cause problems.
+    _currentWorkspace.createPackage(name, dependencies).then((ProcessResult result) {
+      String stderr = result.stderr;
+      if (stderr.contains('devel/setup.bash: No such file or directory')) {
+        mailbox.ws.add('[[CREATE_PACKAGE_FAILED]]' + stderr);
+      }
+    });
   }
 
   void _launcherList(UpDroidMessage um) {
@@ -237,7 +245,17 @@ class CmdrExplorer {
     CmdrPostOffice.send(new ServerMessage('UpDroidClient', 0, um));
   }
 
+  void _returnSelected(UpDroidMessage um) {
+    List<String> split = um.body.split(':');
+    int editorId = int.parse(split[0]);
+    String selectedList = split[1];
+
+    UpDroidMessage newMessage = new UpDroidMessage(um.header, selectedList);
+    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', editorId, newMessage));
+  }
+
   void _sendEditorList(UpDroidMessage um) => mailbox.ws.add(um.toString());
+  void _getSelected(UpDroidMessage um) => mailbox.ws.add(um.toString());
 
   /// Convenience method for adding a formatted filesystem update to the socket
   /// stream.

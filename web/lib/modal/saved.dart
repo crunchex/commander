@@ -1,6 +1,11 @@
 part of updroid_modal;
 
 class UpDroidSavedModal extends UpDroidModal {
+  InputElement input;
+  CheckboxInputElement makeExec;
+  ButtonElement discardButton;
+  ButtonElement saveButton;
+
   UpDroidSavedModal() {
     _setupHead('Save Changes?');
     _setupBody();
@@ -16,7 +21,7 @@ class UpDroidSavedModal extends UpDroidModal {
     // save input section
     HeadingElement askName = new HeadingElement.h3()
       ..text = "Enter Filename: ";
-    InputElement input = new InputElement()
+    input = new InputElement()
       ..id = "save-as-input"
       ..attributes['type'] = 'text';
 
@@ -27,7 +32,7 @@ class UpDroidSavedModal extends UpDroidModal {
     BRElement line = new BRElement();
 
     // executable option
-    var makeExec = new CheckboxInputElement()
+    makeExec = new CheckboxInputElement()
       ..checked = false
       ..id = "make-exec";
     HeadingElement h5 = new HeadingElement.h5()
@@ -52,13 +57,13 @@ class UpDroidSavedModal extends UpDroidModal {
   }
 
   void _setupFooter() {
-    ButtonElement discard = _createButton('warning', 'Discard');
-    discard.classes.add('modal-discard');
-    ButtonElement save = _createButton('primary', 'Save', special: 'saveas');
-    save
+    discardButton = _createButton('warning', 'Discard');
+    discardButton.classes.add('modal-discard');
+    saveButton = _createButton('primary', 'Save', special: 'saveas');
+    saveButton
       ..classes.add('modal-save')
       ..id = 'save-as-commit';
-    _modalFooter.children.addAll([save, discard]);
+    _modalFooter.children.addAll([saveButton, discardButton]);
   }
 
   void hide() {

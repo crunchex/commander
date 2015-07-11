@@ -15,6 +15,7 @@ import 'mailbox.dart';
 import 'column_view.dart';
 
 class UpDroidClient {
+  List<ColumnController> _columnControllers;
   List<List<dynamic>> _columns;
   String _config;
 
@@ -27,6 +28,7 @@ class UpDroidClient {
 
     // Column 0 is already added since it's special (uses panels and contains the logo).
     _columns = [[]];
+    _columnControllers = [];
 
     _mailbox = new Mailbox('UpDroidClient', 1);
 
@@ -36,63 +38,21 @@ class UpDroidClient {
 //    _pulseFeedback(querySelector('#feedback-button'));
   }
 
-//  void _pulseFeedback(AnchorElement feedbackButton) {
-//    // Initial pulse - 30 seconds in.
-//    new Timer(new Duration(seconds: 30), () {
-//      feedbackButton.classes.add('feedback-bold');
-//      new Timer(new Duration(milliseconds: 500), () {
-//        feedbackButton.classes.remove('feedback-bold');
-//      });
-//    });
-//
-//    // Every 5 minutes after.
-//    new Timer.periodic(new Duration(minutes: 5), (timer) {
-//      feedbackButton.classes.add('feedback-bold');
-//      new Timer(new Duration(milliseconds: 500), () {
-//        feedbackButton.classes.remove('feedback-bold');
-//      });
-//    });
-//  }
-
-  /// Returns a [Map] of all the tabs that [UpDroidClient] needs to spawn,
-  /// where key = side|left|right| and value = a list of IDs and UpDroidTab.className.
-  /// TODO: this function should retrieve information from some defaults or
-  /// a user account settings save.
-  String _getConfig([String strConfig = '']) {
-    // TODO: the default should eventually be JSON'd.
-    //if (strConfig == null) strConfig = UpDroidClient.defaultConfig;
-    if (strConfig != '') return strConfig;
-
-    List listConfig = [
-      [{'id': 1, 'class': 'UpDroidExplorer'}],
-      [{'id': 1, 'class': 'UpDroidEditor'}],
-      [{'id': 1, 'class': 'UpDroidConsole'}]
-    ];
-
-    return JSON.encode(listConfig);
+  void _registerMailbox() {
+    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
   }
 
-  int _getAvailableId(String className) {
-    List ids = [];
+  /// Sets up external event handlers for the various Commander classes. These
+  /// are mostly listening events for [WebSocket] messages.
+  void _registerEventHandlers(String config) {
 
-    // Add all used ids for [className] to ids.
-    for (int i = 1; i <= 2; i++) {
-      _columns[i].forEach((tab) {
-
-        if (tab.fullName == className) ids.add(tab.id);
-      });
-    }
-
-    // Find the lowest unused ID possible.
-    int id = 0;
-    bool found = false;
-    while (!found) {
-      id++;
-      if (!ids.contains(id)) break;
-    }
-
-    return id;
   }
+
+  //\/\/ Mailbox Handlers /\/\//
+
+  void _getClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
 
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: use isolates.
@@ -112,21 +72,58 @@ class UpDroidClient {
     int columnWidth = bootStrapColumnsForTabs ~/ (config.length - numberOfPanels);
 
     for (int i = 1; i < config.length; i++) {
-      ColumnView.createColumnView(i, columnWidth).then((ColumnView view) {
-        _columns.add([]);
-
-        view.controlButton.onClick.listen((e) {
-          e.preventDefault();
-          if (_columns[1].length >= 4) return;
-
-          new UpDroidOpenTabModal(1, _openTabFromButton);
-        });
-
-        for (Map tab in config[i]) {
-          _openTab(i, tab['id'], tab['class']);
-        }
-      });
+      _columnControllers.add(new ColumnController(i, columnWidth, config[i], _mailbox, _getAvailableId));
     }
+  }
+
+  void _closeTabFromServer(UpDroidMessage um) {
+    String id = um.body;
+    List idList = id.split('_');
+    String tabType = idList[0];
+    int tabId = int.parse(idList[1]);
+
+    for (ColumnController controller in _columnControllers) {
+      // Break once one of the controllers finds the tab to close.
+      if (controller.findAndCloseTab(tabId, tabType)) break;
+    }
+  }
+
+  //\/\/ Misc Functions /\/\//
+
+  /// Returns a [Map] of all the tabs that [UpDroidClient] needs to spawn,
+  /// where key = side|left|right| and value = a list of IDs and UpDroidTab.className.
+  /// TODO: this function should retrieve information from some defaults or
+  /// a user account settings save.
+  String _getConfig([String strConfig = '']) {
+    // TODO: the default should eventually be JSON'd.
+    //if (strConfig == null) strConfig = UpDroidClient.defaultConfig;
+    if (strConfig != '') return strConfig;
+
+    List listConfig = [
+      [{'id': 1, 'class': 'UpDroidExplorer'}],
+      [{'id': 1, 'class': 'UpDroidConsole'}]
+    ];
+
+    return JSON.encode(listConfig);
+  }
+
+  int _getAvailableId(String className) {
+    List ids = [];
+
+    // Add all used ids for [className] to ids.
+    _columnControllers.forEach((controller) {
+      ids.addAll(controller.returnIds(className));
+    });
+
+    // Find the lowest unused ID possible.
+    int id = 0;
+    bool found = false;
+    while (!found) {
+      id++;
+      if (!ids.contains(id)) break;
+    }
+
+    return id;
   }
 
   void _openPanel(int column, int id, String className) {
@@ -140,81 +137,125 @@ class UpDroidClient {
 
     if (className == 'UpDroidExplorer') {
       _mailbox.ws.send('[[OPEN_PANEL]]' + '$column-$id-$className');
-       _columns[column].add(new UpDroidExplorer(id, column));
+      _columns[column].add(new UpDroidExplorer(id, column));
     }
   }
 
-  void _openTab(int column, int id, String className) {
-    if (_columns[column].length >= 4) return;
+//  void _pulseFeedback(AnchorElement feedbackButton) {
+//    // Initial pulse - 30 seconds in.
+//    new Timer(new Duration(seconds: 30), () {
+//      feedbackButton.classes.add('feedback-bold');
+//      new Timer(new Duration(milliseconds: 500), () {
+//        feedbackButton.classes.remove('feedback-bold');
+//      });
+//    });
+//
+//    // Every 5 minutes after.
+//    new Timer.periodic(new Duration(minutes: 5), (timer) {
+//      feedbackButton.classes.add('feedback-bold');
+//      new Timer(new Duration(milliseconds: 500), () {
+//        feedbackButton.classes.remove('feedback-bold');
+//      });
+//    });
+//  }
+}
 
-    if (_columns[column].isNotEmpty) {
-      for (var tab in _columns[column]) {
+class ColumnController {
+  int columnId;
+  
+  List _config;
+  Function _getAvailableId;
+  ColumnView _view;
+  List _tabs;
+  Mailbox _mailbox;
+
+  ColumnController(this.columnId, int initialWidth, List config, Mailbox mailbox, Function getAvailableId) {
+    _config = config;
+    _mailbox = mailbox;
+    _getAvailableId = getAvailableId;
+    
+    _tabs = [];
+
+    ColumnView.createColumnView(columnId, initialWidth).then((columnView) {
+      _view = columnView;
+
+      setUpController();
+      registerEventHandlers();
+    });
+  }
+
+  void setUpController() {
+    for (Map tab in _config) {
+      _openTab(tab['id'], tab['class']);
+    }
+  }
+
+  void registerEventHandlers() {
+    _view.controlButton.onClick.listen((e) {
+      e.preventDefault();
+      if (_tabs.length >= 4) return;
+
+      new UpDroidOpenTabModal(_openTabFromButton);
+    });
+  }
+
+  List<int> returnIds(String className) {
+    List<int> ids = [];
+    _tabs.forEach((tab) {
+      if (tab.fullName == className) ids.add(tab.id);
+    });
+    return ids;
+  }
+
+  void _openTab(int id, String className) {
+    if (_tabs.length >= 4) return;
+
+    if (_tabs.isNotEmpty) {
+      for (var tab in _tabs) {
         tab.makeInactive();
       }
     }
 
     if (className == 'UpDroidEditor') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _columns[column].add(new UpDroidEditor(id, column));
+      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
+      _tabs.add(new UpDroidEditor(id, columnId));
     } else if (className == 'UpDroidCamera') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _columns[column].add(new UpDroidCamera(id, column));
+      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
+      _tabs.add(new UpDroidCamera(id, columnId));
     } else if (className == 'UpDroidTeleop') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className');
-      _columns[column].add(new UpDroidTeleop(id, column));
+      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
+      _tabs.add(new UpDroidTeleop(id, columnId));
     } else if (className == 'UpDroidConsole') {
       // TODO: initial size should not be hardcoded.
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$column-$id-$className-25-80');
+      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className-25-80');
       //Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
-      _columns[column].add(new UpDroidConsole(id, column));
+      _tabs.add(new UpDroidConsole(id, columnId));
     }
   }
 
-  //\/\/ Mailbox Handlers /\/\//
+  void _openTabFromButton(String className) {
+    int id = _getAvailableId(className);
+    _openTab(id, className);
+  }
 
-  void _closeTabFromServer(UpDroidMessage um) {
-    String id = um.body;
-    List idList = id.split('_');
-    String type = idList[0];
-    int num = int.parse(idList[1]);
+  bool findAndCloseTab(int tabId, String tabType) {
+    bool found = false;
 
-    // Find the tab to remove and remove it.
-    // Also take note of the column it was found in.
-    int col;
-    for (int currColumn = 0; currColumn < 3; currColumn++) {
-      for (int currContainer = 0; currContainer < _columns[currColumn].length; currContainer++) {
-        if (_columns[currColumn][currContainer].fullName == type && _columns[currColumn][currContainer].id == num) {
-          _columns[currColumn].removeAt(currContainer);
-          col = currColumn;
-        }
+    for (int currContainer = 0; currContainer < _tabs.length; currContainer++) {
+      if (_tabs[currContainer].fullName == tabType && _tabs[currContainer].id == tabId) {
+        _tabs.removeAt(currContainer);
+        found = true;
       }
     }
 
     // Make all tabs in that column inactive except the last.
-    _columns[col].forEach((TabController tab) => tab.makeInactive());
+    _tabs.forEach((TabController tab) => tab.makeInactive());
 
     // If there's at least one tab left, make the last one active.
-    if (_columns[col].length > 0) _columns[col].last.makeActive();
+    if (_tabs.isNotEmpty) _tabs.last.makeActive();
 
-    _mailbox.ws.send('[[CLOSE_TAB]]' + id);
-  }
+    _mailbox.ws.send('[[CLOSE_TAB]]' + tabType + '_' + tabId.toString());
 
-  void _openTabFromButton(int column, String className) {
-    int id = _getAvailableId(className);
-    _openTab(column, id, className);
-  }
-
-  void _getClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
-
-  void _registerMailbox() {
-    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
-  }
-
-  /// Sets up external event handlers for the various Commander classes. These
-  /// are mostly listening events for [WebSocket] messages.
-  void _registerEventHandlers(String config) {
-
+    return found;
   }
 }

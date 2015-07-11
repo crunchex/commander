@@ -43,7 +43,7 @@ class ColumnView {
     } else if (width == 5 || width == 10) {
       glyph.classes.addAll(['glyphicons', 'glyphicons-plus']);
     }
-    controlLi.children.add(glyph);
+    controlButton.children.add(glyph);
 
     DivElement tabContent = new DivElement()
     ..id = 'col-$id-tab-content'

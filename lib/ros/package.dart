@@ -13,7 +13,7 @@ class Package {
   /// Equivalent to running 'catkin_create_pkg'.
   Future<Package> create([List<String> dependencies]) {
     Completer completer = new Completer();
-    Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_create_pkg'], workingDirectory: workspace.src.path, runInShell: true).then((result) {
+    Process.run('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_create_pkg --rosdistro indigo $name'], workingDirectory: workspace.src.path, runInShell: true).then((result) {
       completer.complete(this);
     });
     return completer.future;

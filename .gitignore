@@ -25,4 +25,5 @@ bin/cmdr
 *.deb
 deploy/
 src-min-noconflict/
+main.css
 cmdr.css

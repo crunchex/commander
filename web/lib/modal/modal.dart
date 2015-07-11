@@ -6,7 +6,7 @@ import 'dart:convert';
 
 import 'package:bootjack/bootjack.dart';
 
-import '../updroid_message.dart';
+import '../mailbox.dart';
 
 part 'unsaved.dart';
 part 'saved.dart';
@@ -16,6 +16,7 @@ part 'run_node.dart';
 part 'git_pass.dart';
 part 'new_workspace.dart';
 part 'delete_workspace.dart';
+part 'create_package.dart';
 
 /// [UpDroidModal] contains methods to generate [Element]s that make up
 /// a modal in the UpDroid Commander GUI.

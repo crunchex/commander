@@ -3,68 +3,33 @@ library cmdr_editor;
 import 'dart:io';
 import 'dart:convert';
 
+import '../ros/ros.dart';
+import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 
 class CmdrEditor {
   static const String guiName = 'UpDroidEditor';
 
-  int editorNum = 1;
-  Directory _dir;
+  int id;
+  Directory uproot;
+  CmdrMailbox mailbox;
 
-  CmdrEditor(Directory dir) {
-    _dir = dir;
+  Workspace _currentWorkspace;
+
+  CmdrEditor(this.id, this.uproot) {
+    mailbox = new CmdrMailbox(guiName, id);
+    _registerMailbox();
   }
 
-  /// Handler for the [WebSocket]. Performs various actions depending on requests
-  /// it receives or local events that it detects.
-  void handleWebSocket(WebSocket ws) {
-    help.debug('Editor client connected.', 0);
-
-    ws.listen((String s) {
-      help.UpDroidMessage um = new help.UpDroidMessage(s);
-      help.debug('Editor incoming: ' + s, 0);
-
-      switch (um.header) {
-        case 'EDITOR_DIRECTORY_PATH':
-          _sendPath(ws);
-          break;
-
-        case 'EDITOR_REQUEST_LIST':
-          _sendEditorList(ws);
-          break;
-
-        case 'EDITOR_OPEN':
-          _sendFileContents(ws, um.body);
-          break;
-
-        case 'EDITOR_SAVE':
-          _saveFile(JSON.decode(um.body));
-          break;
-
-        default:
-          help.debug('Editor: message received without updroid header.', 1);
-      }
-    });
-  }
-
-  void _sendPath(WebSocket s) {
-    help.formattedMessage(s, 'EDITOR_DIRECTORY_PATH', _dir.path);
-  }
-
-  void _sendFileContents(WebSocket ws, String path) {
-    var fileToOpen = new File(path);
+  void _openFile(UpDroidMessage um) {
+    var fileToOpen = new File(um.body);
     fileToOpen.readAsString().then((String contents) {
-      ws.add('[[EDITOR_FILE_TEXT]]' + path + '[[CONTENTS]]' + contents);
+      mailbox.ws.add('[[OPEN_FILE]]' + um.body + '[[CONTENTS]]' + contents);
     });
   }
 
-  void _sendEditorList(WebSocket ws) {
-    help.getDirectory(_dir).then((files) {
-      ws.add('[[PATH_LIST]]' + files.toString());
-    });
-  }
-
-  void _saveFile(List args) {
+  void _saveFile(UpDroidMessage um) {
+    List args = JSON.decode(um.body);
     // args[0] = data, args[1] = path. args[2] = executable option
 
     var fileToSave = new File(args[1]);
@@ -78,7 +43,34 @@ class CmdrEditor {
     }
   }
 
-  void cleanup() {
+  void _requestSelected(UpDroidMessage um) {
+    UpDroidMessage newMessage = new UpDroidMessage(um.header, id.toString());
+    CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', -1, newMessage));
+  }
 
+  void _closeTab(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  }
+
+  void _setCurrentWorkspace(UpDroidMessage um) {
+    _currentWorkspace = new Workspace('${uproot.path}/${um.body}');
+  }
+
+  void _returnSelected(UpDroidMessage um) {
+    mailbox.ws.add('[[REQUEST_SELECTED]]' + um.body);
+  }
+
+  void cleanup() {
+    CmdrPostOffice.deregisterStream(guiName, id);
+  }
+
+  void _registerMailbox() {
+    mailbox.registerWebSocketEvent('SAVE_FILE', _saveFile);
+    mailbox.registerWebSocketEvent('REQUEST_SELECTED', _requestSelected);
+    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
+
+    mailbox.registerServerMessageHandler('OPEN_FILE', _openFile);
+    mailbox.registerServerMessageHandler('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);
+    mailbox.registerServerMessageHandler('RETURN_SELECTED', _returnSelected);
   }
 }

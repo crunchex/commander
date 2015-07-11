@@ -1,34 +1,48 @@
 library updroid_camera;
 
-import 'dart:html';
 import 'dart:async';
+import 'dart:html';
 import 'dart:convert';
 import 'dart:js' as js;
 
 import '../../mailbox.dart';
-import '../../updroid_message.dart';
-import '../../tab_view.dart';
-import '../../tab_controller.dart';
+import '../tab_controller.dart';
+
+enum AspectType { FIXED, FULL }
 
 /// [UpDroidCamera] is a client-side class that uses the jsmpeg library
 /// to render a video stream from a [WebSocket] onto a [_canvasElement].
 class UpDroidCamera extends TabController {
   static String className = 'UpDroidCamera';
-  // Only use where space is constrained, otherwise use className.
-  static const String shortName = 'Camera';
+
+  static List getMenuConfig() {
+    List menu = [
+      {'title': 'File', 'items': [
+        {'type': 'toggle', 'title': 'Close Tab'}]},
+      {'title': 'Devices', 'items': []},
+      {'title': 'Aspect', 'items': [
+        {'type': 'toggle', 'title': 'Fixed'},
+        {'type': 'toggle', 'title': 'Full-Stretched'}]}
+    ];
+    return menu;
+  }
+
+  AnchorElement _fixedButton;
+  AnchorElement _fullStretchedButton;
 
   CanvasElement _canvas;
+  int _width = 320;
+  int _height = 240;
+  AspectType _aspect;
 
-  UpDroidCamera(int id, int col, StreamController<CommanderMessage> cs, {bool active: false}) : super(id, col, className, cs, active: active) {
-    TabView.createTabView(id, col, className, shortName, active, _getMenuConfig()).then((tabView) {
-      view = tabView;
-      setUpController();
-    });
+  UpDroidCamera(int id, int col) :
+  super(id, col, className, 'Camera', getMenuConfig(), true) {
+
   }
 
   void setUpController() {
-    _registerMailbox();
-    
+    _aspect = AspectType.FULL;
+
     _canvas = new CanvasElement();
     _canvas.classes.add('video-canvas');
     setDimensions();
@@ -36,94 +50,102 @@ class UpDroidCamera extends TabController {
 
     _drawLoading();
 
-    _registerEventHandlers();
+    _fixedButton = view.refMap['fixed'];
+    _fullStretchedButton = view.refMap['full-stretched'];
   }
 
   void setDimensions() {
-    // TODO: fix this fixed query selector.
-    var con = querySelector('#col-1-tab-content');
-    var width = (con.contentEdge.width - 13);
-    var height = (con.contentEdge.height - 13);
+    var width = (view.content.contentEdge.width - 13);
+    var height = (view.content.contentEdge.height - 13);
 
-    width <= 640 ? _canvas.width = width : _canvas.width = 640;
-    height <= 480 ? _canvas.height = height : _canvas.height = 482;
-  }
+    _canvas.width = width <= _width ? width : _width;
+    _canvas.height = height <= _height ? height : _height;
 
-  void resizeCanvas() {
-    // TODO: fix this fixed query selector.
-    var con = querySelector('#col-1-tab-content');
-    var width = (con.contentEdge.width - 13);
-    var height = (con.contentEdge.height - 13);
-
-    width <= 640 ? _canvas.width = width : _canvas.width = 640;
-    height <= 480 ? _canvas.height = height : _canvas.height = 482;
+    if (_aspect == AspectType.FIXED) {
+      _canvas.style.width = null;
+      _canvas.style.height = null;
+    } else if (_aspect == AspectType.FULL) {
+      _canvas.style.width = '100%';
+      _canvas.style.height = '100%';
+    }
   }
 
   void _drawLoading() {
     CanvasRenderingContext2D context = _canvas.context2D;
-    context.fillStyle = 444;
-    context.fillText('Loading...', _canvas.width/2-30, _canvas.height/3);
+    context.fillStyle = '#ffffff';
+    context.fillText('Loading...', _canvas.width / 2 - 30, _canvas.height / 2);
   }
 
-  void _setDevices(String devices) {
+  List<int> _setDevices(String devices) {
+    if (devices == '[]') return [];
+
     List<int> deviceIds = JSON.decode(devices);
+    deviceIds.sort((a, b) => a.compareTo(b));
     deviceIds.forEach((int i) {
-      view.config.last['items'].add({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': [i]});
+      view.addMenuItem({'type': 'toggle', 'title': 'Video$i', 'handler': _startPlayer, 'args': i}, '#${shortName.toLowerCase()}-$id-devices');
     });
-    view.refreshMenus();
-    _startPlayer(deviceIds);
+
+    // Returns the sorted list.
+    return deviceIds;
   }
 
-  void _startPlayer(List args) {
-    String deviceId = '${args[0]}';
+  void _startPlayer(int deviceId) {
+    String deviceIdString = deviceId.toString();
     String url = window.location.host;
     url = url.split(':')[0];
-    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/${className.toLowerCase()}/$id/input/$deviceId']);
+    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/${className.toLowerCase()}/$id/input/$deviceIdString']);
 
     var options = new js.JsObject.jsify({'canvas': _canvas});
 
     new js.JsObject(js.context['jsmpeg'], [client, options]);
   }
 
-  void _closeTab() {
-    view.destroy();
-    cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
-  }
-
   //\/\/ Mailbox Handlers /\/\//
 
-  void _postReadySetup(UpDroidMessage um) {
-    _setDevices(um.body);
-    //_startPlayer();
+  void _signalReady(UpDroidMessage um) {
+    mailbox.ws.send('[[SIGNAL_READY]]');
   }
 
-  void _registerMailbox() {
+  void _throwAlert(UpDroidMessage um) {
+    window.alert('Camera won\'t work without ffmpeg. Please install it!');
+  }
+
+  void _postReadySetup(UpDroidMessage um) {
+    List<int> sortedIds = _setDevices(um.body);
+    if (sortedIds.isEmpty) return;
+
+    _startPlayer(id % sortedIds.length);
+  }
+
+  void registerMailbox() {
+    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SIGNAL_READY', _signalReady);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'NO_FFMPEG', _throwAlert);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CAMERA_READY', _postReadySetup);
   }
 
-  void _registerEventHandlers() {
-    window.onResize.listen((e) {
-      resizeCanvas();
-    });
-
-    view.cloneControlHitbox.onClick.listen((e) {
+  void registerEventHandlers() {
+    _fixedButton.onClick.listen((e) {
+      _aspect = AspectType.FIXED;
+      setDimensions();
       e.preventDefault();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${className}'));
     });
 
-    // TODO: this should be in tab_controller somehow.
-    view.closeControlHitbox.onClick.listen((e) {
-      view.destroy();
-      cs.add(new CommanderMessage('UPDROIDCLIENT', 'CLOSE_TAB', body: '${className}_$id'));
+    _fullStretchedButton.onClick.listen((e) {
+      _aspect = AspectType.FULL;
+      setDimensions();
+      e.preventDefault();
+    });
+
+    window.onResize.listen((e) {
+      setDimensions();
     });
   }
 
-  List _getMenuConfig() {
-    List menu = [
-      {'title': 'File', 'items': [
-        {'type': 'toggle', 'title': 'Close Tab', 'handler': _closeTab}]},
-      {'title': 'Devices', 'items': []}
-    ];
-    return menu;
+  Future<bool> preClose() {
+    Completer c = new Completer();
+    c.complete(true);
+    return c.future;
   }
+
+  void cleanUp() {}
 }

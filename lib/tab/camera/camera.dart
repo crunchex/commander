@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import '../../server_mailbox.dart';
 import '../../server_helper.dart' as help;
 
 part 'camera_server.dart';
@@ -12,37 +13,44 @@ part 'camera_server.dart';
 class CmdrCamera {
   static const String guiName = 'UpDroidCamera';
 
-  int cameraNum;
+  int id;
   Map<int, CameraServer> servers;
+  CmdrMailbox mailbox;
 
   StreamSubscription _currentDeviceSub;
 
-
-  CmdrCamera(this.cameraNum, this.servers) {
-    // TODO: this should be dynamically assigned when
-    // multiple consoles are spawned.
-
-    help.debug('Spawning UpDroidCamera ($cameraNum)', 0);
+  CmdrCamera(this.id, this.servers) {
+    mailbox = new CmdrMailbox(guiName, id);
+    _registerMailbox();
   }
 
-  /// Route websocket connections to messages (cmdr) and video data (input).
-  void handleWebSocket(WebSocket ws, HttpRequest request) {
-    if (request.uri.pathSegments.length == 2) {
-      ws.add('[[CAMERA_READY]]' + JSON.encode(_getDeviceIds()));
-    } else {
-      int deviceId = int.parse(request.uri.pathSegments.last);
-      if (servers[deviceId] == null) {
-        servers[deviceId] = new CameraServer(deviceId);
-      }
-      // request.uri is updroidcamera/id/input
-      if (_currentDeviceSub != null) {
-        _currentDeviceSub.cancel();
-      }
-      ws.add(servers[deviceId].streamHeader);
-      _currentDeviceSub = servers[deviceId].transStream.stream.asBroadcastStream().listen((data) {
-        ws.add(data);
-      });
+  void _signalReady(UpDroidMessage) {
+    ProcessResult result = Process.runSync('bash', ['-c', 'ffmpeg --help']);
+    if (result.exitCode == 127) {
+      mailbox.ws.add('[[NO_FFMPEG]]');
+      return;
     }
+
+    mailbox.ws.add('[[CAMERA_READY]]' + JSON.encode(_getDeviceIds()));
+  }
+
+  void _closeTab(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  }
+
+  void _handleInputStream(HttpRequest request) {
+    int deviceId = int.parse(request.uri.pathSegments.last);
+    if (servers[deviceId] == null) {
+      servers[deviceId] = new CameraServer(deviceId);
+    }
+    // request.uri is updroidcamera/id/input
+    if (_currentDeviceSub != null) {
+      _currentDeviceSub.cancel();
+    }
+    mailbox.ws.add(servers[deviceId].streamHeader);
+    _currentDeviceSub = servers[deviceId].transStream.stream.asBroadcastStream().listen((data) {
+      mailbox.ws.add(data);
+    });
   }
 
   List<int> _getDeviceIds() {
@@ -53,5 +61,18 @@ class CmdrCamera {
     List<int> deviceIds = [];
     rawDevices.forEach((String id) => deviceIds.add(int.parse(id)));
     return deviceIds;
+  }
+
+  void _registerMailbox() {
+    mailbox.registerWebSocketEvent('SIGNAL_READY', _signalReady);
+    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
+
+    _getDeviceIds().forEach((int key) {
+      mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/input/$key', _handleInputStream);
+    });
+  }
+
+  void cleanup() {
+    CmdrPostOffice.deregisterStream(guiName, id);
   }
 }

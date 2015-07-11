@@ -1,19 +1,18 @@
 library cmdr;
 
 import 'dart:io';
-import 'dart:async';
-import 'dart:convert';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
-import 'package:path/path.dart' as pathLib;
 
 import 'tab/pty.dart';
 import 'tab/camera/camera.dart';
+import 'tab/teleop.dart';
 import 'tab/editor.dart';
 import 'tab/explorer.dart';
 import 'git.dart';
+import 'server_mailbox.dart';
 import 'server_helper.dart' as help;
 
 part 'commands.dart';
@@ -23,26 +22,38 @@ class CmdrServer {
   static String defaultUprootPath = '/home/${Platform.environment['USER']}/uproot';
   static const String defaultGuiPath = '/opt/updroid/cmdr/web';
   static const bool defaultDebugFlag = false;
+  static const bool defaultQuiet = false;
 
-  Map _explorers = {};
-  Map<int, CmdrEditor> _editors = {};
-  Map<int, CmdrPty> _ptys = {};
-  Map<int, CmdrCamera> _cameras = {};
+  ArgResults _args;
+
+  Map _panels = {};
+  Map<String, Map<int, dynamic>> _tabs = {};
   Map<int, CameraServer> _camServers = {};
+  CmdrMailbox _mailbox;
+  Directory dir;
 
   CmdrServer (ArgResults results) {
-    Directory dir = new Directory(results['workspace']);
+    _args = results;
+
+    dir = new Directory(_args['workspace']);
     dir.create();
-    _initServer(dir, _getVirDir(results));
+    _initServer(_getVirDir());
+
+    _mailbox = new CmdrMailbox('UpDroidClient', 1);
+    _registerMailbox();
+
+    // A stream that pushes anything it receives onto the main websocket to the client.
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
-  VirtualDirectory _getVirDir (ArgResults results) {
-    String guiPath = results['path'];
+  VirtualDirectory _getVirDir() {
+    String guiPath = _args['path'];
     VirtualDirectory virDir;
     virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
         ..allowDirectoryListing = true
         ..followLinks = true
+        // Uncomment to serve to Dartium for debugging.
+        //..jailroot = false
         ..directoryHandler = (dir, request) {
           // Redirects '/' to 'index.html'
           var indexUri = new Uri.file(dir.path).resolve('index.html');
@@ -53,21 +64,21 @@ class CmdrServer {
   }
 
   /// Initializes and HTTP server to serve the gui and handle [WebSocket] requests.
-  void _initServer(Directory dir, VirtualDirectory virDir) {
+  void _initServer(VirtualDirectory virDir) {
     // Set up an HTTP webserver and listen for standard page requests or upgraded
     // [WebSocket] requests.
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
-      print('[UpDroid Commander serving on port 12060]');
-      print('You can now enter "localhost:12060" in your browser.\nCtrl-C to exit.');
+      _printStartMessage();
+
       help.debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
-          .listen((HttpRequest request) => _routeRequest(request, dir, virDir))
+          .listen((HttpRequest request) => _routeRequest(request, virDir))
           .asFuture()  // Automatically cancels on error.
           .catchError((_) => help.debug("caught error", 1));
     });
   }
 
-  void _routeRequest(HttpRequest request, Directory dir, VirtualDirectory virDir) {
+  void _routeRequest(HttpRequest request, VirtualDirectory virDir) {
     // WebSocket requests are considered "upgraded" HTTP requests.
     if (!WebSocketTransformer.isUpgradeRequest(request)) {
       _handleStandardRequest(request, virDir);
@@ -78,36 +89,22 @@ class CmdrServer {
 
     // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
     int objectID = int.parse(request.uri.pathSegments[1]);
-    switch (request.uri.pathSegments[0]) {
-      case 'updroideditor':
-        WebSocketTransformer
-          .upgrade(request)
-          .then((WebSocket ws) => _editors[objectID].handleWebSocket(ws));
-        break;
+    String type = request.uri.pathSegments[0];
 
-      case 'updroidexplorer':
-        WebSocketTransformer
-          .upgrade(request)
-          .then((WebSocket ws) => _explorers[objectID].handleWebSocket(ws));
-        break;
-
-      case 'updroidcamera':
-        WebSocketTransformer
-          .upgrade(request)
-          .then((WebSocket ws) => _cameras[objectID].handleWebSocket(ws, request));
-        break;
-
-      case 'updroidconsole':
-        WebSocketTransformer
-          .upgrade(request)
-          .then((WebSocket ws) => _ptys[objectID].handleWebSocket(ws));
-        break;
-
-      default:
-        WebSocketTransformer
-          .upgrade(request)
-          .then((WebSocket ws) => _handleWebSocket(ws, dir));
+    if (type == 'updroidclient') {
+      WebSocketTransformer.upgrade(request)
+      .then((WebSocket ws) => _mailbox.handleWebSocket(ws, request));
+      return;
     }
+
+    if (type == 'updroidexplorer') {
+      WebSocketTransformer.upgrade(request)
+      .then((WebSocket ws) => _panels[type][objectID].mailbox.handleWebSocket(ws, request));
+      return;
+    }
+
+    WebSocketTransformer.upgrade(request)
+    .then((WebSocket ws) => _tabs[type][objectID].mailbox.handleWebSocket(ws, request));
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
@@ -120,164 +117,139 @@ class CmdrServer {
     }
   }
 
-  /// Handler for the [WebSocket]. Performs various actions depending on requests
-  /// it receives or local events that it detects.
-  void _handleWebSocket(WebSocket socket, Directory dir) {
-    help.debug('Commander client connected.', 0);
+  void _registerMailbox() {
+    _mailbox.registerWebSocketEvent('CLIENT_CONFIG', _clientConfig);
+    _mailbox.registerWebSocketEvent('GIT_PUSH', _gitPush);
+    _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
+    _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
+    _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
+//    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
+//    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
 
-    socket.listen((String s) {
-      help.UpDroidMessage um = new help.UpDroidMessage(s);
-      help.debug('Server incoming: ' + s, 0);
+    _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
 
-      switch (um.header) {
-        case 'CLIENT_CONFIG':
-          _initBackendClasses(dir).then((value) {
-            socket.add('[[CLIENT_SERVER_READY]]' + JSON.encode(value));
-          });
-          break;
-
-		//TODO: Need to change to grab all directories
-
-        case 'GIT_PUSH':
-          List runArgs = um.body.split('++');
-          String dirPath = runArgs[0];
-          String password = runArgs[1];
-          //help.debug('dirPath: $dirPath, password: $password', 0);
-          Git.push(dirPath, password);
-          break;
-
-        case 'CLOSE_TAB':
-          _closeTab(um.body);
-          break;
-
-        case 'OPEN_TAB':
-          _openTab(um.body, dir);
-          break;
-
-        case 'ADD_EXPLORER':
-          _newExplorerCmdr(JSON.decode(um.body), dir);
-          break;
-
-        case 'CLOSE_EXPLORER':
-          _closeExplorerCmdr(int.parse(um.body));
-          break;
-
-        default:
-          help.debug('Message received without updroid header.', 1);
-      }
-    }).onDone(() => _cleanUpBackend());
+    _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
+    _mailbox.registerServerMessageHandler('CLOSE_TAB', _closeTabFromServer);
+    _mailbox.registerServerMessageHandler('REQUEST_EDITOR_LIST', _sendEditorList);
   }
 
-  // TODO: foldername passed but not used
-  Future _initBackendClasses(Directory dir) {
-    var completer = new Completer();
-
-    Directory srcDir = new Directory('${pathLib.normalize(dir.path)}');
-    srcDir.list().toList().then((folderList) {
-      var result = [];
-      var names = [];
-      bool workspace;
-      for(FileSystemEntity item in folderList) {
-        if(item.runtimeType.toString() == "_Directory") {
-          result.add(item);
-        }
-      }
-      folderList = result;
-
-      int num = 1;
-      for(var folder in folderList) {
-        workspace = false;
-        for (var subFolder in folder.listSync()) {
-          if(pathLib.basename(subFolder.path) == 'src') workspace = true;
-        }
-        if (workspace == true) {
-          names.add(pathLib.basename(folder.path));
-          _explorers[num] = new CmdrExplorer(folder, num);
-          num += 1;
-        }
-      }
-      completer.complete(names);
-    });
-
-    return completer.future;
+  void _clientConfig(UpDroidMessage um) {
+    // TODO: send back some kind of saved config from the filesystem.
+    _mailbox.ws.add('[[SERVER_READY]]');
   }
 
-  void _newExplorerCmdr(List explorerInfo, Directory dir) {
-    int expNum = int.parse(explorerInfo[0]);
-    String name = explorerInfo[1];
-    Directory newWorkspace = new Directory(pathLib.normalize(dir.path + "/" + name));
-    Directory source = new Directory(pathLib.normalize(newWorkspace.path + "/src"));
-    source.createSync(recursive: true);
-    Process.runSync('bash', ['-c', '. /opt/ros/indigo/setup.bash && catkin_init_workspace'], workingDirectory: pathLib.normalize(newWorkspace.path + "/src"), runInShell: true);
-    _explorers[expNum] = (new CmdrExplorer(newWorkspace, expNum));
-
+  void _gitPush(UpDroidMessage um) {
+    List runArgs = um.body.split('++');
+    String dirPath = runArgs[0];
+    String password = runArgs[1];
+    //help.debug('dirPath: $dirPath, password: $password', 0);
+    Git.push(dirPath, password);
   }
 
-  void _closeExplorerCmdr(int expNum) {
-    var toRemove;
-
-    toRemove = _explorers[expNum];
-    Directory workspace = new Directory(toRemove.expPath);
-    _explorers.remove(expNum);
-    workspace.delete(recursive: true);
-    toRemove.killExplorer();
-  }
-
-  void _openTab(String id, Directory dir) {
+  void _openPanel(UpDroidMessage um) {
+    String id = um.body;
     List idList = id.split('-');
-    //int col = int.parse(idList[0]);
     int num = int.parse(idList[1]);
-    String type = idList[2];
+    String type = idList[2].toLowerCase();
+
+    help.debug('Open panel request received: $id', 0);
+
+    if (!_panels.containsKey(type)) _panels[type] = {};
+
+    switch (type) {
+      case 'updroidexplorer':
+        _panels[type][num] = new CmdrExplorer(num, dir);
+        break;
+    }
+  }
+
+  void _openTab(UpDroidMessage um) {
+    String id = um.body;
+    List idList = id.split('-');
+    int num = int.parse(idList[1]);
+    String type = idList[2].toLowerCase();
 
     help.debug('Open tab request received: $id', 0);
 
-    switch (type) {
-      case 'UpDroidEditor':
-        _editors[num] = new CmdrEditor(dir);
-        break;
-      case 'UpDroidCamera':
-        _cameras[num] = new CmdrCamera(num, _camServers);
-        break;
+    if (!_tabs.containsKey(type)) _tabs[type] = {};
 
-      case 'UpDroidConsole':
+    switch (type) {
+      case 'updroideditor':
+        _tabs[type][num] = new CmdrEditor(num, dir);
+        break;
+      case 'updroidcamera':
+        _tabs[type][num] = new CmdrCamera(num, _camServers);
+        break;
+      case 'updroidteleop':
+        _tabs[type][num] = new CmdrTeleop(num, dir.path);
+        break;
+      case 'updroidconsole':
         String numRows = idList[3];
         String numCols = idList[4];
-        _ptys[num] = new CmdrPty(num, dir.path, numRows, numCols);
+        _tabs[type][num] = new CmdrPty(num, dir.path, numRows, numCols);
         break;
     }
   }
 
-  void _closeTab(String id) {
-    List idList = id.split('_');
-    String type = idList[0];
-    int num = int.parse(idList[1]);
+  void _openTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[OPEN_TAB]]' + um.body);
 
-    help.debug('Close tab request received: $id', 0);
+  void _closeTab(UpDroidMessage um) {
+    List idList = um.body.split('_');
+    String type = idList[0].toLowerCase();
+    int id = int.parse(idList[1]);
 
-    switch (type) {
-      case 'UpDroidEditor':
-        _editors[num].cleanup();
-        _editors[num] = null;
-        break;
+    help.debug('Close tab request received: ${idList.toString()}', 0);
 
-      case 'UpDroidCamera':
-        // TODO: figure out what should happen here now with the camera server.
-        //_cameras[num - 1].cleanup();
-        _cameras[num] = null;
-        break;
-
-      case 'UpDroidConsole':
-        _ptys[num].cleanup();
-        _ptys[num] = null;
-        break;
+    if (_tabs[type][id] != null) {
+      _tabs[type][id].cleanup();
+      _tabs[type].remove(id);
     }
+  }
+
+  void _closeTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[CLOSE_TAB]]' + um.body);
+
+  void _sendEditorList(UpDroidMessage um) {
+    String pathToOpen = um.body;
+    List<String> editorList = [];
+    _tabs['updroideditor'].keys.forEach((int id) => editorList.add(id.toString()));
+    UpDroidMessage newMessage = new UpDroidMessage('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
+    // TODO: need to able to reply back to exact sender in CmdrPostOffice.
+    // This is a hacky way to reply back to the requesting explorer.
+    CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', 0, newMessage));
   }
 
   void _cleanUpBackend() {
-    _explorers = {};
-    _editors = {};
-    _ptys = {};
-    _cameras = {};
+    help.debug('Client disconnected, cleaning up...', 0);
+
+    _panels = {};
+
+    _tabs.values.forEach((Map<int, dynamic> tabMap) {
+      tabMap.values.forEach((dynamic tab) {
+        tab.cleanup();
+      });
+    });
+    _tabs = {};
+
+    _camServers.values.forEach((CameraServer server) {
+      server.cleanup();
+    });
     _camServers = {};
+
+    help.debug('Clean up done.', 0);
+  }
+
+  void _printStartMessage() {
+    if (_args['quiet'] != defaultQuiet) return;
+
+    print('[UpDroid Commander serving on port 12060]');
+    print('You can now enter "localhost:12060" in your browser on this machine,');
+    print('  or "<this machine\'s IP>:12060" on a machine in the same network.');
+
+    ProcessResult pkgStatus = Process.runSync('dpkg' , ['-s', 'libnss-mdns', '|', 'grep', 'Status']);
+    if (pkgStatus.stdout.contains('install ok installed')) {
+      print('  or "${Platform.localHostname}.local:12060" on a Bonjour/libnss-mdns equipped machine.');
+    }
+
+    print('Ctrl-C to exit.');
   }
 }

@@ -52,10 +52,10 @@ if ls $TOPDIR/deploy/cmdr* 1> /dev/null 2>&1; then
 	rm deploy/cmdr*
 fi
 
-fpm -s dir -t deb -n cmdr -v 0.4.8 -p $TOPDIR/deploy/ \
+fpm -s dir -t deb -n cmdr -v 0.5.0 -p $TOPDIR/deploy/ \
     --vendor "UpDroid, Inc." \
     --provides cmdr \
-    --description "A browser-based IDE and omni-tool for robots." \
+    --description "A browser-based IDE and omni-tool for robotics software development." \
     --maintainer "Mike Lewis <mike@updroid.com>" \
     --iteration 1 \
     --url http://www.updroid.com \

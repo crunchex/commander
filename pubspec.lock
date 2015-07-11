@@ -118,9 +118,11 @@ packages:
     source: hosted
     version: "1.3.2"
   terminal:
-    description: terminal
-    source: hosted
-    version: "0.1.0"
+    description:
+      path: "/home/crunchex/work/terminal/"
+      relative: false
+    source: path
+    version: "0.1.2"
   tokenizr:
     description: tokenizr
     source: hosted

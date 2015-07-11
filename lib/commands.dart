@@ -6,11 +6,13 @@ class CmdrGuiCommand extends Command {
 
   CmdrGuiCommand() {
     argParser.addFlag('debug', abbr: 'd', defaultsTo: CmdrServer.defaultDebugFlag,
-        help: 'Prints debug messages to cmdr.log');
+        help: 'Prints debug messages to /var/log/updroid/cmdr.log');
+    argParser.addFlag('quiet', abbr: 'q', defaultsTo: CmdrServer.defaultQuiet,
+        help: 'Starts cmdr with no output on stdout.');
     argParser.addOption('workspace', abbr: 'w', defaultsTo: CmdrServer.defaultUprootPath,
-        help: 'Overrides the default workspace for cmdr.');
+        help: 'Overrides the default workspaces directory for cmdr.');
     argParser.addOption('path', abbr: 'p', defaultsTo: CmdrServer.defaultGuiPath,
-        help: 'Overrides the default path of the gui files location.\nOnly useful for cmdr developers.');
+        help: 'Overrides the default path of the static gui files location.\nOnly useful for cmdr developers.');
   }
 
   void run() {

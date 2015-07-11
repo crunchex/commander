@@ -1,14 +1,16 @@
-library updroid_message;
-
-import 'dart:async';
+part of mailbox;
 
 /// Container class that extracts the header (denoted with double brackets)
 /// and body from the raw text of a formatted [WebSocket] message received
 /// from the UpDroid server.
 class UpDroidMessage {
-  final String s;
+  String s;
 
-  UpDroidMessage(this.s);
+  UpDroidMessage(String header, String body) {
+    s = '[[$header]]$body';
+  }
+
+  UpDroidMessage.fromString(this.s);
 
   String get header => createHeader();
   String get body => createBody();
@@ -22,8 +24,13 @@ class UpDroidMessage {
 }
 
 /// Transformer to convert serialized [WebSocket] messages into the UpDroidMessage.
-StreamTransformer updroidTransformer = new StreamTransformer.fromHandlers(handleData: (event, sink) {
-  sink.add(new UpDroidMessage(event.data));
+StreamTransformer toUpDroidMessage = new StreamTransformer.fromHandlers(handleData: (event, sink) {
+  sink.add(new UpDroidMessage.fromString(event.data));
+});
+
+/// Transformer to convert UpDroidMessages into serialized [WebSocket] messages.
+StreamTransformer fromUpDroidMessage = new StreamTransformer.fromHandlers(handleData: (event, sink) {
+  sink.add(event.data.s);
 });
 
 /// A class for the intra-client message passing.

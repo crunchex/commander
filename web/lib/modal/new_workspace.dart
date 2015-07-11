@@ -2,8 +2,13 @@ part of updroid_modal;
 
 class UpDroidWorkspaceModal extends UpDroidModal {
   List _refs = [];
+  var _doneHandler;
 
-  UpDroidWorkspaceModal() {
+  InputElement input;
+
+  UpDroidWorkspaceModal(doneHandler) {
+    _doneHandler = doneHandler;
+
     _setupHead('Enter Workspace Name');
     _setupBody();
     _setupFooter();
@@ -17,8 +22,8 @@ class UpDroidWorkspaceModal extends UpDroidModal {
 
     // save input section
     HeadingElement askName = new HeadingElement.h3()
-      ..text = "WorkspacePath /";
-    InputElement input = new InputElement()
+      ..text = "Enter name: ";
+    input = new InputElement()
       ..id = "workspace-input"
       ..attributes['type'] = 'text';
     _refs.add(input);
@@ -26,8 +31,8 @@ class UpDroidWorkspaceModal extends UpDroidModal {
     _modalBody.children.add(workspaceInput);
 
     _buttonListeners.add(input.onKeyUp.listen((e) {
-      var keyEvent = new KeyEvent.wrap(e);
-      if (keyEvent.keyCode == KeyCode.ENTER) {
+      if (e.keyCode == KeyCode.ENTER) {
+        _doneHandler();
         _destroyModal();
       }
     }));
@@ -37,9 +42,17 @@ class UpDroidWorkspaceModal extends UpDroidModal {
     ButtonElement discard = _createButton('warning', 'Discard');
     discard.classes.add('modal-discard');
     discard.text = "Cancel";
+    discard.onClick.listen((e) {
+      _doneHandler();
+      _destroyModal();
+    });
     ButtonElement save = _createButton('primary', 'Save');
     save.classes.add('modal-save');
     save.text = "Create";
+    save.onClick.listen((e) {
+      _doneHandler();
+      _destroyModal();
+    });
     _refs.add(save);
     _modalFooter.children.addAll([save, discard]);
   }

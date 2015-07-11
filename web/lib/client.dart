@@ -35,8 +35,6 @@ class UpDroidClient {
 
     _registerMailbox();
     _registerEventHandlers(_getConfig());
-
-//    _pulseFeedback(querySelector('#feedback-button'));
   }
 
   void _registerMailbox() {
@@ -141,24 +139,6 @@ class UpDroidClient {
       _panels.add(new UpDroidExplorer(id, column));
     }
   }
-
-//  void _pulseFeedback(AnchorElement feedbackButton) {
-//    // Initial pulse - 30 seconds in.
-//    new Timer(new Duration(seconds: 30), () {
-//      feedbackButton.classes.add('feedback-bold');
-//      new Timer(new Duration(milliseconds: 500), () {
-//        feedbackButton.classes.remove('feedback-bold');
-//      });
-//    });
-//
-//    // Every 5 minutes after.
-//    new Timer.periodic(new Duration(minutes: 5), (timer) {
-//      feedbackButton.classes.add('feedback-bold');
-//      new Timer(new Duration(milliseconds: 500), () {
-//        feedbackButton.classes.remove('feedback-bold');
-//      });
-//    });
-//  }
 }
 
 class ColumnController {

@@ -143,21 +143,23 @@ class UpDroidClient {
 
 class ColumnController {
   int columnId;
+  int width;
   
   List _config;
+  Mailbox _mailbox;
   Function _getAvailableId;
+
   ColumnView _view;
   List _tabs;
-  Mailbox _mailbox;
 
-  ColumnController(this.columnId, int initialWidth, List config, Mailbox mailbox, Function getAvailableId) {
+  ColumnController(this.columnId, this.width, List config, Mailbox mailbox, Function getAvailableId) {
     _config = config;
     _mailbox = mailbox;
     _getAvailableId = getAvailableId;
     
     _tabs = [];
 
-    ColumnView.createColumnView(columnId, initialWidth).then((columnView) {
+    ColumnView.createColumnView(columnId, this.width).then((columnView) {
       _view = columnView;
 
       setUpController();
@@ -167,19 +169,20 @@ class ColumnController {
 
   void setUpController() {
     for (Map tab in _config) {
-      _openTab(tab['id'], tab['class']);
+      openTab(tab['id'], tab['class']);
     }
   }
 
   void registerEventHandlers() {
     _view.controlButton.onClick.listen((e) {
       e.preventDefault();
-      if (_tabs.length >= 4) return;
+      if (!_canAddMoreTabs) return;
 
-      new UpDroidOpenTabModal(_openTabFromButton);
+      new UpDroidOpenTabModal(openTabFromModal);
     });
   }
 
+  /// Returns a list of IDs of all tabs whose type match [className].
   List<int> returnIds(String className) {
     List<int> ids = [];
     _tabs.forEach((tab) {
@@ -188,8 +191,9 @@ class ColumnController {
     return ids;
   }
 
-  void _openTab(int id, String className) {
-    if (_tabs.length >= 4) return;
+  /// Opens a [TabController].
+  void openTab(int id, String className) {
+    if (!_canAddMoreTabs) return;
 
     if (_tabs.isNotEmpty) {
       for (var tab in _tabs) {
@@ -214,18 +218,21 @@ class ColumnController {
     }
   }
 
-  void _openTabFromButton(String className) {
+  /// A wrapper for [openTab] when an availble ID needs to be chosen across all open [ColumnController]s.
+  void openTabFromModal(String className) {
     int id = _getAvailableId(className);
-    _openTab(id, className);
+    openTab(id, className);
   }
 
+  /// Locates a [TabController] by [tabId] and [tabType] and closes it. Returns true if
+  /// said tab was found.
   bool findAndCloseTab(int tabId, String tabType) {
     bool found = false;
-
-    for (int currContainer = 0; currContainer < _tabs.length; currContainer++) {
-      if (_tabs[currContainer].fullName == tabType && _tabs[currContainer].id == tabId) {
-        _tabs.removeAt(currContainer);
+    for (int i = 0; i < _tabs.length; i++) {
+      if (_tabs[i].fullName == tabType && _tabs[i].id == tabId) {
         found = true;
+        _tabs.removeAt(i);
+        break;
       }
     }
 
@@ -239,4 +246,7 @@ class ColumnController {
 
     return found;
   }
+
+  bool get _canAddMoreTabs => _tabs.length < _maxTabs;
+  int get _maxTabs => (width / 10 * 8).toInt();
 }

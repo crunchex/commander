@@ -12,7 +12,7 @@ class ColumnView {
 
   int id, width;
   DivElement columnContent;
-  AnchorElement controlButton;
+  AnchorElement controlButton, maximizeButton;
 
   DivElement _rowMain;
 
@@ -24,6 +24,19 @@ class ColumnView {
     ..classes.addAll(['col-xs-$width', 'column-content']);
     _rowMain.children.add(columnContent);
 
+    maximizeButton = new AnchorElement()
+      ..id = 'column-$id-maximize'
+      ..classes.add('maximize-button');
+    columnContent.children.add(maximizeButton);
+
+    SpanElement maximizeGlyph = new SpanElement();
+    if (width == 5) {
+      maximizeGlyph.classes.addAll(['glyphicons', 'glyphicons-resize-full']);
+    } else if (width == 10) {
+      maximizeGlyph.classes.addAll(['glyphicons', 'glyphicons-resize-small']);
+    }
+    maximizeButton.children.add(maximizeGlyph);
+
     UListElement navTabs = new UListElement()
     ..classes.addAll(['nav', 'nav-tabs'])
     ..attributes['role'] = 'tablist';
@@ -33,17 +46,17 @@ class ColumnView {
     if (width == 5 || width == 10) navTabs.children.add(controlLi);
 
     controlButton = new AnchorElement()
-    ..id = 'column-$width-new'
+    ..id = 'column-$id-new'
     ..classes.add('new-tab-button');
     controlLi.children.add(controlButton);
 
-    SpanElement glyph = new SpanElement();
+    SpanElement controlGlyph = new SpanElement();
     if (width == 2) {
-      glyph.classes.addAll(['glyphicons', 'glyphicons-chevron-down']);
+      controlGlyph.classes.addAll(['glyphicons', 'glyphicons-chevron-down']);
     } else if (width == 5 || width == 10) {
-      glyph.classes.addAll(['glyphicons', 'glyphicons-plus']);
+      controlGlyph.classes.addAll(['glyphicons', 'glyphicons-plus']);
     }
-    controlButton.children.add(glyph);
+    controlButton.children.add(controlGlyph);
 
     DivElement tabContent = new DivElement()
     ..id = 'col-$id-tab-content'

@@ -1,6 +1,7 @@
 library panel_controller;
 
 import 'dart:async';
+import 'dart:html';
 
 import '../mailbox.dart';
 import '../container_view.dart';

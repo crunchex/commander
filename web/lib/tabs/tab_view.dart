@@ -17,7 +17,7 @@ class TabView extends ContainerView {
   DivElement closeControlHitbox;
 
   TabView(int id, int col, String title, String shortName, List config, [bool externalCss=false]) :
-  super(id, col, title, shortName, config) {
+  super(id, col, title, shortName, config, querySelector('#column-$col').children[1]) {
     if (externalCss) {
       String cssPath = 'lib/tabs/${shortName.toLowerCase()}/${shortName.toLowerCase()}.css';
       loadExternalCss(cssPath);

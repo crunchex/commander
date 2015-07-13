@@ -19,10 +19,10 @@ abstract class ContainerView {
 
   DivElement _tabContainer, _tabContent;
 
-  ContainerView(this.id, this.col, this.title, this.shortName, this.config) {
+  ContainerView(this.id, this.col, this.title, this.shortName, this.config, DivElement handles) {
     refMap = {};
 
-    _setUpTabHandle();
+    _setUpTabHandle(handles);
     _setUpTabContainer();
   }
 
@@ -83,7 +83,7 @@ abstract class ContainerView {
   }
 
   /// Takes a [num], [col], and [title] to add a new tab for the specified column.
-  void _setUpTabHandle() {
+  void _setUpTabHandle(DivElement handles) {
     tabHandle = new LIElement()
       ..classes.add('tab-handle')
       ..classes.add('active');
@@ -96,8 +96,7 @@ abstract class ContainerView {
         ..dataset['toggle'] = 'tab';
     tabHandle.children.add(tabHandleButton);
 
-    DivElement column = querySelector('#column-$col');
-    column.children.first.children.add(tabHandle);
+    handles.children.add(tabHandle);
   }
 
   /// Takes a [num], [col], [title], [config], and [active] to generate the menu bar and menu items

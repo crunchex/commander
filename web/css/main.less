@@ -47,10 +47,10 @@
 @upcom-black: #0c0c0c;
 
 html, body {
-  min-width: 1200px;
   width: auto !important;
   height: 100%;
   min-height: 650px;
+  overflow-x: hidden;
 }
 
 /* Login */
@@ -165,8 +165,19 @@ html, body {
   padding-right: 5px;
 }
 
-.column-content.col-xs-5 {
+.column-content.col-xs-1,
+.column-content.col-xs-5,
+.column-content.col-xs-9,
+.column-content.col-xs-10 {
   margin-top: 27px;
+}
+
+.column-content.col-xs-5 {
+  width: ~"calc(50% - 110px)";
+}
+
+.column-content.col-xs-2 {
+  width: 220px;
 }
 
 /* Nav/Logo */
@@ -215,6 +226,23 @@ html, body {
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
+}
+
+a.help-button,
+a.help-button:active,
+a.help-button:visited {
+  position: fixed;
+  right: 0;
+  margin: 5px 10px;
+  color: @brand-red;
+}
+
+a.help-button:hover {
+  color: @upcom-med-grey;
+}
+
+a.help-button>.glyphicons.glyphicons-circle-question-mark {
+  font-size: 18px;
 }
 
 /* Tabs */
@@ -315,10 +343,6 @@ html, body {
   border-bottom-width: 0;
   .font-avenir-demi();
   border-radius: 0;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
 }
 
 .nav-tabs>li>a.new-tab-button:hover {
@@ -326,6 +350,27 @@ html, body {
   color: @upcom-white;
   background-color:@brand-red;
   border-color:@brand-red;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+.column-content>.maximize-button {
+  position: absolute;
+  right: 0;
+  padding: 4px 8px 4px 8px;
+  margin: 0 5px 0 0;
+  border: 1px solid @upcom-white;
+  border-bottom-width: 0;
+  color: @upcom-dark-grey;
+  font-size: 14px;
+}
+
+.column-content>.maximize-button:hover {
+  color: @upcom-white;
+  background-color: @brand-red;
+  border-color: @brand-red;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;

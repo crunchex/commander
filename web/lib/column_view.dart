@@ -110,6 +110,8 @@ class ColumnView {
   /// Restores content and removes all the "hidden" styling effects.
   void _showTabsAndContent() {
     // TODO: move these styles to CSS and use classes instead.
+    _navTabs.style.visibility = 'visible';
+
     _navTabs.children.getRange(1, _navTabs.children.length)
     .forEach((e) => e.children
     .forEach((e) => e.style.display = ''));
@@ -121,6 +123,8 @@ class ColumnView {
   /// Hides content and tacks on additional "hidden" styling effects.
   void _hideTabsAndContent() {
     // TODO: move these styles to CSS and use classes instead.
+    _navTabs.style.visibility = 'hidden';
+
     _navTabs.children.getRange(1, _navTabs.children.length)
     .forEach((e) => e.children
     .forEach((e) => e.style.display = 'none'));

@@ -73,7 +73,7 @@ class ColumnView {
     columnContent.classes.add('col-xs-9');
 
     // Responsive width minus the other columns that are currently fixed;
-    columnContent.style.width = 'calc(100% - 300px)';
+    columnContent.style.width = 'calc(100% - 270px)';
 
     _maximizeGlyph.classes.remove('glyphicons-resize-full');
     _maximizeGlyph.classes.add('glyphicons-resize-small');
@@ -99,7 +99,7 @@ class ColumnView {
     columnContent.classes.add('col-xs-1');
 
     // Fixed-width.
-    columnContent.style.width = '80px';
+    columnContent.style.width = '50px';
 
     _maximizeGlyph.classes.remove('glyphicons-resize-small');
     _maximizeGlyph.classes.add('glyphicons-resize-full');

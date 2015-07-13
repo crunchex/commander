@@ -95,7 +95,6 @@ class ColumnView {
   }
 
   void minimize() {
-    print('minimizing: ${columnContent.id}');
     columnContent.classes.removeAll(['col-xs-5', 'col-xs-9', 'col-xs-10']);
     columnContent.classes.add('col-xs-1');
 

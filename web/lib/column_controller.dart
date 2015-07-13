@@ -62,7 +62,6 @@ class ColumnController {
       if (state == ColumnState.NORMAL) {
         maximize(true);
       } else {
-        print('resetting to normal');
         resetToNormal(true);
       }
     });

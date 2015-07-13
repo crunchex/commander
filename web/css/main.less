@@ -47,7 +47,6 @@
 @upcom-black: #0c0c0c;
 
 html, body {
-  min-width: 1220px;
   width: auto !important;
   height: 100%;
   min-height: 650px;
@@ -173,8 +172,12 @@ html, body {
   margin-top: 27px;
 }
 
+.column-content.col-xs-5 {
+  width: ~"calc(50% - 110px)";
+}
+
 .column-content.col-xs-2 {
-  min-width: 200px;
+  width: 220px;
 }
 
 /* Nav/Logo */

@@ -72,7 +72,9 @@ class ColumnView {
     columnContent.classes.removeAll(['col-xs-1', 'col-xs-5', 'col-xs-10']);
     columnContent.classes.add('col-xs-9');
 
-    columnContent.style.width = (querySelector('#column-0').clientWidth <= 200) ? 'calc(100% - 200px)' : '';
+    // Responsive width minus the other columns that are currently fixed;
+    columnContent.style.width = 'calc(100% - 300px)';
+
     _maximizeGlyph.classes.remove('glyphicons-resize-full');
     _maximizeGlyph.classes.add('glyphicons-resize-small');
 
@@ -83,7 +85,9 @@ class ColumnView {
     columnContent.classes.removeAll(['col-xs-1', 'col-xs-9', 'col-xs-10']);
     columnContent.classes.add('col-xs-5');
 
-    columnContent.style.width = '';
+    // Responsive width minus half the panel column.
+    columnContent.style.width = 'calc(50% - 110px)';
+
     _maximizeGlyph.classes.remove('glyphicons-resize-small');
     _maximizeGlyph.classes.add('glyphicons-resize-full');
 
@@ -95,27 +99,35 @@ class ColumnView {
     columnContent.classes.removeAll(['col-xs-5', 'col-xs-9', 'col-xs-10']);
     columnContent.classes.add('col-xs-1');
 
-    columnContent.style.width = '';
+    // Fixed-width.
+    columnContent.style.width = '80px';
+
     _maximizeGlyph.classes.remove('glyphicons-resize-small');
     _maximizeGlyph.classes.add('glyphicons-resize-full');
 
     _hideTabsAndContent();
   }
 
+  /// Restores content and removes all the "hidden" styling effects.
   void _showTabsAndContent() {
+    // TODO: move these styles to CSS and use classes instead.
     _navTabs.children.getRange(1, _navTabs.children.length)
     .forEach((e) => e.children
     .forEach((e) => e.style.display = ''));
 
     _tabContent.children.forEach((e) => e.style.display = '');
+    _tabContent.style.backgroundColor = '';
   }
 
+  /// Hides content and tacks on additional "hidden" styling effects.
   void _hideTabsAndContent() {
+    // TODO: move these styles to CSS and use classes instead.
     _navTabs.children.getRange(1, _navTabs.children.length)
     .forEach((e) => e.children
     .forEach((e) => e.style.display = 'none'));
 
     _tabContent.children.forEach((e) => e.style.display = 'none');
+    _tabContent.style.backgroundColor = '#eaecec';
   }
 
   void cleanUp() {

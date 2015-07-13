@@ -9,9 +9,11 @@ import 'modal/modal.dart';
 import 'column_view.dart';
 import 'mailbox.dart';
 
+enum ColumnState { MINIMIZED, NORMAL, MAXIMIZED }
+
 class ColumnController {
   int columnId;
-  int width;
+  ColumnState state;
 
   List _config;
   Mailbox _mailbox;
@@ -20,14 +22,14 @@ class ColumnController {
   ColumnView _view;
   List _tabs;
 
-  ColumnController(this.columnId, this.width, List config, Mailbox mailbox, Function getAvailableId) {
+  ColumnController(this.columnId, this.state, List config, Mailbox mailbox, Function getAvailableId) {
     _config = config;
     _mailbox = mailbox;
     _getAvailableId = getAvailableId;
 
     _tabs = [];
 
-    ColumnView.createColumnView(columnId, this.width).then((columnView) {
+    ColumnView.createColumnView(columnId, state).then((columnView) {
       _view = columnView;
 
       setUpController();
@@ -48,7 +50,19 @@ class ColumnController {
 
       new UpDroidOpenTabModal(openTabFromModal);
     });
+
+    _view.maximizeButton.onClick.listen((e) {
+      if (_view.maximizeButton.children[0].classes.contains('glyphicons-resize-full')) {
+        maximize();
+      } else {
+        minimize();
+      }
+    });
   }
+
+  void maximize() => _view.maximize();
+  void resetToNormal() => _view.normalize();
+  void minimize() => _view.minimize();
 
   /// Returns a list of IDs of all tabs whose type match [className].
   List<int> returnIds(String className) {
@@ -116,5 +130,5 @@ class ColumnController {
   }
 
   bool get _canAddMoreTabs => _tabs.length < _maxTabs;
-  int get _maxTabs => (width / 10 * 8).toInt();
+  int get _maxTabs => (ColumnView.width[state] / 10 * 8).toInt();
 }

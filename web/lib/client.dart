@@ -59,12 +59,12 @@ class UpDroidClient {
 
     // Determine the column width for each tab column depending on how many
     // there are in the config, minus 1 for the explorer panel.
-    const bootStrapColumnsForTabs = 10;
-    const numberOfPanels = 1;
-    int columnWidth = bootStrapColumnsForTabs ~/ (config.length - numberOfPanels);
+//    const bootStrapColumnsForTabs = 10;
+//    const numberOfPanels = 1;
+//    int columnWidth = bootStrapColumnsForTabs ~/ (config.length - numberOfPanels);
 
     for (int i = 1; i < config.length; i++) {
-      _columnControllers.add(new ColumnController(i, columnWidth, config[i], _mailbox, _getAvailableId));
+      _columnControllers.add(new ColumnController(i, ColumnState.NORMAL, config[i], _mailbox, _getAvailableId));
     }
   }
 
@@ -80,6 +80,8 @@ class UpDroidClient {
     }
   }
 
+  //\/\/ Event Handlers /\/\/
+
   //\/\/ Misc Functions /\/\//
 
   /// Returns a [Map] of all the tabs that [UpDroidClient] needs to spawn,
@@ -93,6 +95,7 @@ class UpDroidClient {
 
     List listConfig = [
       [{'id': 1, 'class': 'UpDroidExplorer'}],
+      [{'id': 1, 'class': 'UpDroidEditor'}],
       [{'id': 1, 'class': 'UpDroidConsole'}]
     ];
 

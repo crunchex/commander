@@ -64,7 +64,13 @@ class UpDroidClient {
 //    int columnWidth = bootStrapColumnsForTabs ~/ (config.length - numberOfPanels);
 
     for (int i = 1; i < config.length; i++) {
-      _columnControllers.add(new ColumnController(i, ColumnState.NORMAL, config[i], _mailbox, _getAvailableId));
+      ColumnController controller = new ColumnController(i, ColumnState.NORMAL, config[i], _mailbox, _getAvailableId);
+
+      controller.columnEvents.listen((ColumnState newState) {
+        print(newState.toString());
+      });
+
+      _columnControllers.add(controller);
     }
   }
 

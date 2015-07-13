@@ -1,5 +1,7 @@
 library column_controller;
 
+import 'dart:async';
+
 import 'tabs/tab_controller.dart';
 import 'tabs/teleop/teleop.dart';
 import 'tabs/editor/editor.dart';
@@ -14,6 +16,9 @@ enum ColumnState { MINIMIZED, NORMAL, MAXIMIZED }
 class ColumnController {
   int columnId;
   ColumnState state;
+  Stream<ColumnState> columnEvents;
+
+  StreamController<ColumnState> _columnEventsController;
 
   List _config;
   Mailbox _mailbox;
@@ -27,6 +32,8 @@ class ColumnController {
     _mailbox = mailbox;
     _getAvailableId = getAvailableId;
 
+    _columnEventsController = new StreamController<ColumnState>();
+    columnEvents = _columnEventsController.stream;
     _tabs = [];
 
     ColumnView.createColumnView(columnId, state).then((columnView) {
@@ -60,9 +67,18 @@ class ColumnController {
     });
   }
 
-  void maximize() => _view.maximize();
-  void resetToNormal() => _view.normalize();
-  void minimize() => _view.minimize();
+  void maximize() {
+    _columnEventsController.add(ColumnState.MAXIMIZED);
+    _view.maximize();
+  }
+  void resetToNormal() {
+    _columnEventsController.add(ColumnState.NORMAL);
+    _view.normalize();
+  }
+  void minimize() {
+    _columnEventsController.add(ColumnState.MINIMIZED);
+    _view.minimize();
+  }
 
   /// Returns a list of IDs of all tabs whose type match [className].
   List<int> returnIds(String className) {
@@ -131,4 +147,8 @@ class ColumnController {
 
   bool get _canAddMoreTabs => _tabs.length < _maxTabs;
   int get _maxTabs => (ColumnView.width[state] / 10 * 8).toInt();
+
+  void cleanUp() {
+    _columnEventsController.close();
+  }
 }

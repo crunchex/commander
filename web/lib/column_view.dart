@@ -23,6 +23,7 @@ class ColumnView {
   DivElement columnContent;
   AnchorElement controlButton, maximizeButton;
 
+  SpanElement _maximizeGlyph;
   DivElement _rowMain;
 
   ColumnView(this.id, this.state) {
@@ -38,10 +39,10 @@ class ColumnView {
       ..classes.add('maximize-button');
     columnContent.children.add(maximizeButton);
 
-    SpanElement maximizeGlyph = new SpanElement()
+    _maximizeGlyph = new SpanElement()
     ..classes.add('glyphicons')
     ..classes.add((state == ColumnState.MAXIMIZED) ? 'glyphicons-resize-small' : 'glyphicons-resize-full');
-    maximizeButton.children.add(maximizeGlyph);
+    maximizeButton.children.add(_maximizeGlyph);
 
     UListElement navTabs = new UListElement()
     ..classes.addAll(['nav', 'nav-tabs'])
@@ -72,6 +73,8 @@ class ColumnView {
 
     columnContent.style.width = (querySelector('#column-0').clientWidth <= 200) ? 'calc(100% - 200px)' : '';
 //    columnContent.style.visibility = 'visible';
+    _maximizeGlyph.classes.remove('glyphicons-resize-full');
+    _maximizeGlyph.classes.add('glyphicons-resize-small');
   }
 
   void normalize() {
@@ -80,14 +83,19 @@ class ColumnView {
 
     columnContent.style.width = '';
 //    columnContent.style.visibility = 'visible';
+    _maximizeGlyph.classes.remove('glyphicons-resize-small');
+    _maximizeGlyph.classes.add('glyphicons-resize-full');
   }
 
   void minimize() {
+    print('minimizing: ${columnContent.id}');
     columnContent.classes.removeAll(['col-xs-5', 'col-xs-9', 'col-xs-10']);
     columnContent.classes.add('col-xs-1');
 
     columnContent.style.width = '';
 //    columnContent.style.visibility = 'hidden';
+    _maximizeGlyph.classes.remove('glyphicons-resize-small');
+    _maximizeGlyph.classes.add('glyphicons-resize-full');
   }
 
   void cleanUp() {

@@ -65,12 +65,17 @@ class UpDroidClient {
 
     for (int i = 1; i < config.length; i++) {
       ColumnController controller = new ColumnController(i, ColumnState.NORMAL, config[i], _mailbox, _getAvailableId);
+      _columnControllers.add(controller);
 
       controller.columnEvents.listen((ColumnState newState) {
-        print(newState.toString());
+        if (newState == ColumnState.MAXIMIZED) {
+          _columnControllers.where((c) => c != controller).forEach((c) => c.minimize(false));
+        } else if (newState == ColumnState.MINIMIZED) {
+          _columnControllers.where((c) => c != controller).forEach((c) => c.maximize(false));
+        } else {
+          _columnControllers.where((c) => c != controller).forEach((c) => c.resetToNormal(false));
+        }
       });
-
-      _columnControllers.add(controller);
     }
   }
 

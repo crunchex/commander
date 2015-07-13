@@ -59,24 +59,36 @@ class ColumnController {
     });
 
     _view.maximizeButton.onClick.listen((e) {
-      if (_view.maximizeButton.children[0].classes.contains('glyphicons-resize-full')) {
-        maximize();
+      if (state == ColumnState.NORMAL) {
+        maximize(true);
       } else {
-        minimize();
+        print('resetting to normal');
+        resetToNormal(true);
       }
     });
   }
 
-  void maximize() {
-    _columnEventsController.add(ColumnState.MAXIMIZED);
+  /// Maximizes the [ColumnController]'s state. If [external] == true, then an
+  /// event is not fired to avoid an endless loop.
+  void maximize(bool internal) {
+    state = ColumnState.MAXIMIZED;
+    if (internal) _columnEventsController.add(state);
     _view.maximize();
   }
-  void resetToNormal() {
-    _columnEventsController.add(ColumnState.NORMAL);
+
+  /// Resets the [ColumnController]'s state to normal. If [external] == true, then an
+  /// event is not fired to avoid an endless loop.
+  void resetToNormal(bool internal) {
+    state = ColumnState.NORMAL;
+    if (internal) _columnEventsController.add(state);
     _view.normalize();
   }
-  void minimize() {
-    _columnEventsController.add(ColumnState.MINIMIZED);
+
+  /// Minimizes the [ColumnController]'s state. If [external] == true, then an
+  /// event is not fired to avoid an endless loop.
+  void minimize(bool internal) {
+    state = ColumnState.MINIMIZED;
+    if (internal) _columnEventsController.add(state);
     _view.minimize();
   }
 

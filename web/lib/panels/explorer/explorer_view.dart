@@ -22,7 +22,7 @@ abstract class ExplorerView {
       ..classes.add('glyphicons');
     viewLaunchers = new SpanElement()
       ..title = 'Launchers View'
-      ..classes.addAll(['glyphicons', 'glyphicons-circle-arrow-right']);
+      ..classes.addAll(['glyphicons', 'glyphicons-cluster']);
     toolbar.children.addAll([viewLaunchers, viewWorkspace]);
   }
 }

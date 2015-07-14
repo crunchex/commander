@@ -38,6 +38,14 @@ class CmdrCamera {
     CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
   }
 
+  void _cloneTab(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  }
+
+  void _moveTab(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  }
+
   void _handleInputStream(HttpRequest request) {
     int deviceId = int.parse(request.uri.pathSegments.last);
     if (servers[deviceId] == null) {
@@ -66,6 +74,8 @@ class CmdrCamera {
   void _registerMailbox() {
     mailbox.registerWebSocketEvent('SIGNAL_READY', _signalReady);
     mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
+    mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
+    mailbox.registerWebSocketEvent('MOVE_TAB', _moveTab);
 
     _getDeviceIds().forEach((int key) {
       mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/input/$key', _handleInputStream);

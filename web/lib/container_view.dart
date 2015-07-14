@@ -13,11 +13,9 @@ abstract class ContainerView {
 
   LinkElement styleLink;
   AnchorElement tabHandleButton;
-  DivElement content, tabContent;
+  DivElement content, tabContainer, tabContent;
   LIElement tabHandle;
   UListElement menus;
-
-  DivElement tabContainer;
 
   ContainerView(this.id, this.col, this.title, this.shortName, this.config, DivElement handles) {
     refMap = {};

@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'panels/panel_controller.dart';
 import 'panels/explorer/explorer.dart';
+import 'tabs/tab_controller.dart';
 import 'mailbox.dart';
 import 'column_controller.dart';
 
@@ -34,6 +35,8 @@ class UpDroidClient {
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'MOVE_TAB', _moveTabFromServer);
   }
 
   /// Sets up external event handlers for the various Commander classes. These
@@ -95,6 +98,31 @@ class UpDroidClient {
       // Break once one of the controllers finds the tab to close.
       if (controller.findAndCloseTab(tabId, tabType)) break;
     }
+  }
+
+  void _cloneTabFromServer(UpDroidMessage um) {
+    String id = um.body;
+    List idList = id.split('_');
+    String tabType = idList[0];
+    int col = int.parse(idList[2]);
+
+    _columnControllers[col == 1 ? 0 : 1].openTabFromModal(tabType);
+  }
+
+  void _moveTabFromServer(UpDroidMessage um) {
+    List idList = um.body.split('_');
+    String tabType = idList[0];
+    int id = int.parse(idList[1]);
+
+    // Working with indexes here, not the columnId.
+    int oldColIndex = int.parse(idList[2]) - 1;
+    int newColIndex = int.parse(idList[3]) - 1;
+
+    // Don't go any further if a move request can't be done.
+    if (!_columnControllers[newColIndex].canAddMoreTabs) return;
+
+    TabController tab = _columnControllers[oldColIndex].removeTab(tabType, id);
+    _columnControllers[newColIndex].addTab(tab);
   }
 
   //\/\/ Event Handlers /\/\/

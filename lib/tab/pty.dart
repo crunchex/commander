@@ -74,6 +74,14 @@ class CmdrPty {
     CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
   }
 
+  void _cloneTab(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  }
+
+  void _moveTab(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  }
+
   void _resizeHandle(UpDroidMessage um) {
     // Resize the shell.
     List newSize = um.body.split('x');
@@ -96,6 +104,8 @@ class CmdrPty {
     mailbox.registerWebSocketEvent('START_PTY', _startPty);
     mailbox.registerWebSocketEvent('RESIZE', _resizeRelay);
     mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
+    mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
+    mailbox.registerWebSocketEvent('MOVE_TAB', _moveTab);
 
     mailbox.registerServerMessageHandler('RESIZE', _resizeHandle);
 

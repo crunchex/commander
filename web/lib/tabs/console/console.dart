@@ -183,7 +183,10 @@ class UpDroidConsole extends TabController {
 
   void onFocus() {
     // Main content is terminal-output.
-    view.content.children[0].children[0].focus();
+    Element e = view.content.children[0];
+    print('Focusing on: ${e.classes.toString()}');
+    e.click();
+    e.focus();
   }
 
   Future<bool> preClose() {

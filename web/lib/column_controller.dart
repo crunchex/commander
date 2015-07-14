@@ -73,9 +73,13 @@ class ColumnController {
       // Cycle columns.
       if (e.shiftKey) {
         if (e.keyCode == KeyCode.LEFT && columnId != 1) {
-          querySelector('#col-1-tab-content').children[0].children[1].focus();
+          Element e = querySelector('#col-1-tab-content').children[0].children[1];
+          print('Focusing on: ${e.classes.toString()}');
+          e.click();
         } else if (e.keyCode == KeyCode.RIGHT && columnId != 2) {
-          querySelector('#col-2-tab-content').children[0].children[1].focus();
+          Element e = querySelector('#col-2-tab-content').children[0].children[1];
+          print('Focusing on: ${e.classes.toString()}, with parent: ${e.parent.classes.toString()}, and first child: ${e.children[0].classes.toString()}');
+          e.click();
         }
 
         return;
@@ -89,13 +93,15 @@ class ColumnController {
         if (currentActiveTabIndex > 0) {
           currentActiveTab.makeInactive();
           _tabs[currentActiveTabIndex - 1].makeActive();
-          _tabs[currentActiveTabIndex - 1].view.content.focus();
+          print('Focusing on ${_tabs[currentActiveTabIndex - 1].view.content.classes.toString()}');
+          _tabs[currentActiveTabIndex - 1].view.content.click();
         }
       } else if (e.keyCode == KeyCode.RIGHT) {
         if (currentActiveTabIndex < _tabs.length - 1) {
           currentActiveTab.makeInactive();
           _tabs[currentActiveTabIndex + 1].makeActive();
-          _tabs[currentActiveTabIndex + 1].view.content.focus();
+          print('Focusing on ${_tabs[currentActiveTabIndex + 1].view.content.classes.toString()}');
+          _tabs[currentActiveTabIndex + 1].view.content.click();
         }
       }
     });

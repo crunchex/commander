@@ -364,7 +364,9 @@ class UpDroidEditor extends TabController {
 
   void onFocus() {
     // Main content is ace_content, not necessarily in the same location due to other dynamic elements.
-    querySelector('.updroid-editor .updroid_editor .ace_content').focus();
+    Element e = view.content.children[0].querySelector('.ace_text-input');
+    e.click();
+    e.focus();
   }
 
   Future<bool> preClose() {

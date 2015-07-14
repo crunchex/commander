@@ -143,7 +143,10 @@ class UpDroidCamera extends TabController {
 
   void onFocus() {
     // Main content is the canvas element.
-    view.content.children[0].children[0];
+    Element e = view.content.children[0];
+    print('Focusing on: ${e.classes.toString()}');
+    e.click();
+    e.focus();
   }
 
   Future<bool> preClose() {

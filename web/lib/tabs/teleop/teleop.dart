@@ -155,7 +155,10 @@ class UpDroidTeleop extends TabController {
 
   void onFocus() {
     // Main content is the very first child of content.
-    view.content.children[0].focus();
+    Element e = view.content;
+    print('Focusing on: ${e.classes.toString()}');
+    e.click();
+    e.focus();
   }
 
   Future<bool> preClose() {

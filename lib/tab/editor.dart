@@ -6,19 +6,26 @@ import 'dart:convert';
 import '../ros/ros.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
+import '../tab.dart';
 
-class CmdrEditor {
-  static const String guiName = 'UpDroidEditor';
-
-  int id;
+class CmdrEditor extends Tab {
   Directory uproot;
   CmdrMailbox mailbox;
 
   Workspace _currentWorkspace;
 
-  CmdrEditor(this.id, this.uproot) {
-    mailbox = new CmdrMailbox(guiName, id);
-    _registerMailbox();
+  CmdrEditor(id, this.uproot) :
+  super(id, 'UpDroidEditor') {
+
+  }
+
+  void registerMailbox() {
+    mailbox.registerWebSocketEvent('SAVE_FILE', _saveFile);
+    mailbox.registerWebSocketEvent('REQUEST_SELECTED', _requestSelected);
+
+    mailbox.registerServerMessageHandler('OPEN_FILE', _openFile);
+    mailbox.registerServerMessageHandler('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);
+    mailbox.registerServerMessageHandler('RETURN_SELECTED', _returnSelected);
   }
 
   void _openFile(UpDroidMessage um) {
@@ -48,18 +55,6 @@ class CmdrEditor {
     CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', -1, newMessage));
   }
 
-  void _closeTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _cloneTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _moveTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
   void _setCurrentWorkspace(UpDroidMessage um) {
     _currentWorkspace = new Workspace('${uproot.path}/${um.body}');
   }
@@ -69,18 +64,6 @@ class CmdrEditor {
   }
 
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, id);
-  }
 
-  void _registerMailbox() {
-    mailbox.registerWebSocketEvent('SAVE_FILE', _saveFile);
-    mailbox.registerWebSocketEvent('REQUEST_SELECTED', _requestSelected);
-    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
-    mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
-    mailbox.registerWebSocketEvent('MOVE_TAB', _moveTab);
-
-    mailbox.registerServerMessageHandler('OPEN_FILE', _openFile);
-    mailbox.registerServerMessageHandler('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);
-    mailbox.registerServerMessageHandler('RETURN_SELECTED', _returnSelected);
   }
 }

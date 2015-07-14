@@ -203,7 +203,7 @@ class CmdrServer {
     help.debug('Close tab request received: ${idList.toString()}', 0);
 
     if (_tabs[type][id] != null) {
-      _tabs[type][id].cleanup();
+      _tabs[type][id].close();
       _tabs[type].remove(id);
     }
   }
@@ -229,7 +229,7 @@ class CmdrServer {
 
     _tabs.values.forEach((Map<int, dynamic> tabMap) {
       tabMap.values.forEach((dynamic tab) {
-        tab.cleanup();
+        tab.close();
       });
     });
     _tabs = {};

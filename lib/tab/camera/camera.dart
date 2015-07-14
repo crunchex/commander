@@ -7,21 +7,26 @@ import 'dart:typed_data';
 
 import '../../server_mailbox.dart';
 import '../../server_helper.dart' as help;
+import '../../tab.dart';
 
 part 'camera_server.dart';
 
-class CmdrCamera {
-  static const String guiName = 'UpDroidCamera';
-
-  int id;
+class CmdrCamera extends Tab {
   Map<int, CameraServer> servers;
-  CmdrMailbox mailbox;
 
   StreamSubscription _currentDeviceSub;
 
-  CmdrCamera(this.id, this.servers) {
-    mailbox = new CmdrMailbox(guiName, id);
-    _registerMailbox();
+  CmdrCamera(this.id, this.servers) :
+  super(id, 'UpDroidCamera') {
+
+  }
+
+  void registerMailbox() {
+    mailbox.registerWebSocketEvent('SIGNAL_READY', _signalReady);
+
+    _getDeviceIds().forEach((int key) {
+      mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/input/$key', _handleInputStream);
+    });
   }
 
   void _signalReady(UpDroidMessage) {
@@ -32,18 +37,6 @@ class CmdrCamera {
     }
 
     mailbox.ws.add('[[CAMERA_READY]]' + JSON.encode(_getDeviceIds()));
-  }
-
-  void _closeTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _cloneTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _moveTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
   }
 
   void _handleInputStream(HttpRequest request) {
@@ -71,18 +64,7 @@ class CmdrCamera {
     return deviceIds;
   }
 
-  void _registerMailbox() {
-    mailbox.registerWebSocketEvent('SIGNAL_READY', _signalReady);
-    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
-    mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
-    mailbox.registerWebSocketEvent('MOVE_TAB', _moveTab);
-
-    _getDeviceIds().forEach((int key) {
-      mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/input/$key', _handleInputStream);
-    });
-  }
-
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, id);
+
   }
 }

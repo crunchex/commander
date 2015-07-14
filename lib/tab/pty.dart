@@ -4,24 +4,27 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
+import '../tab.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 
-class CmdrPty {
-  static const String guiName = 'UpDroidConsole';
-
-  int id;
-  CmdrMailbox mailbox;
-
+class CmdrPty extends Tab {
   Process _shell;
   String _workspacePath;
   Socket _ptySocket;
 
-  CmdrPty(this.id, String workspacePath, String numRows, String numCols) {
-    mailbox = new CmdrMailbox(guiName, id);
-    _registerMailbox();
-
+  CmdrPty(id, String workspacePath, String numRows, String numCols) :
+  super(id, 'UpDroidConsole') {
     _workspacePath = workspacePath;
+  }
+
+  void registerMailbox() {
+    mailbox.registerWebSocketEvent('START_PTY', _startPty);
+    mailbox.registerWebSocketEvent('RESIZE', _resizeRelay);
+
+    mailbox.registerServerMessageHandler('RESIZE', _resizeHandle);
+
+    mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/cmdr-pty', _handleIOStream);
   }
 
   void _startPty(UpDroidMessage um) {
@@ -70,18 +73,6 @@ class CmdrPty {
     CmdrPostOffice.send(new ServerMessage('UpDroidConsole', 0, um));
   }
 
-  void _closeTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _cloneTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _moveTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
   void _resizeHandle(UpDroidMessage um) {
     // Resize the shell.
     List newSize = um.body.split('x');
@@ -95,20 +86,7 @@ class CmdrPty {
   }
 
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, id);
     if (_ptySocket != null) _ptySocket.destroy();
     if (_shell != null) _shell.kill();
-  }
-
-  void _registerMailbox() {
-    mailbox.registerWebSocketEvent('START_PTY', _startPty);
-    mailbox.registerWebSocketEvent('RESIZE', _resizeRelay);
-    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
-    mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
-    mailbox.registerWebSocketEvent('MOVE_TAB', _moveTab);
-
-    mailbox.registerServerMessageHandler('RESIZE', _resizeHandle);
-
-    mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/cmdr-pty', _handleIOStream);
   }
 }

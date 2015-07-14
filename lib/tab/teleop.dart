@@ -32,6 +32,10 @@ class CmdrTeleop {
     CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
   }
 
+  void _cloneTab(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  }
+
   void _handleGamepadInput(HttpRequest request) {
     mailbox.ws.where((e) => request.uri.path == '/${guiName.toLowerCase()}/$id/controller/0')
     .listen((String s) {
@@ -46,6 +50,7 @@ class CmdrTeleop {
 
   void _registerMailbox() {
     mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
+    mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
 
     mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/controller/0', _handleGamepadInput);
   }

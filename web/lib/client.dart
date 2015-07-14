@@ -34,6 +34,7 @@ class UpDroidClient {
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
   }
 
   /// Sets up external event handlers for the various Commander classes. These
@@ -89,6 +90,15 @@ class UpDroidClient {
       // Break once one of the controllers finds the tab to close.
       if (controller.findAndCloseTab(tabId, tabType)) break;
     }
+  }
+
+  void _cloneTabFromServer(UpDroidMessage um) {
+    String id = um.body;
+    List idList = id.split('_');
+    String tabType = idList[0];
+    int col = int.parse(idList[2]);
+
+    _columnControllers[col == 1 ? 0 : 1].openTabFromModal(tabType);
   }
 
   //\/\/ Event Handlers /\/\/

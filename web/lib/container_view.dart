@@ -13,11 +13,11 @@ abstract class ContainerView {
 
   LinkElement styleLink;
   AnchorElement tabHandleButton;
-  DivElement content;
+  DivElement content, tabContainer;
   LIElement tabHandle;
   UListElement menus;
 
-  DivElement _tabContainer, _tabContent;
+  DivElement _tabContent;
 
   ContainerView(this.id, this.col, this.title, this.shortName, this.config, DivElement handles) {
     refMap = {};
@@ -29,19 +29,19 @@ abstract class ContainerView {
   /// Adds the CSS classes to make a tab 'active'.
   void makeActive() {
     tabHandle.classes.add('active');
-    _tabContainer.classes.add('active');
+    tabContainer.classes.add('active');
   }
 
   /// Removes the CSS classes to make a tab 'inactive'.
   void makeInactive() {
     tabHandle.classes.remove('active');
-    _tabContainer.classes.remove('active');
+    tabContainer.classes.remove('active');
   }
 
   /// Removes the tab elements from the DOM.
   void destroy() {
     tabHandle.remove();
-    _tabContainer.remove();
+    tabContainer.remove();
     if (styleLink != null) styleLink.remove();
   }
 
@@ -104,7 +104,7 @@ abstract class ContainerView {
   void _setUpTabContainer() {
     String name = title.toLowerCase().replaceAll(' ', '-');
 
-    _tabContainer = new DivElement()
+    tabContainer = new DivElement()
         ..id = 'tab-$name-$id-container'
         ..classes.add('tab-pane')
         ..classes.add('active');
@@ -114,7 +114,7 @@ abstract class ContainerView {
         ..classes.add('nav-tabs')
         ..classes.add('inner-tabs')
         ..attributes['role'] = 'tablist';
-    _tabContainer.children.add(menus);
+    tabContainer.children.add(menus);
 
     menus.children = new List<Element>();
     for (Map configItem in config) {
@@ -123,7 +123,7 @@ abstract class ContainerView {
 
     _tabContent = new DivElement()
         ..classes.add('tab-content');
-    _tabContainer.children.add(_tabContent);
+    tabContainer.children.add(_tabContent);
 
     content = new DivElement()
         ..classes.add(name);
@@ -131,7 +131,7 @@ abstract class ContainerView {
     refMap['content'] = content;
 
     DivElement colOneTabContent = querySelector('#col-$col-tab-content');
-    colOneTabContent.children.insert(0, _tabContainer);
+    colOneTabContent.children.insert(0, tabContainer);
   }
 
   /// Generates a dropdown menu and returns the new [LIElement].

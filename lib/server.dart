@@ -130,6 +130,7 @@ class CmdrServer {
 
     _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
     _mailbox.registerServerMessageHandler('CLOSE_TAB', _closeTabFromServer);
+    _mailbox.registerServerMessageHandler('CLONE_TAB', _cloneTabFromServer);
     _mailbox.registerServerMessageHandler('REQUEST_EDITOR_LIST', _sendEditorList);
   }
 
@@ -207,6 +208,7 @@ class CmdrServer {
   }
 
   void _closeTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[CLOSE_TAB]]' + um.body);
+  void _cloneTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[CLONE_TAB]]' + um.body);
 
   void _sendEditorList(UpDroidMessage um) {
     String pathToOpen = um.body;

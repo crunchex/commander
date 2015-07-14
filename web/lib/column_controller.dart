@@ -1,6 +1,7 @@
 library column_controller;
 
 import 'dart:async';
+import 'dart:html';
 
 import 'tabs/tab_controller.dart';
 import 'tabs/teleop/teleop.dart';
@@ -25,7 +26,7 @@ class ColumnController {
   Function _getAvailableId;
 
   ColumnView _view;
-  List _tabs;
+  List<TabController> _tabs;
 
   ColumnController(this.columnId, this.state, List config, Mailbox mailbox, Function getAvailableId) {
     _config = config;
@@ -63,6 +64,39 @@ class ColumnController {
         maximize(true);
       } else {
         resetToNormal(true);
+      }
+    });
+
+    _view.columnContent.onKeyUp.listen((e) {
+      if (!e.ctrlKey) return;
+
+      // Cycle columns.
+      if (e.shiftKey) {
+        if (e.keyCode == KeyCode.LEFT && columnId != 1) {
+          querySelector('#col-1-tab-content').children[0].children[1].children[1].focus();
+        } else if (e.keyCode == KeyCode.RIGHT && columnId != 2) {
+          querySelector('#col-2-tab-content').children[0].children[1].children[1].focus();
+        }
+
+        return;
+      }
+
+      // Cycle tabs.
+      TabController currentActiveTab = _tabs.firstWhere((TabController tab) => tab.view.tabHandle.classes.contains('active'));
+      int currentActiveTabIndex = _tabs.indexOf(currentActiveTab);
+
+      if (e.keyCode == KeyCode.LEFT) {
+        if (currentActiveTabIndex > 0) {
+          currentActiveTab.makeInactive();
+          _tabs[currentActiveTabIndex - 1].makeActive();
+          _tabs[currentActiveTabIndex - 1].view.content.focus();
+        }
+      } else if (e.keyCode == KeyCode.RIGHT) {
+        if (currentActiveTabIndex < _tabs.length - 1) {
+          currentActiveTab.makeInactive();
+          _tabs[currentActiveTabIndex + 1].makeActive();
+          _tabs[currentActiveTabIndex + 1].view.content.focus();
+        }
       }
     });
   }

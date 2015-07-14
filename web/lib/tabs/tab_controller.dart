@@ -54,7 +54,6 @@ abstract class TabController {
   void registerMailbox();
   void setUpController();
   void registerEventHandlers();
-  void onFocus();
   Future<bool> preClose();
   void cleanUp();
   Element get elementToFocus;

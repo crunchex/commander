@@ -118,6 +118,9 @@ class UpDroidClient {
     int oldColIndex = int.parse(idList[2]) - 1;
     int newColIndex = int.parse(idList[3]) - 1;
 
+    // Don't go any further if a move request can't be done.
+    if (!_columnControllers[newColIndex].canAddMoreTabs) return;
+
     TabController tab = _columnControllers[oldColIndex].removeTab(tabType, id);
     _columnControllers[newColIndex].addTab(tab);
   }

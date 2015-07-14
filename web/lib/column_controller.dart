@@ -59,7 +59,7 @@ class ColumnController {
   void registerEventHandlers() {
     _view.controlButton.onClick.listen((e) {
       e.preventDefault();
-      if (!_canAddMoreTabs) return;
+      if (!canAddMoreTabs) return;
 
       new UpDroidOpenTabModal(openTabFromModal);
     });
@@ -147,7 +147,7 @@ class ColumnController {
 
   /// Opens a [TabController].
   void openTab(int id, String className) {
-    if (!_canAddMoreTabs) return;
+    if (!canAddMoreTabs) return;
 
     if (_tabs.isNotEmpty) {
       for (var tab in _tabs) {
@@ -233,7 +233,7 @@ class ColumnController {
     _tabs.add(tab);
   }
 
-  bool get _canAddMoreTabs => _tabs.length < _maxTabs;
+  bool get canAddMoreTabs => _tabs.length < _maxTabs;
   int get _maxTabs => (ColumnView.width[state] / 10 * 8).toInt();
 
   void cleanUp() {

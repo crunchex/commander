@@ -56,6 +56,10 @@ class CmdrEditor {
     CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
   }
 
+  void _moveTab(UpDroidMessage um) {
+    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  }
+
   void _setCurrentWorkspace(UpDroidMessage um) {
     _currentWorkspace = new Workspace('${uproot.path}/${um.body}');
   }
@@ -73,6 +77,7 @@ class CmdrEditor {
     mailbox.registerWebSocketEvent('REQUEST_SELECTED', _requestSelected);
     mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
+    mailbox.registerWebSocketEvent('MOVE_TAB', _moveTab);
 
     mailbox.registerServerMessageHandler('OPEN_FILE', _openFile);
     mailbox.registerServerMessageHandler('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);

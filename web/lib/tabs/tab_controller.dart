@@ -16,7 +16,6 @@ abstract class TabController {
 
   TabView view;
   Mailbox mailbox;
-
   AnchorElement _closeTabButton;
 
   TabController(this.id, this.col, this.fullName, this.shortName, List menuConfig, [bool externalCss=false]) {
@@ -73,16 +72,5 @@ abstract class TabController {
   }
 
   void _cloneTab() => mailbox.ws.send('[[CLONE_TAB]]' + '${fullName}_${id}_$col');
-
-  void _moveTabTo(int newCol) {
-    makeInactive();
-
-    // Move the tab handle.
-    querySelector('#column-${newCol.toString()}').children[1].children.add(view.tabHandle);
-    // Move the tab content.
-    querySelector('#col-${newCol.toString()}-tab-content').children.add(view.tabContainer);
-    // Update the controller and view's columns.
-    col = newCol;
-    view.col = newCol;
-  }
+  void _moveTabTo(int newCol) => mailbox.ws.send('[[MOVE_TAB]]' + '${fullName}_${id}_${col}_$newCol');
 }

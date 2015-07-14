@@ -155,21 +155,24 @@ class ColumnController {
       }
     }
 
+    TabController newTab;
     if (className == 'UpDroidEditor') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      _tabs.add(new UpDroidEditor(id, columnId));
+      newTab = new UpDroidEditor(id, columnId);
     } else if (className == 'UpDroidCamera') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      _tabs.add(new UpDroidCamera(id, columnId));
+      newTab = new UpDroidCamera(id, columnId);
     } else if (className == 'UpDroidTeleop') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      _tabs.add(new UpDroidTeleop(id, columnId));
+      newTab = new UpDroidTeleop(id, columnId);
     } else if (className == 'UpDroidConsole') {
       // TODO: initial size should not be hardcoded.
       _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className-25-80');
       //Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
-      _tabs.add(new UpDroidConsole(id, columnId));
+      newTab = new UpDroidConsole(id, columnId);
     }
+
+    _tabs.add(newTab);
   }
 
   /// A wrapper for [openTab] when an availble ID needs to be chosen across all open [ColumnController]s.
@@ -199,6 +202,35 @@ class ColumnController {
     _mailbox.ws.send('[[CLOSE_TAB]]' + tabType + '_' + tabId.toString());
 
     return found;
+  }
+
+  TabController removeTab(String tabType, int id) {
+    TabController tab = _tabs.firstWhere((TabController t) => t.fullName == tabType && t.id == id);
+    _tabs.remove(tab);
+
+    // Make all tabs in that column inactive except the last.
+    _tabs.forEach((TabController tab) => tab.makeInactive());
+
+    // If there's at least one tab left, make the last one active.
+    if (_tabs.isNotEmpty) _tabs.last.makeActive();
+
+    return tab;
+  }
+
+  void addTab(TabController tab) {
+    // Make all tabs in that column inactive before adding the new one.
+    _tabs.forEach((TabController tab) => tab.makeInactive());
+
+    // Move the tab handle.
+    querySelector('#column-${columnId.toString()}').children[1].children.add(tab.view.tabHandle);
+    // Move the tab content.
+    querySelector('#col-${columnId.toString()}-tab-content').children.add(tab.view.tabContainer);
+    // Update the controller and view's columns.
+    tab.col = columnId;
+    tab.view.col = columnId;
+
+    tab.makeActive();
+    _tabs.add(tab);
   }
 
   bool get _canAddMoreTabs => _tabs.length < _maxTabs;

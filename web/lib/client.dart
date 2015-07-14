@@ -76,6 +76,12 @@ class UpDroidClient {
           _columnControllers.where((c) => c != controller).forEach((c) => c.resetToNormal(false));
         }
       });
+
+      controller.columnEvents.listen((ColumnEvent event) {
+        if (event == ColumnEvent.LOST_FOCUS) {
+          _columnControllers.firstWhere((c) => c != controller).getsFocus();
+        }
+      });
     }
   }
 

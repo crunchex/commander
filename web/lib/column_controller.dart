@@ -13,7 +13,7 @@ import 'column_view.dart';
 import 'mailbox.dart';
 
 enum ColumnState { MINIMIZED, NORMAL, MAXIMIZED }
-enum ColumnEvent { SELECTED, DESELECTED }
+enum ColumnEvent { LOST_FOCUS }
 
 class ColumnController {
   int columnId;
@@ -77,14 +77,8 @@ class ColumnController {
 
       // Cycle columns.
       if (e.shiftKey) {
-        if (e.keyCode == KeyCode.LEFT && columnId != 1) {
-          Element e = querySelector('#col-1-tab-content').children[0].children[1];
-          print('Focusing on: ${e.classes.toString()}');
-          e.focus();
-        } else if (e.keyCode == KeyCode.RIGHT && columnId != 2) {
-          Element e = querySelector('#col-2-tab-content').children[0].children[1];
-          print('Focusing on: ${e.classes.toString()}, with parent: ${e.parent.classes.toString()}, and first child: ${e.children[0].classes.toString()}');
-          e.focus();
+        if ((e.keyCode == KeyCode.LEFT && columnId != 1) || (e.keyCode == KeyCode.RIGHT && columnId != 2)) {
+          _columnEventsController.add(ColumnEvent.LOST_FOCUS);
         }
 
         return;
@@ -94,22 +88,28 @@ class ColumnController {
       TabController currentActiveTab = _tabs.firstWhere((TabController tab) => tab.view.tabHandle.classes.contains('active'));
       int currentActiveTabIndex = _tabs.indexOf(currentActiveTab);
 
-      if (e.keyCode == KeyCode.LEFT) {
-        if (currentActiveTabIndex > 0) {
-          currentActiveTab.makeInactive();
-          _tabs[currentActiveTabIndex - 1].makeActive();
-          print('Focusing on ${_tabs[currentActiveTabIndex - 1].view.content.classes.toString()}');
-          _tabs[currentActiveTabIndex - 1].view.tabContent.focus();
-        }
-      } else if (e.keyCode == KeyCode.RIGHT) {
-        if (currentActiveTabIndex < _tabs.length - 1) {
-          currentActiveTab.makeInactive();
-          _tabs[currentActiveTabIndex + 1].makeActive();
-          print('Focusing on ${_tabs[currentActiveTabIndex + 1].view.content.classes.toString()}');
-          _tabs[currentActiveTabIndex + 1].view.tabContent.focus();
-        }
+      if (e.keyCode == KeyCode.LEFT && currentActiveTabIndex > 0) {
+        cycleTab(true, currentActiveTab, currentActiveTabIndex);
+      } else if (e.keyCode == KeyCode.RIGHT && currentActiveTabIndex < _tabs.length - 1) {
+        cycleTab(false, currentActiveTab, currentActiveTabIndex);
       }
     });
+  }
+
+  void getsFocus() {
+    _view.tabContent.querySelector('.active').children[1].focus();
+  }
+
+  void cycleTab(bool left, TabController currentActiveTab, int currentActiveTabIndex) {
+    currentActiveTab.makeInactive();
+
+    if (left) {
+      _tabs[currentActiveTabIndex - 1].makeActive();
+      _tabs[currentActiveTabIndex - 1].view.tabContent.focus();
+    } else {
+      _tabs[currentActiveTabIndex + 1].makeActive();
+      _tabs[currentActiveTabIndex + 1].view.tabContent.focus();
+    }
   }
 
   /// Maximizes the [ColumnController]'s state. If [external] == true, then an

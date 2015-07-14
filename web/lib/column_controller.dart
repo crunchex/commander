@@ -1,6 +1,7 @@
 library column_controller;
 
 import 'dart:async';
+import 'dart:html';
 
 import 'tabs/tab_controller.dart';
 import 'tabs/teleop/teleop.dart';
@@ -12,27 +13,32 @@ import 'column_view.dart';
 import 'mailbox.dart';
 
 enum ColumnState { MINIMIZED, NORMAL, MAXIMIZED }
+enum ColumnEvent { LOST_FOCUS }
 
 class ColumnController {
   int columnId;
   ColumnState state;
-  Stream<ColumnState> columnEvents;
+  Stream<ColumnState> columnStateChanges;
+  Stream<ColumnEvent> columnEvents;
 
-  StreamController<ColumnState> _columnEventsController;
+  StreamController<ColumnState> _columnStateChangesController;
+  StreamController<ColumnEvent> _columnEventsController;
 
   List _config;
   Mailbox _mailbox;
   Function _getAvailableId;
 
   ColumnView _view;
-  List _tabs;
+  List<TabController> _tabs;
 
   ColumnController(this.columnId, this.state, List config, Mailbox mailbox, Function getAvailableId) {
     _config = config;
     _mailbox = mailbox;
     _getAvailableId = getAvailableId;
 
-    _columnEventsController = new StreamController<ColumnState>();
+    _columnStateChangesController = new StreamController<ColumnState>();
+    columnStateChanges = _columnStateChangesController.stream;
+    _columnEventsController = new StreamController<ColumnEvent>();
     columnEvents = _columnEventsController.stream;
     _tabs = [];
 
@@ -65,13 +71,52 @@ class ColumnController {
         resetToNormal(true);
       }
     });
+
+    _view.columnContent.onKeyDown.listen((e) {
+      if (!e.ctrlKey) return;
+
+      // Cycle columns.
+      if (e.shiftKey) {
+        if ((e.keyCode == KeyCode.LEFT && columnId != 1) || (e.keyCode == KeyCode.RIGHT && columnId != 2)) {
+          _columnEventsController.add(ColumnEvent.LOST_FOCUS);
+        }
+
+        return;
+      }
+
+      // Cycle tabs.
+      TabController currentActiveTab = _tabs.firstWhere((TabController tab) => tab.view.tabHandle.classes.contains('active'));
+      int currentActiveTabIndex = _tabs.indexOf(currentActiveTab);
+
+      if (e.keyCode == KeyCode.LEFT && currentActiveTabIndex > 0) {
+        cycleTab(true, currentActiveTab, currentActiveTabIndex);
+      } else if (e.keyCode == KeyCode.RIGHT && currentActiveTabIndex < _tabs.length - 1) {
+        cycleTab(false, currentActiveTab, currentActiveTabIndex);
+      }
+    });
+  }
+
+  void getsFocus() {
+    _view.tabContent.querySelector('.active').children[1].focus();
+  }
+
+  void cycleTab(bool left, TabController currentActiveTab, int currentActiveTabIndex) {
+    currentActiveTab.makeInactive();
+
+    if (left) {
+      _tabs[currentActiveTabIndex - 1].makeActive();
+      _tabs[currentActiveTabIndex - 1].view.tabContent.focus();
+    } else {
+      _tabs[currentActiveTabIndex + 1].makeActive();
+      _tabs[currentActiveTabIndex + 1].view.tabContent.focus();
+    }
   }
 
   /// Maximizes the [ColumnController]'s state. If [external] == true, then an
   /// event is not fired to avoid an endless loop.
   void maximize(bool internal) {
     state = ColumnState.MAXIMIZED;
-    if (internal) _columnEventsController.add(state);
+    if (internal) _columnStateChangesController.add(state);
     _view.maximize();
   }
 
@@ -79,7 +124,7 @@ class ColumnController {
   /// event is not fired to avoid an endless loop.
   void resetToNormal(bool internal) {
     state = ColumnState.NORMAL;
-    if (internal) _columnEventsController.add(state);
+    if (internal) _columnStateChangesController.add(state);
     _view.normalize();
   }
 
@@ -87,7 +132,7 @@ class ColumnController {
   /// event is not fired to avoid an endless loop.
   void minimize(bool internal) {
     state = ColumnState.MINIMIZED;
-    if (internal) _columnEventsController.add(state);
+    if (internal) _columnStateChangesController.add(state);
     _view.minimize();
   }
 
@@ -160,6 +205,7 @@ class ColumnController {
   int get _maxTabs => (ColumnView.width[state] / 10 * 8).toInt();
 
   void cleanUp() {
+    _columnStateChangesController.close();
     _columnEventsController.close();
   }
 }

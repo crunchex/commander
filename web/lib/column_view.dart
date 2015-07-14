@@ -20,12 +20,12 @@ class ColumnView {
 
   int id;
   ColumnState state;
-  DivElement columnContent;
+  DivElement columnContent, tabContent;
   AnchorElement controlButton, maximizeButton;
 
   SpanElement _maximizeGlyph;
   UListElement _navTabs;
-  DivElement _rowMain, _tabContent;
+  DivElement _rowMain;
 
   ColumnView(this.id, this.state) {
     _rowMain = querySelector('#row-main');
@@ -62,10 +62,10 @@ class ColumnView {
     ..classes.addAll(['glyphicons', 'glyphicons-plus']);
     controlButton.children.add(controlGlyph);
 
-    _tabContent = new DivElement()
+    tabContent = new DivElement()
     ..id = 'col-$id-tab-content'
     ..classes.add('tab-content');
-    columnContent.children.add(_tabContent);
+    columnContent.children.add(tabContent);
   }
 
   void maximize() {
@@ -116,8 +116,8 @@ class ColumnView {
     .forEach((e) => e.children
     .forEach((e) => e.style.display = ''));
 
-    _tabContent.children.forEach((e) => e.style.display = '');
-    _tabContent.style.backgroundColor = '';
+    tabContent.children.forEach((e) => e.style.display = '');
+    tabContent.style.backgroundColor = '';
   }
 
   /// Hides content and tacks on additional "hidden" styling effects.
@@ -129,8 +129,8 @@ class ColumnView {
     .forEach((e) => e.children
     .forEach((e) => e.style.display = 'none'));
 
-    _tabContent.children.forEach((e) => e.style.display = 'none');
-    _tabContent.style.backgroundColor = '#eaecec';
+    tabContent.children.forEach((e) => e.style.display = 'none');
+    tabContent.style.backgroundColor = '#eaecec';
   }
 
   void cleanUp() {

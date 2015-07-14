@@ -60,11 +60,9 @@ class UpDroidClient {
       }
     }
 
-    // Determine the column width for each tab column depending on how many
-    // there are in the config, minus 1 for the explorer panel.
-//    const bootStrapColumnsForTabs = 10;
-//    const numberOfPanels = 1;
-//    int columnWidth = bootStrapColumnsForTabs ~/ (config.length - numberOfPanels);
+    // TODO: make the initial min-width more responsive to how the tabs start out initially.
+    // For now we assume they start off 50/50.
+    querySelector('body').style.minWidth = '1211px';
 
     for (int i = 1; i < config.length; i++) {
       ColumnController controller = new ColumnController(i, ColumnState.NORMAL, config[i], _mailbox, _getAvailableId);
@@ -72,10 +70,13 @@ class UpDroidClient {
 
       controller.columnStateChanges.listen((ColumnState newState) {
         if (newState == ColumnState.MAXIMIZED) {
+          querySelector('body').style.minWidth = '770px';
           _columnControllers.where((c) => c != controller).forEach((c) => c.minimize(false));
         } else if (newState == ColumnState.MINIMIZED) {
+          querySelector('body').style.minWidth = '770px';
           _columnControllers.where((c) => c != controller).forEach((c) => c.maximize(false));
         } else {
+          querySelector('body').style.minWidth = '1211px';
           _columnControllers.where((c) => c != controller).forEach((c) => c.resetToNormal(false));
         }
       });

@@ -73,9 +73,9 @@ class ColumnController {
       // Cycle columns.
       if (e.shiftKey) {
         if (e.keyCode == KeyCode.LEFT && columnId != 1) {
-          querySelector('#col-1-tab-content').children[0].children[1].children[1].focus();
+          querySelector('#col-1-tab-content').children[0].children[1].focus();
         } else if (e.keyCode == KeyCode.RIGHT && columnId != 2) {
-          querySelector('#col-2-tab-content').children[0].children[1].children[1].focus();
+          querySelector('#col-2-tab-content').children[0].children[1].focus();
         }
 
         return;

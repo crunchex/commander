@@ -67,7 +67,7 @@ class UpDroidClient {
       ColumnController controller = new ColumnController(i, ColumnState.NORMAL, config[i], _mailbox, _getAvailableId);
       _columnControllers.add(controller);
 
-      controller.columnEvents.listen((ColumnState newState) {
+      controller.columnStateChanges.listen((ColumnState newState) {
         if (newState == ColumnState.MAXIMIZED) {
           _columnControllers.where((c) => c != controller).forEach((c) => c.minimize(false));
         } else if (newState == ColumnState.MINIMIZED) {

@@ -17,9 +17,9 @@ enum ColumnState { MINIMIZED, NORMAL, MAXIMIZED }
 class ColumnController {
   int columnId;
   ColumnState state;
-  Stream<ColumnState> columnEvents;
+  Stream<ColumnState> columnStateChanges;
 
-  StreamController<ColumnState> _columnEventsController;
+  StreamController<ColumnState> _columnStateChangesController;
 
   List _config;
   Mailbox _mailbox;
@@ -33,8 +33,8 @@ class ColumnController {
     _mailbox = mailbox;
     _getAvailableId = getAvailableId;
 
-    _columnEventsController = new StreamController<ColumnState>();
-    columnEvents = _columnEventsController.stream;
+    _columnStateChangesController = new StreamController<ColumnState>();
+    columnStateChanges = _columnStateChangesController.stream;
     _tabs = [];
 
     ColumnView.createColumnView(columnId, state).then((columnView) {
@@ -111,7 +111,7 @@ class ColumnController {
   /// event is not fired to avoid an endless loop.
   void maximize(bool internal) {
     state = ColumnState.MAXIMIZED;
-    if (internal) _columnEventsController.add(state);
+    if (internal) _columnStateChangesController.add(state);
     _view.maximize();
   }
 
@@ -119,7 +119,7 @@ class ColumnController {
   /// event is not fired to avoid an endless loop.
   void resetToNormal(bool internal) {
     state = ColumnState.NORMAL;
-    if (internal) _columnEventsController.add(state);
+    if (internal) _columnStateChangesController.add(state);
     _view.normalize();
   }
 
@@ -127,7 +127,7 @@ class ColumnController {
   /// event is not fired to avoid an endless loop.
   void minimize(bool internal) {
     state = ColumnState.MINIMIZED;
-    if (internal) _columnEventsController.add(state);
+    if (internal) _columnStateChangesController.add(state);
     _view.minimize();
   }
 
@@ -200,6 +200,6 @@ class ColumnController {
   int get _maxTabs => (ColumnView.width[state] / 10 * 8).toInt();
 
   void cleanUp() {
-    _columnEventsController.close();
+    _columnStateChangesController.close();
   }
 }

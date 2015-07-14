@@ -122,7 +122,8 @@ abstract class ContainerView {
     }
 
     tabContent = new DivElement()
-        ..classes.add('tab-content');
+        ..classes.add('tab-content')
+        ..tabIndex = -1;
     tabContainer.children.add(tabContent);
 
     content = new DivElement()

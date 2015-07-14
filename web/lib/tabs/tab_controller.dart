@@ -30,6 +30,10 @@ abstract class TabController {
       _closeTabButton.onClick.listen((e) => _closeTab());
       view.closeControlHitbox.onClick.listen((e) => _closeTab());
 
+      // When the content of this tab receives focus, transfer it to whatever is the main content of the tab
+      // (which may or may not be the direct child of view.content).
+      view.content.onFocus.listen((e) => onFocus());
+
       setUpController();
       registerEventHandlers();
     });
@@ -41,6 +45,7 @@ abstract class TabController {
   void registerMailbox();
   void setUpController();
   void registerEventHandlers();
+  void onFocus();
   Future<bool> preClose();
   void cleanUp();
 

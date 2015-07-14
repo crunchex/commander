@@ -141,6 +141,11 @@ class UpDroidCamera extends TabController {
     });
   }
 
+  void onFocus() {
+    // Main content is the canvas element.
+    view.content.children[0].children[0];
+  }
+
   Future<bool> preClose() {
     Completer c = new Completer();
     c.complete(true);

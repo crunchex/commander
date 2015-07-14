@@ -181,6 +181,11 @@ class UpDroidConsole extends TabController {
     });
   }
 
+  void onFocus() {
+    // Main content is terminal-output.
+    view.content.children[0].children[0].focus();
+  }
+
   Future<bool> preClose() {
     Completer c = new Completer();
     c.complete(true);

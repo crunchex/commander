@@ -362,6 +362,11 @@ class UpDroidEditor extends TabController {
     view.tabHandleButton.title = view.extra.text;
   }
 
+  void onFocus() {
+    // Main content is ace_content, not necessarily in the same location due to other dynamic elements.
+    querySelector('.updroid-editor .updroid_editor .ace_content').focus();
+  }
+
   Future<bool> preClose() {
     return _handleAnyChanges().then((_) => true);
   }

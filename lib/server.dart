@@ -14,6 +14,8 @@ import 'tab/explorer.dart';
 import 'git.dart';
 import 'server_mailbox.dart';
 import 'server_helper.dart' as help;
+import 'updroid_message.dart';
+import 'server_message.dart';
 
 part 'commands.dart';
 

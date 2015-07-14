@@ -4,13 +4,12 @@ import 'dart:io';
 import 'dart:convert';
 
 import '../ros/ros.dart';
-import '../server_mailbox.dart';
 import '../tab.dart';
 
 class CmdrTeleop extends Tab {
   Process _shell;
 
-  CmdrTeleop(id, String workspacePath) :
+  CmdrTeleop(int id, String workspacePath) :
   super(id, 'UpDroidTeleop') {
     Workspace workspace = new Workspace(workspacePath);
 //    Ros.runNode(workspace, 'ros_arduino_python joy_cmdr.launch');
@@ -23,10 +22,6 @@ class CmdrTeleop extends Tab {
   }
 
   void registerMailbox() {
-    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
-    mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
-    mailbox.registerWebSocketEvent('MOVE_TAB', _moveTab);
-
     mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/controller/0', _handleGamepadInput);
   }
 

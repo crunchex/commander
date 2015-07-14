@@ -5,6 +5,9 @@ import 'dart:io';
 import 'dart:convert';
 
 import '../tab.dart';
+import '../post_office.dart';
+import '../updroid_message.dart';
+import '../server_message.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 
@@ -13,7 +16,7 @@ class CmdrPty extends Tab {
   String _workspacePath;
   Socket _ptySocket;
 
-  CmdrPty(id, String workspacePath, String numRows, String numCols) :
+  CmdrPty(int id, String workspacePath, String numRows, String numCols) :
   super(id, 'UpDroidConsole') {
     _workspacePath = workspacePath;
   }

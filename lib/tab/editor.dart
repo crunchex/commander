@@ -14,7 +14,7 @@ class CmdrEditor extends Tab {
 
   Workspace _currentWorkspace;
 
-  CmdrEditor(id, this.uproot) :
+  CmdrEditor(int id, this.uproot) :
   super(id, 'UpDroidEditor') {
 
   }

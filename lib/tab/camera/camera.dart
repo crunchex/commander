@@ -5,7 +5,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import '../../server_mailbox.dart';
 import '../../server_helper.dart' as help;
 import '../../tab.dart';
 
@@ -16,7 +15,7 @@ class CmdrCamera extends Tab {
 
   StreamSubscription _currentDeviceSub;
 
-  CmdrCamera(this.id, this.servers) :
+  CmdrCamera(int id, this.servers) :
   super(id, 'UpDroidCamera') {
 
   }

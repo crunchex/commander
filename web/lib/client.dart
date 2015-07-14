@@ -68,13 +68,19 @@ class UpDroidClient {
       ColumnController controller = new ColumnController(i, ColumnState.NORMAL, config[i], _mailbox, _getAvailableId);
       _columnControllers.add(controller);
 
-      controller.columnEvents.listen((ColumnState newState) {
+      controller.columnStateChanges.listen((ColumnState newState) {
         if (newState == ColumnState.MAXIMIZED) {
           _columnControllers.where((c) => c != controller).forEach((c) => c.minimize(false));
         } else if (newState == ColumnState.MINIMIZED) {
           _columnControllers.where((c) => c != controller).forEach((c) => c.maximize(false));
         } else {
           _columnControllers.where((c) => c != controller).forEach((c) => c.resetToNormal(false));
+        }
+      });
+
+      controller.columnEvents.listen((ColumnEvent event) {
+        if (event == ColumnEvent.LOST_FOCUS) {
+          _columnControllers.firstWhere((c) => c != controller).getsFocus();
         }
       });
     }

@@ -41,6 +41,11 @@ abstract class TabController {
 
       setUpController();
       registerEventHandlers();
+
+      // When the content of this tab receives focus, transfer it to whatever is the main content of the tab
+      // (which may or may not be the direct child of view.content).
+      // Also, this is done last as additional view set up may have been done in setUpController().
+      view.tabContent.onFocus.listen((e) => elementToFocus.focus());
     });
   }
 
@@ -50,8 +55,10 @@ abstract class TabController {
   void registerMailbox();
   void setUpController();
   void registerEventHandlers();
+  void onFocus();
   Future<bool> preClose();
   void cleanUp();
+  Element get elementToFocus;
 
   Future _closeTab() async {
     // Cancel closing if preClose returns false for some reason.

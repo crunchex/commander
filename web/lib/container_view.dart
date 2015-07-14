@@ -13,11 +13,9 @@ abstract class ContainerView {
 
   LinkElement styleLink;
   AnchorElement tabHandleButton;
-  DivElement content, tabContainer;
+  DivElement content, tabContainer, tabContent;
   LIElement tabHandle;
   UListElement menus;
-
-  DivElement _tabContent;
 
   ContainerView(this.id, this.col, this.title, this.shortName, this.config, DivElement handles) {
     refMap = {};
@@ -121,13 +119,14 @@ abstract class ContainerView {
       menus.children.add(_createDropdownMenu(configItem));
     }
 
-    _tabContent = new DivElement()
-        ..classes.add('tab-content');
-    tabContainer.children.add(_tabContent);
+    tabContent = new DivElement()
+        ..classes.add('tab-content')
+        ..tabIndex = -1;
+    tabContainer.children.add(tabContent);
 
     content = new DivElement()
         ..classes.add(name);
-    _tabContent.children.add(content);
+    tabContent.children.add(content);
     refMap['content'] = content;
 
     DivElement colOneTabContent = querySelector('#col-$col-tab-content');

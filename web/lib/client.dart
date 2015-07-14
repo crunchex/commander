@@ -120,7 +120,10 @@ class UpDroidClient {
     int newColIndex = int.parse(idList[3]) - 1;
 
     // Don't go any further if a move request can't be done.
-    if (!_columnControllers[newColIndex].canAddMoreTabs) return;
+    if (!_columnControllers[newColIndex].canAddMoreTabs) {
+      window.alert('Can\'t move tab. Already at max on this side.');
+      return;
+    }
 
     TabController tab = _columnControllers[oldColIndex].removeTab(tabType, id);
     _columnControllers[newColIndex].addTab(tab);

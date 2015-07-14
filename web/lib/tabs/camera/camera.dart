@@ -44,6 +44,7 @@ class UpDroidCamera extends TabController {
     _aspect = AspectType.FULL;
 
     _canvas = new CanvasElement();
+    _canvas.tabIndex = -1;
     _canvas.classes.add('video-canvas');
     setDimensions();
     view.content.children.add(_canvas);

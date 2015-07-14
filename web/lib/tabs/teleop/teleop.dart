@@ -18,6 +18,8 @@ class UpDroidTeleop extends TabController {
     return menu;
   }
 
+  DivElement containerDiv;
+
   WebSocket _ws;
 
   UpDroidTeleop(int id, int col) :
@@ -26,15 +28,23 @@ class UpDroidTeleop extends TabController {
   }
 
   void setUpController() {
+    // Dummy div so that teleop fits with the onFocus API from tab controller.
+    containerDiv = new DivElement()
+    ..style.width = '100%'
+    ..style.height = '100%'
+    ..style.backgroundColor = '#107C10'
+    ..tabIndex = -1;
+    view.content.children.add(containerDiv);
+
     view.content.contentEdge.height = new Dimension.percent(100);
-    view.content.style.backgroundColor = '#107C10';
+
     // TODO: compress this svg (use that OS X tool).
     ImageElement image = new ImageElement(src: 'lib/tabs/teleop/xbox.svg')
       ..style.position = 'absolute'
       ..style.top = '50%'
       ..style.left = '50%'
       ..style.transform = 'translate(-50%, -200px)';
-    view.content.children.add(image);
+    containerDiv.children.add(image);
 
     for (int i = 0; i < 4; i++) {
       SpanElement span = new SpanElement()
@@ -42,7 +52,7 @@ class UpDroidTeleop extends TabController {
         ..style.top = '50%'
         ..style.left = '50%'
         ..style.transform = 'translate(-50%, -${i * 20 + 50}px)';
-      view.content.children.add(span);
+      containerDiv.children.add(span);
 
       ParagraphElement axisLabel = new ParagraphElement()
         ..id = '${className.toLowerCase()}-$id-axis-label-$i'
@@ -67,7 +77,7 @@ class UpDroidTeleop extends TabController {
         ..style.top = '50%'
         ..style.left = '50%'
         ..style.transform = 'translate(-50%, ${i * 20 - 30}px)';
-      view.content.children.add(span);
+      containerDiv.children.add(span);
 
       ParagraphElement buttonLabel = new ParagraphElement()
         ..id = '${className.toLowerCase()}-$id-button-label-$i'
@@ -107,7 +117,7 @@ class UpDroidTeleop extends TabController {
         var updateStatus = new js.JsObject(js.context['updateStatus'], []);
         String payloadString = '[';
         for (int i = 1; i <= 21; i++) {
-          payloadString += view.content.children[i].children[1].text;
+          payloadString += containerDiv.children[i].children[1].text;
 
           if (i == 21) {
             break;
@@ -120,7 +130,7 @@ class UpDroidTeleop extends TabController {
         }
         payloadString += ']';
 
-        if (view.content.children[1].children[1].text != 'disconnected') {
+        if (containerDiv.children[1].children[1].text != 'disconnected') {
           _ws.send(payloadString);
         };
       });
@@ -155,7 +165,7 @@ class UpDroidTeleop extends TabController {
 
   void onFocus() {
     // Main content is the very first child of content.
-    Element e = view.content;
+    Element e = containerDiv;
     print('Focusing on: ${e.classes.toString()}');
     e.click();
     e.focus();

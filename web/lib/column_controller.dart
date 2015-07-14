@@ -13,13 +13,16 @@ import 'column_view.dart';
 import 'mailbox.dart';
 
 enum ColumnState { MINIMIZED, NORMAL, MAXIMIZED }
+enum ColumnEvent { SELECTED, DESELECTED }
 
 class ColumnController {
   int columnId;
   ColumnState state;
   Stream<ColumnState> columnStateChanges;
+  Stream<ColumnEvent> columnEvents;
 
   StreamController<ColumnState> _columnStateChangesController;
+  StreamController<ColumnEvent> _columnEventsController;
 
   List _config;
   Mailbox _mailbox;
@@ -35,6 +38,8 @@ class ColumnController {
 
     _columnStateChangesController = new StreamController<ColumnState>();
     columnStateChanges = _columnStateChangesController.stream;
+    _columnEventsController = new StreamController<ColumnEvent>();
+    columnEvents = _columnEventsController.stream;
     _tabs = [];
 
     ColumnView.createColumnView(columnId, state).then((columnView) {
@@ -201,5 +206,6 @@ class ColumnController {
 
   void cleanUp() {
     _columnStateChangesController.close();
+    _columnEventsController.close();
   }
 }

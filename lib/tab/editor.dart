@@ -7,6 +7,9 @@ import 'api/ros/ros.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 import 'api/tab.dart';
+import 'api/updroid_message.dart';
+import '../post_office.dart';
+import 'api/server_message.dart';
 
 class CmdrEditor extends Tab {
   Directory uproot;

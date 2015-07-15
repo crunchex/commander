@@ -6,8 +6,8 @@ import 'dart:convert';
 
 import 'api/tab.dart';
 import '../post_office.dart';
-import '../updroid_message.dart';
-import '../server_message.dart';
+import 'api/updroid_message.dart';
+import 'api/server_message.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 

@@ -11,8 +11,8 @@ import 'tab/explorer.dart';
 import 'tab/api/git.dart';
 import 'server_mailbox.dart';
 import 'server_helper.dart' as help;
-import 'updroid_message.dart';
-import 'server_message.dart';
+import 'tab/api/updroid_message.dart';
+import 'tab/api/server_message.dart';
 import 'tab_interface.dart';
 import 'post_office.dart';
 

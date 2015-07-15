@@ -4,8 +4,8 @@ import 'dart:async';
 
 import '../../server_mailbox.dart';
 import '../../post_office.dart';
-import '../../updroid_message.dart';
-import '../../server_message.dart';
+import 'updroid_message.dart';
+import 'server_message.dart';
 
 abstract class Tab {
   int id;

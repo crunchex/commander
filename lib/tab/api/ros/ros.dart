@@ -3,7 +3,7 @@ library ros;
 import 'dart:io';
 import 'dart:async';
 
-import '../../../../packages/xml/xml.dart';
+import 'package:xml/xml.dart';
 
 import '../../../server_helper.dart' as help;
 

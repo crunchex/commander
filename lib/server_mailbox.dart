@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:async';
 
 import 'server_helper.dart' as help;
-import 'updroid_message.dart';
+import 'tab/api/updroid_message.dart';
 import 'post_office.dart';
 
 class CmdrMailbox {

@@ -6,16 +6,14 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 
-import 'tab/pty.dart';
 import 'tab/camera/camera.dart';
-import 'tab/teleop.dart';
-import 'tab/editor.dart';
 import 'tab/explorer.dart';
 import 'git.dart';
 import 'server_mailbox.dart';
 import 'server_helper.dart' as help;
 import 'updroid_message.dart';
 import 'server_message.dart';
+import 'tab_interface.dart';
 
 part 'commands.dart';
 
@@ -30,7 +28,6 @@ class CmdrServer {
 
   Map _panels = {};
   Map<String, Map<int, dynamic>> _tabs = {};
-  Map<int, CameraServer> _camServers = {};
   CmdrMailbox _mailbox;
   Directory dir;
 
@@ -177,21 +174,12 @@ class CmdrServer {
 
     if (!_tabs.containsKey(type)) _tabs[type] = {};
 
-    switch (type) {
-      case 'updroideditor':
-        _tabs[type][num] = new CmdrEditor(num, dir);
-        break;
-      case 'updroidcamera':
-        _tabs[type][num] = new CmdrCamera(num, _camServers);
-        break;
-      case 'updroidteleop':
-        _tabs[type][num] = new CmdrTeleop(num, dir.path);
-        break;
-      case 'updroidconsole':
-        String numRows = idList[3];
-        String numCols = idList[4];
-        _tabs[type][num] = new CmdrPty(num, dir.path, numRows, numCols);
-        break;
+
+    if (idList.length <= 3) {
+      _tabs[type][num] = new TabInterface(type, num, dir);
+    } else {
+      List extra = idList.getRange(3, idList.length);
+      _tabs[type][num] = new TabInterface(type, num, dir, extra);
     }
   }
 
@@ -235,11 +223,6 @@ class CmdrServer {
       });
     });
     _tabs = {};
-
-    _camServers.values.forEach((CameraServer server) {
-      server.cleanup();
-    });
-    _camServers = {};
 
     help.debug('Clean up done.', 0);
   }

@@ -11,9 +11,8 @@ import '../../tab.dart';
 part 'camera_server.dart';
 
 class CmdrCamera extends Tab {
-  Map<int, CameraServer> servers;
-
   StreamSubscription _currentDeviceSub;
+  int _currentDeviceId;
 
   CmdrCamera(int id, this.servers) :
   super(id, 'UpDroidCamera') {
@@ -39,16 +38,16 @@ class CmdrCamera extends Tab {
   }
 
   void _handleInputStream(HttpRequest request) {
-    int deviceId = int.parse(request.uri.pathSegments.last);
-    if (servers[deviceId] == null) {
-      servers[deviceId] = new CameraServer(deviceId);
+    _currentDeviceId = int.parse(request.uri.pathSegments.last);
+    if (CameraServer.servers[_currentDeviceId] == null) {
+      CameraServer.servers[_currentDeviceId] = new CameraServer(_currentDeviceId);
     }
     // request.uri is updroidcamera/id/input
     if (_currentDeviceSub != null) {
-      _currentDeviceSub.cancel();
+      CameraServer.servers[_currentDeviceId].unsubscribeToString(_currentDeviceSub);
     }
-    mailbox.ws.add(servers[deviceId].streamHeader);
-    _currentDeviceSub = servers[deviceId].transStream.stream.asBroadcastStream().listen((data) {
+    mailbox.ws.add(CameraServer.streamHeader);
+    _currentDeviceSub = CameraServer.servers[_currentDeviceId].subscribeToStream().listen((data) {
       mailbox.ws.add(data);
     });
   }
@@ -64,6 +63,6 @@ class CmdrCamera extends Tab {
   }
 
   void cleanup() {
-
+    CameraServer.servers[_currentDeviceId].unsubscribeToString(_currentDeviceSub);
   }
 }

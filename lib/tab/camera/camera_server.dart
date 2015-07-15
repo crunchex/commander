@@ -1,14 +1,18 @@
 part of cmdr_camera;
 
+Map<int, CameraServer> _camServers;
+
 class CameraServer {
-  int videoId;
-  StreamController<List<int>> transStream;
+  static Map<int, CameraServer> get servers {
+    if (_camServers == null) {
+      _camServers = {};
+    }
 
-  Process _shell;
-  Uint16List streamHeader;
+    return _camServers;
+  }
 
-  CameraServer(this.videoId) {
-    streamHeader = [];
+  static Uint16List get streamHeader {
+    Uint16List streamHeader = [];
 
     streamHeader.addAll(UTF8.encode('jsmp'));
     // TODO: replace hardcoding with actual UInt16BE conversion.
@@ -22,7 +26,16 @@ class CameraServer {
     //  this.height = (data[6] * 256 + data[7]);
     streamHeader.addAll([1, 64, 0, 240]);
 
-    transStream = new StreamController<List<int>>.broadcast();
+    return streamHeader;
+  }
+
+  int videoId, listenerCount;
+
+  Process _shell;
+  StreamController<List<int>> _transStream;
+
+  CameraServer(this.videoId) {
+    _transStream = new StreamController<List<int>>.broadcast();
 
     var addressesIListenFrom = InternetAddress.ANY_IP_V4;
     int portIListenOn = 13020 + videoId;
@@ -30,12 +43,22 @@ class CameraServer {
       udpSocket.listen((RawSocketEvent event) {
         if (event == RawSocketEvent.READ) {
           Datagram dg = udpSocket.receive();
-          transStream.add(dg.data);
+          _transStream.add(dg.data);
         }
       });
     });
 
     _runFFMpeg();
+  }
+
+  Stream subscribeToStream() {
+    listenerCount++;
+    return _transStream.stream;
+  }
+
+  void unsubscribeToString(StreamSubscription sub) {
+    listenerCount--;
+    sub.cancel();
   }
 
   void _runFFMpeg() {

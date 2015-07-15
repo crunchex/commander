@@ -1,26 +1,40 @@
 library updroid_message;
 
-/// Container class that extracts the header (denoted with double brackets)
-/// and body from the raw text of a formatted [WebSocket] message received
-/// from the UpDroid client.
+import 'dart:async';
+
+/// A class that defines the message structure for tab communication.
 class Msg {
-  String s;
+  String header, body;
 
-  Msg(String header, String body) {
-    s = '[[$header]]$body';
+  Msg(this.header, this.body);
+
+  /// Returns a new instance of [Msg], given a formatted String.
+  /// Throws an error if not in the format: [[HEADER]]body
+  Msg.fromString(String s) {
+    if (!s.contains('[[') || !s.contains(']]')) throw new MalformedMsgError(s);
+
+    String minusFirstBrackets = s.replaceFirst('[[', '');
+    int indexOfSecondBrackets = minusFirstBrackets.indexOf(']]');
+
+    header = minusFirstBrackets.substring(0, indexOfSecondBrackets);
+    body = minusFirstBrackets.substring(indexOfSecondBrackets + 2, minusFirstBrackets.length);
   }
 
-  Msg.fromString(this.s);
-
-  String get header => createHeader();
-  String get body => createBody();
-
-  String createHeader() {
-    var header = new RegExp(r'^\[\[[A-Z_]+\]\]').firstMatch(s)[0];
-    return header.replaceAll(new RegExp(r'\[\[|\]\]'), '');
+  String toString() {
+    return '[[$header]]$body';
   }
 
-  String createBody() => s.replaceFirst(new RegExp(r'^\[\[[A-Z_]+\]\]'), '');
+  /// Transformer to convert String messages into the Msg.
+  static StreamTransformer toMsg = new StreamTransformer.fromHandlers(handleData: (event, sink) {
+    sink.add(new Msg.fromString(event.data));
+  });
 
-  String toString() => s;
+  /// Transformer to convert Msg into Strings that could be sent over Websockets or ports.
+  static StreamTransformer fromMsg = new StreamTransformer.fromHandlers(handleData: (event, sink) {
+    sink.add(event.data.s);
+  });
+}
+
+class MalformedMsgError extends StateError {
+  MalformedMsgError(String msg) : super('Wrong format for Msg: $msg');
 }

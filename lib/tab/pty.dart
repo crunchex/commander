@@ -45,7 +45,7 @@ class CmdrPty extends Tab {
         if (dataString.contains('listening on port: ')) {
           String port = dataString.replaceFirst('listening on port: ', '');
           Msg portMessage = new Msg('PTY_READY', '');
-          mailbox.ws.add(portMessage.s);
+          mailbox.ws.add(portMessage.toString());
           portListener.cancel();
 
           Socket.connect('127.0.0.1', int.parse(port)).then((socket) {

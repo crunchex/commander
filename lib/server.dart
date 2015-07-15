@@ -6,7 +6,6 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 
-import 'tab/camera/camera.dart';
 import 'tab/explorer.dart';
 import 'tab/api/git.dart';
 import 'server_mailbox.dart';

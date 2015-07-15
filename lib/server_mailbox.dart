@@ -38,6 +38,8 @@ class CmdrMailbox {
     });
   }
 
+  void send(Msg m) => ws.add(m.toString());
+
   void handleWebSocket(WebSocket ws, HttpRequest request) {
     this.ws = ws;
     if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className.toLowerCase()) {

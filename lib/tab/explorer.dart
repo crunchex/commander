@@ -10,7 +10,6 @@ import 'api/ros/ros.dart';
 import 'api/updroid_message.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
-import 'api/updroid_message.dart';
 import '../post_office.dart';
 import 'api/server_message.dart';
 
@@ -36,7 +35,7 @@ class CmdrExplorer {
     // TODO: handle changes to uproot made on the server side.
 //    _uprootWatcher = new DirectoryWatcher(uproot.path);
 //    _uprootWatcherStream = _uprootWatcher.events.listen((WatchEvent w) {
-//      mailbox.ws.add('[[WORKSPACE_NAME]]' + w.path.replaceFirst('${uproot.path}/', '').split('/').first);
+//      mailbox.send(new Msg('WORKSPACE_NAME', w.path.replaceFirst('${uproot.path}/', '').split('/').first);
 //    });
   }
 
@@ -72,7 +71,7 @@ class CmdrExplorer {
     }
 
     List<String> files = _currentWorkspace.listContentsSync();
-    files.forEach((String file) => mailbox.ws.add('[[ADD_UPDATE]]' + file));
+    files.forEach((String file) => mailbox.send(new Msg('ADD_UPDATE', file)));
   }
 
   void _getPath(Msg um) => _sendPath();
@@ -82,7 +81,7 @@ class CmdrExplorer {
     uproot.list()
     .where((Directory w) => Workspace.isWorkspace(w.path))
     .listen((Directory w) => names.add(w.path.split('/').last))
-    .onDone(() => mailbox.ws.add('[[WORKSPACE_NAMES]]' + JSON.encode(names)));
+    .onDone(() => mailbox.send(new Msg('WORKSPACE_NAMES', JSON.encode(names))));
   }
 
   void _newWorkspace(Msg um) {
@@ -141,7 +140,7 @@ class CmdrExplorer {
 
       // Force a remove update on the top level folder as
       // watcher issue workaround.
-      if (isDir) mailbox.ws.add('[[REMOVE_UPDATE]]D:$oldPath');
+      if (isDir) mailbox.send(new Msg('REMOVE_UPDATE', 'D:$oldPath'));
     });
   }
 
@@ -155,7 +154,7 @@ class CmdrExplorer {
 
     // Force a remove update on the top level folder as
     // watcher issue workaround.
-    if (isDir) mailbox.ws.add('[[REMOVE_UPDATE]]D:$path');
+    if (isDir) mailbox.send(new Msg('REMOVE_UPDATE', 'D:$path'));
   }
 
   void _openFile(Msg um) {
@@ -174,7 +173,7 @@ class CmdrExplorer {
 
   void _workspaceClean(Msg um) {
     _currentWorkspace.clean().then((result) {
-      mailbox.ws.add('[[WORKSPACE_CLEAN]]');
+      mailbox.send(new Msg('WORKSPACE_CLEAN', ''));
     });
   }
 
@@ -182,8 +181,8 @@ class CmdrExplorer {
     _currentWorkspace.buildWorkspace().then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
-//      mailbox.ws.add('[[WORKSPACE_BUILD]]' + resultString);
-      mailbox.ws.add('[[BUILD_COMPLETE]]' + JSON.encode([_currentWorkspace.path]));
+//      mailbox.send(new Msg('WORKSPACE_BUILD', resultString);
+      mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([_currentWorkspace.path])));
     });
   }
 
@@ -193,8 +192,8 @@ class CmdrExplorer {
     _currentWorkspace.buildPackage(packageName).then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
-//      mailbox.ws.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
-      mailbox.ws.add('[[BUILD_COMPLETE]]' + JSON.encode([packagePath]));
+//      mailbox.send(new Msg('PACKAGE_BUILD_RESULTS', resultString);
+      mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([packagePath])));
     });
   }
 
@@ -208,8 +207,8 @@ class CmdrExplorer {
     _currentWorkspace.buildPackages(packageNames).then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
-//      mailbox.ws.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
-      mailbox.ws.add('[[BUILD_COMPLETE]]' + data);
+//      mailbox.send(new Msg('PACKAGE_BUILD_RESULTS', resultString);
+      mailbox.send(new Msg('BUILD_COMPLETE', data));
     });
   }
 
@@ -223,7 +222,7 @@ class CmdrExplorer {
     _currentWorkspace.createPackage(name, dependencies).then((ProcessResult result) {
       String stderr = result.stderr;
       if (stderr.contains('devel/setup.bash: No such file or directory')) {
-        mailbox.ws.add('[[CREATE_PACKAGE_FAILED]]' + stderr);
+        mailbox.send(new Msg('CREATE_PACKAGE_FAILED', stderr));
       }
     });
   }
@@ -231,7 +230,7 @@ class CmdrExplorer {
   void _launcherList(Msg um) {
     _currentWorkspace.listLaunchers().listen((Map launcher) {
       String data = JSON.encode(launcher);
-      mailbox.ws.add('[[LAUNCH]]' + data);
+      mailbox.send(new Msg('LAUNCH', data));
     });
   }
 
@@ -258,8 +257,8 @@ class CmdrExplorer {
     CmdrPostOffice.send(new ServerMessage('UpDroidEditor', editorId, newMessage));
   }
 
-  void _sendEditorList(Msg um) => mailbox.ws.add(um.toString());
-  void _getSelected(Msg um) => mailbox.ws.add(um.toString());
+  void _sendEditorList(Msg um) => mailbox.send(um);
+  void _getSelected(Msg um) => mailbox.send(um);
 
   /// Convenience method for adding a formatted filesystem update to the socket
   /// stream.
@@ -272,9 +271,9 @@ class CmdrExplorer {
     bool isFile = await FileSystemEntity.isFile(path);
     String fileString = isFile ? 'F:${path}' : 'D:${path}';
 
-    var formatted = '[[${header}_UPDATE]]' + fileString;
-    help.debug('Outgoing: ' + formatted, 0);
-    if (header != 'MODIFY') mailbox.ws.add(formatted);
+    Msg formatted = new Msg('${header}_UPDATE', fileString);
+    help.debug('Outgoing: ' + formatted.toString(), 0);
+    if (header != 'MODIFY') mailbox.send(formatted);
   }
 
   void _setCurrentWorkspace(String newWorkspaceName) {
@@ -290,7 +289,7 @@ class CmdrExplorer {
   }
 
   void _sendPath() {
-    mailbox.ws.add('[[EXPLORER_DIRECTORY_PATH]]' + _currentWorkspace.path);
+    mailbox.send(new Msg('EXPLORER_DIRECTORY_PATH', _currentWorkspace.path));
   }
 
   void cleanup() {

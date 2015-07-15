@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import '../../server_helper.dart' as help;
 import '../api/tab.dart';
+import '../api/updroid_message.dart';
 
 part 'camera_server.dart';
 
@@ -30,11 +31,11 @@ class CmdrCamera extends Tab {
   void _signalReady(UpDroidMessage) {
     ProcessResult result = Process.runSync('bash', ['-c', 'ffmpeg --help']);
     if (result.exitCode == 127) {
-      mailbox.ws.add('[[NO_FFMPEG]]');
+      mailbox.send(new Msg('NO_FFMPEG', ''));
       return;
     }
 
-    mailbox.ws.add('[[CAMERA_READY]]' + JSON.encode(_getDeviceIds()));
+    mailbox.send(new Msg('CAMERA_READY', JSON.encode(_getDeviceIds())));
   }
 
   void _handleInputStream(HttpRequest request) {

@@ -137,7 +137,7 @@ class CmdrServer {
 
   void _clientConfig(Msg um) {
     // TODO: send back some kind of saved config from the filesystem.
-    _mailbox.ws.add('[[SERVER_READY]]');
+    _mailbox.send(new Msg('SERVER_READY', ''));
   }
 
   void _gitPush(Msg um) {
@@ -184,7 +184,7 @@ class CmdrServer {
     }
   }
 
-  void _openTabFromServer(Msg um) => _mailbox.ws.add('[[OPEN_TAB]]' + um.body);
+  void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));
 
   void _closeTab(Msg um) {
     List idList = um.body.split('_');
@@ -199,9 +199,9 @@ class CmdrServer {
     }
   }
 
-  void _closeTabFromServer(Msg um) => _mailbox.ws.add('[[CLOSE_TAB]]' + um.body);
-  void _cloneTabFromServer(Msg um) => _mailbox.ws.add('[[CLONE_TAB]]' + um.body);
-  void _moveTabFromServer(Msg um) => _mailbox.ws.add('[[MOVE_TAB]]' + um.body);
+  void _closeTabFromServer(Msg um) => _mailbox.send(new Msg('CLOSE_TAB', um.body));
+  void _cloneTabFromServer(Msg um) => _mailbox.send(new Msg('CLONE_TAB', um.body));
+  void _moveTabFromServer(Msg um) => _mailbox.send(new Msg('MOVE_TAB', um.body));
 
   void _sendEditorList(Msg um) {
     String pathToOpen = um.body;

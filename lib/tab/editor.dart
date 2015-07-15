@@ -34,7 +34,7 @@ class CmdrEditor extends Tab {
   void _openFile(Msg um) {
     var fileToOpen = new File(um.body);
     fileToOpen.readAsString().then((String contents) {
-      mailbox.ws.add('[[OPEN_FILE]]' + um.body + '[[CONTENTS]]' + contents);
+      mailbox.send(new Msg('OPEN_FILE', um.body + '[[CONTENTS]]' + contents));
     });
   }
 
@@ -63,7 +63,7 @@ class CmdrEditor extends Tab {
   }
 
   void _returnSelected(Msg um) {
-    mailbox.ws.add('[[REQUEST_SELECTED]]' + um.body);
+    mailbox.send(new Msg('REQUEST_SELECTED', um.body));
   }
 
   void cleanup() {

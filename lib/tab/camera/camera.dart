@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import '../../server_helper.dart' as help;
-import '../../tab.dart';
+import '../api/tab.dart';
 
 part 'camera_server.dart';
 

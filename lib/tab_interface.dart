@@ -3,7 +3,7 @@ library tab_interface;
 import 'dart:async';
 import 'dart:io';
 
-import 'tab.dart';
+import 'tab/api/tab.dart';
 import 'tab/pty.dart';
 import 'tab/camera/camera.dart';
 import 'tab/teleop.dart';

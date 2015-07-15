@@ -3,8 +3,8 @@ library cmdr_teleop;
 import 'dart:io';
 import 'dart:convert';
 
-import '../ros/ros.dart';
-import '../tab.dart';
+import 'api/ros';
+import 'api/tab.dart';
 
 class CmdrTeleop extends Tab {
   Process _shell;

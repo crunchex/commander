@@ -3,10 +3,10 @@ library cmdr_editor;
 import 'dart:io';
 import 'dart:convert';
 
-import '../ros/ros.dart';
+import 'api/ros';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
-import '../tab.dart';
+import 'api/tab.dart';
 
 class CmdrEditor extends Tab {
   Directory uproot;

@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
-import '../tab.dart';
+import 'api/tab.dart';
 import '../post_office.dart';
 import '../updroid_message.dart';
 import '../server_message.dart';

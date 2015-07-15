@@ -1,14 +1,18 @@
 part of cmdr_camera;
 
+Map<int, CameraServer> _camServers;
+
 class CameraServer {
-  int videoId;
-  StreamController<List<int>> transStream;
+  static Map<int, CameraServer> get servers {
+    if (_camServers == null) {
+      _camServers = {};
+    }
 
-  Process _shell;
-  Uint16List streamHeader;
+    return _camServers;
+  }
 
-  CameraServer(this.videoId) {
-    streamHeader = [];
+  static Uint16List get streamHeader {
+    Uint16List streamHeader = [];
 
     streamHeader.addAll(UTF8.encode('jsmp'));
     // TODO: replace hardcoding with actual UInt16BE conversion.
@@ -22,20 +26,43 @@ class CameraServer {
     //  this.height = (data[6] * 256 + data[7]);
     streamHeader.addAll([1, 64, 0, 240]);
 
-    transStream = new StreamController<List<int>>.broadcast();
+    return streamHeader;
+  }
+
+  int videoId;
+
+  Process _shell;
+  RawDatagramSocket _udpSocket;
+  StreamController<List<int>> _transStream;
+  int _listenerCount;
+
+  CameraServer(this.videoId) {
+    _listenerCount = 0;
+    _transStream = new StreamController<List<int>>.broadcast();
 
     var addressesIListenFrom = InternetAddress.ANY_IP_V4;
     int portIListenOn = 13020 + videoId;
     RawDatagramSocket.bind(addressesIListenFrom, portIListenOn).then((RawDatagramSocket udpSocket) {
-      udpSocket.listen((RawSocketEvent event) {
+      _udpSocket = udpSocket;
+      _udpSocket.listen((RawSocketEvent event) {
         if (event == RawSocketEvent.READ) {
-          Datagram dg = udpSocket.receive();
-          transStream.add(dg.data);
+          Datagram dg = _udpSocket.receive();
+          _transStream.add(dg.data);
         }
       });
     });
 
     _runFFMpeg();
+  }
+
+  Stream subscribeToStream() {
+    _listenerCount++;
+    return _transStream.stream;
+  }
+
+  void unsubscribeToString(StreamSubscription sub) {
+    _listenerCount--;
+    sub.cancel();
   }
 
   void _runFFMpeg() {
@@ -53,7 +80,13 @@ class CameraServer {
     });
   }
 
-  void cleanup() {
+  Future<bool> cleanup() async {
+    if (_listenerCount != 0) return false;
+
     _shell.kill();
+    _udpSocket.close();
+    await _transStream.close();
+
+    return true;
   }
 }

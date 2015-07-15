@@ -3,32 +3,42 @@ library cmdr_editor;
 import 'dart:io';
 import 'dart:convert';
 
-import '../ros/ros.dart';
+import 'api/ros/ros.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
+import 'api/tab.dart';
+import 'api/updroid_message.dart';
+import '../post_office.dart';
+import 'api/server_message.dart';
 
-class CmdrEditor {
-  static const String guiName = 'UpDroidEditor';
-
-  int id;
+class CmdrEditor extends Tab {
   Directory uproot;
   CmdrMailbox mailbox;
 
   Workspace _currentWorkspace;
 
-  CmdrEditor(this.id, this.uproot) {
-    mailbox = new CmdrMailbox(guiName, id);
-    _registerMailbox();
+  CmdrEditor(int id, this.uproot) :
+  super(id, 'UpDroidEditor') {
+
   }
 
-  void _openFile(UpDroidMessage um) {
+  void registerMailbox() {
+    mailbox.registerWebSocketEvent('SAVE_FILE', _saveFile);
+    mailbox.registerWebSocketEvent('REQUEST_SELECTED', _requestSelected);
+
+    mailbox.registerServerMessageHandler('OPEN_FILE', _openFile);
+    mailbox.registerServerMessageHandler('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);
+    mailbox.registerServerMessageHandler('RETURN_SELECTED', _returnSelected);
+  }
+
+  void _openFile(Msg um) {
     var fileToOpen = new File(um.body);
     fileToOpen.readAsString().then((String contents) {
-      mailbox.ws.add('[[OPEN_FILE]]' + um.body + '[[CONTENTS]]' + contents);
+      mailbox.send(new Msg('OPEN_FILE', um.body + '[[CONTENTS]]' + contents));
     });
   }
 
-  void _saveFile(UpDroidMessage um) {
+  void _saveFile(Msg um) {
     List args = JSON.decode(um.body);
     // args[0] = data, args[1] = path. args[2] = executable option
 
@@ -43,44 +53,20 @@ class CmdrEditor {
     }
   }
 
-  void _requestSelected(UpDroidMessage um) {
-    UpDroidMessage newMessage = new UpDroidMessage(um.header, id.toString());
+  void _requestSelected(Msg um) {
+    Msg newMessage = new Msg(um.header, id.toString());
     CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', -1, newMessage));
   }
 
-  void _closeTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _cloneTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _moveTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _setCurrentWorkspace(UpDroidMessage um) {
+  void _setCurrentWorkspace(Msg um) {
     _currentWorkspace = new Workspace('${uproot.path}/${um.body}');
   }
 
-  void _returnSelected(UpDroidMessage um) {
-    mailbox.ws.add('[[REQUEST_SELECTED]]' + um.body);
+  void _returnSelected(Msg um) {
+    mailbox.send(new Msg('REQUEST_SELECTED', um.body));
   }
 
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, id);
-  }
 
-  void _registerMailbox() {
-    mailbox.registerWebSocketEvent('SAVE_FILE', _saveFile);
-    mailbox.registerWebSocketEvent('REQUEST_SELECTED', _requestSelected);
-    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
-    mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
-    mailbox.registerWebSocketEvent('MOVE_TAB', _moveTab);
-
-    mailbox.registerServerMessageHandler('OPEN_FILE', _openFile);
-    mailbox.registerServerMessageHandler('SET_CURRENT_WORKSPACE', _setCurrentWorkspace);
-    mailbox.registerServerMessageHandler('RETURN_SELECTED', _returnSelected);
   }
 }

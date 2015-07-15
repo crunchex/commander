@@ -3,22 +3,15 @@ library cmdr_teleop;
 import 'dart:io';
 import 'dart:convert';
 
-import '../ros/ros.dart';
-import '../server_mailbox.dart';
+import 'api/ros/ros.dart';
+import 'api/tab.dart';
 
-class CmdrTeleop {
-  static const String guiName = 'UpDroidTeleop';
-
-  int id;
-  CmdrMailbox mailbox;
-
+class CmdrTeleop extends Tab {
   Process _shell;
 
-  CmdrTeleop(this.id, String workspacePath) {
-    mailbox = new CmdrMailbox(guiName, id);
-    _registerMailbox();
-
-    Workspace workspace = new Workspace(workspacePath);
+  CmdrTeleop(int id, Directory dir) :
+  super(id, 'UpDroidTeleop') {
+    Workspace workspace = new Workspace(dir.path);
 //    Ros.runNode(workspace, 'ros_arduino_python joy_cmdr.launch');
 
     Process.start('bash', ['-c', '. ${workspace.path}/catkin_ws/devel/setup.bash && roslaunch ros_arduino_python joy_cmdr.launch'], runInShell: true).then((process) {
@@ -28,16 +21,8 @@ class CmdrTeleop {
     });
   }
 
-  void _closeTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _cloneTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
-  }
-
-  void _moveTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  void registerMailbox() {
+    mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/controller/0', _handleGamepadInput);
   }
 
   void _handleGamepadInput(HttpRequest request) {
@@ -48,15 +33,6 @@ class CmdrTeleop {
   }
 
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, id);
     _shell.kill();
-  }
-
-  void _registerMailbox() {
-    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
-    mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
-    mailbox.registerWebSocketEvent('MOVE_TAB', _moveTab);
-
-    mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/controller/0', _handleGamepadInput);
   }
 }

@@ -6,9 +6,12 @@ import 'dart:convert';
 import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as pathLib;
 
-import '../ros/ros.dart';
+import 'api/ros/ros.dart';
+import 'api/updroid_message.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
+import '../post_office.dart';
+import 'api/server_message.dart';
 
 class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';
@@ -32,7 +35,7 @@ class CmdrExplorer {
     // TODO: handle changes to uproot made on the server side.
 //    _uprootWatcher = new DirectoryWatcher(uproot.path);
 //    _uprootWatcherStream = _uprootWatcher.events.listen((WatchEvent w) {
-//      mailbox.ws.add('[[WORKSPACE_NAME]]' + w.path.replaceFirst('${uproot.path}/', '').split('/').first);
+//      mailbox.send(new Msg('WORKSPACE_NAME', w.path.replaceFirst('${uproot.path}/', '').split('/').first);
 //    });
   }
 
@@ -61,27 +64,27 @@ class CmdrExplorer {
     mailbox.registerServerMessageHandler('REQUEST_SELECTED', _getSelected);
   }
 
-  void _sendWorkspaceSync(UpDroidMessage um) {
+  void _sendWorkspaceSync(Msg um) {
     if (_currentWatcher == null) {
       _currentWatcher = new DirectoryWatcher(_currentWorkspace.src.path);
       _currentWatcherStream = _currentWatcher.events.listen((e) => _formattedFsUpdate(e));
     }
 
     List<String> files = _currentWorkspace.listContentsSync();
-    files.forEach((String file) => mailbox.ws.add('[[ADD_UPDATE]]' + file));
+    files.forEach((String file) => mailbox.send(new Msg('ADD_UPDATE', file)));
   }
 
-  void _getPath(UpDroidMessage um) => _sendPath();
+  void _getPath(Msg um) => _sendPath();
 
-  void _sendWorkspaceNames(UpDroidMessage um) {
+  void _sendWorkspaceNames(Msg um) {
     List<String> names = [];
     uproot.list()
     .where((Directory w) => Workspace.isWorkspace(w.path))
     .listen((Directory w) => names.add(w.path.split('/').last))
-    .onDone(() => mailbox.ws.add('[[WORKSPACE_NAMES]]' + JSON.encode(names)));
+    .onDone(() => mailbox.send(new Msg('WORKSPACE_NAMES', JSON.encode(names))));
   }
 
-  void _newWorkspace(UpDroidMessage um) {
+  void _newWorkspace(Msg um) {
     String data = um.body;
     Workspace newWorkspace = new Workspace('${uproot.path}/$data');
     newWorkspace.create().then((Workspace workspace) {
@@ -90,9 +93,9 @@ class CmdrExplorer {
     });
   }
 
-  void _setWorkspace(UpDroidMessage um) => _setCurrentWorkspace(um.body);
+  void _setWorkspace(Msg um) => _setCurrentWorkspace(um.body);
 
-  void _fsNewFile(UpDroidMessage um) {
+  void _fsNewFile(Msg um) {
     String path = um.body;
     String fullPath = pathLib.join(path + '/untitled.py');
     File newFile = new File(fullPath);
@@ -107,7 +110,7 @@ class CmdrExplorer {
     newFile.create();
   }
 
-  void _fsNewFolder(UpDroidMessage um) {
+  void _fsNewFolder(Msg um) {
     String path = um.body;
     String fullPath = path;
     Directory newFolder = new Directory(fullPath);
@@ -122,7 +125,7 @@ class CmdrExplorer {
     newFolder.createSync();
   }
 
-  void _fsRename(UpDroidMessage um) {
+  void _fsRename(Msg um) {
     String data = um.body;
     List<String> split = data.split(':');
     String oldPath = split[0];
@@ -137,11 +140,11 @@ class CmdrExplorer {
 
       // Force a remove update on the top level folder as
       // watcher issue workaround.
-      if (isDir) mailbox.ws.add('[[REMOVE_UPDATE]]D:$oldPath');
+      if (isDir) mailbox.send(new Msg('REMOVE_UPDATE', 'D:$oldPath'));
     });
   }
 
-  void _fsDelete(UpDroidMessage um) {
+  void _fsDelete(Msg um) {
     String path = um.body;
     FileSystemEntity entity;
     bool isDir = FileSystemEntity.isDirectorySync(path);
@@ -151,50 +154,50 @@ class CmdrExplorer {
 
     // Force a remove update on the top level folder as
     // watcher issue workaround.
-    if (isDir) mailbox.ws.add('[[REMOVE_UPDATE]]D:$path');
+    if (isDir) mailbox.send(new Msg('REMOVE_UPDATE', 'D:$path'));
   }
 
-  void _openFile(UpDroidMessage um) {
+  void _openFile(Msg um) {
     int destinationId = -1;
-    UpDroidMessage newMessage = um;
+    Msg newMessage = um;
 
     // Need to tell a specific UpDroidEditor to open the path.
     if (!um.body.startsWith('/')) {
       List<String> split = um.body.split(':');
       destinationId = int.parse(split[0]);
-      newMessage = new UpDroidMessage(um.header, split[1]);
+      newMessage = new Msg(um.header, split[1]);
     }
 
     CmdrPostOffice.send(new ServerMessage('UpDroidEditor', destinationId, newMessage));
   }
 
-  void _workspaceClean(UpDroidMessage um) {
+  void _workspaceClean(Msg um) {
     _currentWorkspace.clean().then((result) {
-      mailbox.ws.add('[[WORKSPACE_CLEAN]]');
+      mailbox.send(new Msg('WORKSPACE_CLEAN', ''));
     });
   }
 
-  void _buildWorkspace(UpDroidMessage um) {
+  void _buildWorkspace(Msg um) {
     _currentWorkspace.buildWorkspace().then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
-//      mailbox.ws.add('[[WORKSPACE_BUILD]]' + resultString);
-      mailbox.ws.add('[[BUILD_COMPLETE]]' + JSON.encode([_currentWorkspace.path]));
+//      mailbox.send(new Msg('WORKSPACE_BUILD', resultString);
+      mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([_currentWorkspace.path])));
     });
   }
 
-  void _buildPackage(UpDroidMessage um) {
+  void _buildPackage(Msg um) {
     String packagePath = um.body;
     String packageName = packagePath.split('/').last;
     _currentWorkspace.buildPackage(packageName).then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
-//      mailbox.ws.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
-      mailbox.ws.add('[[BUILD_COMPLETE]]' + JSON.encode([packagePath]));
+//      mailbox.send(new Msg('PACKAGE_BUILD_RESULTS', resultString);
+      mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([packagePath])));
     });
   }
 
-  void _buildPackages(UpDroidMessage um) {
+  void _buildPackages(Msg um) {
     String data = um.body;
     List<String> packagePaths = JSON.decode(data);
 
@@ -204,12 +207,12 @@ class CmdrExplorer {
     _currentWorkspace.buildPackages(packageNames).then((result) {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
-//      mailbox.ws.add('[[PACKAGE_BUILD_RESULTS]]' + resultString);
-      mailbox.ws.add('[[BUILD_COMPLETE]]' + data);
+//      mailbox.send(new Msg('PACKAGE_BUILD_RESULTS', resultString);
+      mailbox.send(new Msg('BUILD_COMPLETE', data));
     });
   }
 
-  void _createPackage(UpDroidMessage um) {
+  void _createPackage(Msg um) {
     List<String> split = um.body.split(':');
     String name = split[0];
 
@@ -219,19 +222,19 @@ class CmdrExplorer {
     _currentWorkspace.createPackage(name, dependencies).then((ProcessResult result) {
       String stderr = result.stderr;
       if (stderr.contains('devel/setup.bash: No such file or directory')) {
-        mailbox.ws.add('[[CREATE_PACKAGE_FAILED]]' + stderr);
+        mailbox.send(new Msg('CREATE_PACKAGE_FAILED', stderr));
       }
     });
   }
 
-  void _launcherList(UpDroidMessage um) {
+  void _launcherList(Msg um) {
     _currentWorkspace.listLaunchers().listen((Map launcher) {
       String data = JSON.encode(launcher);
-      mailbox.ws.add('[[LAUNCH]]' + data);
+      mailbox.send(new Msg('LAUNCH', data));
     });
   }
 
-  void _runLauncher(UpDroidMessage um) {
+  void _runLauncher(Msg um) {
     String data = um.body;
     List decodedData = JSON.decode(data);
     String packageName = decodedData[0];
@@ -241,21 +244,21 @@ class CmdrExplorer {
     _currentWorkspace.runNode(packageName, nodeName, nodeArgs);
   }
 
-  void _requestEditorList(UpDroidMessage um) {
+  void _requestEditorList(Msg um) {
     CmdrPostOffice.send(new ServerMessage('UpDroidClient', 0, um));
   }
 
-  void _returnSelected(UpDroidMessage um) {
+  void _returnSelected(Msg um) {
     List<String> split = um.body.split(':');
     int editorId = int.parse(split[0]);
     String selectedList = split[1];
 
-    UpDroidMessage newMessage = new UpDroidMessage(um.header, selectedList);
+    Msg newMessage = new Msg(um.header, selectedList);
     CmdrPostOffice.send(new ServerMessage('UpDroidEditor', editorId, newMessage));
   }
 
-  void _sendEditorList(UpDroidMessage um) => mailbox.ws.add(um.toString());
-  void _getSelected(UpDroidMessage um) => mailbox.ws.add(um.toString());
+  void _sendEditorList(Msg um) => mailbox.send(um);
+  void _getSelected(Msg um) => mailbox.send(um);
 
   /// Convenience method for adding a formatted filesystem update to the socket
   /// stream.
@@ -268,13 +271,13 @@ class CmdrExplorer {
     bool isFile = await FileSystemEntity.isFile(path);
     String fileString = isFile ? 'F:${path}' : 'D:${path}';
 
-    var formatted = '[[${header}_UPDATE]]' + fileString;
-    help.debug('Outgoing: ' + formatted, 0);
-    if (header != 'MODIFY') mailbox.ws.add(formatted);
+    Msg formatted = new Msg('${header}_UPDATE', fileString);
+    help.debug('Outgoing: ' + formatted.toString(), 0);
+    if (header != 'MODIFY') mailbox.send(formatted);
   }
 
   void _setCurrentWorkspace(String newWorkspaceName) {
-    UpDroidMessage um = new UpDroidMessage('SET_CURRENT_WORKSPACE', newWorkspaceName);
+    Msg um = new Msg('SET_CURRENT_WORKSPACE', newWorkspaceName);
     CmdrPostOffice.send(new ServerMessage('UpDroidEditor', 0, um));
 
     if (_currentWatcherStream != null) _currentWatcherStream.cancel();
@@ -286,7 +289,7 @@ class CmdrExplorer {
   }
 
   void _sendPath() {
-    mailbox.ws.add('[[EXPLORER_DIRECTORY_PATH]]' + _currentWorkspace.path);
+    mailbox.send(new Msg('EXPLORER_DIRECTORY_PATH', _currentWorkspace.path));
   }
 
   void cleanup() {

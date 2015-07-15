@@ -6,14 +6,14 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 
-import 'tab/pty.dart';
-import 'tab/camera/camera.dart';
-import 'tab/teleop.dart';
-import 'tab/editor.dart';
 import 'tab/explorer.dart';
-import 'git.dart';
+import 'tab/api/git.dart';
 import 'server_mailbox.dart';
 import 'server_helper.dart' as help;
+import 'tab/api/updroid_message.dart';
+import 'tab/api/server_message.dart';
+import 'tab_interface.dart';
+import 'post_office.dart';
 
 part 'commands.dart';
 
@@ -28,7 +28,6 @@ class CmdrServer {
 
   Map _panels = {};
   Map<String, Map<int, dynamic>> _tabs = {};
-  Map<int, CameraServer> _camServers = {};
   CmdrMailbox _mailbox;
   Directory dir;
 
@@ -104,7 +103,7 @@ class CmdrServer {
     }
 
     WebSocketTransformer.upgrade(request)
-    .then((WebSocket ws) => _tabs[type][objectID].mailbox.handleWebSocket(ws, request));
+    .then((WebSocket ws) => _tabs[type][objectID].tab.mailbox.handleWebSocket(ws, request));
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
@@ -135,12 +134,12 @@ class CmdrServer {
     _mailbox.registerServerMessageHandler('REQUEST_EDITOR_LIST', _sendEditorList);
   }
 
-  void _clientConfig(UpDroidMessage um) {
+  void _clientConfig(Msg um) {
     // TODO: send back some kind of saved config from the filesystem.
-    _mailbox.ws.add('[[SERVER_READY]]');
+    _mailbox.send(new Msg('SERVER_READY', ''));
   }
 
-  void _gitPush(UpDroidMessage um) {
+  void _gitPush(Msg um) {
     List runArgs = um.body.split('++');
     String dirPath = runArgs[0];
     String password = runArgs[1];
@@ -148,7 +147,7 @@ class CmdrServer {
     Git.push(dirPath, password);
   }
 
-  void _openPanel(UpDroidMessage um) {
+  void _openPanel(Msg um) {
     String id = um.body;
     List idList = id.split('-');
     int num = int.parse(idList[1]);
@@ -165,7 +164,7 @@ class CmdrServer {
     }
   }
 
-  void _openTab(UpDroidMessage um) {
+  void _openTab(Msg um) {
     String id = um.body;
     List idList = id.split('-');
     int num = int.parse(idList[1]);
@@ -175,27 +174,18 @@ class CmdrServer {
 
     if (!_tabs.containsKey(type)) _tabs[type] = {};
 
-    switch (type) {
-      case 'updroideditor':
-        _tabs[type][num] = new CmdrEditor(num, dir);
-        break;
-      case 'updroidcamera':
-        _tabs[type][num] = new CmdrCamera(num, _camServers);
-        break;
-      case 'updroidteleop':
-        _tabs[type][num] = new CmdrTeleop(num, dir.path);
-        break;
-      case 'updroidconsole':
-        String numRows = idList[3];
-        String numCols = idList[4];
-        _tabs[type][num] = new CmdrPty(num, dir.path, numRows, numCols);
-        break;
+
+    if (idList.length <= 3) {
+      _tabs[type][num] = new TabInterface(type, num, dir);
+    } else {
+      List extra = new List.from(idList.getRange(3, idList.length));
+      _tabs[type][num] = new TabInterface(type, num, dir, extra);
     }
   }
 
-  void _openTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[OPEN_TAB]]' + um.body);
+  void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));
 
-  void _closeTab(UpDroidMessage um) {
+  void _closeTab(Msg um) {
     List idList = um.body.split('_');
     String type = idList[0].toLowerCase();
     int id = int.parse(idList[1]);
@@ -203,20 +193,20 @@ class CmdrServer {
     help.debug('Close tab request received: ${idList.toString()}', 0);
 
     if (_tabs[type][id] != null) {
-      _tabs[type][id].cleanup();
+      _tabs[type][id].close();
       _tabs[type].remove(id);
     }
   }
 
-  void _closeTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[CLOSE_TAB]]' + um.body);
-  void _cloneTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[CLONE_TAB]]' + um.body);
-  void _moveTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[MOVE_TAB]]' + um.body);
+  void _closeTabFromServer(Msg um) => _mailbox.send(new Msg('CLOSE_TAB', um.body));
+  void _cloneTabFromServer(Msg um) => _mailbox.send(new Msg('CLONE_TAB', um.body));
+  void _moveTabFromServer(Msg um) => _mailbox.send(new Msg('MOVE_TAB', um.body));
 
-  void _sendEditorList(UpDroidMessage um) {
+  void _sendEditorList(Msg um) {
     String pathToOpen = um.body;
     List<String> editorList = [];
     _tabs['updroideditor'].keys.forEach((int id) => editorList.add(id.toString()));
-    UpDroidMessage newMessage = new UpDroidMessage('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
+    Msg newMessage = new Msg('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
     // TODO: need to able to reply back to exact sender in CmdrPostOffice.
     // This is a hacky way to reply back to the requesting explorer.
     CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', 0, newMessage));
@@ -229,15 +219,10 @@ class CmdrServer {
 
     _tabs.values.forEach((Map<int, dynamic> tabMap) {
       tabMap.values.forEach((dynamic tab) {
-        tab.cleanup();
+        tab.close();
       });
     });
     _tabs = {};
-
-    _camServers.values.forEach((CameraServer server) {
-      server.cleanup();
-    });
-    _camServers = {};
 
     help.debug('Clean up done.', 0);
   }

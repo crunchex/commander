@@ -15,12 +15,12 @@ class TabInterface {
   Directory dir;
   List extra;
 
+  Tab tab;
   Stream<String> input;
   Stream<String> output;
 
   StreamController<String> _inputController;
   StreamController<String> _outputController;
-  Tab _tab;
 
   TabInterface(this.tabType, this.id, this.dir, [this.extra]) {
     _inputController = new StreamController<String>();
@@ -35,19 +35,23 @@ class TabInterface {
   void _spawnTab() {
     switch (tabType) {
       case 'updroideditor':
-        _tab = new CmdrEditor(id, dir);
+        tab = new CmdrEditor(id, dir);
         break;
       case 'updroidcamera':
-        _tab = new CmdrCamera(id, _camServers);
+        tab = new CmdrCamera(id, dir);
         break;
       case 'updroidteleop':
-        _tab = new CmdrTeleop(id, dir.path);
+        tab = new CmdrTeleop(id, dir);
         break;
       case 'updroidconsole':
         String idRows = extra[0];
         String idCols = extra[1];
-        _tab = new CmdrPty(id, dir.path, idRows, idCols);
+        tab = new CmdrPty(id, dir.path, idRows, idCols);
         break;
     }
+  }
+
+  void close() {
+    tab.cleanup();
   }
 }

@@ -3,7 +3,7 @@ library cmdr_editor;
 import 'dart:io';
 import 'dart:convert';
 
-import 'api/ros';
+import 'api/ros/ros.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 import 'api/tab.dart';

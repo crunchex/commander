@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as pathLib;
 
-import 'api/ros';
+import 'api/ros/ros.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 

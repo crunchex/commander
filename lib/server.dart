@@ -104,7 +104,7 @@ class CmdrServer {
     }
 
     WebSocketTransformer.upgrade(request)
-    .then((WebSocket ws) => _tabs[type][objectID].mailbox.handleWebSocket(ws, request));
+    .then((WebSocket ws) => _tabs[type][objectID].tab.mailbox.handleWebSocket(ws, request));
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
@@ -179,7 +179,7 @@ class CmdrServer {
     if (idList.length <= 3) {
       _tabs[type][num] = new TabInterface(type, num, dir);
     } else {
-      List extra = idList.getRange(3, idList.length);
+      List extra = new List.from(idList.getRange(3, idList.length));
       _tabs[type][num] = new TabInterface(type, num, dir, extra);
     }
   }

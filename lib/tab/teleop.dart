@@ -3,15 +3,15 @@ library cmdr_teleop;
 import 'dart:io';
 import 'dart:convert';
 
-import 'api/ros';
+import 'api/ros/ros.dart';
 import 'api/tab.dart';
 
 class CmdrTeleop extends Tab {
   Process _shell;
 
-  CmdrTeleop(int id, String workspacePath) :
+  CmdrTeleop(int id, Directory dir) :
   super(id, 'UpDroidTeleop') {
-    Workspace workspace = new Workspace(workspacePath);
+    Workspace workspace = new Workspace(dir.path);
 //    Ros.runNode(workspace, 'ros_arduino_python joy_cmdr.launch');
 
     Process.start('bash', ['-c', '. ${workspace.path}/catkin_ws/devel/setup.bash && roslaunch ros_arduino_python joy_cmdr.launch'], runInShell: true).then((process) {

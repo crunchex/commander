@@ -29,20 +29,24 @@ class CameraServer {
     return streamHeader;
   }
 
-  int videoId, listenerCount;
+  int videoId;
 
   Process _shell;
+  RawDatagramSocket _udpSocket;
   StreamController<List<int>> _transStream;
+  int _listenerCount;
 
   CameraServer(this.videoId) {
+    _listenerCount = 0;
     _transStream = new StreamController<List<int>>.broadcast();
 
     var addressesIListenFrom = InternetAddress.ANY_IP_V4;
     int portIListenOn = 13020 + videoId;
     RawDatagramSocket.bind(addressesIListenFrom, portIListenOn).then((RawDatagramSocket udpSocket) {
-      udpSocket.listen((RawSocketEvent event) {
+      _udpSocket = udpSocket;
+      _udpSocket.listen((RawSocketEvent event) {
         if (event == RawSocketEvent.READ) {
-          Datagram dg = udpSocket.receive();
+          Datagram dg = _udpSocket.receive();
           _transStream.add(dg.data);
         }
       });
@@ -52,12 +56,12 @@ class CameraServer {
   }
 
   Stream subscribeToStream() {
-    listenerCount++;
+    _listenerCount++;
     return _transStream.stream;
   }
 
   void unsubscribeToString(StreamSubscription sub) {
-    listenerCount--;
+    _listenerCount--;
     sub.cancel();
   }
 
@@ -76,7 +80,13 @@ class CameraServer {
     });
   }
 
-  void cleanup() {
+  Future<bool> cleanup() async {
+    if (_listenerCount != 0) return false;
+
     _shell.kill();
+    _udpSocket.close();
+    await _transStream.close();
+
+    return true;
   }
 }

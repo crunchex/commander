@@ -15,7 +15,7 @@ class CmdrCamera extends Tab {
   StreamSubscription _currentDeviceSub;
   int _currentDeviceId;
 
-  CmdrCamera(int id, this.servers) :
+  CmdrCamera(int id, Directory dir) :
   super(id, 'UpDroidCamera') {
 
   }
@@ -64,6 +64,12 @@ class CmdrCamera extends Tab {
   }
 
   void cleanup() {
-    CameraServer.servers[_currentDeviceId].unsubscribeToString(_currentDeviceSub);
+    if (_currentDeviceSub != null) {
+      CameraServer.servers[_currentDeviceId].unsubscribeToString(_currentDeviceSub);
+    }
+
+    CameraServer.servers[_currentDeviceId].cleanup().then((bool serverClean) {
+      if (serverClean) CameraServer.servers.remove(_currentDeviceId);
+    });
   }
 }

@@ -75,7 +75,7 @@ cd $TOPDIR/bin
 
 echo -n "Building (minifying) cmdr......."
 dart2js --output-type=dart --categories=Server --minify -o cmdr cmdr.dart > /dev/null
-# rm cmdr.deps
+rm -rf cmdr.deps
 sed -i '1i#!/usr/bin/env dart' cmdr
 chmod +x cmdr
 echo "OK"

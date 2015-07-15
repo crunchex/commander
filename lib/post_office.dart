@@ -29,7 +29,7 @@ class CmdrPostOffice {
       postOffice.outboxes[receiverClass] = {};
     }
 
-    postOffice.outboxes[receiverClass][id] = new StreamController<UpDroidMessage>();
+    postOffice.outboxes[receiverClass][id] = new StreamController<Msg>();
     return postOffice.outboxes[receiverClass][id].stream;
   }
 
@@ -56,7 +56,7 @@ class CmdrPostOffice {
   }
 
   StreamController<ServerMessage> postOfficeStream;
-  Map<String, Map<int, StreamController<UpDroidMessage>>> outboxes = {};
+  Map<String, Map<int, StreamController<Msg>>> outboxes = {};
 
   CmdrPostOffice() {
     postOfficeStream = new StreamController<ServerMessage>.broadcast();
@@ -80,8 +80,8 @@ class CmdrPostOffice {
 
     // Dispatch message to all registered receivers with matching class.
     if (sm.id == 0) {
-      Map<int, StreamController<UpDroidMessage>> boxes = outboxes[sm.receiverClass];
-      boxes.values.forEach((StreamController<UpDroidMessage> s) => s.add(sm.um));
+      Map<int, StreamController<Msg>> boxes = outboxes[sm.receiverClass];
+      boxes.values.forEach((StreamController<Msg> s) => s.add(sm.um));
       return;
     }
 

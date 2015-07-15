@@ -5,7 +5,7 @@ import 'updroid_message.dart';
 class ServerMessage {
   String receiverClass;
   int id;
-  UpDroidMessage um;
+  Msg um;
 
   /// Constructs a new [ServerMessage] where [receiverClass] is a class type,
   /// such as 'UpDroidClient'. [id] can be -1 for the destination with the lowest

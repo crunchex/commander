@@ -135,12 +135,12 @@ class CmdrServer {
     _mailbox.registerServerMessageHandler('REQUEST_EDITOR_LIST', _sendEditorList);
   }
 
-  void _clientConfig(UpDroidMessage um) {
+  void _clientConfig(Msg um) {
     // TODO: send back some kind of saved config from the filesystem.
     _mailbox.ws.add('[[SERVER_READY]]');
   }
 
-  void _gitPush(UpDroidMessage um) {
+  void _gitPush(Msg um) {
     List runArgs = um.body.split('++');
     String dirPath = runArgs[0];
     String password = runArgs[1];
@@ -148,7 +148,7 @@ class CmdrServer {
     Git.push(dirPath, password);
   }
 
-  void _openPanel(UpDroidMessage um) {
+  void _openPanel(Msg um) {
     String id = um.body;
     List idList = id.split('-');
     int num = int.parse(idList[1]);
@@ -165,7 +165,7 @@ class CmdrServer {
     }
   }
 
-  void _openTab(UpDroidMessage um) {
+  void _openTab(Msg um) {
     String id = um.body;
     List idList = id.split('-');
     int num = int.parse(idList[1]);
@@ -184,9 +184,9 @@ class CmdrServer {
     }
   }
 
-  void _openTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[OPEN_TAB]]' + um.body);
+  void _openTabFromServer(Msg um) => _mailbox.ws.add('[[OPEN_TAB]]' + um.body);
 
-  void _closeTab(UpDroidMessage um) {
+  void _closeTab(Msg um) {
     List idList = um.body.split('_');
     String type = idList[0].toLowerCase();
     int id = int.parse(idList[1]);
@@ -199,15 +199,15 @@ class CmdrServer {
     }
   }
 
-  void _closeTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[CLOSE_TAB]]' + um.body);
-  void _cloneTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[CLONE_TAB]]' + um.body);
-  void _moveTabFromServer(UpDroidMessage um) => _mailbox.ws.add('[[MOVE_TAB]]' + um.body);
+  void _closeTabFromServer(Msg um) => _mailbox.ws.add('[[CLOSE_TAB]]' + um.body);
+  void _cloneTabFromServer(Msg um) => _mailbox.ws.add('[[CLONE_TAB]]' + um.body);
+  void _moveTabFromServer(Msg um) => _mailbox.ws.add('[[MOVE_TAB]]' + um.body);
 
-  void _sendEditorList(UpDroidMessage um) {
+  void _sendEditorList(Msg um) {
     String pathToOpen = um.body;
     List<String> editorList = [];
     _tabs['updroideditor'].keys.forEach((int id) => editorList.add(id.toString()));
-    UpDroidMessage newMessage = new UpDroidMessage('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
+    Msg newMessage = new Msg('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
     // TODO: need to able to reply back to exact sender in CmdrPostOffice.
     // This is a hacky way to reply back to the requesting explorer.
     CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', 0, newMessage));

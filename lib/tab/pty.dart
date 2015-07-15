@@ -30,7 +30,7 @@ class CmdrPty extends Tab {
     mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/cmdr-pty', _handleIOStream);
   }
 
-  void _startPty(UpDroidMessage um) {
+  void _startPty(Msg um) {
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
     // See http://bitbucket.org/updroid/cmdr-pty
     Process.start('cmdr-pty', ['-p', 'tcp', '-s', '${um.body}'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
@@ -44,7 +44,7 @@ class CmdrPty extends Tab {
         String dataString = UTF8.decode(data);
         if (dataString.contains('listening on port: ')) {
           String port = dataString.replaceFirst('listening on port: ', '');
-          UpDroidMessage portMessage = new UpDroidMessage('PTY_READY', '');
+          Msg portMessage = new Msg('PTY_READY', '');
           mailbox.ws.add(portMessage.s);
           portListener.cancel();
 
@@ -72,11 +72,11 @@ class CmdrPty extends Tab {
       .listen((data) => _ptySocket.add(data));
   }
 
-  void _resizeRelay(UpDroidMessage um) {
+  void _resizeRelay(Msg um) {
     CmdrPostOffice.send(new ServerMessage('UpDroidConsole', 0, um));
   }
 
-  void _resizeHandle(UpDroidMessage um) {
+  void _resizeHandle(Msg um) {
     // Resize the shell.
     List newSize = um.body.split('x');
     int newRow = int.parse(newSize[0]);

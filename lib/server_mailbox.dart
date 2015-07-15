@@ -11,7 +11,7 @@ class CmdrMailbox {
   String className;
   int id;
   WebSocket ws;
-  Stream<UpDroidMessage> inbox;
+  Stream<Msg> inbox;
 
   Map _wsRegistry;
   List<Function> _wsCloseRegistry;
@@ -26,7 +26,7 @@ class CmdrMailbox {
 
     inbox = CmdrPostOffice.registerClass(className, id);
 
-    inbox.listen((UpDroidMessage um) {
+    inbox.listen((Msg um) {
       help.debug('[${className}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
 
       if (!_serverStreamRegistry.containsKey(um.header)) {
@@ -42,7 +42,7 @@ class CmdrMailbox {
     this.ws = ws;
     if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className.toLowerCase()) {
       ws.listen((String s) {
-        UpDroidMessage um = new UpDroidMessage.fromString(s);
+        Msg um = new Msg.fromString(s);
         help.debug('$className incoming: ' + um.header, 0);
 
         _wsRegistry[um.header](um);
@@ -54,7 +54,7 @@ class CmdrMailbox {
 
   /// Registers a [function] to be called on one of the main [WebSocket] requests.
   /// [msg] is required to know which function to call.
-  void registerWebSocketEvent(String msg, function(UpDroidMessage um)) {
+  void registerWebSocketEvent(String msg, function(Msg um)) {
     _wsRegistry[msg] = function;
   }
 
@@ -72,7 +72,7 @@ class CmdrMailbox {
 
   /// Registers a [function] to be called on a received [UpDroidMessage] with [msg]
   /// as the header.
-  void registerServerMessageHandler(String msg, function(UpDroidMessage um)) {
+  void registerServerMessageHandler(String msg, function(Msg um)) {
     _serverStreamRegistry[msg] = function;
   }
 }

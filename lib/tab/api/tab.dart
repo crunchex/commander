@@ -33,15 +33,15 @@ abstract class Tab {
     CmdrPostOffice.deregisterStream(guiName, id);
   }
 
-  void _closeTab(UpDroidMessage um) {
+  void _closeTab(Msg um) {
     CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
   }
 
-  void _cloneTab(UpDroidMessage um) {
+  void _cloneTab(Msg um) {
     CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
   }
 
-  void _moveTab(UpDroidMessage um) {
+  void _moveTab(Msg um) {
     CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
   }
 }

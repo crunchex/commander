@@ -31,14 +31,14 @@ class CmdrEditor extends Tab {
     mailbox.registerServerMessageHandler('RETURN_SELECTED', _returnSelected);
   }
 
-  void _openFile(UpDroidMessage um) {
+  void _openFile(Msg um) {
     var fileToOpen = new File(um.body);
     fileToOpen.readAsString().then((String contents) {
       mailbox.ws.add('[[OPEN_FILE]]' + um.body + '[[CONTENTS]]' + contents);
     });
   }
 
-  void _saveFile(UpDroidMessage um) {
+  void _saveFile(Msg um) {
     List args = JSON.decode(um.body);
     // args[0] = data, args[1] = path. args[2] = executable option
 
@@ -53,16 +53,16 @@ class CmdrEditor extends Tab {
     }
   }
 
-  void _requestSelected(UpDroidMessage um) {
-    UpDroidMessage newMessage = new UpDroidMessage(um.header, id.toString());
+  void _requestSelected(Msg um) {
+    Msg newMessage = new Msg(um.header, id.toString());
     CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', -1, newMessage));
   }
 
-  void _setCurrentWorkspace(UpDroidMessage um) {
+  void _setCurrentWorkspace(Msg um) {
     _currentWorkspace = new Workspace('${uproot.path}/${um.body}');
   }
 
-  void _returnSelected(UpDroidMessage um) {
+  void _returnSelected(Msg um) {
     mailbox.ws.add('[[REQUEST_SELECTED]]' + um.body);
   }
 

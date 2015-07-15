@@ -22,12 +22,18 @@ class ColumnView {
   ColumnState state;
   DivElement columnContent, tabContent;
   AnchorElement controlButton, maximizeButton;
+  bool hideMinimizedCompletely;
 
   SpanElement _maximizeGlyph;
   UListElement _navTabs;
   DivElement _rowMain;
 
   ColumnView(this.id, this.state) {
+    // This controls whether or not a minimized column is hidden completely,
+    // or stays visible as a col-xs-1 stub.
+    // We may eventually decide to remove this option and a lot of code below.
+    hideMinimizedCompletely = true;
+
     _rowMain = querySelector('#row-main');
 
     columnContent = new DivElement()
@@ -69,6 +75,16 @@ class ColumnView {
   }
 
   void maximize() {
+    if (hideMinimizedCompletely) {
+      columnContent.style.width = 'calc(100% - 220px)';
+      columnContent.style.display = '';
+
+      _maximizeGlyph.classes.remove('glyphicons-resize-full');
+      _maximizeGlyph.classes.add('glyphicons-resize-small');
+
+      return;
+    }
+
     columnContent.classes.removeAll(['col-xs-1', 'col-xs-5', 'col-xs-10']);
     columnContent.classes.add('col-xs-9');
 
@@ -82,6 +98,16 @@ class ColumnView {
   }
 
   void normalize() {
+    if (hideMinimizedCompletely) {
+      columnContent.style.width = 'calc(50% - 110px)';
+      columnContent.style.display = '';
+
+      _maximizeGlyph.classes.remove('glyphicons-resize-small');
+      _maximizeGlyph.classes.add('glyphicons-resize-full');
+
+      return;
+    }
+
     columnContent.classes.removeAll(['col-xs-1', 'col-xs-9', 'col-xs-10']);
     columnContent.classes.add('col-xs-5');
 
@@ -95,6 +121,16 @@ class ColumnView {
   }
 
   void minimize() {
+    if (hideMinimizedCompletely) {
+      columnContent.style.width = '';
+      columnContent.style.display = 'none';
+
+      _maximizeGlyph.classes.remove('glyphicons-resize-small');
+      _maximizeGlyph.classes.add('glyphicons-resize-full');
+
+      return;
+    }
+
     columnContent.classes.removeAll(['col-xs-5', 'col-xs-9', 'col-xs-10']);
     columnContent.classes.add('col-xs-1');
 

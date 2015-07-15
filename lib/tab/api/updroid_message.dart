@@ -6,7 +6,9 @@ import 'dart:async';
 class Msg {
   String header, body;
 
-  Msg(this.header, this.body);
+  Msg(this.header, [String body]) {
+    this.body = (body == null) ? '' : body;
+  }
 
   /// Returns a new instance of [Msg], given a formatted String.
   /// Throws an error if not in the format: [[HEADER]]body
@@ -17,12 +19,16 @@ class Msg {
     int indexOfSecondBrackets = minusFirstBrackets.indexOf(']]');
 
     header = minusFirstBrackets.substring(0, indexOfSecondBrackets);
+
+    body = '';
     body = minusFirstBrackets.substring(indexOfSecondBrackets + 2, minusFirstBrackets.length);
   }
 
   String toString() {
     return '[[$header]]$body';
   }
+
+  bool get hasBody => body != '';
 
   /// Transformer to convert String messages into the Msg.
   static StreamTransformer toMsg = new StreamTransformer.fromHandlers(handleData: (event, sink) {

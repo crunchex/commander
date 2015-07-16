@@ -54,9 +54,11 @@ class TabInterface {
         }
 
         sendPort.send('_spawnTab is done');
-      } else {
-        print('_spawnTab received: $received');
+
+        continue;
       }
+
+      print('_spawnTab received: $received');
     }
   }
 
@@ -78,13 +80,24 @@ void _main(SendPort interfacesSendPort) async {
   ReceivePort isolatesReceivePort = new ReceivePort();
   interfacesSendPort.send(isolatesReceivePort.sendPort);
 
-  List extra = await isolatesReceivePort.firstWhere((List args) => args.length == 4);
+  List args;
+  await for (var received in isolatesReceivePort) {
+    if (args == null) {
+      args = received;
 
-  int id = extra[0];
-  String path = extra[1];
-  String idRows = extra[2];
-  String idCols = extra[3];
-  new CmdrPty(id, path, idRows, idCols, isolatesReceivePort, interfacesSendPort);
+      int id = received[0];
+      String path = received[1];
+      String idRows = received[2];
+      String idCols = received[3];
+      print('got args: ${id.toString()}, $path, $idRows, $idCols');
+
+      continue;
+    }
+
+    print('received string: $received');
+  }
+
+//  new CmdrPty(id, path, idRows, idCols, isolatesReceivePort, interfacesSendPort);
 
   // Handle each message sent through its receive port.
 //  await for (String msg in isolatesReceivePort) {

@@ -28,7 +28,7 @@ class Mailbox {
     // Create the server <-> client [WebSocket].
     // Port 12060 is the default port that UpDroid uses.
     String url = window.location.host.split(':')[0];
-    _initWebSocket(url);
+    _initWebSocket(url, true);
   }
 
   /// Returns a [Future] [UpDroidMessage] as a response from the server when given a
@@ -59,7 +59,7 @@ class Mailbox {
     _wsRegistry[type].add(function);
   }
 
-  void _initWebSocket(String url, [int retrySeconds = 2]) {
+  void _initWebSocket(String url, enableDisconnectedAlert, [int retrySeconds = 2]) {
     bool encounteredError = false;
 
     ws = new WebSocket('ws://' + url + ':12060/${_name.toLowerCase()}/$_id');
@@ -83,11 +83,13 @@ class Mailbox {
     ws.onClose.listen((e) {
       _wsRegistry[EventType.ON_CLOSE].forEach((f(e)) => f(e));
 
-      if (_name == 'UpDroidClient') window.alert("UpDroid Commander has lost connection to the server.");
+      if (_name == 'UpDroidClient' && enableDisconnectedAlert) {
+        window.alert("UpDroid Commander has lost connection to the server.");
+      }
 
       //print('$_name-$_id disconnected. Retrying...');
       if (!encounteredError) {
-        new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
+        new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, false, retrySeconds * 2));
       }
       encounteredError = true;
     });
@@ -95,7 +97,7 @@ class Mailbox {
     ws.onError.listen((e) {
       //print('$_name-$_id disconnected. Retrying...');
       if (!encounteredError) {
-        new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, retrySeconds * 2));
+        new Timer(new Duration(seconds:retrySeconds), () => _initWebSocket(url, false, retrySeconds * 2));
       }
       encounteredError = true;
     });

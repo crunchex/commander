@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:xml/xml.dart';
 
-import '../server_helper.dart' as help;
+import '../../../server_helper.dart' as help;
 
 part 'workspace.dart';
 

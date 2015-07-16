@@ -181,6 +181,8 @@ class UpDroidConsole extends TabController {
     });
   }
 
+  Element get elementToFocus => view.content.children[0];
+
   Future<bool> preClose() {
     Completer c = new Completer();
     c.complete(true);

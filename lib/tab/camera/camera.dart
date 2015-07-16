@@ -5,50 +5,50 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import '../../server_mailbox.dart';
 import '../../server_helper.dart' as help;
+import '../api/tab.dart';
+import '../api/updroid_message.dart';
 
 part 'camera_server.dart';
 
-class CmdrCamera {
-  static const String guiName = 'UpDroidCamera';
-
-  int id;
-  Map<int, CameraServer> servers;
-  CmdrMailbox mailbox;
-
+class CmdrCamera extends Tab {
   StreamSubscription _currentDeviceSub;
+  int _currentDeviceId;
 
-  CmdrCamera(this.id, this.servers) {
-    mailbox = new CmdrMailbox(guiName, id);
-    _registerMailbox();
+  CmdrCamera(int id, Directory dir) :
+  super(id, 'UpDroidCamera') {
+
+  }
+
+  void registerMailbox() {
+    mailbox.registerWebSocketEvent('SIGNAL_READY', _signalReady);
+
+    _getDeviceIds().forEach((int key) {
+      mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/input/$key', _handleInputStream);
+    });
   }
 
   void _signalReady(UpDroidMessage) {
     ProcessResult result = Process.runSync('bash', ['-c', 'ffmpeg --help']);
     if (result.exitCode == 127) {
-      mailbox.ws.add('[[NO_FFMPEG]]');
+      mailbox.send(new Msg('NO_FFMPEG', ''));
       return;
     }
 
-    mailbox.ws.add('[[CAMERA_READY]]' + JSON.encode(_getDeviceIds()));
-  }
-
-  void _closeTab(UpDroidMessage um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+    mailbox.send(new Msg('CAMERA_READY', JSON.encode(_getDeviceIds())));
   }
 
   void _handleInputStream(HttpRequest request) {
-    int deviceId = int.parse(request.uri.pathSegments.last);
-    if (servers[deviceId] == null) {
-      servers[deviceId] = new CameraServer(deviceId);
+    _currentDeviceId = int.parse(request.uri.pathSegments.last);
+    if (CameraServer.servers[_currentDeviceId] == null) {
+      CameraServer.servers[_currentDeviceId] = new CameraServer(_currentDeviceId);
     }
     // request.uri is updroidcamera/id/input
     if (_currentDeviceSub != null) {
-      _currentDeviceSub.cancel();
+      CameraServer.servers[_currentDeviceId].unsubscribeToString(_currentDeviceSub);
     }
-    mailbox.ws.add(servers[deviceId].streamHeader);
-    _currentDeviceSub = servers[deviceId].transStream.stream.asBroadcastStream().listen((data) {
+    mailbox.ws.add(CameraServer.streamHeader);
+    _currentDeviceSub = CameraServer.servers[_currentDeviceId].subscribeToStream().listen((data) {
       mailbox.ws.add(data);
     });
   }
@@ -63,16 +63,13 @@ class CmdrCamera {
     return deviceIds;
   }
 
-  void _registerMailbox() {
-    mailbox.registerWebSocketEvent('SIGNAL_READY', _signalReady);
-    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
-
-    _getDeviceIds().forEach((int key) {
-      mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/input/$key', _handleInputStream);
-    });
-  }
-
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, id);
+    if (_currentDeviceSub != null) {
+      CameraServer.servers[_currentDeviceId].unsubscribeToString(_currentDeviceSub);
+    }
+
+    CameraServer.servers[_currentDeviceId].cleanup().then((bool serverClean) {
+      if (serverClean) CameraServer.servers.remove(_currentDeviceId);
+    });
   }
 }

@@ -5,6 +5,7 @@ import 'dart:async';
 
 import '../mailbox.dart';
 import '../container_view.dart';
+import '../context_menu.dart';
 
 part 'tab_view.dart';
 
@@ -15,7 +16,6 @@ abstract class TabController {
 
   TabView view;
   Mailbox mailbox;
-
   AnchorElement _closeTabButton;
 
   TabController(this.id, this.col, this.fullName, this.shortName, List menuConfig, [bool externalCss=false]) {
@@ -30,8 +30,21 @@ abstract class TabController {
       _closeTabButton.onClick.listen((e) => _closeTab());
       view.closeControlHitbox.onClick.listen((e) => _closeTab());
 
+      view.tabHandleButton.onContextMenu.listen((e) {
+        e.preventDefault();
+        List menu = [
+          {'type': 'toggle', 'title': 'Clone', 'handler': _cloneTab},
+          {'type': 'toggle', 'title': 'Move ${col == 1 ? 'Right' : 'Left'}', 'handler': () => _moveTabTo(col == 1 ? 2 : 1)}];
+        ContextMenu.createContextMenu(e.page, menu);
+      });
+
       setUpController();
       registerEventHandlers();
+
+      // When the content of this tab receives focus, transfer it to whatever is the main content of the tab
+      // (which may or may not be the direct child of view.content).
+      // Also, this is done last as additional view set up may have been done in setUpController().
+      view.tabContent.onFocus.listen((e) => elementToFocus.focus());
     });
   }
 
@@ -43,6 +56,7 @@ abstract class TabController {
   void registerEventHandlers();
   Future<bool> preClose();
   void cleanUp();
+  Element get elementToFocus;
 
   Future _closeTab() async {
     // Cancel closing if preClose returns false for some reason.
@@ -56,13 +70,6 @@ abstract class TabController {
     mailbox.ws.send(um.s);
   }
 
-//  void _cloneTab(Event e) {
-//    e.preventDefault();
-//    if (cs != null) {
-//      cs.add(new CommanderMessage('UPDROIDCLIENT', 'OPEN_TAB', body: '${col}_${tabType}'));
-//    } else {
-//      UpDroidMessage um = new UpDroidMessage('CLOSE_TAB', '${tabType}_$id');
-//      mailbox.ws.send(um.s);
-//    }
-//  }
+  void _cloneTab() => mailbox.ws.send('[[CLONE_TAB]]' + '${fullName}_${id}_$col');
+  void _moveTabTo(int newCol) => mailbox.ws.send('[[MOVE_TAB]]' + '${fullName}_${id}_${col}_$newCol');
 }

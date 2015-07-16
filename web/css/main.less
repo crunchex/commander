@@ -47,10 +47,10 @@
 @upcom-black: #0c0c0c;
 
 html, body {
-  min-width: 1200px;
   width: auto !important;
   height: 100%;
   min-height: 650px;
+  overflow-x: hidden;
 }
 
 /* Login */
@@ -151,6 +151,7 @@ html, body {
 .fill {
   height: ~"calc(100% - 30px)";
   padding: 0 5px 0 5px;
+  border-top: 10px solid @brand-red;
 }
 
 .row {
@@ -160,13 +161,24 @@ html, body {
 
 .column-content {
   list-style: none;
-  height: ~"calc(100% - 27px)";
+  height: ~"calc(100% - 17px)";
   padding-left: 5px;
   padding-right: 5px;
 }
 
+.column-content.col-xs-1,
+.column-content.col-xs-5,
+.column-content.col-xs-9,
+.column-content.col-xs-10 {
+  margin-top: 17px;
+}
+
 .column-content.col-xs-5 {
-  margin-top: 27px;
+  width: ~"calc(50% - 110px)";
+}
+
+.column-content.col-xs-2 {
+  width: 220px;
 }
 
 /* Nav/Logo */
@@ -184,25 +196,27 @@ html, body {
   border: none;
   background-color: @brand-red;
   //border-color: @brand-red;
-  height: 46px;
+  height: 36px;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
 }
 
-.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a:hover {
-  background-color: @upcom-light-grey;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
-}
+//.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a:hover {
+//  background-color: @upcom-light-grey;
+//  -webkit-transition: all 0.5s ease;
+//  -moz-transition: all 0.5s ease;
+//  -o-transition: all 0.5s ease;
+//  transition: all 0.5s ease;
+//}
 
 .upcom-logo {
   height: 100%;
   width: 100%;
   fill: @upcom-white;
+  position: relative;
+  top: -4px;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -221,8 +235,7 @@ a.help-button,
 a.help-button:active,
 a.help-button:visited {
   position: fixed;
-  right: 0;
-  margin: 5px 10px;
+  margin: 4px 0 0 106px;
   color: @brand-red;
 }
 
@@ -254,12 +267,12 @@ a.help-button>.glyphicons.glyphicons-circle-question-mark {
   border-bottom: 1px;
 }
 
-.col-xs-2>.nav-tabs>li.tab-handle {
+.col-xs-2 .nav-tabs>li.tab-handle {
   float: right;
-  top: 27px;
+  top: 17px;
 }
 
-.col-xs-2>.nav-tabs>li.tab-handle>a {
+.col-xs-2 .nav-tabs>li.tab-handle>a {
   margin-right: 0;
   border-bottom-right-radius: 2px;
 }
@@ -332,10 +345,6 @@ a.help-button>.glyphicons.glyphicons-circle-question-mark {
   border-bottom-width: 0;
   .font-avenir-demi();
   border-radius: 0;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
 }
 
 .nav-tabs>li>a.new-tab-button:hover {
@@ -343,6 +352,27 @@ a.help-button>.glyphicons.glyphicons-circle-question-mark {
   color: @upcom-white;
   background-color:@brand-red;
   border-color:@brand-red;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+.column-content>.maximize-button {
+  position: absolute;
+  right: 0;
+  padding: 4px 8px 4px 8px;
+  margin: 0 5px 0 0;
+  border: 1px solid @upcom-white;
+  border-bottom-width: 0;
+  color: @upcom-dark-grey;
+  font-size: 14px;
+}
+
+.column-content>.maximize-button:hover {
+  color: @upcom-white;
+  background-color: @brand-red;
+  border-color: @brand-red;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -495,6 +525,11 @@ li div input {
   /* Height of menu tabs */
   height: ~"calc(100% - 24px)";
   padding: 0 4px 4px 4px;
+  outline: none;
+}
+
+.tab-pane > .tab-content:focus {
+  outline: none;
 }
 
 /* Modal */

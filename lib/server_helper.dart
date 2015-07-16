@@ -1,7 +1,6 @@
 library server_helper;
 
 import 'dart:io';
-import 'dart:async';
 import 'package:logging/logging.dart';
 import 'package:logging_handlers/server_logging_handlers.dart';
 
@@ -53,18 +52,4 @@ void debug(String logstring, int level) {
       log.severe('Debug level not specified - fix this!');
       log.severe(logstring);
   }
-}
-
-/// Recursively traverses the given directory path and asynchronously
-/// returns a list of filesystem entities.
-Future<List<FileSystemEntity>> getDirectory(Directory dir) {
-  var files = <FileSystemEntity>[];
-  var completer = new Completer();
-  var lister = dir.list(recursive: true);
-  lister.listen (
-      (file) => files.add(file),
-      // Should also register onError.
-      onDone:   () => completer.complete(files)
-      );
-  return completer.future;
 }

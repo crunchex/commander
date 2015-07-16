@@ -362,6 +362,8 @@ class UpDroidEditor extends TabController {
     view.tabHandleButton.title = view.extra.text;
   }
 
+  Element get elementToFocus => view.content.children[0].querySelector('.ace_text-input');
+
   Future<bool> preClose() {
     return _handleAnyChanges().then((_) => true);
   }

@@ -15,13 +15,10 @@ class Msg {
   Msg.fromString(String s) {
     if (!s.contains('[[') || !s.contains(']]')) throw new MalformedMsgError(s);
 
-    String minusFirstBrackets = s.replaceFirst('[[', '');
-    int indexOfSecondBrackets = minusFirstBrackets.indexOf(']]');
+    int indexOfSecondBrackets = s.indexOf(']]');
 
-    header = minusFirstBrackets.substring(0, indexOfSecondBrackets);
-
-    body = '';
-    body = minusFirstBrackets.substring(indexOfSecondBrackets + 2, minusFirstBrackets.length);
+    header = s.substring(2, indexOfSecondBrackets);
+    body = s.substring(indexOfSecondBrackets + 2, s.length);
   }
 
   String toString() {
@@ -32,7 +29,7 @@ class Msg {
 
   /// Transformer to convert String messages into the Msg.
   static StreamTransformer toMsg = new StreamTransformer.fromHandlers(handleData: (event, sink) {
-    sink.add(new Msg.fromString(event.data));
+    sink.add(new Msg.fromString(event));
   });
 
   /// Transformer to convert Msg into Strings that could be sent over Websockets or ports.

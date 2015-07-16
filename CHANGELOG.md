@@ -1,9 +1,22 @@
 # Change Log
 
+## 0.5.1 - 2015-7-16
+
+### New
+	- Tab columns can now be "maximized" (where other Tab columns become hidden).
+	- Tabs can now be "cloned" (in terms of type) and moved between columns via a right-click menu from their handles.
+
+### Changed
+	- Changed the icon for Launchers view button in the lower-right corner of Explorer.
+	- Small aesthetic improvements.
+
+### Fixed
+	- Fixed a bug where a window alert would fire more than once after a permanent disconnection to the server-side.
+
 ## 0.5.0 - 2015-7-10
 
 ### New
-	- Redesigned Explorer, bot visually and functionally.
+	- Redesigned Explorer, both visually and functionally.
 	- New look and color scheme (as always, a work in progress).
 
 ### Changed

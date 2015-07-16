@@ -27,6 +27,7 @@ class ColumnController {
   List _config;
   Mailbox _mailbox;
   Function _getAvailableId;
+  bool _disableCyclingHotkeys;
 
   ColumnView _view;
   List<TabController> _tabs;
@@ -41,6 +42,10 @@ class ColumnController {
     _columnEventsController = new StreamController<ColumnEvent>();
     columnEvents = _columnEventsController.stream;
     _tabs = [];
+
+    // This controls whether or not we listen to hotkeys for tab and column switching.
+    // TODO: figure out some good hotkeys to use.
+    _disableCyclingHotkeys = true;
 
     ColumnView.createColumnView(columnId, state).then((columnView) {
       _view = columnView;
@@ -72,12 +77,13 @@ class ColumnController {
       }
     });
 
+    if (_disableCyclingHotkeys) return;
     _view.columnContent.onKeyDown.listen((e) {
       if (!e.ctrlKey) return;
 
       // Cycle columns.
       if (e.shiftKey) {
-        if ((e.keyCode == KeyCode.LEFT && columnId != 1) || (e.keyCode == KeyCode.RIGHT && columnId != 2)) {
+        if ((e.keyCode == KeyCode.PAGE_DOWN && columnId != 1) || (e.keyCode == KeyCode.PAGE_UP && columnId != 2)) {
           _columnEventsController.add(ColumnEvent.LOST_FOCUS);
         }
 
@@ -88,9 +94,9 @@ class ColumnController {
       TabController currentActiveTab = _tabs.firstWhere((TabController tab) => tab.view.tabHandle.classes.contains('active'));
       int currentActiveTabIndex = _tabs.indexOf(currentActiveTab);
 
-      if (e.keyCode == KeyCode.LEFT && currentActiveTabIndex > 0) {
+      if (e.keyCode == KeyCode.PAGE_DOWN && currentActiveTabIndex > 0) {
         cycleTab(true, currentActiveTab, currentActiveTabIndex);
-      } else if (e.keyCode == KeyCode.RIGHT && currentActiveTabIndex < _tabs.length - 1) {
+      } else if (e.keyCode == KeyCode.PAGE_UP && currentActiveTabIndex < _tabs.length - 1) {
         cycleTab(false, currentActiveTab, currentActiveTabIndex);
       }
     });

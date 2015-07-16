@@ -16,7 +16,7 @@
 ## 0.5.0 - 2015-7-10
 
 ### New
-	- Redesigned Explorer, bot visually and functionally.
+	- Redesigned Explorer, both visually and functionally.
 	- New look and color scheme (as always, a work in progress).
 
 ### Changed

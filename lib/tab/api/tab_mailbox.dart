@@ -12,7 +12,10 @@ class TabMailbox {
   ReceivePort _receivePort;
   SendPort _sendPort;
 
-  TabMailbox(SendPort replyTo) {
+  TabMailbox(ReceivePort receivePort, SendPort sendPort) {
+    _receivePort = receivePort;
+    _sendPort = sendPort;
+
     _registry = {};
     _endpointRegistry = {};
 

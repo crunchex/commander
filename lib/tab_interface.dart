@@ -45,6 +45,9 @@ class TabInterface {
         print('_spawnTab got the port');
         sendPort = received;
 
+        // Send the args.
+        sendPort.send([id, dir.path, extra[0], extra[1]]);
+
         // Initiate a test with 10 outgoing messages.
         for (int i = 0; i < 10; i++) {
           sendPort.send('test $i');
@@ -69,22 +72,27 @@ class TabInterface {
 }
 
 void _main(SendPort interfacesSendPort) async {
-//  String idRows = extra[0];
-//  String idCols = extra[1];
-//  new CmdrPty(id, dir.path, idRows, idCols);
   print("_main() the Isolate has been spawned!");
 
   // Set up the isolate's port pair.
   ReceivePort isolatesReceivePort = new ReceivePort();
   interfacesSendPort.send(isolatesReceivePort.sendPort);
 
-  // Handle each message sent through its receive port.
-  await for (String msg in isolatesReceivePort) {
-    if (msg != '_spawnTab is done') {
-      print("_main() received: $msg");
-      continue;
-    }
+  List extra = await isolatesReceivePort.firstWhere((List args) => args.length == 4);
 
-    interfacesSendPort.send('_main() thinks we\'re done');
-  };
+  int id = extra[0];
+  String path = extra[1];
+  String idRows = extra[2];
+  String idCols = extra[3];
+  new CmdrPty(id, path, idRows, idCols, isolatesReceivePort, interfacesSendPort);
+
+  // Handle each message sent through its receive port.
+//  await for (String msg in isolatesReceivePort) {
+//    if (msg != '_spawnTab is done') {
+//      print("_main() received: $msg");
+//      continue;
+//    }
+//
+//    interfacesSendPort.send('_main() thinks we\'re done');
+//  }
 }

@@ -21,18 +21,24 @@ class CmdrPty {
   Socket _ptySocket;
   TabMailbox mailbox;
 
-  CmdrPty(int id, String workspacePath, String numRows, String numCols, ReceivePort rp, SendPort sp) {
+  CmdrPty(int id, String workspacePath, String numRows, String numCols, SendPort sp) {
     _workspacePath = workspacePath;
-    mailbox = new TabMailbox(rp, sp);
+    guiName = 'UpDroidConsole';
+    mailbox = new TabMailbox(sp);
+
+    registerMailbox();
   }
 
   void registerMailbox() {
     mailbox.registerMessageHandler('START_PTY', _startPty);
-    mailbox.registerMessageHandler('RESIZE', _resizeRelay);
-    mailbox.registerMessageHandler('RESIZE', _resizeHandle);
+//    mailbox.registerMessageHandler('RESIZE', _resizeRelay);
+//    mailbox.registerMessageHandler('RESIZE', _resizeHandle);
+    mailbox.registerMessageHandler('TEST', _test);
 
     mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/cmdr-pty', _handleIOStream);
   }
+
+  void _test(String s) => print('test successful');
 
   void _startPty(String um) {
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
@@ -55,7 +61,7 @@ class CmdrPty {
           Socket.connect('127.0.0.1', int.parse(port)).then((socket) {
             _ptySocket = socket;
             help.debug('CmdrPty-$id connected to: ${socket.remoteAddress.address}:${socket.remotePort}', 0);
-            socket.listen((data) => mailbox.ws.add((data)));
+            socket.listen((data) => mailbox.send(new Msg('DATA', data)));
           });
         }
       });
@@ -72,21 +78,21 @@ class CmdrPty {
 
   void _handleIOStream(String data) => _ptySocket.add(UTF8.encode(data));
 
-  void _resizeRelay(Msg um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidConsole', 0, um));
-  }
+//  void _resizeRelay(Msg um) {
+//    CmdrPostOffice.send(new ServerMessage('UpDroidConsole', 0, um));
+//  }
 
-  void _resizeHandle(Msg um) {
-    // Resize the shell.
-    List newSize = um.body.split('x');
-    int newRow = int.parse(newSize[0]);
-    int newCol = int.parse(newSize[1]) - 1;
-    _shell.stdin.writeln('${newRow}x${newCol}');
-
-    // Send the new size to all UpDroidConsoles (including this one) to be relayed
-    // back to their client side.
-//    mailbox.ws.add(um.toString());
-  }
+//  void _resizeHandle(Msg um) {
+//    // Resize the shell.
+//    List newSize = um.body.split('x');
+//    int newRow = int.parse(newSize[0]);
+//    int newCol = int.parse(newSize[1]) - 1;
+//    _shell.stdin.writeln('${newRow}x${newCol}');
+//
+//    // Send the new size to all UpDroidConsoles (including this one) to be relayed
+//    // back to their client side.
+////    mailbox.ws.add(um.toString());
+//  }
 
   void cleanup() {
     if (_ptySocket != null) _ptySocket.destroy();

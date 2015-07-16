@@ -10,6 +10,7 @@ import 'tab/camera/camera.dart';
 import 'tab/teleop.dart';
 import 'tab/editor.dart';
 import 'console_mailbox.dart';
+import 'tab/api/updroid_message.dart';
 
 class TabInterface {
   String tabType;
@@ -44,16 +45,12 @@ class TabInterface {
       if (sendPort == null) {
         print('_spawnTab got the port');
         sendPort = received;
+        mailbox.sendPort = sendPort;
 
         // Send the args.
-        sendPort.send([id, dir.path, extra[0], extra[1]]);
+        mailbox.sendPort.send([id, dir.path, extra[0], extra[1]]);
 
-        // Initiate a test with 10 outgoing messages.
-        for (int i = 0; i < 10; i++) {
-          sendPort.send('test $i');
-        }
-
-        sendPort.send('_spawnTab is done');
+        mailbox.sendPort.send(new Msg('TEST').toString());
 
         continue;
       }
@@ -81,6 +78,7 @@ void _main(SendPort interfacesSendPort) async {
   interfacesSendPort.send(isolatesReceivePort.sendPort);
 
   List args;
+  CmdrPty console;
   await for (var received in isolatesReceivePort) {
     if (args == null) {
       args = received;
@@ -90,14 +88,12 @@ void _main(SendPort interfacesSendPort) async {
       String idRows = received[2];
       String idCols = received[3];
       print('got args: ${id.toString()}, $path, $idRows, $idCols');
-
+      console = new CmdrPty(id, path, idRows, idCols, interfacesSendPort);
       continue;
     }
 
-    print('received string: $received');
+    console.mailbox.receivePort.add(received);
   }
-
-//  new CmdrPty(id, path, idRows, idCols, isolatesReceivePort, interfacesSendPort);
 
   // Handle each message sent through its receive port.
 //  await for (String msg in isolatesReceivePort) {

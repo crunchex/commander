@@ -18,7 +18,6 @@ class ConsoleMailbox {
 
   ConsoleMailbox(this.className, this.id) {
     receivePort = new ReceivePort();
-    sendPort = receivePort.sendPort;
 
     inbox = CmdrPostOffice.registerClass(className, id);
 

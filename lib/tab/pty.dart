@@ -13,6 +13,30 @@ import '../server_helper.dart' as help;
 import 'api/tab_mailbox.dart';
 
 class CmdrPty {
+  static void main(SendPort interfacesSendPort) async {
+    // Set up the isolate's port pair.
+    ReceivePort isolatesReceivePort = new ReceivePort();
+    interfacesSendPort.send(isolatesReceivePort.sendPort);
+
+    List args;
+    CmdrPty console;
+    await for (var received in isolatesReceivePort) {
+      if (args == null) {
+        args = received;
+
+        int id = received[0];
+        String path = received[1];
+        String idRows = received[2];
+        String idCols = received[3];
+        console = new CmdrPty(id, path, idRows, idCols, interfacesSendPort);
+
+        continue;
+      }
+
+      console.mailbox.receivePort.add(received);
+    }
+  }
+
   int id;
   String guiName;
 

@@ -38,18 +38,16 @@ class TabInterface {
   }
 
   Future _spawnTab() async {
-    Isolate tab = await Isolate.spawn(_main, mailbox.sendPort);
+    SendPort initialSendPort = mailbox.receivePort.sendPort;
+    Isolate tab = await Isolate.spawn(CmdrPty.main, initialSendPort);
 
-    SendPort sendPort;
     await for (var received in mailbox.receivePort) {
-      if (sendPort == null) {
-        print('_spawnTab got the port');
-        sendPort = received;
-        mailbox.sendPort = sendPort;
+      if (mailbox.sendPort == null) {
+        mailbox.sendPort = received;
 
         // Send the args.
         mailbox.sendPort.send([id, dir.path, extra[0], extra[1]]);
-
+        // Send a test message to try and get the message handler in the isolate called.
         mailbox.sendPort.send(new Msg('TEST').toString());
 
         continue;
@@ -59,49 +57,7 @@ class TabInterface {
     }
   }
 
-  Future sendReceive(SendPort port, String msg) {
-    ReceivePort receivePort = new ReceivePort();
-    port.send([msg, receivePort.sendPort]);
-    return receivePort.first;
-  }
-
   void close() {
 //    tab.cleanup();
   }
-}
-
-void _main(SendPort interfacesSendPort) async {
-  print("_main() the Isolate has been spawned!");
-
-  // Set up the isolate's port pair.
-  ReceivePort isolatesReceivePort = new ReceivePort();
-  interfacesSendPort.send(isolatesReceivePort.sendPort);
-
-  List args;
-  CmdrPty console;
-  await for (var received in isolatesReceivePort) {
-    if (args == null) {
-      args = received;
-
-      int id = received[0];
-      String path = received[1];
-      String idRows = received[2];
-      String idCols = received[3];
-      print('got args: ${id.toString()}, $path, $idRows, $idCols');
-      console = new CmdrPty(id, path, idRows, idCols, interfacesSendPort);
-      continue;
-    }
-
-    console.mailbox.receivePort.add(received);
-  }
-
-  // Handle each message sent through its receive port.
-//  await for (String msg in isolatesReceivePort) {
-//    if (msg != '_spawnTab is done') {
-//      print("_main() received: $msg");
-//      continue;
-//    }
-//
-//    interfacesSendPort.send('_main() thinks we\'re done');
-//  }
 }

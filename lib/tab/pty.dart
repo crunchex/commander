@@ -59,7 +59,9 @@ class CmdrPty {
 //    mailbox.registerMessageHandler('RESIZE', _resizeHandle);
     mailbox.registerMessageHandler('TEST', _test);
 
-    mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/cmdr-pty', _handleIOStream);
+    mailbox.registerMessageHandler('DATA', _handleIOStream);
+
+//    mailbox.registerEndpointHandler('/${guiName.toLowerCase()}/$id/cmdr-pty', _handleIOStream);
   }
 
   void _test(String s) => print('test successful');
@@ -67,7 +69,7 @@ class CmdrPty {
   void _startPty(String um) {
     // Process launches 'cmdr-pty', a go program that provides a direct hook to a system pty.
     // See http://bitbucket.org/updroid/cmdr-pty
-    Process.start('cmdr-pty', ['-p', 'tcp', '-s', '${um}'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
+    Process.start('cmdr-pty', ['-p', 'tcp'], environment: {'TERM':'vt100'}, workingDirectory: _workspacePath).then((Process shell) {
       _shell = shell;
 
       Stream stdoutBroadcast = shell.stdout.asBroadcastStream();
@@ -78,21 +80,22 @@ class CmdrPty {
         String dataString = UTF8.decode(data);
         if (dataString.contains('listening on port: ')) {
           String port = dataString.replaceFirst('listening on port: ', '');
+          print('got port: $port');
 //          Msg portMessage = new Msg('PTY_READY', '');
-//          mailbox.ws.add(portMessage.toString());
+//          mailbox.send(portMessage);
 //          portListener.cancel();
 
           Socket.connect('127.0.0.1', int.parse(port)).then((socket) {
             _ptySocket = socket;
             help.debug('CmdrPty-$id connected to: ${socket.remoteAddress.address}:${socket.remotePort}', 0);
-            socket.listen((data) => mailbox.send(new Msg('DATA', data)));
+            socket.listen((data) => mailbox.send(new Msg('DATA', JSON.encode(data))));
           });
         }
       });
 
       // Log the rest of stdout/err for debug.
-      stdoutBroadcast.listen((data) => help.debug('pty[$id] stdout: ${UTF8.decode(data)}', 0));
-      shell.stderr.listen((data) => help.debug('pty[$id] stderr: ${UTF8.decode(data)}', 0));
+      stdoutBroadcast.listen((data) => print('pty[$id] stdout: ${UTF8.decode(data)}'));
+      shell.stderr.listen((data) => print('pty[$id] stderr: ${UTF8.decode(data)}'));
     }).catchError((error) {
       if (error is! ProcessException) throw error;
       help.debug('cmdr-pty [$id]: run failed. Probably not installed', 1);
@@ -100,7 +103,9 @@ class CmdrPty {
     });
   }
 
-  void _handleIOStream(String data) => _ptySocket.add(UTF8.encode(data));
+  void _handleIOStream(String data) {
+    if (_ptySocket != null) _ptySocket.add(JSON.decode(data));
+  }
 
 //  void _resizeRelay(Msg um) {
 //    CmdrPostOffice.send(new ServerMessage('UpDroidConsole', 0, um));

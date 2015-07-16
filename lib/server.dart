@@ -102,8 +102,8 @@ class CmdrServer {
       return;
     }
 
-//    WebSocketTransformer.upgrade(request)
-//    .then((WebSocket ws) => _tabs[type][objectID].tab.mailbox.handleWebSocket(ws, request));
+    WebSocketTransformer.upgrade(request)
+    .then((WebSocket ws) => _tabs[type][objectID].mailbox.receive(ws, request));
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {

@@ -48,12 +48,12 @@ class TabInterface {
         // Send the args.
         mailbox.sendPort.send([id, dir.path, extra[0], extra[1]]);
         // Send a test message to try and get the message handler in the isolate called.
-        mailbox.sendPort.send(new Msg('TEST').toString());
+        mailbox.sendPort.send(new Msg('START_PTY').toString());
 
         continue;
       }
 
-      print('_spawnTab received: $received');
+      mailbox.send(new Msg.fromString(received));
     }
   }
 

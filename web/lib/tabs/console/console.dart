@@ -3,6 +3,7 @@ library updroid_console;
 import 'dart:html';
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:terminal/terminal.dart';
 import 'package:terminal/theme.dart';
@@ -66,37 +67,42 @@ class UpDroidConsole extends TabController {
   }
 
   /// Starts a secondary WebSocket with direct access to the pty spawned by CmdrPty.
-  void _initWebSocket(UpDroidMessage um) {
-    String url = window.location.host;
-    url = url.split(':')[0];
-    // window.location.host returns whatever is in the URL bar (including port).
-    // Since the port here needs to be dynamic, the default needs to be replaced.
-    _resetWebSocket('ws://' + url + ':12060/${className.toLowerCase()}/$id/cmdr-pty');
-  }
+//  void _initWebSocket(UpDroidMessage um) {
+//    String url = window.location.host;
+//    url = url.split(':')[0];
+//    // window.location.host returns whatever is in the URL bar (including port).
+//    // Since the port here needs to be dynamic, the default needs to be replaced.
+//    _resetWebSocket('ws://' + url + ':12060/${className.toLowerCase()}/$id/cmdr-pty');
+//  }
+//
+//  void _resetWebSocket(String url, [int retrySeconds = 2]) {
+//    bool encounteredError = false;
+//
+//    _ws = new WebSocket(url);
+////    _ws.binaryType = "arraybuffer";
+//
+//    _ws.onMessage.listen((MessageEvent event) {
+//      try {
+//        ByteBuffer buf = event.data;
+//        _term.stdout.add(buf.asUint8List());
+//      } catch(e) {
+//        // A websocket event from the server side.
+//        _resizeHandler(new UpDroidMessage.fromString(event.data));
+//      }
+//    });
+//
+//    _ws.onError.listen((e) {
+//      print('Console-$id disconnected. Retrying...');
+//      if (!encounteredError) {
+//        new Timer(new Duration(seconds:retrySeconds), () => _resetWebSocket(url, retrySeconds * 2));
+//      }
+//      encounteredError = true;
+//    });
+//  }
 
-  void _resetWebSocket(String url, [int retrySeconds = 2]) {
-    bool encounteredError = false;
-
-    _ws = new WebSocket(url);
-    _ws.binaryType = "arraybuffer";
-
-    _ws.onMessage.listen((MessageEvent event) {
-      try {
-        ByteBuffer buf = event.data;
-        _term.stdout.add(buf.asUint8List());
-      } catch(e) {
-        // A websocket event from the server side.
-        _resizeHandler(new UpDroidMessage.fromString(event.data));
-      }
-    });
-
-    _ws.onError.listen((e) {
-      print('Console-$id disconnected. Retrying...');
-      if (!encounteredError) {
-        new Timer(new Duration(seconds:retrySeconds), () => _resetWebSocket(url, retrySeconds * 2));
-      }
-      encounteredError = true;
-    });
+  void _handleData(UpDroidMessage um) {
+//    print(um.body.toString());
+    _term.stdout.add(JSON.decode(um.body));
   }
 
   /// Handle an incoming resize event, originating from either this [UpDroidConsole] or another.
@@ -149,14 +155,17 @@ class UpDroidConsole extends TabController {
 
   void registerMailbox() {
     mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'START_PTY', _startPty);
-    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PTY_READY', _initWebSocket);
+//    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PTY_READY', _initWebSocket);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'RESIZE', _resizeHandler);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'DATA', _handleData);
   }
 
   /// Sets up the event handlers for the console.
   void registerEventHandlers() {
     _term.stdin.stream.listen((data) {
-      if (_ws != null) _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
+//      if (_ws != null) _ws.sendByteBuffer(new Uint8List.fromList(data).buffer);
+      mailbox.ws.send('[[DATA]]' + JSON.encode(data));
+//    print('[[DATA]]' + JSON.encode(new Uint8List.fromList(data)));
     });
 
     _themeButton.onClick.listen((e) {

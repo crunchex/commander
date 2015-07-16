@@ -144,8 +144,8 @@ class UpDroidClient {
 
     List listConfig = [
       [{'id': 1, 'class': 'UpDroidExplorer'}],
-      [{'id': 1, 'class': 'UpDroidEditor'}],
-      [{'id': 1, 'class': 'UpDroidConsole'}]
+      [{'id': 1, 'class': 'UpDroidConsole'}],
+      []
     ];
 
     return JSON.encode(listConfig);

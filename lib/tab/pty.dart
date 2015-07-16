@@ -9,15 +9,17 @@ import '../post_office.dart';
 import 'api/updroid_message.dart';
 import 'api/server_message.dart';
 import '../server_helper.dart' as help;
+import 'api/tab_mailbox.dart';
 
-class CmdrPty extends Tab {
+class CmdrPty {
   Process _shell;
   String _workspacePath;
   Socket _ptySocket;
+  TabMailbox mailbox;
 
-  CmdrPty(int id, String workspacePath, String numRows, String numCols) :
-  super(id, 'UpDroidConsole') {
+  CmdrPty(int id, String workspacePath, String numRows, String numCols) {
     _workspacePath = workspacePath;
+    mailbox = new TabMailbox();
   }
 
   void registerMailbox() {

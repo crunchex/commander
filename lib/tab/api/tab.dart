@@ -1,25 +1,27 @@
 library tab;
 
 import 'dart:async';
+import 'dart:isolate';
 
 import '../../server_mailbox.dart';
 import '../../post_office.dart';
 import 'updroid_message.dart';
 import 'server_message.dart';
+import 'tab_mailbox.dart';
 
 abstract class Tab {
   int id;
   String guiName;
 
-  CmdrMailbox mailbox;
+  TabMailbox mailbox;
 
-  Tab(this.id, this.guiName) {
-    mailbox = new CmdrMailbox(guiName, id);
+  Tab(this.id, this.guiName, SendPort sendPort) {
+    mailbox = new TabMailbox(sendPort);
 
     // Register Tab's event handlers.
-    mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
-    mailbox.registerWebSocketEvent('CLONE_TAB', _cloneTab);
-    mailbox.registerWebSocketEvent('MOVE_TAB', _moveTab);
+    mailbox.registerMessageHandler('CLOSE_TAB', _closeTab);
+    mailbox.registerMessageHandler('CLONE_TAB', _cloneTab);
+    mailbox.registerMessageHandler('MOVE_TAB', _moveTab);
 
     // Register subclass' event handlers.
     registerMailbox();
@@ -33,15 +35,18 @@ abstract class Tab {
     CmdrPostOffice.deregisterStream(guiName, id);
   }
 
-  void _closeTab(Msg um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  void _closeTab(String msg) {
+    Msg m = new Msg('CLOSE_TAB', msg);
+    mailbox.relay(new ServerMessage('UpDroidClient', -1, m));
   }
 
-  void _cloneTab(Msg um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  void _cloneTab(String msg) {
+    Msg m = new Msg('CLONE_TAB', msg);
+    mailbox.relay(new ServerMessage('UpDroidClient', -1, m));
   }
 
-  void _moveTab(Msg um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', -1, um));
+  void _moveTab(String msg) {
+    Msg m = new Msg('MOVE_TAB', msg);
+    mailbox.relay(new ServerMessage('UpDroidClient', -1, m));
   }
 }

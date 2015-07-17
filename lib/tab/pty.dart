@@ -6,13 +6,11 @@ import 'dart:convert';
 import 'dart:isolate';
 
 import 'api/tab.dart';
-import '../post_office.dart';
 import 'api/updroid_message.dart';
 import 'api/server_message.dart';
 import '../server_helper.dart' as help;
-import 'api/tab_mailbox.dart';
 
-class CmdrPty {
+class CmdrPty extends Tab {
   static Future main(SendPort interfacesSendPort) async {
     // Set up the isolate's port pair.
     ReceivePort isolatesReceivePort = new ReceivePort();
@@ -35,20 +33,13 @@ class CmdrPty {
     }
   }
 
-  int id;
-  String guiName;
-
   Process _shell;
   String _workspacePath;
   Socket _ptySocket;
-  TabMailbox mailbox;
 
-  CmdrPty(int id, String workspacePath, SendPort sp) {
+  CmdrPty(int id, String workspacePath, SendPort sp) :
+  super(id, 'UpDroidConsole', sp) {
     _workspacePath = workspacePath;
-    guiName = 'UpDroidConsole';
-    mailbox = new TabMailbox(sp);
-
-    registerMailbox();
     mailbox.send(new Msg('TAB_READY'));
   }
 

@@ -22,7 +22,7 @@ class ServerMessage {
     List<String> split = serverHeader.split(':');
     receiverClass = split[0];
     id = int.parse(split[1]);
-    um = raw.substring(endIndex + 3, raw.length);
+    um = new Msg.fromString(raw.substring(endIndex + 4, raw.length));
   }
 
   String toString() {

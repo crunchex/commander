@@ -7,6 +7,7 @@ import 'dart:isolate';
 import 'server_helper.dart' as help;
 import 'tab/api/updroid_message.dart';
 import 'post_office.dart';
+import 'tab/api/server_message.dart';
 
 class ConsoleMailbox {
   String className;
@@ -19,7 +20,7 @@ class ConsoleMailbox {
   ConsoleMailbox(this.className, this.id) {
     receivePort = new ReceivePort();
 
-    inbox = CmdrPostOffice.registerClass(className, id);
+    inbox = CmdrPostOffice.registerClass('UpDroidConsole', id);
 
     inbox.listen((Msg um) {
       help.debug('[${className}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
@@ -43,4 +44,6 @@ class ConsoleMailbox {
       .listen((data) => sendPort.send('${request.uri.path}:um.'));
     }
   }
+
+  void relay(ServerMessage sm) => CmdrPostOffice.send(sm);
 }

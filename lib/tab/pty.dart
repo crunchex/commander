@@ -54,8 +54,8 @@ class CmdrPty {
 
   void registerMailbox() {
     mailbox.registerMessageHandler('START_PTY', _startPty);
-//    mailbox.registerMessageHandler('RESIZE', _resizeRelay);
-//    mailbox.registerMessageHandler('RESIZE', _resizeHandle);
+    mailbox.registerMessageHandler('INITIATE_RESIZE', _resizeRelay);
+    mailbox.registerMessageHandler('RESIZE', _resizeHandle);
     mailbox.registerMessageHandler('DATA', _handleIOStream);
   }
 
@@ -94,20 +94,20 @@ class CmdrPty {
     if (_ptySocket != null) _ptySocket.add(JSON.decode(msg));
   }
 
-//  void _resizeRelay(Msg um) {
-//    CmdrPostOffice.send(new ServerMessage('UpDroidConsole', 0, um));
-//  }
+  void _resizeRelay(String msg) {
+    Msg m = new Msg('RESIZE', msg);
+    mailbox.relay(new ServerMessage('UpDroidConsole', 0, m));
+  }
 
-  void _resizeHandle(Msg um) {
+  void _resizeHandle(String msg) {
     // Resize the shell.
-    List newSize = um.body.split('x');
+    List newSize = msg.split('x');
     int newRow = int.parse(newSize[0]);
     int newCol = int.parse(newSize[1]) - 1;
     _shell.stdin.writeln('${newRow}x${newCol}');
-
     // Send the new size to all UpDroidConsoles (including this one) to be relayed
     // back to their client side.
-//    mailbox.ws.add(um.toString());
+    mailbox.send(new Msg('RESIZE', msg));
   }
 
   void cleanup() {

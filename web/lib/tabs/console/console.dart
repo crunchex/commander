@@ -141,7 +141,7 @@ class UpDroidConsole extends TabController {
         if (_resizeTimer != null) _resizeTimer.cancel();
         _resizeTimer = new Timer(new Duration(milliseconds: 500), () {
           List<int> newSize = _term.calculateSize();
-          mailbox.ws.send('[[RESIZE]]' + '${newSize[0]}x${newSize[1]}');
+          mailbox.ws.send('[[INITIATE_RESIZE]]' + '${newSize[0]}x${newSize[1]}');
         });
       }
     });

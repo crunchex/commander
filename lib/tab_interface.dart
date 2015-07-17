@@ -11,6 +11,7 @@ import 'tab/teleop.dart';
 import 'tab/editor.dart';
 import 'console_mailbox.dart';
 import 'tab/api/updroid_message.dart';
+import 'tab/api/server_message.dart';
 
 class TabInterface {
   String tabType;
@@ -53,7 +54,13 @@ class TabInterface {
         continue;
       }
 
-      mailbox.send(new Msg.fromString(received));
+      // At this point we are assuming messages are always strings.
+      String message = received;
+      if (message.startsWith('s:')) {
+        mailbox.relay(new ServerMessage.fromString(message));
+      } else {
+        mailbox.send(new Msg.fromString(received));
+      }
     }
   }
 

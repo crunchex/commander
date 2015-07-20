@@ -5,13 +5,13 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as pathLib;
+import 'package:upcom-api/ros/ros.dart';
+import 'package:upcom-api/server_message.dart';
+import 'package:upcom-api/updroid_message.dart';
 
-import 'api/ros/ros.dart';
-import 'api/updroid_message.dart';
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 import '../post_office.dart';
-import 'api/server_message.dart';
 
 class CmdrExplorer {
   static const String guiName = 'UpDroidExplorer';

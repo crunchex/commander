@@ -125,6 +125,12 @@ packages:
     description: tokenizr
     source: hosted
     version: "0.0.1+1"
+  upcom-api:
+    description:
+      path: "/home/crunchex/work/upcom-api/"
+      relative: false
+    source: path
+    version: "0.1.0"
   utf:
     description: utf
     source: hosted

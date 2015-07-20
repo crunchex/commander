@@ -3,8 +3,9 @@ library server_mailbox;
 import 'dart:io';
 import 'dart:async';
 
+import 'package:upcom-api/updroid_message.dart';
+
 import 'server_helper.dart' as help;
-import 'tab/api/updroid_message.dart';
 import 'post_office.dart';
 
 class CmdrMailbox {

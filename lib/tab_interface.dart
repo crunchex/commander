@@ -4,14 +4,14 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:upcom-api/server_message.dart';
+import 'package:upcom-api/updroid_message.dart';
+
 //import 'tab/api/tab.dart';
 //import 'tab/camera/camera.dart';
 //import 'tab/teleop.dart';
 //import 'tab/editor.dart';
-import 'tab/pty.dart';
 import 'console_mailbox.dart';
-import 'tab/api/updroid_message.dart';
-import 'tab/api/server_message.dart';
 
 class TabInterface {
   String tabType;
@@ -30,7 +30,7 @@ class TabInterface {
   Future _spawnTab() async {
     SendPort initialSendPort = mailbox.receivePort.sendPort;
 //    Isolate tab = await Isolate.spawn(CmdrPty.main, initialSendPort);
-    await Isolate.spawn(CmdrConsole.main, initialSendPort);
+    await Isolate.spawnUri(new Uri.file('/home/crunchex/work/upcom-console/lib/pty.dart'), [], initialSendPort, packageRoot: new Uri.file('/home/crunchex/work/upcom-console/packages/'));
 
     await for (var received in mailbox.receivePort) {
       if (mailbox.sendPort == null) {

@@ -3,8 +3,8 @@ library post_office;
 import 'dart:io';
 import 'dart:async';
 
-import 'tab/api/server_message.dart';
-import 'tab/api/updroid_message.dart';
+import 'package:upcom-api/server_message.dart';
+import 'package:upcom-api/updroid_message.dart';
 import 'server_helper.dart' as help;
 
 CmdrPostOffice _postOffice;

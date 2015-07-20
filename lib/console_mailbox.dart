@@ -4,10 +4,11 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:isolate';
 
+import 'package:upcom-api/server_message.dart';
+import 'package:upcom-api/updroid_message.dart';
+
 import 'server_helper.dart' as help;
-import 'tab/api/updroid_message.dart';
 import 'post_office.dart';
-import 'tab/api/server_message.dart';
 
 class ConsoleMailbox {
   String className;

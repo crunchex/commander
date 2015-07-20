@@ -5,13 +5,13 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
+import 'package:upcom-api/git.dart';
+import 'package:upcom-api/updroid_message.dart';
+import 'package:upcom-api/server_message.dart';
 
 import 'tab/explorer.dart';
-import 'tab/api/git.dart';
 import 'server_mailbox.dart';
 import 'server_helper.dart' as help;
-import 'tab/api/updroid_message.dart';
-import 'tab/api/server_message.dart';
 import 'tab_interface.dart';
 import 'post_office.dart';
 

@@ -4,11 +4,11 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'tab/api/tab.dart';
+//import 'tab/api/tab.dart';
+//import 'tab/camera/camera.dart';
+//import 'tab/teleop.dart';
+//import 'tab/editor.dart';
 import 'tab/pty.dart';
-import 'tab/camera/camera.dart';
-import 'tab/teleop.dart';
-import 'tab/editor.dart';
 import 'console_mailbox.dart';
 import 'tab/api/updroid_message.dart';
 import 'tab/api/server_message.dart';
@@ -21,26 +21,16 @@ class TabInterface {
 
   Isolate tab;
   ConsoleMailbox mailbox;
-  Stream<String> input;
-  Stream<String> output;
-
-  StreamController<String> _inputController;
-  StreamController<String> _outputController;
 
   TabInterface(this.tabType, this.id, this.dir, [this.extra]) {
-    _inputController = new StreamController<String>();
-    input = _inputController.stream;
-
-    _outputController = new StreamController<String>();
-    output = _outputController.stream;
-
     mailbox = new ConsoleMailbox(tabType, id);
     _spawnTab();
   }
 
   Future _spawnTab() async {
     SendPort initialSendPort = mailbox.receivePort.sendPort;
-    Isolate tab = await Isolate.spawn(CmdrPty.main, initialSendPort);
+//    Isolate tab = await Isolate.spawn(CmdrPty.main, initialSendPort);
+    await Isolate.spawn(CmdrPty.main, initialSendPort);
 
     await for (var received in mailbox.receivePort) {
       if (mailbox.sendPort == null) {

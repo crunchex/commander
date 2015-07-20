@@ -11,26 +11,8 @@ import 'api/server_message.dart';
 import '../server_helper.dart' as help;
 
 class CmdrConsole extends Tab {
-  static Future main(SendPort interfacesSendPort) async {
-    // Set up the isolate's port pair.
-    ReceivePort isolatesReceivePort = new ReceivePort();
-    interfacesSendPort.send(isolatesReceivePort.sendPort);
-
-    List args;
-    CmdrConsole console;
-    await for (var received in isolatesReceivePort) {
-      if (args == null) {
-        args = received;
-
-        int id = received[0];
-        String path = received[1];
-        console = new CmdrConsole(id, path, interfacesSendPort);
-
-        continue;
-      }
-
-      console.mailbox.receive(received);
-    }
+  static Future main(SendPort interfacesSendPort) {
+    return Tab.main(interfacesSendPort, (id, path, port) => new CmdrConsole(id, path, port));
   }
 
   Process _shell;

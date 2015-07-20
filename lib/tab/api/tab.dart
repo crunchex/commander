@@ -10,6 +10,28 @@ import 'server_message.dart';
 import 'tab_mailbox.dart';
 
 abstract class Tab {
+  static Future main(SendPort interfacesSendPort, Function constructor) async {
+    // Set up the isolate's port pair.
+    ReceivePort isolatesReceivePort = new ReceivePort();
+    interfacesSendPort.send(isolatesReceivePort.sendPort);
+
+    List args;
+    Tab tab;
+    await for (var received in isolatesReceivePort) {
+      if (args == null) {
+        args = received;
+
+        int id = received[0];
+        String path = received[1];
+        tab = constructor(id, path, interfacesSendPort);
+
+        continue;
+      }
+
+      tab.mailbox.receive(received);
+    }
+  }
+
   int id;
   String guiName;
 

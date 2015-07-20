@@ -10,21 +10,21 @@ import 'api/updroid_message.dart';
 import 'api/server_message.dart';
 import '../server_helper.dart' as help;
 
-class CmdrPty extends Tab {
+class CmdrConsole extends Tab {
   static Future main(SendPort interfacesSendPort) async {
     // Set up the isolate's port pair.
     ReceivePort isolatesReceivePort = new ReceivePort();
     interfacesSendPort.send(isolatesReceivePort.sendPort);
 
     List args;
-    CmdrPty console;
+    CmdrConsole console;
     await for (var received in isolatesReceivePort) {
       if (args == null) {
         args = received;
 
         int id = received[0];
         String path = received[1];
-        console = new CmdrPty(id, path, interfacesSendPort);
+        console = new CmdrConsole(id, path, interfacesSendPort);
 
         continue;
       }
@@ -37,7 +37,7 @@ class CmdrPty extends Tab {
   String _workspacePath;
   Socket _ptySocket;
 
-  CmdrPty(int id, String workspacePath, SendPort sp) :
+  CmdrConsole(int id, String workspacePath, SendPort sp) :
   super(id, 'UpDroidConsole', sp) {
     _workspacePath = workspacePath;
     mailbox.send(new Msg('TAB_READY'));

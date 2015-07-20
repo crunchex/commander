@@ -30,7 +30,7 @@ class TabInterface {
   Future _spawnTab() async {
     SendPort initialSendPort = mailbox.receivePort.sendPort;
 //    Isolate tab = await Isolate.spawn(CmdrPty.main, initialSendPort);
-    await Isolate.spawn(CmdrPty.main, initialSendPort);
+    await Isolate.spawn(CmdrConsole.main, initialSendPort);
 
     await for (var received in mailbox.receivePort) {
       if (mailbox.sendPort == null) {

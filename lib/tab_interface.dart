@@ -30,7 +30,9 @@ class TabInterface {
   Future _spawnTab() async {
     SendPort initialSendPort = mailbox.receivePort.sendPort;
 //    Isolate tab = await Isolate.spawn(CmdrPty.main, initialSendPort);
-    await Isolate.spawnUri(new Uri.file('/home/crunchex/work/upcom-console/lib/pty.dart'), [], initialSendPort, packageRoot: new Uri.file('/home/crunchex/work/upcom-console/packages/'));
+    Uri tabFile = new Uri.file('/home/crunchex/work/upcom-console/lib/pty.dart');
+    Uri packageRoot = new Uri.file('/home/crunchex/work/upcom-console/packages/');
+    await Isolate.spawnUri(tabFile, [], initialSendPort, packageRoot: packageRoot);
 
     await for (var received in mailbox.receivePort) {
       if (mailbox.sendPort == null) {

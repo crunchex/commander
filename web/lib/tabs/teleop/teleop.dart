@@ -102,7 +102,7 @@ class UpDroidTeleop extends TabController {
     url = url.split(':')[0];
     // window.location.host returns whatever is in the URL bar (including port).
     // Since the port here needs to be dynamic, the default needs to be replaced.
-    _initWebSocket('ws://' + url + ':12060/${className.toLowerCase()}/$id/controller/0');
+    _initWebSocket('ws://' + url + ':12060/${className}/$id/controller/0');
 
     //_setGamepads();
   }

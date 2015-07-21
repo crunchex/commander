@@ -94,7 +94,7 @@ class UpDroidCamera extends TabController {
     String deviceIdString = deviceId.toString();
     String url = window.location.host;
     url = url.split(':')[0];
-    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/${className.toLowerCase()}/$id/input/$deviceIdString']);
+    js.JsObject client = new js.JsObject(js.context['WebSocket'], ['ws://' + url + ':12060/$className/$id/input/$deviceIdString']);
 
     var options = new js.JsObject.jsify({'canvas': _canvas});
 
@@ -115,11 +115,11 @@ class UpDroidCamera extends TabController {
     List<int> sortedIds = _setDevices(um.body);
     if (sortedIds.isEmpty) return;
 
-    _startPlayer(id % sortedIds.length);
+//    _startPlayer(id % sortedIds.length);
   }
 
   void registerMailbox() {
-    mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'SIGNAL_READY', _signalReady);
+    mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'TAB_READY', _signalReady);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'NO_FFMPEG', _throwAlert);
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CAMERA_READY', _postReadySetup);
   }

@@ -62,7 +62,7 @@ class Mailbox {
   void _initWebSocket(String url, enableDisconnectedAlert, [int retrySeconds = 2]) {
     bool encounteredError = false;
 
-    ws = new WebSocket('ws://' + url + ':12060/${_name.toLowerCase()}/$_id');
+    ws = new WebSocket('ws://' + url + ':12060/${_name}/$_id');
 
     // Call all the functions registered to ON_OPEN.
     ws.onOpen.listen((e) => _wsRegistry[EventType.ON_OPEN].forEach((f(e)) => f(e)));

@@ -3,8 +3,9 @@ library server_mailbox;
 import 'dart:io';
 import 'dart:async';
 
+import 'package:upcom-api/updroid_message.dart';
+
 import 'server_helper.dart' as help;
-import 'tab/api/updroid_message.dart';
 import 'post_office.dart';
 
 class CmdrMailbox {
@@ -42,7 +43,7 @@ class CmdrMailbox {
 
   void handleWebSocket(WebSocket ws, HttpRequest request) {
     this.ws = ws;
-    if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className.toLowerCase()) {
+    if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className) {
       ws.listen((String s) {
         Msg um = new Msg.fromString(s);
         help.debug('$className incoming: ' + um.header, 0);

@@ -115,7 +115,7 @@ class UpDroidCamera extends TabController {
     List<int> sortedIds = _setDevices(um.body);
     if (sortedIds.isEmpty) return;
 
-//    _startPlayer(id % sortedIds.length);
+    _startPlayer(id % sortedIds.length);
   }
 
   void registerMailbox() {

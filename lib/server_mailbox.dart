@@ -43,7 +43,7 @@ class CmdrMailbox {
 
   void handleWebSocket(WebSocket ws, HttpRequest request) {
     this.ws = ws;
-    if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className.toLowerCase()) {
+    if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className) {
       ws.listen((String s) {
         Msg um = new Msg.fromString(s);
         help.debug('$className incoming: ' + um.header, 0);

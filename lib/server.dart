@@ -90,13 +90,13 @@ class CmdrServer {
     int objectID = int.parse(request.uri.pathSegments[1]);
     String type = request.uri.pathSegments[0];
 
-    if (type == 'updroidclient') {
+    if (type == 'UpDroidClient') {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _mailbox.handleWebSocket(ws, request));
       return;
     }
 
-    if (type == 'updroidexplorer') {
+    if (type == 'UpDroidExplorer') {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _panels[type][objectID].mailbox.handleWebSocket(ws, request));
       return;
@@ -151,14 +151,14 @@ class CmdrServer {
     String id = um.body;
     List idList = id.split('-');
     int num = int.parse(idList[1]);
-    String type = idList[2].toLowerCase();
+    String type = idList[2];
 
     help.debug('Open panel request received: $id', 0);
 
     if (!_panels.containsKey(type)) _panels[type] = {};
 
     switch (type) {
-      case 'updroidexplorer':
+      case 'UpDroidExplorer':
         _panels[type][num] = new CmdrExplorer(num, dir);
         break;
     }
@@ -168,12 +168,11 @@ class CmdrServer {
     String id = um.body;
     List idList = id.split('-');
     int num = int.parse(idList[1]);
-    String type = idList[2].toLowerCase();
+    String type = idList[2];
 
     help.debug('Open tab request received: $id', 0);
 
     if (!_tabs.containsKey(type)) _tabs[type] = {};
-
 
     if (idList.length <= 3) {
       _tabs[type][num] = new TabInterface(type, num, dir);
@@ -187,7 +186,7 @@ class CmdrServer {
 
   void _closeTab(Msg um) {
     List idList = um.body.split('_');
-    String type = idList[0].toLowerCase();
+    String type = idList[0];
     int id = int.parse(idList[1]);
 
     help.debug('Close tab request received: ${idList.toString()}', 0);
@@ -205,7 +204,7 @@ class CmdrServer {
   void _sendEditorList(Msg um) {
     String pathToOpen = um.body;
     List<String> editorList = [];
-    _tabs['updroideditor'].keys.forEach((int id) => editorList.add(id.toString()));
+    _tabs['UpDroidEditor'].keys.forEach((int id) => editorList.add(id.toString()));
     Msg newMessage = new Msg('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
     // TODO: need to able to reply back to exact sender in CmdrPostOffice.
     // This is a hacky way to reply back to the requesting explorer.

@@ -24,24 +24,35 @@ class TabInterface {
 
   TabInterface(this.tabType, this.id, this.dir, [this.extra]) {
     mailbox = new ConsoleMailbox(tabType, id);
-    _spawnTab();
+
+    // TODO: all this hardcoded stuff should be pulled from a tab registry file somewhere.
+    Uri tabFile, packageRoot;
+    switch (tabType) {
+      case 'UpDroidConsole':
+        tabFile = new Uri.file('/home/crunchex/work/upcom-console/lib/pty.dart');
+        packageRoot = new Uri.file('/home/crunchex/work/upcom-console/packages/');
+        break;
+      case 'UpDroidEditor':
+        tabFile = new Uri.file('/home/crunchex/work/upcom-editor/lib/editor.dart');
+        packageRoot = new Uri.file('/home/crunchex/work/upcom-editor/packages/');
+        break;
+    }
+
+    _spawnTab(tabFile, packageRoot);
   }
 
-  Future _spawnTab() async {
+  Future _spawnTab(Uri tabFile, Uri packageRoot) async {
     SendPort initialSendPort = mailbox.receivePort.sendPort;
-//    Isolate tab = await Isolate.spawn(CmdrPty.main, initialSendPort);
-    Uri tabFile = new Uri.file('/home/crunchex/work/upcom-console/lib/pty.dart');
-    Uri packageRoot = new Uri.file('/home/crunchex/work/upcom-console/packages/');
-    await Isolate.spawnUri(tabFile, [], initialSendPort, packageRoot: packageRoot);
+
+    // Prepare the args.
+    List args = [id, dir.path];
+    if (extra != null) args.addAll(extra);
+
+    await Isolate.spawnUri(tabFile, args, initialSendPort, packageRoot: packageRoot);
 
     await for (var received in mailbox.receivePort) {
       if (mailbox.sendPort == null) {
         mailbox.sendPort = received;
-
-        // Send the args.
-        mailbox.sendPort.send([id, dir.path, extra[0], extra[1]]);
-        // Send a test message to try and get the message handler in the isolate called.
-//        mailbox.sendPort.send(new Msg('START_PTY').toString());
 
         continue;
       }

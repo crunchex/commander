@@ -21,7 +21,7 @@ class ConsoleMailbox {
   ConsoleMailbox(this.className, this.id) {
     receivePort = new ReceivePort();
 
-    inbox = CmdrPostOffice.registerClass('UpDroidConsole', id);
+    inbox = CmdrPostOffice.registerClass(className, id);
 
     inbox.listen((Msg um) {
       help.debug('[${className}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
@@ -33,7 +33,7 @@ class ConsoleMailbox {
 
   void receive(WebSocket ws, HttpRequest request) {
     this.ws = ws;
-    if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className.toLowerCase()) {
+    if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className) {
       ws.listen((String s) {
         Msg um = new Msg.fromString(s);
         help.debug('$className incoming: ' + um.header, 0);

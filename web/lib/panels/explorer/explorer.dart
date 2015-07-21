@@ -4,8 +4,9 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:convert';
 
-import '../../modal/modal.dart';
-import '../../mailbox.dart';
+import 'package:upcom-api/web/modal/modal.dart';
+import 'package:upcom-api/web/mailbox/mailbox.dart';
+
 import '../panel_controller.dart';
 import 'workspace/workspace_controller.dart';
 import 'launchers/launchers_controller.dart';

@@ -3,14 +3,15 @@ library column_controller;
 import 'dart:async';
 import 'dart:html';
 
-import 'tabs/tab_controller.dart';
+import 'package:upcom-api/web/tab/tab_controller.dart';
+import 'package:upcom-api/web/modal/modal.dart';
+import 'package:upcom-api/web/mailbox/mailbox.dart';
+
 import 'tabs/teleop/teleop.dart';
 import 'tabs/editor/editor.dart';
 import 'tabs/console/console.dart';
 import 'tabs/camera/camera.dart';
-import 'modal/modal.dart';
 import 'column_view.dart';
-import 'mailbox.dart';
 
 enum ColumnState { MINIMIZED, NORMAL, MAXIMIZED }
 enum ColumnEvent { LOST_FOCUS }

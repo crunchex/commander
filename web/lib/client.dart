@@ -3,10 +3,11 @@ library updroid_client;
 import 'dart:html';
 import 'dart:convert';
 
+import 'package:upcom-api/web/tab/tab_controller.dart';
+import 'package:upcom-api/web/mailbox/mailbox.dart';
+
 import 'panels/panel_controller.dart';
 import 'panels/explorer/explorer.dart';
-import 'tabs/tab_controller.dart';
-import 'mailbox.dart';
 import 'column_controller.dart';
 
 class UpDroidClient {

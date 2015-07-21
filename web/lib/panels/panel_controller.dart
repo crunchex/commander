@@ -3,8 +3,8 @@ library panel_controller;
 import 'dart:async';
 import 'dart:html';
 
-import '../mailbox.dart';
-import '../container_view.dart';
+import 'package:upcom-api/web/mailbox/mailbox.dart';
+import 'package:upcom-api/web/tab/container_view.dart';
 
 part 'panel_view.dart';
 

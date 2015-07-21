@@ -8,9 +8,9 @@ import 'package:ace/ace.dart' as ace;
 import 'package:ace/proxy.dart';
 import "package:path/path.dart" as pathLib;
 
-import '../../mailbox.dart';
-import '../tab_controller.dart';
-import '../../modal/modal.dart';
+import 'package:upcom-api/web/mailbox/mailbox.dart';
+import 'package:upcom-api/web/tab/tab_controller.dart';
+import 'package:upcom-api/web/modal/modal.dart';
 
 part 'templates.dart';
 

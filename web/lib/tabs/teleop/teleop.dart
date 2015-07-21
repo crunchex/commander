@@ -4,7 +4,7 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:js' as js;
 
-import '../tab_controller.dart';
+import 'package:upcom-api/web/tab/tab_controller.dart';
 
 class UpDroidTeleop extends TabController {
   static String className = 'UpDroidTeleop';

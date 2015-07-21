@@ -5,9 +5,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:path/path.dart' as pathLib;
+import 'package:upcom-api/web/menu/context_menu.dart';
+import 'package:upcom-api/web/mailbox/mailbox.dart';
 
-import '../../../context_menu.dart';
-import '../../../mailbox.dart';
 import '../../panel_controller.dart';
 import '../explorer.dart';
 

@@ -7,10 +7,6 @@ import 'dart:isolate';
 import 'package:upcom-api/server_message.dart';
 import 'package:upcom-api/updroid_message.dart';
 
-//import 'tab/api/tab.dart';
-//import 'tab/camera/camera.dart';
-//import 'tab/teleop.dart';
-//import 'tab/editor.dart';
 import 'console_mailbox.dart';
 
 class TabInterface {

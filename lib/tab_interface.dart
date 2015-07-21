@@ -36,6 +36,10 @@ class TabInterface {
         tabFile = new Uri.file('/home/crunchex/work/upcom-editor/lib/editor.dart');
         packageRoot = new Uri.file('/home/crunchex/work/upcom-editor/packages/');
         break;
+      case 'UpDroidTeleop':
+        tabFile = new Uri.file('/home/crunchex/work/upcom-teleop/lib/teleop.dart');
+        packageRoot = new Uri.file('/home/crunchex/work/upcom-teleop/packages/');
+        break;
     }
 
     _spawnTab(tabFile, packageRoot);
@@ -61,6 +65,8 @@ class TabInterface {
       String message = received;
       if (message.startsWith('s:')) {
         mailbox.relay(new ServerMessage.fromString(message));
+      } else if (message.startsWith('c:')) {
+        mailbox.registerEndpoint(message);
       } else {
         mailbox.send(new Msg.fromString(received));
       }

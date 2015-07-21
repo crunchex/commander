@@ -17,8 +17,10 @@ class ConsoleMailbox {
   Stream<Msg> inbox;
   ReceivePort receivePort;
   SendPort sendPort;
+  Set endpointRegistry;
 
   ConsoleMailbox(this.className, this.id) {
+    endpointRegistry = new Set<String>();
     receivePort = new ReceivePort();
 
     inbox = CmdrPostOffice.registerClass(className, id);
@@ -33,18 +35,35 @@ class ConsoleMailbox {
 
   void receive(WebSocket ws, HttpRequest request) {
     this.ws = ws;
-    if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className) {
-      ws.listen((String s) {
+
+    ws.listen((String s) {
+      if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className) {
         Msg um = new Msg.fromString(s);
         help.debug('$className incoming: ' + um.header, 0);
 
         sendPort.send(um.toString());
-      });
-    } else {
-      ws.where((e) => request.uri.path == '/${className}/$id/cmdr-pty')
-      .listen((data) => sendPort.send('${request.uri.path}:um.'));
-    }
+      } else if (endpointRegistry.contains(request.uri.path)) {
+        Msg um = new Msg(request.uri.path, s);
+        sendPort.send(um.toString());
+      } else {
+        help.debug('Cannot deliver message to Isolate: ${request.uri.path}', 0);
+      }
+    });
   }
 
   void relay(ServerMessage sm) => CmdrPostOffice.send(sm);
+
+  void registerEndpoint(String raw) {
+    int endIndex = raw.indexOf(':/c');
+    String serverHeader = raw.substring(2, endIndex);
+
+    List<String> split = serverHeader.split(':');
+    String header = split[0];
+
+    if (header == 'REG_ENDPOINT') {
+      String endpoint = raw.substring(endIndex + 4, raw.length);
+      print('registering endpoint: $endpoint');
+      endpointRegistry.add(endpoint);
+    }
+  }
 }

@@ -3,6 +3,7 @@ library console_mailbox;
 import 'dart:io';
 import 'dart:async';
 import 'dart:isolate';
+import 'dart:convert';
 
 import 'package:upcom-api/server_message.dart';
 import 'package:upcom-api/updroid_message.dart';
@@ -33,8 +34,18 @@ class ConsoleMailbox {
 
   void send(Msg m) => ws.add(m.toString());
 
+  /// Use this function for special cases where raw data needs to be sent
+  /// over Websocket, such as in the case of array buffered/binary data.
+  void sendFromEndpoint(String s) => ws.add(JSON.decode(s));
+
   void receive(WebSocket ws, HttpRequest request) {
     this.ws = ws;
+
+    if (endpointRegistry.contains(request.uri.path)) {
+      help.debug('Sending endpoint connection confirmation to: ${request.uri.path}', 0);
+      Msg um = new Msg(request.uri.path, '');
+      sendPort.send(um.toString());
+    }
 
     ws.listen((String s) {
       if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className) {
@@ -62,7 +73,7 @@ class ConsoleMailbox {
 
     if (header == 'REG_ENDPOINT') {
       String endpoint = raw.substring(endIndex + 4, raw.length);
-      print('registering endpoint: $endpoint');
+      help.debug('Registering endpoint: $endpoint', 0);
       endpointRegistry.add(endpoint);
     }
   }

@@ -40,6 +40,10 @@ class TabInterface {
         tabFile = new Uri.file('/home/crunchex/work/upcom-teleop/lib/teleop.dart');
         packageRoot = new Uri.file('/home/crunchex/work/upcom-teleop/packages/');
         break;
+      case 'UpDroidCamera':
+        tabFile = new Uri.file('/home/crunchex/work/upcom-camera/lib/camera.dart');
+        packageRoot = new Uri.file('/home/crunchex/work/upcom-camera/packages/');
+        break;
     }
 
     _spawnTab(tabFile, packageRoot);
@@ -68,7 +72,12 @@ class TabInterface {
       } else if (message.startsWith('c:')) {
         mailbox.registerEndpoint(message);
       } else {
-        mailbox.send(new Msg.fromString(received));
+        Msg msg = new Msg.fromString(received);
+        if (mailbox.endpointRegistry.contains(msg.header)) {
+          mailbox.sendFromEndpoint(msg.body);
+        } else {
+          mailbox.send(new Msg.fromString(received));
+        }
       }
     }
   }

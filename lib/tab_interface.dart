@@ -26,37 +26,33 @@ class TabInterface {
     mailbox = new ConsoleMailbox(tabType, id);
 
     // TODO: all this hardcoded stuff should be pulled from a tab registry file somewhere.
-    Uri tabFile, packageRoot;
+    Uri tabFile;
     switch (tabType) {
       case 'UpDroidConsole':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-console/lib/pty.dart');
-        packageRoot = new Uri.file('/home/crunchex/work/upcom-console/packages/');
+        tabFile = new Uri.file('/home/crunchex/work/upcom-console/bin/main.dart');
         break;
       case 'UpDroidEditor':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-editor/lib/editor.dart');
-        packageRoot = new Uri.file('/home/crunchex/work/upcom-editor/packages/');
+        tabFile = new Uri.file('/home/crunchex/work/upcom-editor/bin/main.dart');
         break;
       case 'UpDroidTeleop':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-teleop/lib/teleop.dart');
-        packageRoot = new Uri.file('/home/crunchex/work/upcom-teleop/packages/');
+        tabFile = new Uri.file('/home/crunchex/work/upcom-teleop/bin/main.dart');
         break;
       case 'UpDroidCamera':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-camera/lib/camera.dart');
-        packageRoot = new Uri.file('/home/crunchex/work/upcom-camera/packages/');
+        tabFile = new Uri.file('/home/crunchex/work/upcom-camera/bin/main.dart');
         break;
     }
 
-    _spawnTab(tabFile, packageRoot);
+    _spawnTab(tabFile);
   }
 
-  Future _spawnTab(Uri tabFile, Uri packageRoot) async {
+  Future _spawnTab(Uri tabFile) async {
     SendPort initialSendPort = mailbox.receivePort.sendPort;
 
     // Prepare the args.
     List args = [id, dir.path];
     if (extra != null) args.addAll(extra);
 
-    await Isolate.spawnUri(tabFile, args, initialSendPort, packageRoot: packageRoot);
+    await Isolate.spawnUri(tabFile, args, initialSendPort);
 
     await for (var received in mailbox.receivePort) {
       if (mailbox.sendPort == null) {

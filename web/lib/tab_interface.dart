@@ -28,10 +28,6 @@ class TabInterface {
     // Launch the Tab's backend.
     _mailbox.ws.send('[[OPEN_TAB]]' + '$col-$id-$fullName');
 
-    // Set up a custom event to pass ID info to the Tab's frontend.
-    String detail = JSON.encode({ 'id': id, 'col': col });
-    CustomEvent event = new CustomEvent('TabIdEvent', canBubble: false, cancelable: false, detail: detail);
-
     // Call the Tab's frontend (as a JS lib).
     _tabJs = new ScriptElement();
     _tabJs.type = 'text/javascript';
@@ -48,8 +44,13 @@ class TabInterface {
 
     document.body.children.add(_tabJs);
 
-    // Dispatch the custom event once the Tab's frontend is loaded.
-    await _tabJs.onLoad.first;
+    // Wait for the Tab's frontend to be ready to receive the ID event.
+    EventStreamProvider<CustomEvent> tabReadyStream = new EventStreamProvider<CustomEvent>('TabReadyForId');
+    await tabReadyStream.forTarget(window).first;
+
+    // Dispatch a custom event to pass ID info to the Tab's frontend.
+    String detail = JSON.encode({ 'id': id, 'col': col });
+    CustomEvent event = new CustomEvent('TabIdEvent', canBubble: false, cancelable: false, detail: detail);
     window.dispatchEvent(event);
 
     // Set up an interface to the new Tab's view.

@@ -49,7 +49,7 @@ class TabInterface {
     await tabReadyStream.forTarget(window).first;
 
     // Dispatch a custom event to pass ID info to the Tab's frontend.
-    String detail = JSON.encode({ 'id': id, 'col': col });
+    String detail = JSON.encode({ 'id': id, 'col': col, 'className': fullName });
     CustomEvent event = new CustomEvent('TabIdEvent', canBubble: false, cancelable: false, detail: detail);
     window.dispatchEvent(event);
 

@@ -2,15 +2,12 @@ library column_controller;
 
 import 'dart:async';
 import 'dart:html';
+import 'dart:isolate';
 
 import 'package:upcom-api/web/tab/tab_controller.dart';
 import 'package:upcom-api/web/modal/modal.dart';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
 
-import 'tabs/teleop/teleop.dart';
-import 'tabs/editor/editor.dart';
-import 'tabs/console/console.dart';
-import 'tabs/camera/camera.dart';
 import 'column_view.dart';
 
 enum ColumnState { MINIMIZED, NORMAL, MAXIMIZED }
@@ -31,7 +28,7 @@ class ColumnController {
   bool _disableCyclingHotkeys;
 
   ColumnView _view;
-  List<TabController> _tabs;
+  List<Isolate> _tabs;
 
   ColumnController(this.columnId, this.state, List config, Mailbox mailbox, Function getAvailableId) {
     _config = config;
@@ -162,24 +159,29 @@ class ColumnController {
       }
     }
 
-    TabController newTab;
+//    TabController newTab;
     if (className == 'UpDroidEditor') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      newTab = new UpDroidEditor(id, columnId);
+      ScriptElement editorJs = new ScriptElement()
+        ..type = 'text/javascript'
+        ..src = 'tabs/upcom-editor/index.dart.js';
+      document.body.children.add(editorJs);
     } else if (className == 'UpDroidCamera') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      newTab = new UpDroidCamera(id, columnId);
+//      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
+//      newTab = new UpDroidCamera(id, columnId);
     } else if (className == 'UpDroidTeleop') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      newTab = new UpDroidTeleop(id, columnId);
+      ScriptElement teleopJs = new ScriptElement()
+        ..type = 'text/javascript'
+        ..src = 'tabs/upcom-teleop/index.dart.js';
+      document.body.children.add(teleopJs);
     } else if (className == 'UpDroidConsole') {
       // TODO: initial size should not be hardcoded.
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className-25-80');
-      //Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
-      newTab = new UpDroidConsole(id, columnId);
+//      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className-25-80');
+//      newTab = new UpDroidConsole(id, columnId);
     }
 
-    _tabs.add(newTab);
+//    _tabs.add(newTab);
   }
 
   /// A wrapper for [openTab] when an availble ID needs to be chosen across all open [ColumnController]s.

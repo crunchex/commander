@@ -3,6 +3,7 @@ library column_controller;
 import 'dart:async';
 import 'dart:html';
 import 'dart:isolate';
+import 'dart:convert';
 
 import 'package:upcom-api/web/tab/tab_controller.dart';
 import 'package:upcom-api/web/modal/modal.dart';
@@ -167,8 +168,11 @@ class ColumnController {
         ..src = 'tabs/upcom-editor/index.dart.js';
       document.body.children.add(editorJs);
     } else if (className == 'UpDroidCamera') {
-//      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-//      newTab = new UpDroidCamera(id, columnId);
+      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
+      ScriptElement cameraJs = new ScriptElement()
+        ..type = 'text/javascript'
+        ..src = 'tabs/upcom-camera/index.dart.js';
+      document.body.children.add(cameraJs);
     } else if (className == 'UpDroidTeleop') {
       _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
       ScriptElement teleopJs = new ScriptElement()
@@ -176,6 +180,11 @@ class ColumnController {
         ..src = 'tabs/upcom-teleop/index.dart.js';
       document.body.children.add(teleopJs);
     } else if (className == 'UpDroidConsole') {
+      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
+      ScriptElement consoleJs = new ScriptElement()
+        ..type = 'text/javascript'
+        ..src = 'tabs/upcom-console/index.dart.js';
+      document.body.children.add(consoleJs);
       // TODO: initial size should not be hardcoded.
 //      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className-25-80');
 //      newTab = new UpDroidConsole(id, columnId);

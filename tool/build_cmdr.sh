@@ -105,6 +105,17 @@ cat $WEB/css/glyphicons.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
 pub build > /dev/null
 echo "OK"
 
+echo -n "Setting up tabs................."
+BUILD=$TOPDIR/build/web
+mkdir -p $BUILD/tabs
+
+# TODO fix these hard-coded paths
+cp -r /home/crunchex/work/upcom-editor/build/web $BUILD/tabs/upcom-editor
+cp -r /home/crunchex/work/upcom-console/build/web $BUILD/tabs/upcom-console
+cp -r /home/crunchex/work/upcom-camera/build/web $BUILD/tabs/upcom-camera
+cp -r /home/crunchex/work/upcom-teleop/build/web $BUILD/tabs/upcom-teleop
+echo "OK"
+
 echo -n "Cleaning up gui................."
 BUILD=$TOPDIR/build/web
 mkdir -p $BUILD/fonts

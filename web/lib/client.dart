@@ -3,12 +3,12 @@ library updroid_client;
 import 'dart:html';
 import 'dart:convert';
 
-import 'package:upcom-api/web/tab/tab_controller.dart';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
 
 import 'panels/panel_controller.dart';
 import 'panels/explorer/explorer.dart';
 import 'column_controller.dart';
+import 'tab_interface.dart';
 
 class UpDroidClient {
   String _config;
@@ -126,7 +126,7 @@ class UpDroidClient {
       return;
     }
 
-    TabController tab = _columnControllers[oldColIndex].removeTab(tabType, id);
+    TabInterface tab = _columnControllers[oldColIndex].removeTab(tabType, id);
     _columnControllers[newColIndex].addTab(tab);
   }
 

@@ -2,14 +2,12 @@ library column_controller;
 
 import 'dart:async';
 import 'dart:html';
-import 'dart:isolate';
-import 'dart:convert';
 
-import 'package:upcom-api/web/tab/tab_controller.dart';
 import 'package:upcom-api/web/modal/modal.dart';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
 
 import 'column_view.dart';
+import 'tab_interface.dart';
 
 enum ColumnState { MINIMIZED, NORMAL, MAXIMIZED }
 enum ColumnEvent { LOST_FOCUS }
@@ -29,7 +27,7 @@ class ColumnController {
   bool _disableCyclingHotkeys;
 
   ColumnView _view;
-  List<Isolate> _tabs;
+  List<TabInterface> _tabs;
 
   ColumnController(this.columnId, this.state, List config, Mailbox mailbox, Function getAvailableId) {
     _config = config;
@@ -54,9 +52,9 @@ class ColumnController {
     });
   }
 
-  void setUpController() {
+  Future setUpController() async {
     for (Map tab in _config) {
-      openTab(tab['id'], tab['class']);
+      await openTab(tab['id'], tab['class']);
     }
   }
 
@@ -90,7 +88,7 @@ class ColumnController {
       }
 
       // Cycle tabs.
-      TabController currentActiveTab = _tabs.firstWhere((TabController tab) => tab.view.tabHandle.classes.contains('active'));
+      TabInterface currentActiveTab = _tabs.firstWhere((TabInterface tab) => tab.isActive());
       int currentActiveTabIndex = _tabs.indexOf(currentActiveTab);
 
       if (e.keyCode == KeyCode.PAGE_DOWN && currentActiveTabIndex > 0) {
@@ -105,7 +103,7 @@ class ColumnController {
     _view.tabContent.querySelector('.active').children[1].focus();
   }
 
-  void cycleTab(bool left, TabController currentActiveTab, int currentActiveTabIndex) {
+  void cycleTab(bool left, TabInterface currentActiveTab, int currentActiveTabIndex) {
     currentActiveTab.makeInactive();
 
     if (left) {
@@ -151,40 +149,18 @@ class ColumnController {
   }
 
   /// Opens a [TabController].
-  void openTab(int id, String className) {
-    if (!canAddMoreTabs) return;
+  Future openTab(int id, String className) async {
+    if (!canAddMoreTabs) return null;
 
     if (_tabs.isNotEmpty) {
-      for (var tab in _tabs) {
+      for (TabInterface tab in _tabs) {
         tab.makeInactive();
       }
     }
 
-    // Launch the Tab's backend.
-    _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-
-    // Set up a custom event to pass ID info to the Tab's frontend.
-    String detail = JSON.encode({ 'id': id, 'col': columnId });
-    CustomEvent event = new CustomEvent('TabIdEvent', canBubble: false, cancelable: false, detail: detail);
-
-    // Call the Tab's frontend (as a JS lib).
-    ScriptElement tabJs = new ScriptElement();
-    tabJs.type = 'text/javascript';
-
-    if (className == 'UpDroidEditor') {
-      tabJs.src = 'tabs/upcom-editor/index.dart.js';
-    } else if (className == 'UpDroidCamera') {
-      tabJs.src = 'tabs/upcom-camera/index.dart.js';
-    } else if (className == 'UpDroidTeleop') {
-      tabJs.src = 'tabs/upcom-teleop/index.dart.js';
-    } else if (className == 'UpDroidConsole') {
-      tabJs.src = 'tabs/upcom-console/index.dart.js';
-    }
-
-    document.body.children.add(tabJs);
-
-    // Dispatch the custom event once the Tab's frontend is loaded.
-    tabJs.onLoad.first.then((_) => window.dispatchEvent(event));
+    TabInterface tab = new TabInterface(id, columnId, className, _mailbox);
+    await tab.setupComplete;
+    _tabs.add(tab);
   }
 
   /// A wrapper for [openTab] when an availble ID needs to be chosen across all open [ColumnController]s.
@@ -206,7 +182,7 @@ class ColumnController {
     }
 
     // Make all tabs in that column inactive except the last.
-    _tabs.forEach((TabController tab) => tab.makeInactive());
+    _tabs.forEach((TabInterface tab) => tab.makeInactive());
 
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
@@ -216,12 +192,12 @@ class ColumnController {
     return found;
   }
 
-  TabController removeTab(String tabType, int id) {
-    TabController tab = _tabs.firstWhere((TabController t) => t.fullName == tabType && t.id == id);
+  TabInterface removeTab(String tabType, int id) {
+    TabInterface tab = _tabs.firstWhere((TabInterface t) => t.fullName == tabType && t.id == id);
     _tabs.remove(tab);
 
     // Make all tabs in that column inactive except the last.
-    _tabs.forEach((TabController tab) => tab.makeInactive());
+    _tabs.forEach((TabInterface tab) => tab.makeInactive());
 
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
@@ -229,9 +205,9 @@ class ColumnController {
     return tab;
   }
 
-  void addTab(TabController tab) {
+  void addTab(TabInterface tab) {
     // Make all tabs in that column inactive before adding the new one.
-    _tabs.forEach((TabController tab) => tab.makeInactive());
+    _tabs.forEach((TabInterface tab) => tab.makeInactive());
 
     // Move the tab handle.
     querySelector('#column-${columnId.toString()}').children[1].children.add(tab.view.tabHandle);

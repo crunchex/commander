@@ -46,7 +46,7 @@ class TabInterface {
 
     // Wait for the Tab's frontend to be ready to receive the ID event.
     EventStreamProvider<CustomEvent> tabReadyStream = new EventStreamProvider<CustomEvent>('TabReadyForId');
-    await tabReadyStream.forTarget(window).first;
+    await tabReadyStream.forTarget(window).where((e) => e.detail == fullName).first;
 
     // Dispatch a custom event to pass ID info to the Tab's frontend.
     String detail = JSON.encode({ 'id': id, 'col': col, 'className': fullName });

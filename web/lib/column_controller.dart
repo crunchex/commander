@@ -160,37 +160,31 @@ class ColumnController {
       }
     }
 
-//    TabController newTab;
+    // Launch the Tab's backend.
+    _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
+
+    // Set up a custom event to pass ID info to the Tab's frontend.
+    String detail = JSON.encode({ 'id': id, 'col': columnId });
+    CustomEvent event = new CustomEvent('TabIdEvent', canBubble: false, cancelable: false, detail: detail);
+
+    // Call the Tab's frontend (as a JS lib).
+    ScriptElement tabJs = new ScriptElement();
+    tabJs.type = 'text/javascript';
+
     if (className == 'UpDroidEditor') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      ScriptElement editorJs = new ScriptElement()
-        ..type = 'text/javascript'
-        ..src = 'tabs/upcom-editor/index.dart.js';
-      document.body.children.add(editorJs);
+      tabJs.src = 'tabs/upcom-editor/index.dart.js';
     } else if (className == 'UpDroidCamera') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      ScriptElement cameraJs = new ScriptElement()
-        ..type = 'text/javascript'
-        ..src = 'tabs/upcom-camera/index.dart.js';
-      document.body.children.add(cameraJs);
+      tabJs.src = 'tabs/upcom-camera/index.dart.js';
     } else if (className == 'UpDroidTeleop') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      ScriptElement teleopJs = new ScriptElement()
-        ..type = 'text/javascript'
-        ..src = 'tabs/upcom-teleop/index.dart.js';
-      document.body.children.add(teleopJs);
+      tabJs.src = 'tabs/upcom-teleop/index.dart.js';
     } else if (className == 'UpDroidConsole') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      ScriptElement consoleJs = new ScriptElement()
-        ..type = 'text/javascript'
-        ..src = 'tabs/upcom-console/index.dart.js';
-      document.body.children.add(consoleJs);
-      // TODO: initial size should not be hardcoded.
-//      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className-25-80');
-//      newTab = new UpDroidConsole(id, columnId);
+      tabJs.src = 'tabs/upcom-console/index.dart.js';
     }
 
-//    _tabs.add(newTab);
+    document.body.children.add(tabJs);
+
+    // Dispatch the custom event once the Tab's frontend is loaded.
+    tabJs.onLoad.first.then((_) => window.dispatchEvent(event));
   }
 
   /// A wrapper for [openTab] when an availble ID needs to be chosen across all open [ColumnController]s.

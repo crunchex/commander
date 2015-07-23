@@ -178,6 +178,7 @@ class ColumnController {
     for (int i = 0; i < _tabs.length; i++) {
       if (_tabs[i].fullName == tabType && _tabs[i].id == tabId) {
         found = true;
+        _tabs[i].shutdownScript();
         _tabs.removeAt(i);
         break;
       }

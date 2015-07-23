@@ -122,6 +122,7 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
     _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
+    _mailbox.registerWebSocketEvent('UPDATE_COLUMN', _updateColumn);
 //    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
 //    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
 
@@ -180,6 +181,16 @@ class CmdrServer {
       List extra = new List.from(idList.getRange(3, idList.length));
       _tabs[type][num] = new TabInterface(type, num, dir, extra);
     }
+  }
+
+  void _updateColumn(Msg um) {
+    List idList = um.body.split('_');
+    String type = idList[0];
+    int id = int.parse(idList[1]);
+    String newColumn = idList[2];
+
+    Msg newMessage = new Msg(um.header, newColumn);
+    CmdrPostOffice.send(new ServerMessage(type, id, newMessage));
   }
 
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));

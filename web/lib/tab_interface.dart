@@ -23,6 +23,7 @@ class TabInterface {
   bool isActive() => view.isActive();
   void makeActive() => view.makeActive();
   void makeInactive() => view.makeInactive();
+  void shutdownScript() => _tabJs.remove();
 
   Future _setUp() async {
     await _initiateTabSetup();
@@ -42,8 +43,11 @@ class TabInterface {
     _mailbox.ws.send('[[OPEN_TAB]]' + '$col-$id-$fullName');
 
     // Call the Tab's frontend (as a JS lib).
-    _tabJs = new ScriptElement();
-    _tabJs.type = 'text/javascript';
+    String name = fullName.toLowerCase().replaceAll(' ', '-');
+
+    _tabJs = new ScriptElement()
+    ..id = '$name-$id-script'
+    ..type = 'text/javascript';
 
     if (fullName == 'UpDroidEditor') {
       _tabJs.src = 'tabs/upcom-editor/index.dart.js';

@@ -216,7 +216,11 @@ class ColumnController {
     querySelector('#column-${columnId.toString()}').children[1].children.add(tab.view.tabHandle);
     // Move the tab content.
     querySelector('#col-${columnId.toString()}-tab-content').children.add(tab.view.tabContainer);
-    // Update the controller and view's columns.
+
+    // Send a message to update the column on the real classes.
+    _mailbox.ws.send('[[UPDATE_COLUMN]]' + tab.fullName + '_' + tab.id.toString() + '_' + columnId.toString());
+
+    // Update the [TabInterface] and [TabViewInterface]'s columns.
     tab.col = columnId;
     tab.view.col = columnId;
 

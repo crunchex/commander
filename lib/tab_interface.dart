@@ -4,8 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:upcom-api/server_message.dart';
-import 'package:upcom-api/updroid_message.dart';
+import 'package:upcom-api/tab_backend.dart';
 
 import 'console_mailbox.dart';
 

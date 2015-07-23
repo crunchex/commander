@@ -6,8 +6,7 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
 import 'package:upcom-api/git.dart';
-import 'package:upcom-api/updroid_message.dart';
-import 'package:upcom-api/server_message.dart';
+import 'package:upcom-api/tab_backend.dart';
 
 import 'tab/explorer.dart';
 import 'server_mailbox.dart';

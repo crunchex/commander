@@ -3,7 +3,7 @@ library server_mailbox;
 import 'dart:io';
 import 'dart:async';
 
-import 'package:upcom-api/updroid_message.dart';
+import 'package:upcom-api/tab_backend.dart';
 
 import 'server_helper.dart' as help;
 import 'post_office.dart';

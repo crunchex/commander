@@ -161,6 +161,8 @@ class ColumnController {
     TabInterface tab = new TabInterface(id, columnId, className, _mailbox);
     await tab.setupComplete;
     _tabs.add(tab);
+
+    return null;
   }
 
   /// A wrapper for [openTab] when an availble ID needs to be chosen across all open [ColumnController]s.

@@ -25,6 +25,19 @@ class TabInterface {
   void makeInactive() => view.makeInactive();
 
   Future _setUp() async {
+    await _initiateTabSetup();
+    await _sendIdEvent();
+
+    // Set up an interface to the new Tab's view.
+    view = new TabViewInterface(id, col, fullName);
+
+    return null;
+  }
+
+  Future _initiateTabSetup() {
+    // Wait for the Tab's frontend to be ready to receive the ID event.
+    EventStreamProvider<CustomEvent> tabReadyStream = new EventStreamProvider<CustomEvent>('TabReadyForId');
+
     // Launch the Tab's backend.
     _mailbox.ws.send('[[OPEN_TAB]]' + '$col-$id-$fullName');
 
@@ -44,17 +57,19 @@ class TabInterface {
 
     document.body.children.add(_tabJs);
 
+    return tabReadyStream.forTarget(window).where((CustomEvent e) => e.detail == fullName).first;
+  }
+
+  Future _sendIdEvent() {
     // Wait for the Tab's frontend to be ready to receive the ID event.
-    EventStreamProvider<CustomEvent> tabReadyStream = new EventStreamProvider<CustomEvent>('TabReadyForId');
-    await tabReadyStream.forTarget(window).where((e) => e.detail == fullName).first;
+    EventStreamProvider<CustomEvent> tabDoneStream = new EventStreamProvider<CustomEvent>('TabSetupComplete');
 
     // Dispatch a custom event to pass ID info to the Tab's frontend.
     String detail = JSON.encode({ 'id': id, 'col': col, 'className': fullName });
     CustomEvent event = new CustomEvent('TabIdEvent', canBubble: false, cancelable: false, detail: detail);
     window.dispatchEvent(event);
 
-    // Set up an interface to the new Tab's view.
-    view = new TabViewInterface(id, col, fullName);
+    return tabDoneStream.forTarget(window).where((e) => e.detail == fullName).first;
   }
 }
 

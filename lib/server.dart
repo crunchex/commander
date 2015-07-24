@@ -210,8 +210,6 @@ class CmdrServer {
   }
 
   void _sendTabInfo(Msg um) {
-    Map tabsInfo = {};
-
     // Specialized transformer that takes a tab directory as input and extracts tab info
     // from the json file within.
     StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
@@ -220,13 +218,12 @@ class CmdrServer {
       sink.add(JSON.decode(tabInfoString));
     });
 
-    Directory tabsDir = new Directory('$_installationPath/bin/tabs');
-    tabsDir.list().transform(extractTabInfo).listen((Map tabInfoMap) {
-      tabsInfo[tabInfoMap['refName']] = tabInfoMap;
-    }).onDone(() {
-      print(tabsInfo.toString());
-      _mailbox.send(new Msg('TABS_INFO', JSON.encode(tabsInfo)));
-    });
+    Map tabsInfo = {};
+    new Directory('$_installationPath/bin/tabs')
+      .list()
+      .transform(extractTabInfo)
+      .listen((Map tabInfoMap) => tabsInfo[tabInfoMap['refName']] = tabInfoMap)
+      .onDone(() =>_mailbox.send(new Msg('TABS_INFO', JSON.encode(tabsInfo))));
   }
 
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));

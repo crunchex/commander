@@ -48,7 +48,7 @@ command -v pub >/dev/null 2>&1 || {
 	exit 1;
 }
 echo "OK"
-echo -n "Checking system for lessc...."
+echo -n "Checking system for lessc......."
 command -v lessc >/dev/null 2>&1 || {
 	echo "FAIL";
 	echo "Please install less (npm -g install less) and restart this script. Aborting."

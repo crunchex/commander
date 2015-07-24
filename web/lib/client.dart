@@ -13,7 +13,7 @@ import 'column_controller.dart';
 import 'tab_interface.dart';
 
 class UpDroidClient {
-  String _config;
+  List _config;
   List<PanelController> _panels;
   List<ColumnController> _columnControllers;
   Map _tabsInfo;
@@ -29,9 +29,6 @@ class UpDroidClient {
     FutureGroup readyForInitialization = new FutureGroup();
     readyForInitialization.add(_gotConfig.future);
     readyForInitialization.add(_gotTabInfo.future);
-
-    _config = _getConfig();
-    _gotConfig.complete();
 
     // TODO: figure out how to handle panels along with the logo.
     _panels = [];
@@ -68,9 +65,8 @@ class UpDroidClient {
   }
 
   void _setUpConfig(UpDroidMessage um) {
-//    Completer c = new Completer();
-//    _gotConfig = c.future;
-//    c.complete();
+    _config = JSON.decode(um.body);
+    _gotConfig.complete();
   }
 
   void _refreshTabsInfo(UpDroidMessage um) {
@@ -131,20 +127,14 @@ class UpDroidClient {
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: use isolates.
   void _initializeClient() {
-    List config = JSON.decode(_config);
-
-    for (int i = 0; i < 1; i++) {
-      for (Map panel in config[i]) {
-        _openPanel(i, panel['id'], panel['class']);
-      }
-    }
+    _openPanel(0, 1, 'UpDroidExplorer');
 
     // TODO: make the initial min-width more responsive to how the tabs start out initially.
     // For now we assume they start off 50/50.
     querySelector('body').style.minWidth = '1211px';
 
-    for (int i = 1; i < config.length; i++) {
-      ColumnController controller = new ColumnController(i, ColumnState.NORMAL, config[i], _mailbox, _tabsInfo, _getAvailableId);
+    for (int i = 0; i < _config.length; i++) {
+      ColumnController controller = new ColumnController(i+1, ColumnState.NORMAL, _config[i], _mailbox, _tabsInfo, _getAvailableId);
       _columnControllers.add(controller);
 
       controller.columnStateChanges.listen((ColumnState newState) {
@@ -166,24 +156,6 @@ class UpDroidClient {
         }
       });
     }
-  }
-
-  /// Returns a [Map] of all the tabs that [UpDroidClient] needs to spawn,
-  /// where key = side|left|right| and value = a list of IDs and UpDroidTab.className.
-  /// TODO: this function should retrieve information from some defaults or
-  /// a user account settings save.
-  String _getConfig([String strConfig = '']) {
-    // TODO: the default should eventually be JSON'd.
-    //if (strConfig == null) strConfig = UpDroidClient.defaultConfig;
-    if (strConfig != '') return strConfig;
-
-    List listConfig = [
-      [{'id': 1, 'class': 'UpDroidExplorer'}],
-      [{'id': 1, 'class': 'upcom-editor'}],
-      [{'id': 1, 'class': 'upcom-console'}]
-    ];
-
-    return JSON.encode(listConfig);
   }
 
   int _getAvailableId(String className) {

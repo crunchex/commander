@@ -149,8 +149,21 @@ class CmdrServer {
   }
 
   void _clientConfig(Msg um) {
-    // TODO: send back some kind of saved config from the filesystem.
-    _mailbox.send(new Msg('SERVER_READY', ''));
+    File configFile = new File('/home/${Platform.environment['USER']}/.config/updroid/.lastsession.json');
+    configFile.exists().then((bool exists) {
+      if (exists) {
+        String strConfig = configFile.readAsStringSync();
+        _mailbox.send(new Msg('SERVER_READY', strConfig));
+      } else {
+        List listConfig = [
+          [{'id': 1, 'class': 'upcom-editor'}],
+          [{'id': 1, 'class': 'upcom-console'}]
+        ];
+
+        String strConfig = JSON.encode(listConfig);
+        _mailbox.send(new Msg('SERVER_READY', strConfig));
+      }
+    });
   }
 
   void _gitPush(Msg um) {

@@ -14,6 +14,7 @@ class UpDroidClient {
   String _config;
   List<PanelController> _panels;
   List<ColumnController> _columnControllers;
+  Map _tabsInfo;
 
   bool disconnectAlert = false;
 
@@ -34,6 +35,7 @@ class UpDroidClient {
 
   void _registerMailbox() {
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'TABS_INFO', _refreshTabsInfo);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
@@ -48,7 +50,10 @@ class UpDroidClient {
 
   //\/\/ Mailbox Handlers /\/\//
 
-  void _getClientConfig(UpDroidMessage um) => _mailbox.ws.send('[[CLIENT_CONFIG]]');
+  void _getClientConfig(UpDroidMessage um) {
+    _mailbox.ws.send('[[REQUEST_TABSINFO]]');
+    _mailbox.ws.send('[[CLIENT_CONFIG]]');
+  }
 
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: use isolates.
@@ -88,6 +93,10 @@ class UpDroidClient {
         }
       });
     }
+  }
+
+  void _refreshTabsInfo(UpDroidMessage um) {
+    _tabsInfo = JSON.decode(um.body);
   }
 
   void _closeTabFromServer(UpDroidMessage um) {

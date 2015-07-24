@@ -17,13 +17,15 @@ class TabInterface {
 
   int id, col;
   TabViewInterface view;
+  Map tabInfo;
   String fullName;
   Future setupComplete;
 
   Mailbox _mailbox;
   ScriptElement _tabJs;
 
-  TabInterface(this.id, this.col, this.fullName, Mailbox mailbox) {
+  TabInterface(this.id, this.col, this.tabInfo, Mailbox mailbox) {
+    fullName = tabInfo['fullName'].replaceAll(' ', '');
     _mailbox = mailbox;
     setupComplete = _setUp();
   }
@@ -56,7 +58,7 @@ class TabInterface {
     _tabJs = new ScriptElement()
     ..id = '$name-$id-script'
     ..type = 'text/javascript'
-    ..src = 'tabs/${classNameToFsName[fullName]}/index.dart.js';
+    ..src = 'tabs/${tabInfo['refName']}/index.dart.js';
 
     document.body.children.add(_tabJs);
 

@@ -1,9 +1,11 @@
 library updroid_client;
 
+import 'dart:async';
 import 'dart:html';
 import 'dart:convert';
 
 import 'package:upcom-api/web/mailbox/mailbox.dart';
+import 'package:quiver/async.dart';
 
 import 'panels/panel_controller.dart';
 import 'panels/explorer/explorer.dart';
@@ -15,13 +17,21 @@ class UpDroidClient {
   List<PanelController> _panels;
   List<ColumnController> _columnControllers;
   Map _tabsInfo;
+  Completer _gotConfig, _gotTabInfo;
 
   bool disconnectAlert = false;
 
   Mailbox _mailbox;
 
   UpDroidClient() {
+    _gotConfig = new Completer();
+    _gotTabInfo = new Completer();
+    FutureGroup readyForInitialization = new FutureGroup();
+    readyForInitialization.add(_gotConfig.future);
+    readyForInitialization.add(_gotTabInfo.future);
+
     _config = _getConfig();
+    _gotConfig.complete();
 
     // TODO: figure out how to handle panels along with the logo.
     _panels = [];
@@ -31,12 +41,14 @@ class UpDroidClient {
 
     _registerMailbox();
     _registerEventHandlers(_getConfig());
+
+    readyForInitialization.future.then((_) => _initializeClient());
   }
 
   void _registerMailbox() {
-    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'GET_CONFIG', _getClientConfig);
+    _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'MAKE_REQUESTS', _makeInitialRequests);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'TABS_INFO', _refreshTabsInfo);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _initializeClient);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _setUpConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'MOVE_TAB', _moveTabFromServer);
@@ -50,53 +62,20 @@ class UpDroidClient {
 
   //\/\/ Mailbox Handlers /\/\//
 
-  void _getClientConfig(UpDroidMessage um) {
+  void _makeInitialRequests(UpDroidMessage um) {
     _mailbox.ws.send('[[REQUEST_TABSINFO]]');
     _mailbox.ws.send('[[CLIENT_CONFIG]]');
   }
 
-  /// Initializes all classes based on the loaded configuration in [_config].
-  /// TODO: use isolates.
-  void _initializeClient(UpDroidMessage um) {
-    List config = JSON.decode(_config);
-
-    for (int i = 0; i < 1; i++) {
-      for (Map panel in config[i]) {
-        _openPanel(i, panel['id'], panel['class']);
-      }
-    }
-
-    // TODO: make the initial min-width more responsive to how the tabs start out initially.
-    // For now we assume they start off 50/50.
-    querySelector('body').style.minWidth = '1211px';
-
-    for (int i = 1; i < config.length; i++) {
-      ColumnController controller = new ColumnController(i, ColumnState.NORMAL, config[i], _mailbox, _getAvailableId);
-      _columnControllers.add(controller);
-
-      controller.columnStateChanges.listen((ColumnState newState) {
-        if (newState == ColumnState.MAXIMIZED) {
-          querySelector('body').style.minWidth = '770px';
-          _columnControllers.where((c) => c != controller).forEach((c) => c.minimize(false));
-        } else if (newState == ColumnState.MINIMIZED) {
-          querySelector('body').style.minWidth = '770px';
-          _columnControllers.where((c) => c != controller).forEach((c) => c.maximize(false));
-        } else {
-          querySelector('body').style.minWidth = '1211px';
-          _columnControllers.where((c) => c != controller).forEach((c) => c.resetToNormal(false));
-        }
-      });
-
-      controller.columnEvents.listen((ColumnEvent event) {
-        if (event == ColumnEvent.LOST_FOCUS) {
-          _columnControllers.firstWhere((c) => c != controller).getsFocus();
-        }
-      });
-    }
+  void _setUpConfig(UpDroidMessage um) {
+//    Completer c = new Completer();
+//    _gotConfig = c.future;
+//    c.complete();
   }
 
   void _refreshTabsInfo(UpDroidMessage um) {
     _tabsInfo = JSON.decode(um.body);
+    _gotTabInfo.complete();
   }
 
   void _closeTabFromServer(UpDroidMessage um) {
@@ -117,7 +96,13 @@ class UpDroidClient {
     String tabType = idList[0];
     int col = int.parse(idList[2]);
 
-    _columnControllers[col == 1 ? 0 : 1].openTabFromModal(tabType);
+    Map<String, String> tabInfo;
+    _tabsInfo.keys.forEach((String key) {
+      tabInfo = _tabsInfo[key];
+      if (tabInfo.containsValue(tabType)) return;
+    });
+
+    _columnControllers[col == 1 ? 0 : 1].openTabFromModal(tabInfo);
   }
 
   void _moveTabFromServer(UpDroidMessage um) {
@@ -143,6 +128,46 @@ class UpDroidClient {
 
   //\/\/ Misc Functions /\/\//
 
+  /// Initializes all classes based on the loaded configuration in [_config].
+  /// TODO: use isolates.
+  void _initializeClient() {
+    List config = JSON.decode(_config);
+
+    for (int i = 0; i < 1; i++) {
+      for (Map panel in config[i]) {
+        _openPanel(i, panel['id'], panel['class']);
+      }
+    }
+
+    // TODO: make the initial min-width more responsive to how the tabs start out initially.
+    // For now we assume they start off 50/50.
+    querySelector('body').style.minWidth = '1211px';
+
+    for (int i = 1; i < config.length; i++) {
+      ColumnController controller = new ColumnController(i, ColumnState.NORMAL, config[i], _mailbox, _tabsInfo, _getAvailableId);
+      _columnControllers.add(controller);
+
+      controller.columnStateChanges.listen((ColumnState newState) {
+        if (newState == ColumnState.MAXIMIZED) {
+          querySelector('body').style.minWidth = '770px';
+          _columnControllers.where((c) => c != controller).forEach((c) => c.minimize(false));
+        } else if (newState == ColumnState.MINIMIZED) {
+          querySelector('body').style.minWidth = '770px';
+          _columnControllers.where((c) => c != controller).forEach((c) => c.maximize(false));
+        } else {
+          querySelector('body').style.minWidth = '1211px';
+          _columnControllers.where((c) => c != controller).forEach((c) => c.resetToNormal(false));
+        }
+      });
+
+      controller.columnEvents.listen((ColumnEvent event) {
+        if (event == ColumnEvent.LOST_FOCUS) {
+          _columnControllers.firstWhere((c) => c != controller).getsFocus();
+        }
+      });
+    }
+  }
+
   /// Returns a [Map] of all the tabs that [UpDroidClient] needs to spawn,
   /// where key = side|left|right| and value = a list of IDs and UpDroidTab.className.
   /// TODO: this function should retrieve information from some defaults or
@@ -154,8 +179,8 @@ class UpDroidClient {
 
     List listConfig = [
       [{'id': 1, 'class': 'UpDroidExplorer'}],
-      [{'id': 1, 'class': 'UpDroidEditor'}],
-      [{'id': 1, 'class': 'UpDroidConsole'}]
+      [{'id': 1, 'class': 'upcom-editor'}],
+      [{'id': 1, 'class': 'upcom-console'}]
     ];
 
     return JSON.encode(listConfig);

@@ -17,6 +17,7 @@ class ColumnController {
   ColumnState state;
   Stream<ColumnState> columnStateChanges;
   Stream<ColumnEvent> columnEvents;
+  Map _tabsInfo;
 
   StreamController<ColumnState> _columnStateChangesController;
   StreamController<ColumnEvent> _columnEventsController;
@@ -29,9 +30,10 @@ class ColumnController {
   ColumnView _view;
   List<TabInterface> _tabs;
 
-  ColumnController(this.columnId, this.state, List config, Mailbox mailbox, Function getAvailableId) {
+  ColumnController(this.columnId, this.state, List config, Mailbox mailbox, Map tabInfo, Function getAvailableId) {
     _config = config;
     _mailbox = mailbox;
+    _tabsInfo = tabInfo;
     _getAvailableId = getAvailableId;
 
     _columnStateChangesController = new StreamController<ColumnState>();
@@ -54,7 +56,7 @@ class ColumnController {
 
   Future setUpController() async {
     for (Map tab in _config) {
-      await openTab(tab['id'], tab['class']);
+      await openTab(tab['id'], _tabsInfo[tab['class']]);
     }
   }
 
@@ -63,7 +65,7 @@ class ColumnController {
       e.preventDefault();
       if (!canAddMoreTabs) return;
 
-      new UpDroidOpenTabModal(openTabFromModal);
+      new UpDroidOpenTabModal(openTabFromModal, _tabsInfo);
     });
 
     _view.maximizeButton.onClick.listen((e) {
@@ -149,7 +151,7 @@ class ColumnController {
   }
 
   /// Opens a [TabController].
-  Future openTab(int id, String className) async {
+  Future openTab(int id, Map tabInfo) async {
     if (!canAddMoreTabs) return null;
 
     if (_tabs.isNotEmpty) {
@@ -158,7 +160,7 @@ class ColumnController {
       }
     }
 
-    TabInterface tab = new TabInterface(id, columnId, className, _mailbox);
+    TabInterface tab = new TabInterface(id, columnId, tabInfo, _mailbox);
     await tab.setupComplete;
     _tabs.add(tab);
 
@@ -166,9 +168,9 @@ class ColumnController {
   }
 
   /// A wrapper for [openTab] when an availble ID needs to be chosen across all open [ColumnController]s.
-  void openTabFromModal(String className) {
-    int id = _getAvailableId(className);
-    openTab(id, className);
+  void openTabFromModal(Map tabInfo) {
+    int id = _getAvailableId(tabInfo['fullName']);
+    openTab(id, tabInfo);
   }
 
   /// Locates a [TabController] by [tabId] and [tabType] and closes it. Returns true if

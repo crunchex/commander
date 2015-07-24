@@ -11,8 +11,8 @@ class CmdrGuiCommand extends Command {
         help: 'Starts cmdr with no output on stdout.');
     argParser.addOption('workspace', abbr: 'w', defaultsTo: CmdrServer.defaultUprootPath,
         help: 'Overrides the default workspaces directory for cmdr.');
-    argParser.addOption('path', abbr: 'p', defaultsTo: CmdrServer.defaultGuiPath,
-        help: 'Overrides the default path of the static gui files location.\nOnly useful for cmdr developers.');
+    argParser.addOption('path', abbr: 'p', defaultsTo: CmdrServer.defaultInstallationPath,
+        help: 'Overrides cmdr\'s default installation path.\nLocation of executables, static gui files, and misc.\nOnly useful for cmdr developers.');
   }
 
   void run() {

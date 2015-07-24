@@ -17,27 +17,10 @@ class TabInterface {
   Isolate tab;
   ConsoleMailbox mailbox;
 
-  TabInterface(this.tabType, this.id, this.dir, [this.extra]) {
+  TabInterface(String binPath, String fsName, this.tabType, this.id, this.dir, [this.extra]) {
     mailbox = new ConsoleMailbox(tabType, id);
 
-    // TODO: all this hardcoded stuff should be pulled from a tab registry file somewhere.
-    Uri tabFile;
-    switch (tabType) {
-      case 'UpDroidConsole':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-console/bin/main.dart');
-        break;
-      case 'UpDroidEditor':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-editor/bin/main.dart');
-        break;
-      case 'UpDroidTeleop':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-teleop/bin/main.dart');
-        break;
-      case 'UpDroidCamera':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-camera/bin/main.dart');
-        break;
-    }
-
-    _spawnTab(tabFile);
+    _spawnTab(new Uri.file('$binPath/tabs/$fsName/main.dart'));
   }
 
   Future _spawnTab(Uri tabFile) async {

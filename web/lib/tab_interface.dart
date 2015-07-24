@@ -7,6 +7,14 @@ import 'dart:html';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
 
 class TabInterface {
+  // TODO: all this hardcoded stuff should be pulled from a tab registry file somewhere.
+  static Map classNameToFsName = {
+    'UpDroidEditor': 'upcom-editor',
+    'UpDroidConsole': 'upcom-console',
+    'UpDroidCamera': 'upcom-camera',
+    'UpDroidTeleop': 'upcom-teleop',
+  };
+
   int id, col;
   TabViewInterface view;
   String fullName;
@@ -47,17 +55,8 @@ class TabInterface {
 
     _tabJs = new ScriptElement()
     ..id = '$name-$id-script'
-    ..type = 'text/javascript';
-
-    if (fullName == 'UpDroidEditor') {
-      _tabJs.src = 'tabs/upcom-editor/index.dart.js';
-    } else if (fullName == 'UpDroidCamera') {
-      _tabJs.src = 'tabs/upcom-camera/index.dart.js';
-    } else if (fullName == 'UpDroidTeleop') {
-      _tabJs.src = 'tabs/upcom-teleop/index.dart.js';
-    } else if (fullName == 'UpDroidConsole') {
-      _tabJs.src = 'tabs/upcom-console/index.dart.js';
-    }
+    ..type = 'text/javascript'
+    ..src = 'tabs/${classNameToFsName[fullName]}/index.dart.js';
 
     document.body.children.add(_tabJs);
 

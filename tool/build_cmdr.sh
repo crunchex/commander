@@ -70,16 +70,6 @@ echo -n "Getting app dependencies........"
 pub get > /dev/null
 echo "OK"
 
-### cmdr ###
-cd $TOPDIR/bin
-
-echo -n "Building (minifying) cmdr......."
-dart2js --output-type=dart --categories=Server --minify -o cmdr cmdr.dart > /dev/null
-rm -rf cmdr.deps
-sed -i '1i#!/usr/bin/env dart' cmdr
-chmod +x cmdr
-echo "OK"
-
 ### gui ###
 cd $TOPDIR/
 
@@ -92,14 +82,22 @@ pub build > /dev/null
 echo "OK"
 
 echo -n "Setting up tabs................."
-BUILD=$TOPDIR/build/web
-mkdir -p $BUILD/tabs
+BUILD=$TOPDIR/build/
+BINTABS=$BUILD/bin/tabs
+WEBTABS=$BUILD/web/tabs
+mkdir -p $BINTABS
+mkdir -p $WEBTABS
 
 # TODO fix these hard-coded paths
-cp -r /home/crunchex/work/upcom-editor/build/web $BUILD/tabs/upcom-editor
-cp -r /home/crunchex/work/upcom-console/build/web $BUILD/tabs/upcom-console
-cp -r /home/crunchex/work/upcom-camera/build/web $BUILD/tabs/upcom-camera
-cp -r /home/crunchex/work/upcom-teleop/build/web $BUILD/tabs/upcom-teleop
+cp -r /home/crunchex/work/upcom-editor/build/bin $BINTABS/upcom-editor
+cp -r /home/crunchex/work/upcom-console/build/bin $BINTABS/upcom-console
+cp -r /home/crunchex/work/upcom-camera/build/bin $BINTABS/upcom-camera
+cp -r /home/crunchex/work/upcom-teleop/build/bin $BINTABS/upcom-teleop
+
+cp -r /home/crunchex/work/upcom-editor/build/web $WEBTABS/upcom-editor
+cp -r /home/crunchex/work/upcom-console/build/web $WEBTABS/upcom-console
+cp -r /home/crunchex/work/upcom-camera/build/web $WEBTABS/upcom-camera
+cp -r /home/crunchex/work/upcom-teleop/build/web $WEBTABS/upcom-teleop
 echo "OK"
 
 echo -n "Cleaning up gui................."
@@ -111,6 +109,19 @@ sed -i '/glyphicons.css/d' $BUILD/index.html
 # sed -i '/bootstrap.min.css/d' $BUILD/index.html
 sed -i 's/main.css/cmdr.css/g' $BUILD/index.html
 sed -i 's/main.dart/main.dart.js/g' $BUILD/index.html
+echo "OK"
+
+### cmdr ###
+cd $TOPDIR/bin
+
+BINDIR=$TOPDIR/build/bin
+mkdir -p $BINDIR
+
+echo -n "Building (minifying) cmdr......."
+dart2js --output-type=dart --categories=Server --minify -o $BINDIR/cmdr cmdr.dart
+rm -rf $BINDIR/cmdr.deps
+sed -i '1i#!/usr/bin/env dart' $BINDIR/cmdr
+chmod +x $BINDIR/cmdr
 echo "OK"
 
 ### done ###

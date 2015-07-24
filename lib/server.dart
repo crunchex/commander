@@ -19,19 +19,29 @@ part 'commands.dart';
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
   static String defaultUprootPath = '/home/${Platform.environment['USER']}/uproot';
-  static const String defaultGuiPath = '/opt/updroid/cmdr/web';
+  static const String defaultInstallationPath = '/opt/updroid/cmdr';
   static const bool defaultDebugFlag = false;
   static const bool defaultQuiet = false;
+
+  // TODO: all this hardcoded stuff should be pulled from a tab registry file somewhere.
+  static Map classNameToFsName = {
+    'UpDroidEditor': 'upcom-editor',
+    'UpDroidConsole': 'upcom-console',
+    'UpDroidCamera': 'upcom-camera',
+    'UpDroidTeleop': 'upcom-teleop',
+  };
 
   ArgResults _args;
 
   Map _panels = {};
   Map<String, Map<int, dynamic>> _tabs = {};
   CmdrMailbox _mailbox;
+  String _installationPath;
   Directory dir;
 
   CmdrServer (ArgResults results) {
     _args = results;
+    _installationPath = _args['path'];
 
     dir = new Directory(_args['workspace']);
     dir.create();
@@ -45,7 +55,7 @@ class CmdrServer {
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
   VirtualDirectory _getVirDir() {
-    String guiPath = _args['path'];
+    String guiPath = '${_args['path']}/web';
     VirtualDirectory virDir;
     virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
         ..allowDirectoryListing = true
@@ -170,15 +180,18 @@ class CmdrServer {
     int num = int.parse(idList[1]);
     String type = idList[2];
 
+    String binPath = '$_installationPath/bin';
+    String fsName = classNameToFsName[type];
+
     help.debug('Open tab request received: $id', 0);
 
     if (!_tabs.containsKey(type)) _tabs[type] = {};
 
     if (idList.length <= 3) {
-      _tabs[type][num] = new TabInterface(type, num, dir);
+      _tabs[type][num] = new TabInterface(binPath, fsName, type, num, dir);
     } else {
       List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[type][num] = new TabInterface(type, num, dir, extra);
+      _tabs[type][num] = new TabInterface(binPath, fsName, type, num, dir, extra);
     }
   }
 

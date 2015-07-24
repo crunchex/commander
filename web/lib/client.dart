@@ -40,7 +40,7 @@ class UpDroidClient {
     _mailbox = new Mailbox('UpDroidClient', 1);
 
     _registerMailbox();
-    _registerEventHandlers(_getConfig());
+    _registerEventHandlers();
 
     readyForInitialization.future.then((_) => _initializeClient());
   }
@@ -56,7 +56,7 @@ class UpDroidClient {
 
   /// Sets up external event handlers for the various Commander classes. These
   /// are mostly listening events for [WebSocket] messages.
-  void _registerEventHandlers(String config) {
+  void _registerEventHandlers() {
 
   }
 

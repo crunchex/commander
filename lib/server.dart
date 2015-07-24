@@ -1,10 +1,13 @@
 library cmdr;
 
+import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
+import 'package:path/path.dart' as pathLib;
 import 'package:upcom-api/git.dart';
 import 'package:upcom-api/tab_backend.dart';
 
@@ -132,6 +135,7 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
     _mailbox.registerWebSocketEvent('UPDATE_COLUMN', _updateColumn);
+    _mailbox.registerWebSocketEvent('REQUEST_TABSINFO', _sendTabInfo);
 //    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
 //    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
 
@@ -203,6 +207,26 @@ class CmdrServer {
 
     Msg newMessage = new Msg(um.header, newColumn);
     CmdrPostOffice.send(new ServerMessage(type, id, newMessage));
+  }
+
+  void _sendTabInfo(Msg um) {
+    Map tabsInfo = {};
+
+    // Specialized transformer that takes a tab directory as input and extracts tab info
+    // from the json file within.
+    StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
+      File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
+      String tabInfoString = tabInfoJson.readAsStringSync();
+      sink.add(JSON.decode(tabInfoString));
+    });
+
+    Directory tabsDir = new Directory('$_installationPath/bin/tabs');
+    tabsDir.list().transform(extractTabInfo).listen((Map tabInfoMap) {
+      tabsInfo[tabInfoMap['refName']] = tabInfoMap;
+    }).onDone(() {
+      print(tabsInfo.toString());
+      _mailbox.send(new Msg('TABS_INFO', JSON.encode(tabsInfo)));
+    });
   }
 
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));

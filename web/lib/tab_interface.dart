@@ -42,7 +42,7 @@ class TabInterface {
     EventStreamProvider<CustomEvent> tabReadyStream = new EventStreamProvider<CustomEvent>('TabReadyForId');
 
     // Launch the Tab's backend.
-    _mailbox.ws.send('[[OPEN_TAB]]' + '$col-$id-$fullName');
+    _mailbox.ws.send('[[OPEN_TAB]]' + '$col:$id:$fullName');
 
     // Call the Tab's frontend (as a JS lib).
     String name = fullName.toLowerCase().replaceAll(' ', '-');

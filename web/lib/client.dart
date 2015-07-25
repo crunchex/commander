@@ -76,7 +76,7 @@ class UpDroidClient {
 
   void _closeTabFromServer(UpDroidMessage um) {
     String id = um.body;
-    List idList = id.split('_');
+    List idList = id.split(':');
     String tabType = idList[0];
     int tabId = int.parse(idList[1]);
 
@@ -88,7 +88,7 @@ class UpDroidClient {
 
   void _cloneTabFromServer(UpDroidMessage um) {
     String id = um.body;
-    List idList = id.split('_');
+    List idList = id.split(':');
     String tabType = idList[0];
     int col = int.parse(idList[2]);
 
@@ -102,7 +102,7 @@ class UpDroidClient {
   }
 
   void _moveTabFromServer(UpDroidMessage um) {
-    List idList = um.body.split('_');
+    List idList = um.body.split(':');
     String tabType = idList[0];
     int id = int.parse(idList[1]);
 
@@ -187,7 +187,7 @@ class UpDroidClient {
     }
 
     if (className == 'UpDroidExplorer') {
-      _mailbox.ws.send('[[OPEN_PANEL]]' + '$column-$id-$className');
+      _mailbox.ws.send('[[OPEN_PANEL]]' + '$column:$id:$className');
       _panels.add(new UpDroidExplorer(id, column));
     }
   }

@@ -178,7 +178,7 @@ class CmdrServer {
 
   void _openPanel(Msg um) {
     String id = um.body;
-    List idList = id.split('-');
+    List idList = id.split(':');
     int num = int.parse(idList[1]);
     String type = idList[2];
 
@@ -195,7 +195,8 @@ class CmdrServer {
 
   void _openTab(Msg um) {
     String id = um.body;
-    List idList = id.split('-');
+    List idList = id.split(':');
+    print(idList.toString());
     int num = int.parse(idList[1]);
     String type = idList[2];
 
@@ -215,7 +216,7 @@ class CmdrServer {
   }
 
   void _updateColumn(Msg um) {
-    List idList = um.body.split('_');
+    List idList = um.body.split(':');
     String type = idList[0];
     int id = int.parse(idList[1]);
     String newColumn = idList[2];
@@ -244,7 +245,7 @@ class CmdrServer {
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));
 
   void _closeTab(Msg um) {
-    List idList = um.body.split('_');
+    List idList = um.body.split(':');
     String type = idList[0];
     int id = int.parse(idList[1]);
 

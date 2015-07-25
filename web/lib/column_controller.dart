@@ -192,7 +192,7 @@ class ColumnController {
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
 
-    _mailbox.ws.send('[[CLOSE_TAB]]' + tabType + '_' + tabId.toString());
+    _mailbox.ws.send('[[CLOSE_TAB]]' + tabType + ':' + tabId.toString());
 
     return found;
   }
@@ -220,7 +220,7 @@ class ColumnController {
     querySelector('#col-${columnId.toString()}-tab-content').children.add(tab.view.tabContainer);
 
     // Send a message to update the column on the real classes.
-    _mailbox.ws.send('[[UPDATE_COLUMN]]' + tab.fullName + '_' + tab.id.toString() + '_' + columnId.toString());
+    _mailbox.ws.send('[[UPDATE_COLUMN]]' + tab.fullName + ':' + tab.id.toString() + ':' + columnId.toString());
 
     // Update the [TabInterface] and [TabViewInterface]'s columns.
     tab.col = columnId;

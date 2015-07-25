@@ -1,10 +1,8 @@
 part of updroid_explorer;
 
 abstract class ExplorerView {
-  DivElement content;
-  DivElement explorersDiv;
-  SpanElement viewWorkspace;
-  SpanElement viewLaunchers;
+  DivElement content, explorersDiv;
+  SpanElement viewWorkspace, viewLaunchers;
 
   ExplorerView(int id, DivElement content) {
     this.content = content;
@@ -23,6 +21,7 @@ abstract class ExplorerView {
     viewLaunchers = new SpanElement()
       ..title = 'Launchers View'
       ..classes.addAll(['glyphicons', 'glyphicons-cluster']);
+
     toolbar.children.addAll([viewLaunchers, viewWorkspace]);
   }
 }

@@ -145,7 +145,7 @@ class ColumnController {
   List<int> returnIds(String className) {
     List<int> ids = [];
     _tabs.forEach((tab) {
-      if (tab.fullName == className) ids.add(tab.id);
+      if (tab.fullName == className.replaceAll(' ', '')) ids.add(tab.id);
     });
     return ids;
   }

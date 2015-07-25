@@ -7,14 +7,6 @@ import 'dart:html';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
 
 class TabInterface {
-  // TODO: all this hardcoded stuff should be pulled from a tab registry file somewhere.
-  static Map classNameToFsName = {
-    'UpDroidEditor': 'upcom-editor',
-    'UpDroidConsole': 'upcom-console',
-    'UpDroidCamera': 'upcom-camera',
-    'UpDroidTeleop': 'upcom-teleop',
-  };
-
   int id, col;
   TabViewInterface view;
   Map tabInfo;

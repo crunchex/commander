@@ -160,7 +160,6 @@ class ColumnController {
       }
     }
 
-    print('opening tab: $id, $columnId, ${tabInfo.toString()}');
     TabInterface tab = new TabInterface(id, columnId, tabInfo, _mailbox);
     await tab.setupComplete;
     _tabs.add(tab);

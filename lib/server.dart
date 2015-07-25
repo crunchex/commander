@@ -252,11 +252,11 @@ class CmdrServer {
   void _sendEditorList(Msg um) {
     String pathToOpen = um.body;
     List<String> editorList = [];
-    _tabs['UpDroidEditor'].keys.forEach((int id) => editorList.add(id.toString()));
+    _tabs['upcom-editor'].keys.forEach((int id) => editorList.add(id.toString()));
     Msg newMessage = new Msg('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
     // TODO: need to able to reply back to exact sender in CmdrPostOffice.
     // This is a hacky way to reply back to the requesting explorer.
-    CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, 'UpDroidExplorer', 0, newMessage));
+    CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, 'upcom-explorer', 0, newMessage));
   }
 
   void _cleanUpBackend() {

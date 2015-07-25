@@ -5,11 +5,12 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:upcom-api/tab_backend.dart';
+import 'package:path/path.dart';
 
 import 'console_mailbox.dart';
 
 class TabInterface {
-  String tabType;
+  String refName;
   int id;
   Directory dir;
   List extra;
@@ -17,10 +18,10 @@ class TabInterface {
   Isolate tab;
   ConsoleMailbox mailbox;
 
-  TabInterface(String binPath, String fsName, this.tabType, this.id, this.dir, [this.extra]) {
-    mailbox = new ConsoleMailbox(tabType, id);
+  TabInterface(String binPath, this.refName, this.id, this.dir, [this.extra]) {
+    mailbox = new ConsoleMailbox(refName, id);
 
-    _spawnTab(new Uri.file('$binPath/tabs/$fsName/main.dart'));
+    _spawnTab(new Uri.file(normalize('$binPath/tabs/$refName/main.dart')));
   }
 
   Future _spawnTab(Uri tabFile) async {

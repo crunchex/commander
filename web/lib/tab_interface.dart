@@ -10,14 +10,14 @@ class TabInterface {
   int id, col;
   TabViewInterface view;
   Map tabInfo;
-  String fullName;
+  String refName;
   Future setupComplete;
 
   Mailbox _mailbox;
   ScriptElement _tabJs;
 
   TabInterface(this.id, this.col, this.tabInfo, Mailbox mailbox) {
-    fullName = tabInfo['fullName'].replaceAll(' ', '');
+    refName = tabInfo['refName'];
     _mailbox = mailbox;
     setupComplete = _setUp();
   }
@@ -32,7 +32,7 @@ class TabInterface {
     await _sendIdEvent();
 
     // Set up an interface to the new Tab's view.
-    view = new TabViewInterface(id, col, fullName);
+    view = new TabViewInterface(id, col, refName);
 
     return null;
   }
@@ -42,19 +42,17 @@ class TabInterface {
     EventStreamProvider<CustomEvent> tabReadyStream = new EventStreamProvider<CustomEvent>('TabReadyForId');
 
     // Launch the Tab's backend.
-    _mailbox.ws.send('[[OPEN_TAB]]' + '$col:$id:$fullName');
+    _mailbox.ws.send('[[OPEN_TAB]]' + '$col:$id:$refName');
 
     // Call the Tab's frontend (as a JS lib).
-    String name = fullName.toLowerCase().replaceAll(' ', '-');
-
     _tabJs = new ScriptElement()
-    ..id = '$name-$id-script'
+    ..id = '$refName-$id-script'
     ..type = 'text/javascript'
-    ..src = 'tabs/${tabInfo['refName']}/index.dart.js';
+    ..src = 'tabs/$refName/index.dart.js';
 
     document.body.children.add(_tabJs);
 
-    return tabReadyStream.forTarget(window).where((CustomEvent e) => e.detail == fullName).first;
+    return tabReadyStream.forTarget(window).where((CustomEvent e) => e.detail == refName).first;
   }
 
   Future _sendIdEvent() {
@@ -62,23 +60,23 @@ class TabInterface {
     EventStreamProvider<CustomEvent> tabDoneStream = new EventStreamProvider<CustomEvent>('TabSetupComplete');
 
     // Dispatch a custom event to pass ID info to the Tab's frontend.
-    String detail = JSON.encode({ 'id': id, 'col': col, 'className': fullName });
+    String detail = JSON.encode({ 'id': id, 'col': col, 'refName': refName });
     CustomEvent event = new CustomEvent('TabIdEvent', canBubble: false, cancelable: false, detail: detail);
     window.dispatchEvent(event);
 
-    return tabDoneStream.forTarget(window).where((e) => e.detail == fullName).first;
+    return tabDoneStream.forTarget(window).where((e) => e.detail == refName).first;
   }
 }
 
 class TabViewInterface {
   int id, col;
-  String fullName;
+  String refName;
   DivElement tabHandle, tabContainer, tabContent;
 
-  TabViewInterface(this.id, this.col, this.fullName) {
-    tabHandle = querySelector('#tab-$name-$id-handle');
-    tabContainer = querySelector('#tab-$name-$id-container');
-    tabContent = querySelector('#tab-$name-$id-content');
+  TabViewInterface(this.id, this.col, this.refName) {
+    tabHandle = querySelector('#tab-$refName-$id-handle');
+    tabContainer = querySelector('#tab-$refName-$id-container');
+    tabContent = querySelector('#tab-$refName-$id-content');
   }
 
   bool isActive() => tabHandle.classes.contains('active');
@@ -94,6 +92,4 @@ class TabViewInterface {
     tabHandle.classes.remove('active');
     tabContainer.classes.remove('active');
   }
-
-  String get name => fullName.toLowerCase().replaceAll(' ', '-');
 }

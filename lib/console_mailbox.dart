@@ -11,7 +11,7 @@ import 'server_helper.dart' as help;
 import 'post_office.dart';
 
 class ConsoleMailbox {
-  String className;
+  String refName;
   int id;
   WebSocket ws;
   Stream<Msg> inbox;
@@ -19,14 +19,14 @@ class ConsoleMailbox {
   SendPort sendPort;
   Set endpointRegistry;
 
-  ConsoleMailbox(this.className, this.id) {
+  ConsoleMailbox(this.refName, this.id) {
     endpointRegistry = new Set<String>();
     receivePort = new ReceivePort();
 
-    inbox = CmdrPostOffice.registerClass(className, id);
+    inbox = CmdrPostOffice.registerClass(refName, id);
 
     inbox.listen((Msg um) {
-      help.debug('[${className}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
+      help.debug('[${refName}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
       sendPort.send(um.toString());
     });
   }
@@ -47,9 +47,9 @@ class ConsoleMailbox {
     }
 
     ws.listen((String s) {
-      if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == className) {
+      if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == refName) {
         Msg um = new Msg.fromString(s);
-        help.debug('$className incoming: ' + um.header, 0);
+        help.debug('$refName incoming: ' + um.header, 0);
 
         sendPort.send(um.toString());
       } else if (endpointRegistry.contains(request.uri.path)) {

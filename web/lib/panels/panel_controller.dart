@@ -11,18 +11,18 @@ part 'panel_view.dart';
 abstract class PanelController {
   int id, col;
   bool active;
-  String fullName, shortName;
+  String refName, fullName, shortName;
 
   PanelView view;
   Mailbox mailbox;
 
 //  AnchorElement _closePanelButton;
 
-  PanelController(this.id, this.col, this.fullName, this.shortName, List menuConfig, [bool externalCss=false]) {
-    mailbox = new Mailbox(fullName, id);
+  PanelController(this.id, this.col, this.refName, this.fullName, this.shortName, List menuConfig, [bool externalCss=false]) {
+    mailbox = new Mailbox(refName, id);
     registerMailbox();
 
-    PanelView.createPanelView(id, col, fullName, shortName, menuConfig, externalCss).then((tabView) async {
+    PanelView.createPanelView(id, col, refName, fullName, shortName, menuConfig, externalCss).then((tabView) async {
       view = tabView;
 
 //      _closePanelButton = view.refMap['close-panel'];

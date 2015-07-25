@@ -26,16 +26,6 @@ class CmdrServer {
   static const bool defaultDebugFlag = false;
   static const bool defaultQuiet = false;
 
-  static String guiName = 'UpDroidClient';
-
-  // TODO: all this hardcoded stuff should be pulled from a tab registry file somewhere.
-  static Map classNameToFsName = {
-    'UpDroidEditor': 'upcom-editor',
-    'UpDroidConsole': 'upcom-console',
-    'UpDroidCamera': 'upcom-camera',
-    'UpDroidTeleop': 'upcom-teleop',
-  };
-
   ArgResults _args;
 
   Map _panels = {};
@@ -52,7 +42,7 @@ class CmdrServer {
     dir.create();
     _initServer(_getVirDir());
 
-    _mailbox = new CmdrMailbox('UpDroidClient', 1);
+    _mailbox = new CmdrMailbox(Tab.upcomName, 1);
     _registerMailbox();
 
     // A stream that pushes anything it receives onto the main websocket to the client.
@@ -104,13 +94,13 @@ class CmdrServer {
     int objectID = int.parse(request.uri.pathSegments[1]);
     String type = request.uri.pathSegments[0];
 
-    if (type == 'UpDroidClient') {
+    if (type == Tab.upcomName) {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _mailbox.handleWebSocket(ws, request));
       return;
     }
 
-    if (type == 'UpDroidExplorer') {
+    if (type == 'upcom-explorer') {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _panels[type][objectID].mailbox.handleWebSocket(ws, request));
       return;
@@ -187,7 +177,7 @@ class CmdrServer {
     if (!_panels.containsKey(type)) _panels[type] = {};
 
     switch (type) {
-      case 'UpDroidExplorer':
+      case 'upcom-explorer':
         _panels[type][num] = new CmdrExplorer(num, dir);
         break;
     }
@@ -196,22 +186,20 @@ class CmdrServer {
   void _openTab(Msg um) {
     String id = um.body;
     List idList = id.split(':');
-    print(idList.toString());
     int num = int.parse(idList[1]);
-    String type = idList[2];
+    String refName = idList[2];
 
     String binPath = '$_installationPath/bin';
-    String fsName = classNameToFsName[type];
 
     help.debug('Open tab request received: $id', 0);
 
-    if (!_tabs.containsKey(type)) _tabs[type] = {};
+    if (!_tabs.containsKey(refName)) _tabs[refName] = {};
 
     if (idList.length <= 3) {
-      _tabs[type][num] = new TabInterface(binPath, fsName, type, num, dir);
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir);
     } else {
       List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[type][num] = new TabInterface(binPath, fsName, type, num, dir, extra);
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir, extra);
     }
   }
 
@@ -222,7 +210,7 @@ class CmdrServer {
     String newColumn = idList[2];
 
     Msg newMessage = new Msg(um.header, newColumn);
-    CmdrPostOffice.send(new ServerMessage(guiName, 0, type, id, newMessage));
+    CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
   }
 
   void _sendTabInfo(Msg um) {
@@ -268,7 +256,7 @@ class CmdrServer {
     Msg newMessage = new Msg('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
     // TODO: need to able to reply back to exact sender in CmdrPostOffice.
     // This is a hacky way to reply back to the requesting explorer.
-    CmdrPostOffice.send(new ServerMessage(guiName, 0, 'UpDroidExplorer', 0, newMessage));
+    CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, 'UpDroidExplorer', 0, newMessage));
   }
 
   void _cleanUpBackend() {

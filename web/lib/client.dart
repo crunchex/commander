@@ -13,6 +13,9 @@ import 'column_controller.dart';
 import 'tab_interface.dart';
 
 class UpDroidClient {
+  static const String upcomName = 'upcom';
+  static const String explorerRefName = 'upcom-explorer';
+
   List _config;
   List<PanelController> _panels;
   List<ColumnController> _columnControllers;
@@ -34,7 +37,7 @@ class UpDroidClient {
     _panels = [];
     _columnControllers = [];
 
-    _mailbox = new Mailbox('UpDroidClient', 1);
+    _mailbox = new Mailbox(upcomName, 1);
 
     _registerMailbox();
     _registerEventHandlers();
@@ -77,25 +80,25 @@ class UpDroidClient {
   void _closeTabFromServer(UpDroidMessage um) {
     String id = um.body;
     List idList = id.split(':');
-    String tabType = idList[0];
+    String refName = idList[0];
     int tabId = int.parse(idList[1]);
 
     for (ColumnController controller in _columnControllers) {
       // Break once one of the controllers finds the tab to close.
-      if (controller.findAndCloseTab(tabId, tabType)) break;
+      if (controller.findAndCloseTab(tabId, refName)) break;
     }
   }
 
   void _cloneTabFromServer(UpDroidMessage um) {
     String id = um.body;
     List idList = id.split(':');
-    String tabType = idList[0];
+    String refName = idList[0];
     int col = int.parse(idList[2]);
 
     Map<String, String> tabInfo;
     _tabsInfo.keys.forEach((String key) {
       tabInfo = _tabsInfo[key];
-      if (tabInfo.containsValue(tabType)) return;
+      if (tabInfo.containsValue(refName)) return;
     });
 
     _columnControllers[col == 1 ? 0 : 1].openTabFromModal(tabInfo);
@@ -103,7 +106,7 @@ class UpDroidClient {
 
   void _moveTabFromServer(UpDroidMessage um) {
     List idList = um.body.split(':');
-    String tabType = idList[0];
+    String refName = idList[0];
     int id = int.parse(idList[1]);
 
     // Working with indexes here, not the columnId.
@@ -116,7 +119,7 @@ class UpDroidClient {
       return;
     }
 
-    TabInterface tab = _columnControllers[oldColIndex].removeTab(tabType, id);
+    TabInterface tab = _columnControllers[oldColIndex].removeTab(refName, id);
     _columnControllers[newColIndex].addTab(tab);
   }
 
@@ -127,7 +130,7 @@ class UpDroidClient {
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: use isolates.
   void _initializeClient() {
-    _openPanel(0, 1, 'UpDroidExplorer');
+    _openPanel(0, 1, explorerRefName);
 
     // TODO: make the initial min-width more responsive to how the tabs start out initially.
     // For now we assume they start off 50/50.
@@ -177,7 +180,7 @@ class UpDroidClient {
     return id;
   }
 
-  void _openPanel(int column, int id, String className) {
+  void _openPanel(int column, int id, String refName) {
     if (_panels.length >= 1) return;
 
     if (_panels.isNotEmpty) {
@@ -186,8 +189,8 @@ class UpDroidClient {
       }
     }
 
-    if (className == 'UpDroidExplorer') {
-      _mailbox.ws.send('[[OPEN_PANEL]]' + '$column:$id:$className');
+    if (refName == explorerRefName) {
+      _mailbox.ws.send('[[OPEN_PANEL]]' + '$column:$id:$refName');
       _panels.add(new UpDroidExplorer(id, column));
     }
   }

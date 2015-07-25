@@ -141,11 +141,11 @@ class ColumnController {
     _view.minimize();
   }
 
-  /// Returns a list of IDs of all tabs whose type match [className].
-  List<int> returnIds(String className) {
+  /// Returns a list of IDs of all tabs whose type match [refName].
+  List<int> returnIds(String refName) {
     List<int> ids = [];
     _tabs.forEach((tab) {
-      if (tab.fullName == className.replaceAll(' ', '')) ids.add(tab.id);
+      if (tab.refName == refName) ids.add(tab.id);
     });
     return ids;
   }
@@ -160,6 +160,7 @@ class ColumnController {
       }
     }
 
+    print('opening tab: $id, $columnId, ${tabInfo.toString()}');
     TabInterface tab = new TabInterface(id, columnId, tabInfo, _mailbox);
     await tab.setupComplete;
     _tabs.add(tab);
@@ -173,12 +174,12 @@ class ColumnController {
     openTab(id, tabInfo);
   }
 
-  /// Locates a [TabController] by [tabId] and [tabType] and closes it. Returns true if
+  /// Locates a [TabController] by [tabId] and [refName] and closes it. Returns true if
   /// said tab was found.
-  bool findAndCloseTab(int tabId, String tabType) {
+  bool findAndCloseTab(int tabId, String refName) {
     bool found = false;
     for (int i = 0; i < _tabs.length; i++) {
-      if (_tabs[i].fullName == tabType && _tabs[i].id == tabId) {
+      if (_tabs[i].refName == refName && _tabs[i].id == tabId) {
         found = true;
         _tabs[i].shutdownScript();
         _tabs.removeAt(i);
@@ -192,13 +193,13 @@ class ColumnController {
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
 
-    _mailbox.ws.send('[[CLOSE_TAB]]' + tabType + ':' + tabId.toString());
+    _mailbox.ws.send('[[CLOSE_TAB]]' + refName + ':' + tabId.toString());
 
     return found;
   }
 
-  TabInterface removeTab(String tabType, int id) {
-    TabInterface tab = _tabs.firstWhere((TabInterface t) => t.fullName == tabType && t.id == id);
+  TabInterface removeTab(String refName, int id) {
+    TabInterface tab = _tabs.firstWhere((TabInterface t) => t.refName == refName && t.id == id);
     _tabs.remove(tab);
 
     // Make all tabs in that column inactive except the last.
@@ -220,7 +221,7 @@ class ColumnController {
     querySelector('#col-${columnId.toString()}-tab-content').children.add(tab.view.tabContainer);
 
     // Send a message to update the column on the real classes.
-    _mailbox.ws.send('[[UPDATE_COLUMN]]' + tab.fullName + ':' + tab.id.toString() + ':' + columnId.toString());
+    _mailbox.ws.send('[[UPDATE_COLUMN]]' + tab.refName + ':' + tab.id.toString() + ':' + columnId.toString());
 
     // Update the [TabInterface] and [TabViewInterface]'s columns.
     tab.col = columnId;

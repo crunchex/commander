@@ -21,7 +21,7 @@ part 'commands.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
-  static String defaultUprootPath = '/home/${Platform.environment['USER']}/uproot';
+  static final String defaultUprootPath = '/home/${Platform.environment['USER']}/uproot';
   static const String defaultInstallationPath = '/opt/updroid/cmdr';
   static const bool defaultDebugFlag = false;
   static const bool defaultQuiet = false;

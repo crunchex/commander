@@ -26,6 +26,8 @@ class CmdrServer {
   static const bool defaultDebugFlag = false;
   static const bool defaultQuiet = false;
 
+  static String guiName = 'UpDroidClient';
+
   // TODO: all this hardcoded stuff should be pulled from a tab registry file somewhere.
   static Map classNameToFsName = {
     'UpDroidEditor': 'upcom-editor',
@@ -219,7 +221,7 @@ class CmdrServer {
     String newColumn = idList[2];
 
     Msg newMessage = new Msg(um.header, newColumn);
-    CmdrPostOffice.send(new ServerMessage(type, id, newMessage));
+    CmdrPostOffice.send(new ServerMessage(guiName, 0, type, id, newMessage));
   }
 
   void _sendTabInfo(Msg um) {
@@ -265,7 +267,7 @@ class CmdrServer {
     Msg newMessage = new Msg('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
     // TODO: need to able to reply back to exact sender in CmdrPostOffice.
     // This is a hacky way to reply back to the requesting explorer.
-    CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', 0, newMessage));
+    CmdrPostOffice.send(new ServerMessage(guiName, 0, 'UpDroidExplorer', 0, newMessage));
   }
 
   void _cleanUpBackend() {

@@ -167,7 +167,7 @@ class CmdrExplorer {
       newMessage = new Msg(um.header, split[1]);
     }
 
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', destinationId, newMessage));
+    CmdrPostOffice.send(new ServerMessage(guiName, id, 'UpDroidEditor', destinationId, newMessage));
   }
 
   void _workspaceClean(Msg um) {
@@ -244,7 +244,7 @@ class CmdrExplorer {
   }
 
   void _requestEditorList(Msg um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', 0, um));
+    CmdrPostOffice.send(new ServerMessage(guiName, id, 'UpDroidClient', 0, um));
   }
 
   void _returnSelected(Msg um) {
@@ -253,7 +253,7 @@ class CmdrExplorer {
     String selectedList = split[1];
 
     Msg newMessage = new Msg(um.header, selectedList);
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', editorId, newMessage));
+    CmdrPostOffice.send(new ServerMessage(guiName, id, 'UpDroidEditor', editorId, newMessage));
   }
 
   void _sendEditorList(Msg um) => mailbox.send(um);
@@ -277,7 +277,7 @@ class CmdrExplorer {
 
   void _setCurrentWorkspace(String newWorkspaceName) {
     Msg um = new Msg('SET_CURRENT_WORKSPACE', newWorkspaceName);
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', 0, um));
+    CmdrPostOffice.send(new ServerMessage(guiName, id, 'UpDroidEditor', 0, um));
 
     if (_currentWatcherStream != null) _currentWatcherStream.cancel();
 

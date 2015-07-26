@@ -111,7 +111,7 @@ class CmdrServer {
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
-    help.debug("${request.method} request for: ${request.uri.path}", 0);
+//    help.debug("${request.method} request for: ${request.uri.path}", 0);
 
     if (virDir != null) {
       virDir.serveRequest(request);

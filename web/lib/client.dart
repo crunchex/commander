@@ -95,13 +95,11 @@ class UpDroidClient {
     String refName = idList[0];
     int col = int.parse(idList[2]);
 
-    Map<String, String> tabInfo;
     _tabsInfo.keys.forEach((String key) {
-      tabInfo = _tabsInfo[key];
-      if (tabInfo.containsValue(refName)) return;
+      if (_tabsInfo[key].containsValue(refName)) {
+        _columnControllers[col == 1 ? 0 : 1].openTabFromModal(_tabsInfo[key]);
+      }
     });
-
-    _columnControllers[col == 1 ? 0 : 1].openTabFromModal(tabInfo);
   }
 
   void _moveTabFromServer(Msg um) {

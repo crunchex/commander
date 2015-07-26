@@ -169,7 +169,7 @@ class ColumnController {
 
   /// A wrapper for [openTab] when an availble ID needs to be chosen across all open [ColumnController]s.
   void openTabFromModal(Map tabInfo) {
-    int id = _getAvailableId(tabInfo['fullName']);
+    int id = _getAvailableId(tabInfo['refName']);
     openTab(id, tabInfo);
   }
 

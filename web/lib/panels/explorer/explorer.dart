@@ -62,7 +62,6 @@ class UpDroidExplorer extends PanelController {
   StreamSubscription _workspaceButtonListener, _launchersButtonListener;
 
   ExplorerController controller;
-  StreamController<CommanderMessage> cs;
 
   List<String> _workspaceNames;
 
@@ -99,14 +98,14 @@ class UpDroidExplorer extends PanelController {
     mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REQUEST_SELECTED', _requestSelected);
   }
 
-  void _requestWorkspaceNames(UpDroidMessage um) => _refreshWorkspaceNames();
+  void _requestWorkspaceNames(Msg um) => _refreshWorkspaceNames();
 
-  void _explorerDirPath(UpDroidMessage um) {
+  void _explorerDirPath(Msg um) {
     workspacePath = um.body;
     showWorkspacesController();
   }
 
-  void _refreshOpenMenu(UpDroidMessage um) {
+  void _refreshOpenMenu(Msg um) {
     _workspaceNames = JSON.decode(um.body);
     _workspaceNames.forEach((String name) => _addWorkspaceToMenu(name));
 
@@ -124,7 +123,7 @@ class UpDroidExplorer extends PanelController {
 
   /// Returns an empty list to the server to let it know that there is no [WorkspaceController]
   /// that consequently nothing is selected.
-  void _requestSelected(UpDroidMessage um) {
+  void _requestSelected(Msg um) {
     String selected = JSON.encode([]);
 
     if (controller != null && controller.type == 'workspace') {
@@ -132,7 +131,7 @@ class UpDroidExplorer extends PanelController {
       selected = workspaceController.returnSelected();
     }
 
-    mailbox.ws.send(new UpDroidMessage('RETURN_SELECTED', '${um.body}:$selected').s);
+    mailbox.ws.send(new Msg('RETURN_SELECTED', '${um.body}:$selected').toString());
   }
 
   void _addWorkspaceToMenu(String name) {
@@ -155,7 +154,7 @@ class UpDroidExplorer extends PanelController {
     _workspaceNames = [];
 
     querySelector('#$refName-$id-open-workspace').innerHtml = '';
-    mailbox.ws.send(new UpDroidMessage('REQUEST_WORKSPACE_NAMES', '').s);
+    mailbox.ws.send(new Msg('REQUEST_WORKSPACE_NAMES', '').toString());
   }
 
   void _newWorkspace() {
@@ -163,7 +162,7 @@ class UpDroidExplorer extends PanelController {
     modal = new UpDroidWorkspaceModal(() {
       String newWorkspaceName = modal.input.value;
       if (newWorkspaceName != '') {
-        mailbox.ws.send(new UpDroidMessage('NEW_WORKSPACE', newWorkspaceName).s);
+        mailbox.ws.send(new Msg('NEW_WORKSPACE', newWorkspaceName).toString());
       }
     });
   }

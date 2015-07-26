@@ -58,7 +58,7 @@ class LaunchersController implements ExplorerController {
     _listenersToCleanUp.add(_launchersView.viewWorkspace.onClick.listen((e) => _toggleView()));
   }
 
-  void addLaunch(UpDroidMessage um) {
+  void addLaunch(Msg um) {
     if (!_launchersFound) _launchersView.placeholderText.replaceWith(_launchersView.uList);
     _launchersFound = true;
 

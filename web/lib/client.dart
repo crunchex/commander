@@ -62,22 +62,22 @@ class UpDroidClient {
 
   //\/\/ Mailbox Handlers /\/\//
 
-  void _makeInitialRequests(UpDroidMessage um) {
+  void _makeInitialRequests(Msg um) {
     _mailbox.ws.send('[[REQUEST_TABSINFO]]');
     _mailbox.ws.send('[[CLIENT_CONFIG]]');
   }
 
-  void _setUpConfig(UpDroidMessage um) {
+  void _setUpConfig(Msg um) {
     _config = JSON.decode(um.body);
     _gotConfig.complete();
   }
 
-  void _refreshTabsInfo(UpDroidMessage um) {
+  void _refreshTabsInfo(Msg um) {
     _tabsInfo = JSON.decode(um.body);
     _gotTabInfo.complete();
   }
 
-  void _closeTabFromServer(UpDroidMessage um) {
+  void _closeTabFromServer(Msg um) {
     String id = um.body;
     List idList = id.split(':');
     String refName = idList[0];
@@ -89,7 +89,7 @@ class UpDroidClient {
     }
   }
 
-  void _cloneTabFromServer(UpDroidMessage um) {
+  void _cloneTabFromServer(Msg um) {
     String id = um.body;
     List idList = id.split(':');
     String refName = idList[0];
@@ -104,7 +104,7 @@ class UpDroidClient {
     _columnControllers[col == 1 ? 0 : 1].openTabFromModal(tabInfo);
   }
 
-  void _moveTabFromServer(UpDroidMessage um) {
+  void _moveTabFromServer(Msg um) {
     List idList = um.body.split(':');
     String refName = idList[0];
     int id = int.parse(idList[1]);

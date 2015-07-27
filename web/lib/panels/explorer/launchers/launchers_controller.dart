@@ -5,9 +5,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:path/path.dart' as pathLib;
+import 'package:upcom-api/web/menu/context_menu.dart';
+import 'package:upcom-api/web/mailbox/mailbox.dart';
 
-import '../../../context_menu.dart';
-import '../../../mailbox.dart';
 import '../../panel_controller.dart';
 import '../explorer.dart';
 
@@ -58,7 +58,7 @@ class LaunchersController implements ExplorerController {
     _listenersToCleanUp.add(_launchersView.viewWorkspace.onClick.listen((e) => _toggleView()));
   }
 
-  void addLaunch(UpDroidMessage um) {
+  void addLaunch(Msg um) {
     if (!_launchersFound) _launchersView.placeholderText.replaceWith(_launchersView.uList);
     _launchersFound = true;
 

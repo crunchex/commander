@@ -5,10 +5,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:path/path.dart' as pathLib;
+import 'package:upcom-api/web/modal/modal.dart';
+import 'package:upcom-api/web/menu/context_menu.dart';
+import 'package:upcom-api/web/mailbox/mailbox.dart';
 
-import '../../../modal/modal.dart';
-import '../../../context_menu.dart';
-import '../../../mailbox.dart';
 import '../../panel_controller.dart';
 import '../explorer.dart';
 
@@ -80,7 +80,7 @@ class WorkspaceController implements ExplorerController {
   }
 
   /// Handles an Explorer add update for a single file.
-  void _addUpdate(UpDroidMessage um) => _addFileSystemEntity(um.body);
+  void _addUpdate(Msg um) => _addFileSystemEntity(um.body);
 
   void _addFileSystemEntity(String data) {
     List<String> split = data.split(':');
@@ -161,7 +161,7 @@ class WorkspaceController implements ExplorerController {
 //  }
 
   /// Handles an Explorer remove update for a single file.
-  void _removeUpdate(UpDroidMessage um) => _removeFileSystemEntity(um.body);
+  void _removeUpdate(Msg um) => _removeFileSystemEntity(um.body);
 
   void _removeFileSystemEntity(String data) {
     List<String> split = data.split(':');
@@ -188,7 +188,7 @@ class WorkspaceController implements ExplorerController {
   }
 
   /// First Directory List Generation
-  void _workspaceContents(UpDroidMessage um) {
+  void _workspaceContents(Msg um) {
     List<String> fileStrings = JSON.decode(um.body);
 
     _workspaceView.uList.innerHtml = '';
@@ -231,7 +231,7 @@ class WorkspaceController implements ExplorerController {
     }
   }
 
-  void _buildComplete(UpDroidMessage um) {
+  void _buildComplete(Msg um) {
     List<String> entityPaths = JSON.decode(um.body);
     entityPaths.forEach((String entityPath) {
       FolderEntity package = entities[entityPath];
@@ -239,7 +239,7 @@ class WorkspaceController implements ExplorerController {
     });
   }
 
-  void _addEditorsToContextMenu(UpDroidMessage um) {
+  void _addEditorsToContextMenu(Msg um) {
     List<String> split = um.body.split(':');
     String path = split[0];
     List<String> editorList = JSON.decode(split[1]);
@@ -249,7 +249,7 @@ class WorkspaceController implements ExplorerController {
     });
   }
 
-  void _createFailedAlert(UpDroidMessage um) {
+  void _createFailedAlert(Msg um) {
     window.alert('You must build your workspace at least once before creating a new package.');
   }
 

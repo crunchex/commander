@@ -4,13 +4,13 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:upcom-api/server_message.dart';
-import 'package:upcom-api/updroid_message.dart';
+import 'package:upcom-api/tab_backend.dart';
+import 'package:path/path.dart';
 
 import 'console_mailbox.dart';
 
 class TabInterface {
-  String tabType;
+  String refName;
   int id;
   Directory dir;
   List extra;
@@ -18,27 +18,10 @@ class TabInterface {
   Isolate tab;
   ConsoleMailbox mailbox;
 
-  TabInterface(this.tabType, this.id, this.dir, [this.extra]) {
-    mailbox = new ConsoleMailbox(tabType, id);
+  TabInterface(String binPath, this.refName, this.id, this.dir, [this.extra]) {
+    mailbox = new ConsoleMailbox(refName, id);
 
-    // TODO: all this hardcoded stuff should be pulled from a tab registry file somewhere.
-    Uri tabFile;
-    switch (tabType) {
-      case 'UpDroidConsole':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-console/bin/main.dart');
-        break;
-      case 'UpDroidEditor':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-editor/bin/main.dart');
-        break;
-      case 'UpDroidTeleop':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-teleop/bin/main.dart');
-        break;
-      case 'UpDroidCamera':
-        tabFile = new Uri.file('/home/crunchex/work/upcom-camera/bin/main.dart');
-        break;
-    }
-
-    _spawnTab(tabFile);
+    _spawnTab(new Uri.file(normalize('$binPath/tabs/$refName/main.dart')));
   }
 
   Future _spawnTab(Uri tabFile) async {

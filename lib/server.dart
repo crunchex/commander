@@ -1,13 +1,15 @@
 library cmdr;
 
+import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:http_server/http_server.dart';
+import 'package:path/path.dart' as pathLib;
 import 'package:upcom-api/git.dart';
-import 'package:upcom-api/updroid_message.dart';
-import 'package:upcom-api/server_message.dart';
+import 'package:upcom-api/tab_backend.dart';
 
 import 'tab/explorer.dart';
 import 'server_mailbox.dart';
@@ -19,8 +21,8 @@ part 'commands.dart';
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
-  static String defaultUprootPath = '/home/${Platform.environment['USER']}/uproot';
-  static const String defaultGuiPath = '/opt/updroid/cmdr/web';
+  static final String defaultUprootPath = '/home/${Platform.environment['USER']}/uproot';
+  static const String defaultInstallationPath = '/opt/updroid/cmdr';
   static const bool defaultDebugFlag = false;
   static const bool defaultQuiet = false;
 
@@ -29,16 +31,18 @@ class CmdrServer {
   Map _panels = {};
   Map<String, Map<int, dynamic>> _tabs = {};
   CmdrMailbox _mailbox;
+  String _installationPath;
   Directory dir;
 
   CmdrServer (ArgResults results) {
     _args = results;
+    _installationPath = _args['path'];
 
     dir = new Directory(_args['workspace']);
     dir.create();
     _initServer(_getVirDir());
 
-    _mailbox = new CmdrMailbox('UpDroidClient', 1);
+    _mailbox = new CmdrMailbox(Tab.upcomName, 1);
     _registerMailbox();
 
     // A stream that pushes anything it receives onto the main websocket to the client.
@@ -46,7 +50,7 @@ class CmdrServer {
 
   /// Returns a [VirtualDirectory] set up with a path from [results].
   VirtualDirectory _getVirDir() {
-    String guiPath = _args['path'];
+    String guiPath = '${_args['path']}/web';
     VirtualDirectory virDir;
     virDir = new VirtualDirectory(Platform.script.resolve(guiPath).toFilePath())
         ..allowDirectoryListing = true
@@ -90,13 +94,13 @@ class CmdrServer {
     int objectID = int.parse(request.uri.pathSegments[1]);
     String type = request.uri.pathSegments[0];
 
-    if (type == 'UpDroidClient') {
+    if (type == Tab.upcomName) {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _mailbox.handleWebSocket(ws, request));
       return;
     }
 
-    if (type == 'UpDroidExplorer') {
+    if (type == 'upcom-explorer') {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _panels[type][objectID].mailbox.handleWebSocket(ws, request));
       return;
@@ -107,7 +111,7 @@ class CmdrServer {
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
-    help.debug("${request.method} request for: ${request.uri.path}", 0);
+//    help.debug("${request.method} request for: ${request.uri.path}", 0);
 
     if (virDir != null) {
       virDir.serveRequest(request);
@@ -122,6 +126,8 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
     _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
+    _mailbox.registerWebSocketEvent('UPDATE_COLUMN', _updateColumn);
+    _mailbox.registerWebSocketEvent('REQUEST_TABSINFO', _sendTabInfo);
 //    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
 //    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
 
@@ -135,8 +141,21 @@ class CmdrServer {
   }
 
   void _clientConfig(Msg um) {
-    // TODO: send back some kind of saved config from the filesystem.
-    _mailbox.send(new Msg('SERVER_READY', ''));
+    File configFile = new File('/home/${Platform.environment['USER']}/.config/updroid/.lastsession.json');
+    configFile.exists().then((bool exists) {
+      if (exists) {
+        String strConfig = configFile.readAsStringSync();
+        _mailbox.send(new Msg('SERVER_READY', strConfig));
+      } else {
+        List listConfig = [
+          [{'id': 1, 'class': 'upcom-editor'}],
+          [{'id': 1, 'class': 'upcom-console'}]
+        ];
+
+        String strConfig = JSON.encode(listConfig);
+        _mailbox.send(new Msg('SERVER_READY', strConfig));
+      }
+    });
   }
 
   void _gitPush(Msg um) {
@@ -149,7 +168,7 @@ class CmdrServer {
 
   void _openPanel(Msg um) {
     String id = um.body;
-    List idList = id.split('-');
+    List idList = id.split(':');
     int num = int.parse(idList[1]);
     String type = idList[2];
 
@@ -158,7 +177,7 @@ class CmdrServer {
     if (!_panels.containsKey(type)) _panels[type] = {};
 
     switch (type) {
-      case 'UpDroidExplorer':
+      case 'upcom-explorer':
         _panels[type][num] = new CmdrExplorer(num, dir);
         break;
     }
@@ -166,26 +185,55 @@ class CmdrServer {
 
   void _openTab(Msg um) {
     String id = um.body;
-    List idList = id.split('-');
+    List idList = id.split(':');
     int num = int.parse(idList[1]);
-    String type = idList[2];
+    String refName = idList[2];
+
+    String binPath = '$_installationPath/bin';
 
     help.debug('Open tab request received: $id', 0);
 
-    if (!_tabs.containsKey(type)) _tabs[type] = {};
+    if (!_tabs.containsKey(refName)) _tabs[refName] = {};
 
     if (idList.length <= 3) {
-      _tabs[type][num] = new TabInterface(type, num, dir);
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir);
     } else {
       List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[type][num] = new TabInterface(type, num, dir, extra);
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir, extra);
     }
+  }
+
+  void _updateColumn(Msg um) {
+    List idList = um.body.split(':');
+    String type = idList[0];
+    int id = int.parse(idList[1]);
+    String newColumn = idList[2];
+
+    Msg newMessage = new Msg(um.header, newColumn);
+    CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
+  }
+
+  void _sendTabInfo(Msg um) {
+    // Specialized transformer that takes a tab directory as input and extracts tab info
+    // from the json file within.
+    StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
+      File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
+      String tabInfoString = tabInfoJson.readAsStringSync();
+      sink.add(JSON.decode(tabInfoString));
+    });
+
+    Map tabsInfo = {};
+    new Directory('$_installationPath/bin/tabs')
+      .list()
+      .transform(extractTabInfo)
+      .listen((Map tabInfoMap) => tabsInfo[tabInfoMap['refName']] = tabInfoMap)
+      .onDone(() =>_mailbox.send(new Msg('TABS_INFO', JSON.encode(tabsInfo))));
   }
 
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));
 
   void _closeTab(Msg um) {
-    List idList = um.body.split('_');
+    List idList = um.body.split(':');
     String type = idList[0];
     int id = int.parse(idList[1]);
 
@@ -204,11 +252,11 @@ class CmdrServer {
   void _sendEditorList(Msg um) {
     String pathToOpen = um.body;
     List<String> editorList = [];
-    _tabs['UpDroidEditor'].keys.forEach((int id) => editorList.add(id.toString()));
+    _tabs['upcom-editor'].keys.forEach((int id) => editorList.add(id.toString()));
     Msg newMessage = new Msg('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
     // TODO: need to able to reply back to exact sender in CmdrPostOffice.
     // This is a hacky way to reply back to the requesting explorer.
-    CmdrPostOffice.send(new ServerMessage('UpDroidExplorer', 0, newMessage));
+    CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, 'upcom-explorer', 0, newMessage));
   }
 
   void _cleanUpBackend() {

@@ -1,4 +1,4 @@
-library server_helper;
+library helper;
 
 import 'dart:io';
 import 'package:logging/logging.dart';

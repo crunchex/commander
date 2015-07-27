@@ -5,16 +5,16 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as pathLib;
-import 'package:upcom-api/ros/ros.dart';
-import 'package:upcom-api/server_message.dart';
-import 'package:upcom-api/updroid_message.dart';
+import 'package:upcom-api/ros.dart';
+import 'package:upcom-api/tab_backend.dart';
 
 import '../server_mailbox.dart';
 import '../server_helper.dart' as help;
 import '../post_office.dart';
 
 class CmdrExplorer {
-  static const String guiName = 'UpDroidExplorer';
+  static const String refName = 'upcom-explorer';
+  static const String editorRefName = 'upcom-editor';
 
   int id;
   CmdrMailbox mailbox;
@@ -28,7 +28,7 @@ class CmdrExplorer {
   CmdrExplorer(this.id, this.uproot) {
     if (_currentWorkspace != null) return;
 
-    mailbox = new CmdrMailbox(guiName, id);
+    mailbox = new CmdrMailbox(refName, id);
     _registerMailbox();
 
     // TODO: retrieve saved data for the most recently opened workspace.
@@ -168,7 +168,7 @@ class CmdrExplorer {
       newMessage = new Msg(um.header, split[1]);
     }
 
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', destinationId, newMessage));
+    CmdrPostOffice.send(new ServerMessage(refName, id, editorRefName, destinationId, newMessage));
   }
 
   void _workspaceClean(Msg um) {
@@ -245,7 +245,7 @@ class CmdrExplorer {
   }
 
   void _requestEditorList(Msg um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', 0, um));
+    CmdrPostOffice.send(new ServerMessage(refName, id, Tab.upcomName, 0, um));
   }
 
   void _returnSelected(Msg um) {
@@ -254,7 +254,7 @@ class CmdrExplorer {
     String selectedList = split[1];
 
     Msg newMessage = new Msg(um.header, selectedList);
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', editorId, newMessage));
+    CmdrPostOffice.send(new ServerMessage(refName, id, editorRefName, editorId, newMessage));
   }
 
   void _sendEditorList(Msg um) => mailbox.send(um);
@@ -278,7 +278,7 @@ class CmdrExplorer {
 
   void _setCurrentWorkspace(String newWorkspaceName) {
     Msg um = new Msg('SET_CURRENT_WORKSPACE', newWorkspaceName);
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', 0, um));
+    CmdrPostOffice.send(new ServerMessage(refName, id, editorRefName, 0, um));
 
     if (_currentWatcherStream != null) _currentWatcherStream.cancel();
 
@@ -293,7 +293,7 @@ class CmdrExplorer {
   }
 
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, id);
+    CmdrPostOffice.deregisterStream(refName, id);
     _currentWatcherStream.cancel();
   }
 }

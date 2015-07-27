@@ -56,7 +56,8 @@ class ColumnView {
     ..attributes['role'] = 'tablist';
     columnContent.children.add(_navTabs);
 
-    LIElement controlLi = new LIElement();
+    LIElement controlLi = new LIElement()
+    ..classes.add('tab-control');
     _navTabs.children.add(controlLi);
 
     controlButton = new AnchorElement( )

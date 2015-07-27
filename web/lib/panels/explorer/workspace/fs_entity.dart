@@ -116,7 +116,7 @@ class FolderEntity extends FileSystemEntity {
 
       if (isPackage) {
         menu.add({'type': 'divider', 'title': ''});
-        menu.add({'type': 'toggle', 'title': 'Build', 'handler': build});
+        menu.add({'type': 'toggle', 'title': 'Verify', 'handler': build});
       }
       ContextMenu.createContextMenu(e.page, menu);
     });

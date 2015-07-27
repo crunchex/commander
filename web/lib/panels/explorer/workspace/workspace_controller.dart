@@ -216,25 +216,40 @@ class WorkspaceController implements ExplorerController {
     });
   }
 
+  /// Sends a list of multiple selected package paths to be built, or a Workspace Build
+  /// message if either: the top-level workspace is in the list or if the list is empty.
   void _buildPackages() {
     List<String> packageBuildList = [];
-    entities.values.forEach((FolderEntity entity) {
-      if (entity.isPackage && entity.selected) {
-        entity.toggleBuildingIndicator();
+    for (FolderEntity entity in entities.values) {
+      if (!entity.selected) continue;
+
+      if (entity.isWorkspace) {
+        packageBuildList = [];
+        break;
+      }
+
+      if (entity.isPackage) {
         packageBuildList.add(entity.path);
       }
-    });
+    }
 
     if (packageBuildList.isNotEmpty) {
-      _deselectAllEntities();
+      for (String entityPath in packageBuildList) {
+        FolderEntity package = entities[entityPath];
+        package.toggleBuildingIndicator();
+      }
       _mailbox.ws.send('[[BUILD_PACKAGES]]' + JSON.encode(packageBuildList));
+    } else {
+      FolderEntity package = entities['$workspacePath/src'];
+      package.toggleBuildingIndicator();
+      _mailbox.ws.send('[[WORKSPACE_BUILD]]');
     }
   }
 
   void _buildComplete(Msg um) {
     List<String> entityPaths = JSON.decode(um.body);
     entityPaths.forEach((String entityPath) {
-      FolderEntity package = (entityPath == workspacePath) ? entities['$entityPath/src']: entities[entityPath];
+      FolderEntity package = entities[entityPath];
       package.toggleBuildingIndicator();
     });
   }

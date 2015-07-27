@@ -182,7 +182,7 @@ class CmdrExplorer {
       String resultString = result.exitCode == 0 ? '' : result.stderr;
       help.debug(resultString, 0);
 //      mailbox.send(new Msg('WORKSPACE_BUILD', resultString);
-      mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([_currentWorkspace.path])));
+      mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode(['${_currentWorkspace.path}/src'])));
     });
   }
 

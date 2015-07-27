@@ -234,6 +234,7 @@ class ColumnController {
   int get _maxTabs => (ColumnView.width[state] / 10 * 8).toInt();
 
   void cleanUp() {
+    _view.cleanUp();
     _columnStateChangesController.close();
     _columnEventsController.close();
   }

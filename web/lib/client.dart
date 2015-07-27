@@ -52,6 +52,7 @@ class UpDroidClient {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'MOVE_TAB', _moveTabFromServer);
+    _mailbox.registerWebSocketEvent(EventType.ON_CLOSE, 'CLEAN_UP', _cleanUp);
   }
 
   /// Sets up external event handlers for the various Commander classes. These
@@ -119,6 +120,23 @@ class UpDroidClient {
 
     TabInterface tab = _columnControllers[oldColIndex].removeTab(refName, id);
     _columnControllers[newColIndex].addTab(tab);
+  }
+
+  void _cleanUp(Msg m) {
+    _panels.forEach((panel) {
+      panel.cleanUp();
+      // TODO: need a less hacky way to clean up the explorer stuff.
+      // Right now we have to manually clean up *around* the logo button as it's
+      // part of col-0.
+      panel.view.tabHandle.remove();
+      panel.view.tabContainer.remove();
+    });
+
+    _columnControllers.forEach((controller) => controller.cleanUp());
+
+    String alertMessage = 'UpDroid Commander has lost connection to the server.';
+    alertMessage = alertMessage + ' Please restart the server (if necessary) and refresh the page.';
+    window.alert(alertMessage);
   }
 
   //\/\/ Event Handlers /\/\/

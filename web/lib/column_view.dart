@@ -171,7 +171,11 @@ class ColumnView {
 
   void cleanUp() {
     // TODO: make sure child nodes are all cleaned up.
-    columnContent.innerHtml = '';
-    columnContent = null;
+    columnContent.children.first.remove();
+    columnContent.children.first.innerHtml = '';
+    tabContent.innerHtml = '';
+
+//    columnContent.innerHtml = '';
+//    columnContent = null;
   }
 }

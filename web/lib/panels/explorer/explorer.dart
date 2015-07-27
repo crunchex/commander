@@ -251,11 +251,12 @@ class UpDroidExplorer extends PanelController {
   //\/\/ Handler Helpers /\/\//
 
   void cleanUp() {
-    _fileDropdownListener.cancel();
-    _newWorkspaceListener.cancel();
-//    _closeWorkspaceListener.cancel();
-    _workspaceButtonListener.cancel();
-    _launchersButtonListener.cancel();
+
+    if (_fileDropdownListener != null) _fileDropdownListener.cancel();
+    if (_newWorkspaceListener != null) _newWorkspaceListener.cancel();
+    if (_closeWorkspaceListener != null) _closeWorkspaceListener.cancel();
+    if (_workspaceButtonListener != null) _workspaceButtonListener.cancel();
+    if (_launchersButtonListener != null) _launchersButtonListener.cancel();
   }
 }
 

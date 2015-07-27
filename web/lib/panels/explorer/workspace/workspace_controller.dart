@@ -234,7 +234,7 @@ class WorkspaceController implements ExplorerController {
   void _buildComplete(Msg um) {
     List<String> entityPaths = JSON.decode(um.body);
     entityPaths.forEach((String entityPath) {
-      FolderEntity package = entities[entityPath];
+      FolderEntity package = (entityPath == workspacePath) ? entities['$entityPath/src']: entities[entityPath];
       package.toggleBuildingIndicator();
     });
   }

@@ -123,14 +123,15 @@ class FolderEntity extends FileSystemEntity {
   }
 
   void build() {
+    toggleBuildingIndicator();
+
     // Special case if workspace folder.
     if (name != path.split('/').last) {
       ws.send('[[WORKSPACE_BUILD]]');
       return;
     }
 
-    toggleBuildingIndicator();
-    ws.send('[[BUILD_PACKAGES]]' + JSON.encode([path]));
+    ws.send('[[BUILD_PACKAGE]]' + path);
   }
 
   void toggleBuildingIndicator() {

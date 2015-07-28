@@ -22,6 +22,14 @@ class Package {
     });
   }
 
+  bool hasSelectedLaunchers() {
+    for (Launcher l in launchers) {
+      if (l.isSelected) return true;
+    }
+
+    return false;
+  }
+
   void cleanUp() {
     launchers.forEach((Launcher n) => n.cleanUp());
     view.cleanUp();
@@ -33,14 +41,15 @@ class Launcher {
   List args;
   LauncherView view;
   var deselectAllLaunchers;
+  bool isSelected;
 
   WebSocket _ws;
-
-  bool _selectEnabled, _selected;
+  bool _selectEnabled;
 
   Launcher(this.name, this.args, this.packageName, WebSocket ws, this.deselectAllLaunchers) {
+    isSelected = false;
+
     _ws = ws;
-    _selected = false;
     _selectEnabled = true;
 
     _setUpLauncherView();
@@ -49,7 +58,7 @@ class Launcher {
   }
 
   void runLauncher() {
-    if (!_selected) return;
+    if (!isSelected) return;
 
     List runCommand = [];
     runCommand.addAll([packageName, name]);
@@ -96,18 +105,18 @@ class Launcher {
     });
   }
 
-  void toggleSelected() => _selected ? deselect() : select();
+  void toggleSelected() => isSelected ? deselect() : select();
 
   void select() {
     view.select();
     view.expand();
-    _selected = true;
+    isSelected = true;
   }
 
   void deselect() {
     view.deselect();
     view.collapse();
-    _selected = false;
+    isSelected = false;
   }
 
   void cleanUp() {

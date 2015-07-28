@@ -51,10 +51,12 @@ class LaunchersController implements ExplorerController {
 
   void registerMailbox() {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'LAUNCH', addLaunch);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'BUILD_COMPLETE', _buildComplete);
+
   }
 
   void registerEventHandlers() {
-    _listenersToCleanUp.add(_runLaunchersButton.onClick.listen((e) => _runLaunchers()));
+    _listenersToCleanUp.add(_runLaunchersButton.onClick.listen((e) => _buildPackages()));
     _listenersToCleanUp.add(_launchersView.viewWorkspace.onClick.listen((e) => _toggleView()));
   }
 
@@ -94,6 +96,27 @@ class LaunchersController implements ExplorerController {
       packages[parentPath].view.uElement.children.add(package.view.element);
     }
 
+  }
+
+  /// Sends a list of multiple selected package paths to be built.
+  void _buildPackages() {
+    List<String> packageBuildList = [];
+    for (Package package in packages.values) {
+      if (!package.hasSelectedLaunchers()) continue;
+
+      packageBuildList.add(package.path);
+    }
+
+    if (packageBuildList.isNotEmpty) {
+      _mailbox.ws.send('[[BUILD_PACKAGES]]' + JSON.encode(packageBuildList));
+    }
+  }
+
+  void _buildComplete(Msg um) {
+    List<String> packagePaths = JSON.decode(um.body);
+    packagePaths.forEach((String packagePath) {
+      packages[packagePath].launchers.forEach((Launcher n) => n.runLauncher());
+    });
   }
 
   void _runLaunchers() {

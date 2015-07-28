@@ -74,8 +74,6 @@ class Launcher {
     });
 
     _ws.send('[[RUN_NODE]]' + JSON.encode(runCommand));
-
-    deselect();
   }
 
 

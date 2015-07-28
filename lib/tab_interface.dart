@@ -21,14 +21,15 @@ class TabInterface {
   TabInterface(String binPath, this.refName, this.id, this.dir, [this.extra]) {
     mailbox = new ConsoleMailbox(refName, id);
 
-    _spawnTab(new Uri.file(normalize('$binPath/tabs/$refName/main.dart')));
+    String tabPath = '$binPath/tabs/$refName';
+    _spawnTab(tabPath, new Uri.file(normalize('$tabPath/main.dart')));
   }
 
-  Future _spawnTab(Uri tabFile) async {
+  Future _spawnTab(String tabPath, Uri tabFile) async {
     SendPort initialSendPort = mailbox.receivePort.sendPort;
 
     // Prepare the args.
-    List args = [id, dir.path];
+    List args = [tabPath, id, dir.path];
     if (extra != null) args.addAll(extra);
 
     await Isolate.spawnUri(tabFile, args, initialSendPort);

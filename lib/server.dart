@@ -56,7 +56,7 @@ class CmdrServer {
         ..allowDirectoryListing = true
         ..followLinks = true
         // Uncomment to serve to Dartium for debugging.
-        //..jailroot = false
+        //..jailRoot = false
         ..directoryHandler = (dir, request) {
           // Redirects '/' to 'index.html'
           var indexUri = new Uri.file(dir.path).resolve('index.html');

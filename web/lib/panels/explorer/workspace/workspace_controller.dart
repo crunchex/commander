@@ -8,6 +8,7 @@ import 'package:path/path.dart' as pathLib;
 import 'package:upcom-api/web/modal/modal.dart';
 import 'package:upcom-api/web/menu/context_menu.dart';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
+import 'package:xml/xml.dart';
 
 import '../../panel_controller.dart';
 import '../explorer.dart';
@@ -122,6 +123,16 @@ class WorkspaceController implements ExplorerController {
 
     // If current file is a CMakeLists.txt, tell its parent that it's a package folder.
     if (entity.name == 'CMakeLists.txt') entities[entity.parent].isPackage = true;
+
+    // Detect meta packages with this hacky scheme.
+    // TODO: read contents of package.xml for metapackage tag for bulletproof detection.
+    if (entity.name == 'package.xml') {
+      String parentPath = entity.parent;
+      String parentsParentPath = entities[parentPath].parent;
+      if (parentPath.split('/').last == parentsParentPath.split('/').last) {
+        entities[parentsParentPath].isPackage = true;
+      }
+    }
 
 //    _insertView(entities[entity.parent], entity);
 

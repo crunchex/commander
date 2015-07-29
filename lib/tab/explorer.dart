@@ -15,6 +15,7 @@ import '../post_office.dart';
 class CmdrExplorer {
   static const String refName = 'upcom-explorer';
   static const String editorRefName = 'upcom-editor';
+  static const String buildLogPath = '/var/log/updroid/build.log';
 
   int id;
   CmdrMailbox mailbox;
@@ -78,10 +79,11 @@ class CmdrExplorer {
 
   void _sendWorkspaceNames(Msg um) {
     List<String> names = [];
-    uproot.list()
-    .where((Directory w) => Workspace.isWorkspace(w.path))
-    .listen((Directory w) => names.add(w.path.split('/').last))
-    .onDone(() => mailbox.send(new Msg('WORKSPACE_NAMES', JSON.encode(names))));
+    uproot
+        .list()
+        .where((Directory w) => Workspace.isWorkspace(w.path))
+        .listen((Directory w) => names.add(w.path.split('/').last))
+        .onDone(() => mailbox.send(new Msg('WORKSPACE_NAMES', JSON.encode(names))));
   }
 
   void _newWorkspace(Msg um) {
@@ -116,7 +118,7 @@ class CmdrExplorer {
     Directory newFolder = new Directory(fullPath);
 
     int untitledNum = 0;
-    while(newFolder.existsSync()) {
+    while (newFolder.existsSync()) {
       untitledNum++;
       fullPath = path + untitledNum.toString();
       newFolder = new Directory(fullPath);
@@ -178,23 +180,50 @@ class CmdrExplorer {
   }
 
   void _buildWorkspace(Msg um) {
-    _currentWorkspace.buildWorkspace().then((result) {
-      String resultString = result.exitCode == 0 ? '' : result.stderr;
-      help.debug(resultString, 0);
-//      mailbox.send(new Msg('WORKSPACE_BUILD', resultString);
-      mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode(['${_currentWorkspace.path}/src'])));
-    });
+    File log = new File(buildLogPath);
+    IOSink sink;
+    try {
+      sink = log.openWrite();
+    } on FileSystemException {
+      help.debug('Couldn\'t write build output to $buildLogPath', 1);
+    }
+
+    _currentWorkspace.buildWorkspace().listen((data) {
+      if (sink != null) sink.write(data);
+    })
+      ..onDone(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode(['${_currentWorkspace.path}/src'])));
+      })
+      ..onError(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode(['${_currentWorkspace.path}/src'])));
+      });
   }
 
   void _buildPackage(Msg um) {
     String packagePath = um.body;
     String packageName = packagePath.split('/').last;
-    _currentWorkspace.buildPackage(packageName).then((result) {
-      String resultString = result.exitCode == 0 ? '' : result.stderr;
-      help.debug(resultString, 0);
-//      mailbox.send(new Msg('PACKAGE_BUILD_RESULTS', resultString);
-      mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([packagePath])));
-    });
+
+    File log = new File(buildLogPath);
+    IOSink sink;
+    try {
+      sink = log.openWrite();
+    } on FileSystemException {
+      help.debug('Couldn\'t write build output to $buildLogPath', 1);
+    }
+
+    _currentWorkspace.buildPackage(packageName).listen((data) {
+      if (sink != null) sink.write(data);
+    })
+      ..onDone(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([packagePath])));
+      })
+      ..onError(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([packagePath])));
+      });
   }
 
   void _buildPackages(Msg um) {
@@ -202,14 +231,28 @@ class CmdrExplorer {
     List<String> packagePaths = JSON.decode(data);
 
     List<String> packageNames = [];
-    packagePaths.forEach((String packagePath) => packageNames.add(packagePath.split('/').last));
+    packagePaths.forEach(
+        (String packagePath) => packageNames.add(packagePath.split('/').last));
 
-    _currentWorkspace.buildPackages(packageNames).then((result) {
-      String resultString = result.exitCode == 0 ? '' : result.stderr;
-      help.debug(resultString, 0);
-//      mailbox.send(new Msg('PACKAGE_BUILD_RESULTS', resultString);
-      mailbox.send(new Msg('BUILD_COMPLETE', data));
-    });
+    File log = new File(buildLogPath);
+    IOSink sink;
+    try {
+      sink = log.openWrite();
+    } on FileSystemException {
+      help.debug('Couldn\'t write build output to $buildLogPath', 1);
+    }
+
+    _currentWorkspace.buildPackages(packageNames).listen((data) {
+      if (sink != null) sink.write(data);
+    })
+      ..onDone(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', data));
+      })
+      ..onError(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', data));
+      });
   }
 
   void _createPackage(Msg um) {
@@ -219,7 +262,9 @@ class CmdrExplorer {
     List<String> dependencies = JSON.decode(split[1]);
 
     // A workspace that hasn't been built yet will cause problems.
-    _currentWorkspace.createPackage(name, dependencies).then((ProcessResult result) {
+    _currentWorkspace
+        .createPackage(name, dependencies)
+        .then((ProcessResult result) {
       String stderr = result.stderr;
       if (stderr.contains('devel/setup.bash: No such file or directory')) {
         mailbox.send(new Msg('CREATE_PACKAGE_FAILED', stderr));

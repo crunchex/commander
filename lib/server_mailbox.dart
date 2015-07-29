@@ -4,8 +4,8 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:upcom-api/tab_backend.dart';
+import 'package:upcom-api/debug.dart';
 
-import 'server_helper.dart' as help;
 import 'post_office.dart';
 
 class CmdrMailbox {
@@ -28,10 +28,10 @@ class CmdrMailbox {
     inbox = CmdrPostOffice.registerClass(refName, id);
 
     inbox.listen((Msg um) {
-      help.debug('[${refName}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
+      debug('[${refName}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
 
       if (!_serverStreamRegistry.containsKey(um.header)) {
-        help.debug('[${refName}\'s Mailbox] handler for header: ${um.header} not found', 0);
+        debug('[${refName}\'s Mailbox] handler for header: ${um.header} not found', 0);
         return;
       }
 
@@ -46,7 +46,7 @@ class CmdrMailbox {
     if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == refName) {
       ws.listen((String s) {
         Msg um = new Msg.fromString(s);
-        help.debug('$refName incoming: ' + um.header, 0);
+        debug('$refName incoming: ' + um.header, 0);
 
         _wsRegistry[um.header](um);
       }).onDone(() => _wsCloseRegistry.forEach((f()) => f()));

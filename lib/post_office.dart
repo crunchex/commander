@@ -3,8 +3,8 @@ library post_office;
 import 'dart:io';
 import 'dart:async';
 
+import 'package:upcom-api/debug.dart';
 import 'package:upcom-api/tab_backend.dart';
-import 'server_helper.dart' as help;
 
 CmdrPostOffice _postOffice;
 
@@ -21,7 +21,7 @@ class CmdrPostOffice {
   static void send(ServerMessage sm) => postOffice.postOfficeStream.add(sm);
 
   static Stream registerClass(String receiverClass, int id) {
-    help.debug('[CmdrPostOffice] Registering $receiverClass-$id', 0);
+    debug('[CmdrPostOffice] Registering $receiverClass-$id', 0);
 
     // Set up the stream controller for the outgoing stream.
     if (!postOffice.outboxes.containsKey(receiverClass)) {
@@ -35,7 +35,7 @@ class CmdrPostOffice {
   static Future<bool> deregisterStream(String receiverClass, int id) {
     Completer c = new Completer();
 
-    help.debug('[CmdrPostOffice] De-registering $receiverClass-$id', 0);
+    debug('[CmdrPostOffice] De-registering $receiverClass-$id', 0);
 
     if (!postOffice.outboxes.containsKey(receiverClass) || !postOffice.outboxes[receiverClass].containsKey(id)) {
       c.complete(false);
@@ -65,7 +65,7 @@ class CmdrPostOffice {
   void _dispatch(ServerMessage sm) {
     // TODO: set up some buffer or queue for currently undeliverable messages.
     if (!postOffice.outboxes.containsKey(sm.receiverClass)) {
-      help.debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.receiverId} with header ${sm.um.header}', 0);
+      debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.receiverId} with header ${sm.um.header}', 0);
       return;
     }
 
@@ -87,7 +87,7 @@ class CmdrPostOffice {
     // Dispatch message to registered receiver with matching class and specific ID.
     // TODO: set up some buffer or queue for currently undeliverable messages.
     if (!postOffice.outboxes[sm.receiverClass].containsKey(sm.receiverId)) {
-      help.debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.receiverId} with header ${sm.um.header}', 0);
+      debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.receiverId} with header ${sm.um.header}', 0);
       return;
     }
     outboxes[sm.receiverClass][sm.receiverId].add(sm.um);

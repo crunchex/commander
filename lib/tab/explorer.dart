@@ -7,9 +7,9 @@ import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as pathLib;
 import 'package:upcom-api/ros.dart';
 import 'package:upcom-api/tab_backend.dart';
+import 'package:upcom-api/debug.dart';
 
 import '../server_mailbox.dart';
-import '../server_helper.dart' as help;
 import '../post_office.dart';
 
 class CmdrExplorer {
@@ -186,7 +186,7 @@ class CmdrExplorer {
     try {
       sink = log.openWrite();
     } on FileSystemException {
-      help.debug('Couldn\'t write build output to $buildLogPath', 1);
+      debug('Couldn\'t write build output to $buildLogPath', 1);
     }
 
     _currentWorkspace.buildWorkspace().listen((data) {
@@ -220,7 +220,7 @@ class CmdrExplorer {
     try {
       sink = log.openWrite();
     } on FileSystemException {
-      help.debug('Couldn\'t write build output to $buildLogPath', 1);
+      debug('Couldn\'t write build output to $buildLogPath', 1);
     }
 
     _currentWorkspace.buildPackage(packageName).listen((data) {
@@ -249,7 +249,7 @@ class CmdrExplorer {
     try {
       sink = log.openWrite();
     } on FileSystemException {
-      help.debug('Couldn\'t write build output to $buildLogPath', 1);
+      debug('Couldn\'t write build output to $buildLogPath', 1);
     }
 
     _currentWorkspace.buildPackages(packageNames).listen((data) {
@@ -327,7 +327,7 @@ class CmdrExplorer {
     String fileString = isFile ? 'F:${path}' : 'D:${path}';
 
     Msg formatted = new Msg('${header}_UPDATE', fileString);
-    help.debug('Outgoing: ' + formatted.toString(), 0);
+    debug('Outgoing: ' + formatted.toString(), 0);
     if (header != 'MODIFY') mailbox.send(formatted);
   }
 

@@ -16,7 +16,7 @@ class CmdrGuiCommand extends Command {
   }
 
   void run() {
-    help.enableDebug(argResults['debug']);
+    enableDebug(argResults['debug']);
     new CmdrServer(argResults);
   }
 }
@@ -50,7 +50,7 @@ class BuildLogCommand extends Command {
       shell.stderr.transform(UTF8.decoder).listen((data) => print(data));
     }).catchError((error) {
       if (error is! ProcessException) throw error;
-      help.debug('Unable to tail $logFileDir', 1);
+      debug('Unable to tail $logFileDir', 1);
       return;
     });
   }

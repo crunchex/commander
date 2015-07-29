@@ -10,10 +10,10 @@ import 'package:http_server/http_server.dart';
 import 'package:path/path.dart' as pathLib;
 import 'package:upcom-api/git.dart';
 import 'package:upcom-api/tab_backend.dart';
+import 'package:upcom-api/debug.dart';
 
 import 'tab/explorer.dart';
 import 'server_mailbox.dart';
-import 'server_helper.dart' as help;
 import 'tab_interface.dart';
 import 'post_office.dart';
 
@@ -73,11 +73,11 @@ class CmdrServer {
     HttpServer.bind(InternetAddress.ANY_IP_V4, 12060).then((HttpServer server) {
       _printStartMessage();
 
-      help.debug("HttpServer listening on port:${server.port}...", 0);
+      debug("HttpServer listening on port:${server.port}...", 0);
       server.asBroadcastStream()
           .listen((HttpRequest request) => _routeRequest(request, virDir))
           .asFuture()  // Automatically cancels on error.
-          .catchError((_) => help.debug("caught error", 1));
+          .catchError((_) => debug("caught error", 1));
     });
   }
 
@@ -88,7 +88,7 @@ class CmdrServer {
       return;
     }
 
-    help.debug('Upgraded request received: ${request.uri.path}', 0);
+    debug('Upgraded request received: ${request.uri.path}', 0);
 
     // TODO: objectIDs start at 1, but List indexes start at 0 - fix this.
     int objectID = int.parse(request.uri.pathSegments[1]);
@@ -111,12 +111,12 @@ class CmdrServer {
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
-//    help.debug("${request.method} request for: ${request.uri.path}", 0);
+//    debug("${request.method} request for: ${request.uri.path}", 0);
 
     if (virDir != null) {
       virDir.serveRequest(request);
     } else {
-      help.debug('ERROR: no Virtual Directory to serve', 1);
+      debug('ERROR: no Virtual Directory to serve', 1);
     }
   }
 
@@ -162,7 +162,7 @@ class CmdrServer {
     List runArgs = um.body.split('++');
     String dirPath = runArgs[0];
     String password = runArgs[1];
-    //help.debug('dirPath: $dirPath, password: $password', 0);
+    //debug('dirPath: $dirPath, password: $password', 0);
     Git.push(dirPath, password);
   }
 
@@ -172,7 +172,7 @@ class CmdrServer {
     int num = int.parse(idList[1]);
     String type = idList[2];
 
-    help.debug('Open panel request received: $id', 0);
+    debug('Open panel request received: $id', 0);
 
     if (!_panels.containsKey(type)) _panels[type] = {};
 
@@ -191,7 +191,7 @@ class CmdrServer {
 
     String binPath = '$_installationPath/bin';
 
-    help.debug('Open tab request received: $id', 0);
+    debug('Open tab request received: $id', 0);
 
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
 
@@ -237,7 +237,7 @@ class CmdrServer {
     String type = idList[0];
     int id = int.parse(idList[1]);
 
-    help.debug('Close tab request received: ${idList.toString()}', 0);
+    debug('Close tab request received: ${idList.toString()}', 0);
 
     if (_tabs[type][id] != null) {
       _tabs[type][id].close();
@@ -260,7 +260,7 @@ class CmdrServer {
   }
 
   void _cleanUpBackend() {
-    help.debug('Client disconnected, cleaning up...', 0);
+    debug('Client disconnected, cleaning up...', 0);
 
     _panels = {};
 
@@ -271,7 +271,7 @@ class CmdrServer {
     });
     _tabs = {};
 
-    help.debug('Clean up done.', 0);
+    debug('Clean up done.', 0);
   }
 
   void _printStartMessage() {

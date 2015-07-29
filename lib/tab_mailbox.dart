@@ -5,9 +5,9 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:convert';
 
+import 'package:upcom-api/debug.dart';
 import 'package:upcom-api/tab_backend.dart';
 
-import 'server_helper.dart' as help;
 import 'post_office.dart';
 
 class IsolateMailbox {
@@ -26,7 +26,7 @@ class IsolateMailbox {
     inbox = CmdrPostOffice.registerClass(refName, id);
 
     inbox.listen((Msg um) {
-      help.debug('[${refName}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
+      debug('[${refName}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
       sendPort.send(um.toString());
     });
   }
@@ -41,7 +41,7 @@ class IsolateMailbox {
     this.ws = ws;
 
     if (endpointRegistry.contains(request.uri.path)) {
-      help.debug('Sending endpoint connection confirmation to: ${request.uri.path}', 0);
+      debug('Sending endpoint connection confirmation to: ${request.uri.path}', 0);
       Msg um = new Msg(request.uri.path, '');
       sendPort.send(um.toString());
     }
@@ -49,14 +49,14 @@ class IsolateMailbox {
     ws.listen((String s) {
       if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == refName) {
         Msg um = new Msg.fromString(s);
-        help.debug('$refName incoming: ' + um.header, 0);
+        debug('$refName incoming: ' + um.header, 0);
 
         sendPort.send(um.toString());
       } else if (endpointRegistry.contains(request.uri.path)) {
         Msg um = new Msg(request.uri.path, s);
         sendPort.send(um.toString());
       } else {
-        help.debug('Cannot deliver message to Isolate: ${request.uri.path}', 0);
+        debug('Cannot deliver message to Isolate: ${request.uri.path}', 0);
       }
     });
   }
@@ -72,7 +72,7 @@ class IsolateMailbox {
 
     if (header == 'REG_ENDPOINT') {
       String endpoint = raw.substring(endIndex + 4, raw.length);
-      help.debug('Registering endpoint: $endpoint', 0);
+      debug('Registering endpoint: $endpoint', 0);
       endpointRegistry.add(endpoint);
     }
   }

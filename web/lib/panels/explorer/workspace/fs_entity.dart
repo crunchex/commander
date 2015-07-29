@@ -117,6 +117,7 @@ class FolderEntity extends FileSystemEntity {
       if (isPackage) {
         menu.add({'type': 'divider', 'title': ''});
         menu.add({'type': 'toggle', 'title': 'Verify', 'handler': build});
+        menu.add({'type': 'toggle', 'title': 'Clean', 'handler': clean});
       }
       ContextMenu.createContextMenu(e.page, menu);
     });
@@ -132,6 +133,16 @@ class FolderEntity extends FileSystemEntity {
     }
 
     ws.send('[[BUILD_PACKAGE]]' + path);
+  }
+
+  void clean() {
+    // Special case if workspace folder.
+    if (name != path.split('/').last) {
+      ws.send('[[WORKSPACE_CLEAN]]');
+      return;
+    }
+
+    ws.send('[[CLEAN_PACKAGE]]' + path);
   }
 
   void toggleBuildingIndicator() {

@@ -53,6 +53,7 @@ class CmdrExplorer {
     mailbox.registerWebSocketEvent('OPEN_FILE', _openFile);
     mailbox.registerWebSocketEvent('WORKSPACE_CLEAN', _workspaceClean);
     mailbox.registerWebSocketEvent('WORKSPACE_BUILD', _buildWorkspace);
+    mailbox.registerWebSocketEvent('CLEAN_PACKAGE', _cleanPackage);
     mailbox.registerWebSocketEvent('BUILD_PACKAGE', _buildPackage);
     mailbox.registerWebSocketEvent('BUILD_PACKAGES', _buildPackages);
     mailbox.registerWebSocketEvent('CREATE_PACKAGE', _createPackage);
@@ -174,7 +175,7 @@ class CmdrExplorer {
   }
 
   void _workspaceClean(Msg um) {
-    _currentWorkspace.clean().then((result) {
+    _currentWorkspace.cleanWorkspace().then((result) {
       mailbox.send(new Msg('WORKSPACE_CLEAN', ''));
     });
   }
@@ -199,6 +200,15 @@ class CmdrExplorer {
         if (sink != null) sink.close();
         mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode(['${_currentWorkspace.path}/src'])));
       });
+  }
+
+  void _cleanPackage(Msg um) {
+    String packagePath = um.body;
+    String packageName = packagePath.split('/').last;
+
+    _currentWorkspace.cleanPackage(packageName).then((result) {
+      mailbox.send(new Msg('PACKAGE_CLEAN', packagePath));
+    });
   }
 
   void _buildPackage(Msg um) {

@@ -1,4 +1,4 @@
-library console_mailbox;
+library commander.lib.tab_mailbox;
 
 import 'dart:io';
 import 'dart:async';
@@ -10,7 +10,7 @@ import 'package:upcom-api/tab_backend.dart';
 import 'server_helper.dart' as help;
 import 'post_office.dart';
 
-class ConsoleMailbox {
+class IsolateMailbox {
   String refName;
   int id;
   WebSocket ws;
@@ -19,7 +19,7 @@ class ConsoleMailbox {
   SendPort sendPort;
   Set endpointRegistry;
 
-  ConsoleMailbox(this.refName, this.id) {
+  IsolateMailbox(this.refName, this.id) {
     endpointRegistry = new Set<String>();
     receivePort = new ReceivePort();
 

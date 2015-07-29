@@ -7,7 +7,7 @@ import 'dart:isolate';
 import 'package:upcom-api/tab_backend.dart';
 import 'package:path/path.dart';
 
-import 'console_mailbox.dart';
+import 'tab_mailbox.dart';
 
 class TabInterface {
   String refName;
@@ -16,10 +16,10 @@ class TabInterface {
   List extra;
 
   Isolate tab;
-  ConsoleMailbox mailbox;
+  IsolateMailbox mailbox;
 
   TabInterface(String binPath, this.refName, this.id, this.dir, [this.extra]) {
-    mailbox = new ConsoleMailbox(refName, id);
+    mailbox = new IsolateMailbox(refName, id);
 
     String tabPath = '$binPath/tabs/$refName';
     _spawnTab(tabPath, new Uri.file(normalize('$tabPath/main.dart')));

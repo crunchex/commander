@@ -26,6 +26,10 @@ class CmdrServer {
   static const bool defaultDebugFlag = false;
   static const bool defaultQuiet = false;
 
+  static const String explorerRefName = 'upcom-explorer';
+  static const String editorRefName = 'upcom-editor';
+  static const String consoleRefName = 'upcom-console';
+
   ArgResults _args;
 
   Map _panels = {};
@@ -100,7 +104,7 @@ class CmdrServer {
       return;
     }
 
-    if (type == 'upcom-explorer') {
+    if (type == explorerRefName) {
       WebSocketTransformer.upgrade(request)
       .then((WebSocket ws) => _panels[type][objectID].mailbox.handleWebSocket(ws, request));
       return;
@@ -148,8 +152,8 @@ class CmdrServer {
         _mailbox.send(new Msg('SERVER_READY', strConfig));
       } else {
         List listConfig = [
-          [{'id': 1, 'class': 'upcom-editor'}],
-          [{'id': 1, 'class': 'upcom-console'}]
+          [{'id': 1, 'class': editorRefName}],
+          [{'id': 1, 'class': consoleRefName}]
         ];
 
         String strConfig = JSON.encode(listConfig);
@@ -177,7 +181,7 @@ class CmdrServer {
     if (!_panels.containsKey(type)) _panels[type] = {};
 
     switch (type) {
-      case 'upcom-explorer':
+      case explorerRefName:
         _panels[type][num] = new CmdrExplorer(num, dir);
         break;
     }
@@ -256,7 +260,7 @@ class CmdrServer {
     String pathToOpen = split[2];
 
     List<String> editorList = [];
-    _tabs['upcom-editor'].keys.forEach((int id) => editorList.add(id.toString()));
+    _tabs[editorRefName].keys.forEach((int id) => editorList.add(id.toString()));
     Msg newMessage = new Msg('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
     CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, senderClass, senderId, newMessage));
   }

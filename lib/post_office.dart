@@ -1,6 +1,5 @@
 library post_office;
 
-import 'dart:io';
 import 'dart:async';
 
 import 'package:upcom-api/debug.dart';

@@ -8,7 +8,6 @@ import 'package:path/path.dart' as pathLib;
 import 'package:upcom-api/web/modal/modal.dart';
 import 'package:upcom-api/web/menu/context_menu.dart';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
-import 'package:xml/xml.dart';
 
 import '../../panel_controller.dart';
 import '../explorer.dart';

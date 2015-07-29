@@ -9,6 +9,7 @@ void main(List<String> args) {
 
   CommandRunner runner = new CommandRunner("cmdr", "UpDroid Commander - Robotics Software IDE.")
     ..addCommand(new InfoCommand(version))
+    ..addCommand(new BuildLogCommand())
     ..addCommand(new CmdrGuiCommand());
 
     runner.run(args).catchError((error) {

@@ -31,7 +31,7 @@ class UpDroidExplorer extends PanelController {
         {'type': 'toggle', 'title': 'Clean Workspace'},
 //        {'type': 'toggle', 'title': 'Upload with Git'},
         {'type': 'divider', 'title': 'Launchers'},
-        {'type': 'toggle', 'title': 'Verify and Run'}]},
+        {'type': 'toggle', 'title': 'Run Launchers'}]},
       {'title': 'View', 'items': [
         {'type': 'toggle', 'title': 'Workspace'},
         {'type': 'toggle', 'title': 'Launchers'}]}
@@ -81,7 +81,7 @@ class UpDroidExplorer extends PanelController {
     _buildPackagesButton = view.refMap['verify'];
     _cleanWorkspaceButton = view.refMap['clean-workspace'];
 //      _uploadButton = _view.refMap['upload-with-git'];
-    _runLaunchersButton = view.refMap['verify-and-run'];
+    _runLaunchersButton = view.refMap['run-launchers'];
 
     _workspaceButton = view.refMap['workspace'];
     _launchersButton = view.refMap['launchers'];

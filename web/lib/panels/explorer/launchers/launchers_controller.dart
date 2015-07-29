@@ -56,7 +56,7 @@ class LaunchersController implements ExplorerController {
   }
 
   void registerEventHandlers() {
-    _listenersToCleanUp.add(_runLaunchersButton.onClick.listen((e) => _buildPackages()));
+    _listenersToCleanUp.add(_runLaunchersButton.onClick.listen((e) => _runLaunchers()));
     _listenersToCleanUp.add(_launchersView.viewWorkspace.onClick.listen((e) => _toggleView()));
   }
 

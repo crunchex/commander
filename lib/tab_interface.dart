@@ -59,6 +59,6 @@ class TabInterface {
   }
 
   void close() {
-//    tab.cleanup();
+    mailbox.close();
   }
 }

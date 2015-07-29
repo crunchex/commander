@@ -76,4 +76,8 @@ class IsolateMailbox {
       endpointRegistry.add(endpoint);
     }
   }
+
+  void close() {
+    CmdrPostOffice.deregisterStream(refName, id);
+  }
 }

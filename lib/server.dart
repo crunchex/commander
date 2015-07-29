@@ -250,13 +250,15 @@ class CmdrServer {
   void _moveTabFromServer(Msg um) => _mailbox.send(new Msg('MOVE_TAB', um.body));
 
   void _sendEditorList(Msg um) {
-    String pathToOpen = um.body;
+    List<String> split = um.body.split(':');
+    String senderClass = split[0];
+    int senderId = int.parse(split[1]);
+    String pathToOpen = split[2];
+
     List<String> editorList = [];
     _tabs['upcom-editor'].keys.forEach((int id) => editorList.add(id.toString()));
     Msg newMessage = new Msg('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
-    // TODO: need to able to reply back to exact sender in CmdrPostOffice.
-    // This is a hacky way to reply back to the requesting explorer.
-    CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, 'upcom-explorer', 0, newMessage));
+    CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, senderClass, senderId, newMessage));
   }
 
   void _cleanUpBackend() {

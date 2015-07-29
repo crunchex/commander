@@ -300,7 +300,8 @@ class CmdrExplorer {
   }
 
   void _requestEditorList(Msg um) {
-    CmdrPostOffice.send(new ServerMessage(refName, id, Tab.upcomName, 0, um));
+    Msg messageWithSender = new Msg('REQUEST_EDITOR_LIST', '${refName}:$id:${um.body}');
+    CmdrPostOffice.send(new ServerMessage(refName, id, Tab.upcomName, 0, messageWithSender));
   }
 
   void _returnSelected(Msg um) {

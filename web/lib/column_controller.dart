@@ -3,14 +3,11 @@ library column_controller;
 import 'dart:async';
 import 'dart:html';
 
-import 'tabs/tab_controller.dart';
-import 'tabs/teleop/teleop.dart';
-import 'tabs/editor/editor.dart';
-import 'tabs/console/console.dart';
-import 'tabs/camera/camera.dart';
-import 'modal/modal.dart';
+import 'package:upcom-api/web/modal/modal.dart';
+import 'package:upcom-api/web/mailbox/mailbox.dart';
+
 import 'column_view.dart';
-import 'mailbox.dart';
+import 'tab_interface.dart';
 
 enum ColumnState { MINIMIZED, NORMAL, MAXIMIZED }
 enum ColumnEvent { LOST_FOCUS }
@@ -20,6 +17,7 @@ class ColumnController {
   ColumnState state;
   Stream<ColumnState> columnStateChanges;
   Stream<ColumnEvent> columnEvents;
+  Map _tabsInfo;
 
   StreamController<ColumnState> _columnStateChangesController;
   StreamController<ColumnEvent> _columnEventsController;
@@ -30,11 +28,12 @@ class ColumnController {
   bool _disableCyclingHotkeys;
 
   ColumnView _view;
-  List<TabController> _tabs;
+  List<TabInterface> _tabs;
 
-  ColumnController(this.columnId, this.state, List config, Mailbox mailbox, Function getAvailableId) {
+  ColumnController(this.columnId, this.state, List config, Mailbox mailbox, Map tabInfo, Function getAvailableId) {
     _config = config;
     _mailbox = mailbox;
+    _tabsInfo = tabInfo;
     _getAvailableId = getAvailableId;
 
     _columnStateChangesController = new StreamController<ColumnState>();
@@ -55,9 +54,9 @@ class ColumnController {
     });
   }
 
-  void setUpController() {
+  Future setUpController() async {
     for (Map tab in _config) {
-      openTab(tab['id'], tab['class']);
+      await openTab(tab['id'], _tabsInfo[tab['class']]);
     }
   }
 
@@ -66,7 +65,7 @@ class ColumnController {
       e.preventDefault();
       if (!canAddMoreTabs) return;
 
-      new UpDroidOpenTabModal(openTabFromModal);
+      new UpDroidOpenTabModal(openTabFromModal, _tabsInfo);
     });
 
     _view.maximizeButton.onClick.listen((e) {
@@ -91,7 +90,7 @@ class ColumnController {
       }
 
       // Cycle tabs.
-      TabController currentActiveTab = _tabs.firstWhere((TabController tab) => tab.view.tabHandle.classes.contains('active'));
+      TabInterface currentActiveTab = _tabs.firstWhere((TabInterface tab) => tab.isActive());
       int currentActiveTabIndex = _tabs.indexOf(currentActiveTab);
 
       if (e.keyCode == KeyCode.PAGE_DOWN && currentActiveTabIndex > 0) {
@@ -106,7 +105,7 @@ class ColumnController {
     _view.tabContent.querySelector('.active').children[1].focus();
   }
 
-  void cycleTab(bool left, TabController currentActiveTab, int currentActiveTabIndex) {
+  void cycleTab(bool left, TabInterface currentActiveTab, int currentActiveTabIndex) {
     currentActiveTab.makeInactive();
 
     if (left) {
@@ -142,80 +141,68 @@ class ColumnController {
     _view.minimize();
   }
 
-  /// Returns a list of IDs of all tabs whose type match [className].
-  List<int> returnIds(String className) {
+  /// Returns a list of IDs of all tabs whose type match [refName].
+  List<int> returnIds(String refName) {
     List<int> ids = [];
     _tabs.forEach((tab) {
-      if (tab.fullName == className) ids.add(tab.id);
+      if (tab.refName == refName) ids.add(tab.id);
     });
     return ids;
   }
 
   /// Opens a [TabController].
-  void openTab(int id, String className) {
-    if (!canAddMoreTabs) return;
+  Future openTab(int id, Map tabInfo) async {
+    if (!canAddMoreTabs) return null;
 
     if (_tabs.isNotEmpty) {
-      for (var tab in _tabs) {
+      for (TabInterface tab in _tabs) {
         tab.makeInactive();
       }
     }
 
-    TabController newTab;
-    if (className == 'UpDroidEditor') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      newTab = new UpDroidEditor(id, columnId);
-    } else if (className == 'UpDroidCamera') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      newTab = new UpDroidCamera(id, columnId);
-    } else if (className == 'UpDroidTeleop') {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className');
-      newTab = new UpDroidTeleop(id, columnId);
-    } else if (className == 'UpDroidConsole') {
-      // TODO: initial size should not be hardcoded.
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$columnId-$id-$className-25-80');
-      //Isolate console = await spawnDomUri(new Uri.file('lib/tabs/console.dart'), ['test'], [id, column, true]);
-      newTab = new UpDroidConsole(id, columnId);
-    }
+    TabInterface tab = new TabInterface(id, columnId, tabInfo, _mailbox);
+    await tab.setupComplete;
+    _tabs.add(tab);
 
-    _tabs.add(newTab);
+    return null;
   }
 
   /// A wrapper for [openTab] when an availble ID needs to be chosen across all open [ColumnController]s.
-  void openTabFromModal(String className) {
-    int id = _getAvailableId(className);
-    openTab(id, className);
+  void openTabFromModal(Map tabInfo) {
+    int id = _getAvailableId(tabInfo['refName']);
+    openTab(id, tabInfo);
   }
 
-  /// Locates a [TabController] by [tabId] and [tabType] and closes it. Returns true if
+  /// Locates a [TabController] by [tabId] and [refName] and closes it. Returns true if
   /// said tab was found.
-  bool findAndCloseTab(int tabId, String tabType) {
+  bool findAndCloseTab(int tabId, String refName) {
     bool found = false;
     for (int i = 0; i < _tabs.length; i++) {
-      if (_tabs[i].fullName == tabType && _tabs[i].id == tabId) {
+      if (_tabs[i].refName == refName && _tabs[i].id == tabId) {
         found = true;
+        _tabs[i].shutdownScript();
         _tabs.removeAt(i);
         break;
       }
     }
 
     // Make all tabs in that column inactive except the last.
-    _tabs.forEach((TabController tab) => tab.makeInactive());
+    _tabs.forEach((TabInterface tab) => tab.makeInactive());
 
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
 
-    _mailbox.ws.send('[[CLOSE_TAB]]' + tabType + '_' + tabId.toString());
+    _mailbox.ws.send('[[CLOSE_TAB]]' + refName + ':' + tabId.toString());
 
     return found;
   }
 
-  TabController removeTab(String tabType, int id) {
-    TabController tab = _tabs.firstWhere((TabController t) => t.fullName == tabType && t.id == id);
+  TabInterface removeTab(String refName, int id) {
+    TabInterface tab = _tabs.firstWhere((TabInterface t) => t.refName == refName && t.id == id);
     _tabs.remove(tab);
 
     // Make all tabs in that column inactive except the last.
-    _tabs.forEach((TabController tab) => tab.makeInactive());
+    _tabs.forEach((TabInterface tab) => tab.makeInactive());
 
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
@@ -223,15 +210,19 @@ class ColumnController {
     return tab;
   }
 
-  void addTab(TabController tab) {
+  void addTab(TabInterface tab) {
     // Make all tabs in that column inactive before adding the new one.
-    _tabs.forEach((TabController tab) => tab.makeInactive());
+    _tabs.forEach((TabInterface tab) => tab.makeInactive());
 
     // Move the tab handle.
     querySelector('#column-${columnId.toString()}').children[1].children.add(tab.view.tabHandle);
     // Move the tab content.
     querySelector('#col-${columnId.toString()}-tab-content').children.add(tab.view.tabContainer);
-    // Update the controller and view's columns.
+
+    // Send a message to update the column on the real classes.
+    _mailbox.ws.send('[[UPDATE_COLUMN]]' + tab.refName + ':' + tab.id.toString() + ':' + columnId.toString());
+
+    // Update the [TabInterface] and [TabViewInterface]'s columns.
     tab.col = columnId;
     tab.view.col = columnId;
 
@@ -243,6 +234,7 @@ class ColumnController {
   int get _maxTabs => (ColumnView.width[state] / 10 * 8).toInt();
 
   void cleanUp() {
+    _view.cleanUp();
     _columnStateChangesController.close();
     _columnEventsController.close();
   }

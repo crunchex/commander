@@ -1,11 +1,9 @@
 library post_office;
 
-import 'dart:io';
 import 'dart:async';
 
-import 'tab/api/server_message.dart';
-import 'tab/api/updroid_message.dart';
-import 'server_helper.dart' as help;
+import 'package:upcom-api/debug.dart';
+import 'package:upcom-api/tab_backend.dart';
 
 CmdrPostOffice _postOffice;
 
@@ -22,7 +20,7 @@ class CmdrPostOffice {
   static void send(ServerMessage sm) => postOffice.postOfficeStream.add(sm);
 
   static Stream registerClass(String receiverClass, int id) {
-    help.debug('[CmdrPostOffice] Registering $receiverClass-$id', 0);
+    debug('[CmdrPostOffice] Registering $receiverClass-$id', 0);
 
     // Set up the stream controller for the outgoing stream.
     if (!postOffice.outboxes.containsKey(receiverClass)) {
@@ -36,7 +34,7 @@ class CmdrPostOffice {
   static Future<bool> deregisterStream(String receiverClass, int id) {
     Completer c = new Completer();
 
-    help.debug('[CmdrPostOffice] De-registering $receiverClass-$id', 0);
+    debug('[CmdrPostOffice] De-registering $receiverClass-$id', 0);
 
     if (!postOffice.outboxes.containsKey(receiverClass) || !postOffice.outboxes[receiverClass].containsKey(id)) {
       c.complete(false);
@@ -66,12 +64,12 @@ class CmdrPostOffice {
   void _dispatch(ServerMessage sm) {
     // TODO: set up some buffer or queue for currently undeliverable messages.
     if (!postOffice.outboxes.containsKey(sm.receiverClass)) {
-      help.debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.id} with header ${sm.um.header}', 0);
+      debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.receiverId} with header ${sm.um.header}', 0);
       return;
     }
 
     // Dispatch message to registered receiver with lowest ID.
-    if (sm.id < 0) {
+    if (sm.receiverId < 0) {
       List<int> outboxIds = new List<int>.from(outboxes[sm.receiverClass].keys);
       outboxIds.sort();
       outboxes[sm.receiverClass][outboxIds.first].add(sm.um);
@@ -79,7 +77,7 @@ class CmdrPostOffice {
     }
 
     // Dispatch message to all registered receivers with matching class.
-    if (sm.id == 0) {
+    if (sm.receiverId == 0) {
       Map<int, StreamController<Msg>> boxes = outboxes[sm.receiverClass];
       boxes.values.forEach((StreamController<Msg> s) => s.add(sm.um));
       return;
@@ -87,11 +85,11 @@ class CmdrPostOffice {
 
     // Dispatch message to registered receiver with matching class and specific ID.
     // TODO: set up some buffer or queue for currently undeliverable messages.
-    if (!postOffice.outboxes[sm.receiverClass].containsKey(sm.id)) {
-      help.debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.id} with header ${sm.um.header}', 0);
+    if (!postOffice.outboxes[sm.receiverClass].containsKey(sm.receiverId)) {
+      debug('[CmdrPostOffice] Undeliverable message to ${sm.receiverClass}-${sm.receiverId} with header ${sm.um.header}', 0);
       return;
     }
-    outboxes[sm.receiverClass][sm.id].add(sm.um);
+    outboxes[sm.receiverClass][sm.receiverId].add(sm.um);
   }
 }
 

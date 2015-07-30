@@ -166,13 +166,6 @@ html, body {
   padding-right: 5px;
 }
 
-.column-content.col-xs-1,
-.column-content.col-xs-5,
-.column-content.col-xs-9,
-.column-content.col-xs-10 {
-  margin-top: 17px;
-}
-
 .column-content.col-xs-5 {
   width: ~"calc(50% - 110px)";
 }
@@ -259,6 +252,10 @@ a.help-button>.glyphicons.glyphicons-circle-question-mark {
   border-bottom-width: 0;
 }
 
+.column-content.col-xs-5>.nav-tabs {
+  height: 46px;
+}
+
 .nav-tabs>li>a {
   color: @upcom-dark-grey;
   background-color: @upcom-white;
@@ -267,9 +264,14 @@ a.help-button>.glyphicons.glyphicons-circle-question-mark {
   border-bottom: 1px;
 }
 
+.column-content .nav-tabs>.tab-handle,
+.column-content .nav-tabs>.tab-control,
+.column-content .maximize-button {
+  top: 17px;
+}
+
 .col-xs-2 .nav-tabs>li.tab-handle {
   float: right;
-  top: 17px;
 }
 
 .col-xs-2 .nav-tabs>li.tab-handle>a {
@@ -313,6 +315,7 @@ a.help-button>.glyphicons.glyphicons-circle-question-mark {
   position: relative;
   float: right;
   height: 14px;
+  top: 4px;
   right: 2px;
   padding: 1px;
   z-index: 2;

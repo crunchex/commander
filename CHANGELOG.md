@@ -1,5 +1,28 @@
 # Change Log
 
+## 0.5.2 - 2015-7-30
+
+### New
+	- Camera tabs now display the current video device on tab handle hover.
+	- Added individual package cleaning via right-clicking on packages within the Explorer Workspace view.
+	- Package build output is now appended to a file at /var/log/updroid/build.log. cmdr will attempt to create this file if the directory permissions allow it to.
+	- Added a new top-level command to cmdr (see cmdr --help). Intended to be run within a Console tab to view package build output.
+
+### Changed
+	- Explorer now automatically loads solo workspaces detected in ~/uproot.
+	- Internal installation path structure has changed (in /opt/updroid/cmdr).
+	- The cmdr executable is now installed within /opt/updroid/cmdr with a symlink dropped into /usr/bin.
+	- Console's "dark" theme is now a little darker.
+	- Explorer's "build" buttons have been renamed "verify".
+	- Explorer's verify button will now build the entire workspace by default if no packages are selected.
+	- Improved cmdr crash handling, where the GUI page can be refreshed after dimissing a disconnect alert and restarting cmdr.
+
+### Fixed
+	- Console should now properly resize automatically once the frontend and backend are both loaded.
+	- Fixed Explorer issue with building the top-level 
+	- Fixed Explorer issues with building ROS metapackages.
+	- Fixed a bug where closing a Camera tab would occasionally crash cmdr.
+
 ## 0.5.1 - 2015-7-16
 
 ### New
@@ -16,7 +39,7 @@
 ## 0.5.0 - 2015-7-10
 
 ### New
-	- Redesigned Explorer, bot visually and functionally.
+	- Redesigned Explorer, both visually and functionally.
 	- New look and color scheme (as always, a work in progress).
 
 ### Changed

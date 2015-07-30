@@ -11,13 +11,48 @@ class CmdrGuiCommand extends Command {
         help: 'Starts cmdr with no output on stdout.');
     argParser.addOption('workspace', abbr: 'w', defaultsTo: CmdrServer.defaultUprootPath,
         help: 'Overrides the default workspaces directory for cmdr.');
-    argParser.addOption('path', abbr: 'p', defaultsTo: CmdrServer.defaultGuiPath,
-        help: 'Overrides the default path of the static gui files location.\nOnly useful for cmdr developers.');
+    argParser.addOption('path', abbr: 'p', defaultsTo: CmdrServer.defaultInstallationPath,
+        help: 'Overrides cmdr\'s default installation path.\nLocation of executables, static gui files, and misc.\nOnly useful for cmdr developers.');
   }
 
   void run() {
-    help.enableDebug(argResults['debug']);
+    enableDebug(argResults['debug']);
     new CmdrServer(argResults);
+  }
+}
+
+class BuildLogCommand extends Command {
+  final name = "buildlog";
+  final description = "Shortcut to view logged output from package builds.";
+
+  BuildLogCommand();
+
+  void run() {
+    String logFileDir = '/var/log/updroid';
+    File logFile = new File('$logFileDir/build.log');
+    try {
+      logFile.createSync(recursive:true);
+    } on FileSystemException {
+      print('The BuildLog command requires write access to $logFileDir.');
+      print('Here\'s one way to enable (only need to do once):');
+      print('  \$ sudo groupadd var-updroid');
+      print('  \$ sudo usermod -a -G var-updroid ${Platform.environment['USER']}');
+      print('  \$ sudo mkdir -p $logFileDir');
+      print('  \$ sudo chown -R root:var-updroid $logFileDir');
+      print('  \$ sudo chmod 2775 $logFileDir');
+      print('Log out and back in (or restart session) for changes to take effect.');
+      exit(2);
+    }
+
+    String runCommand = 'tail -f ${logFile.path}';
+    Process.start('bash', ['-c', '$runCommand'], runInShell: true, environment: {'TERM':'vt100'}).then((shell) {
+      shell.stdout.transform(UTF8.decoder).listen((data) => print(data));
+      shell.stderr.transform(UTF8.decoder).listen((data) => print(data));
+    }).catchError((error) {
+      if (error is! ProcessException) throw error;
+      debug('Unable to tail $logFileDir', 1);
+      return;
+    });
   }
 }
 

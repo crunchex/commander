@@ -2,56 +2,63 @@ library tab_interface;
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
-import 'tab/api/tab.dart';
-import 'tab/pty.dart';
-import 'tab/camera/camera.dart';
-import 'tab/teleop.dart';
-import 'tab/editor.dart';
+import 'package:upcom-api/tab_backend.dart';
+import 'package:path/path.dart';
+
+import 'tab_mailbox.dart';
 
 class TabInterface {
-  String tabType;
+  String refName;
   int id;
   Directory dir;
   List extra;
 
-  Tab tab;
-  Stream<String> input;
-  Stream<String> output;
+  Isolate tab;
+  IsolateMailbox mailbox;
 
-  StreamController<String> _inputController;
-  StreamController<String> _outputController;
+  TabInterface(String binPath, this.refName, this.id, this.dir, [this.extra]) {
+    mailbox = new IsolateMailbox(refName, id);
 
-  TabInterface(this.tabType, this.id, this.dir, [this.extra]) {
-    _inputController = new StreamController<String>();
-    input = _inputController.stream;
-
-    _outputController = new StreamController<String>();
-    output = _outputController.stream;
-
-    _spawnTab();
+    String tabPath = '$binPath/tabs/$refName';
+    _spawnTab(tabPath, new Uri.file(normalize('$tabPath/main.dart')));
   }
 
-  void _spawnTab() {
-    switch (tabType) {
-      case 'updroideditor':
-        tab = new CmdrEditor(id, dir);
-        break;
-      case 'updroidcamera':
-        tab = new CmdrCamera(id, dir);
-        break;
-      case 'updroidteleop':
-        tab = new CmdrTeleop(id, dir);
-        break;
-      case 'updroidconsole':
-        String idRows = extra[0];
-        String idCols = extra[1];
-        tab = new CmdrPty(id, dir.path, idRows, idCols);
-        break;
+  Future _spawnTab(String tabPath, Uri tabFile) async {
+    SendPort initialSendPort = mailbox.receivePort.sendPort;
+
+    // Prepare the args.
+    List args = [tabPath, id, dir.path];
+    if (extra != null) args.addAll(extra);
+
+    await Isolate.spawnUri(tabFile, args, initialSendPort);
+
+    await for (var received in mailbox.receivePort) {
+      if (mailbox.sendPort == null) {
+        mailbox.sendPort = received;
+
+        continue;
+      }
+
+      // At this point we are assuming messages are always strings.
+      String message = received;
+      if (message.startsWith('s:')) {
+        mailbox.relay(new ServerMessage.fromString(message));
+      } else if (message.startsWith('c:')) {
+        mailbox.registerEndpoint(message);
+      } else {
+        Msg msg = new Msg.fromString(received);
+        if (mailbox.endpointRegistry.contains(msg.header)) {
+          mailbox.sendFromEndpoint(msg.body);
+        } else {
+          mailbox.send(new Msg.fromString(received));
+        }
+      }
     }
   }
 
   void close() {
-    tab.cleanup();
+    mailbox.close();
   }
 }

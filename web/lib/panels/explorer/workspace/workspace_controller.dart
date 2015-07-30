@@ -5,10 +5,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:path/path.dart' as pathLib;
+import 'package:upcom-api/web/modal/modal.dart';
+import 'package:upcom-api/web/menu/context_menu.dart';
+import 'package:upcom-api/web/mailbox/mailbox.dart';
 
-import '../../../modal/modal.dart';
-import '../../../context_menu.dart';
-import '../../../mailbox.dart';
 import '../../panel_controller.dart';
 import '../explorer.dart';
 
@@ -80,7 +80,7 @@ class WorkspaceController implements ExplorerController {
   }
 
   /// Handles an Explorer add update for a single file.
-  void _addUpdate(UpDroidMessage um) => _addFileSystemEntity(um.body);
+  void _addUpdate(Msg um) => _addFileSystemEntity(um.body);
 
   void _addFileSystemEntity(String data) {
     List<String> split = data.split(':');
@@ -123,6 +123,16 @@ class WorkspaceController implements ExplorerController {
     // If current file is a CMakeLists.txt, tell its parent that it's a package folder.
     if (entity.name == 'CMakeLists.txt') entities[entity.parent].isPackage = true;
 
+    // Detect meta packages with this hacky scheme.
+    // TODO: read contents of package.xml for metapackage tag for bulletproof detection.
+    if (entity.name == 'package.xml') {
+      String parentPath = entity.parent;
+      String parentsParentPath = entities[parentPath].parent;
+      if (parentPath.split('/').last == parentsParentPath.split('/').last) {
+        entities[parentsParentPath].isPackage = true;
+      }
+    }
+
 //    _insertView(entities[entity.parent], entity);
 
     FolderView parentFolder = entities[entity.parent].view;
@@ -161,7 +171,7 @@ class WorkspaceController implements ExplorerController {
 //  }
 
   /// Handles an Explorer remove update for a single file.
-  void _removeUpdate(UpDroidMessage um) => _removeFileSystemEntity(um.body);
+  void _removeUpdate(Msg um) => _removeFileSystemEntity(um.body);
 
   void _removeFileSystemEntity(String data) {
     List<String> split = data.split(':');
@@ -188,7 +198,7 @@ class WorkspaceController implements ExplorerController {
   }
 
   /// First Directory List Generation
-  void _workspaceContents(UpDroidMessage um) {
+  void _workspaceContents(Msg um) {
     List<String> fileStrings = JSON.decode(um.body);
 
     _workspaceView.uList.innerHtml = '';
@@ -216,22 +226,37 @@ class WorkspaceController implements ExplorerController {
     });
   }
 
+  /// Sends a list of multiple selected package paths to be built, or a Workspace Build
+  /// message if either: the top-level workspace is in the list or if the list is empty.
   void _buildPackages() {
     List<String> packageBuildList = [];
-    entities.values.forEach((FolderEntity entity) {
-      if (entity.isPackage && entity.selected) {
-        entity.toggleBuildingIndicator();
+    for (FolderEntity entity in entities.values) {
+      if (!entity.selected) continue;
+
+      if (entity.isWorkspace) {
+        packageBuildList = [];
+        break;
+      }
+
+      if (entity.isPackage) {
         packageBuildList.add(entity.path);
       }
-    });
+    }
 
     if (packageBuildList.isNotEmpty) {
-      _deselectAllEntities();
+      for (String entityPath in packageBuildList) {
+        FolderEntity package = entities[entityPath];
+        package.toggleBuildingIndicator();
+      }
       _mailbox.ws.send('[[BUILD_PACKAGES]]' + JSON.encode(packageBuildList));
+    } else {
+      FolderEntity package = entities['$workspacePath/src'];
+      package.toggleBuildingIndicator();
+      _mailbox.ws.send('[[WORKSPACE_BUILD]]');
     }
   }
 
-  void _buildComplete(UpDroidMessage um) {
+  void _buildComplete(Msg um) {
     List<String> entityPaths = JSON.decode(um.body);
     entityPaths.forEach((String entityPath) {
       FolderEntity package = entities[entityPath];
@@ -239,7 +264,7 @@ class WorkspaceController implements ExplorerController {
     });
   }
 
-  void _addEditorsToContextMenu(UpDroidMessage um) {
+  void _addEditorsToContextMenu(Msg um) {
     List<String> split = um.body.split(':');
     String path = split[0];
     List<String> editorList = JSON.decode(split[1]);
@@ -249,7 +274,7 @@ class WorkspaceController implements ExplorerController {
     });
   }
 
-  void _createFailedAlert(UpDroidMessage um) {
+  void _createFailedAlert(Msg um) {
     window.alert('You must build your workspace at least once before creating a new package.');
   }
 

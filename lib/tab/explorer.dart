@@ -5,16 +5,17 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as pathLib;
+import 'package:upcom-api/ros.dart';
+import 'package:upcom-api/tab_backend.dart';
+import 'package:upcom-api/debug.dart';
 
-import 'api/ros/ros.dart';
-import 'api/updroid_message.dart';
 import '../server_mailbox.dart';
-import '../server_helper.dart' as help;
 import '../post_office.dart';
-import 'api/server_message.dart';
 
 class CmdrExplorer {
-  static const String guiName = 'UpDroidExplorer';
+  static const String refName = 'upcom-explorer';
+  static const String editorRefName = 'upcom-editor';
+  static const String buildLogPath = '/var/log/updroid/build.log';
 
   int id;
   CmdrMailbox mailbox;
@@ -28,7 +29,7 @@ class CmdrExplorer {
   CmdrExplorer(this.id, this.uproot) {
     if (_currentWorkspace != null) return;
 
-    mailbox = new CmdrMailbox(guiName, id);
+    mailbox = new CmdrMailbox(refName, id);
     _registerMailbox();
 
     // TODO: retrieve saved data for the most recently opened workspace.
@@ -52,6 +53,7 @@ class CmdrExplorer {
     mailbox.registerWebSocketEvent('OPEN_FILE', _openFile);
     mailbox.registerWebSocketEvent('WORKSPACE_CLEAN', _workspaceClean);
     mailbox.registerWebSocketEvent('WORKSPACE_BUILD', _buildWorkspace);
+    mailbox.registerWebSocketEvent('CLEAN_PACKAGE', _cleanPackage);
     mailbox.registerWebSocketEvent('BUILD_PACKAGE', _buildPackage);
     mailbox.registerWebSocketEvent('BUILD_PACKAGES', _buildPackages);
     mailbox.registerWebSocketEvent('CREATE_PACKAGE', _createPackage);
@@ -78,10 +80,11 @@ class CmdrExplorer {
 
   void _sendWorkspaceNames(Msg um) {
     List<String> names = [];
-    uproot.list()
-    .where((Directory w) => Workspace.isWorkspace(w.path))
-    .listen((Directory w) => names.add(w.path.split('/').last))
-    .onDone(() => mailbox.send(new Msg('WORKSPACE_NAMES', JSON.encode(names))));
+    uproot
+        .list()
+        .where((Directory w) => Workspace.isWorkspace(w.path))
+        .listen((Directory w) => names.add(w.path.split('/').last))
+        .onDone(() => mailbox.send(new Msg('WORKSPACE_NAMES', JSON.encode(names))));
   }
 
   void _newWorkspace(Msg um) {
@@ -116,7 +119,7 @@ class CmdrExplorer {
     Directory newFolder = new Directory(fullPath);
 
     int untitledNum = 0;
-    while(newFolder.existsSync()) {
+    while (newFolder.existsSync()) {
       untitledNum++;
       fullPath = path + untitledNum.toString();
       newFolder = new Directory(fullPath);
@@ -168,33 +171,69 @@ class CmdrExplorer {
       newMessage = new Msg(um.header, split[1]);
     }
 
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', destinationId, newMessage));
+    CmdrPostOffice.send(new ServerMessage(refName, id, editorRefName, destinationId, newMessage));
   }
 
   void _workspaceClean(Msg um) {
-    _currentWorkspace.clean().then((result) {
+    _currentWorkspace.cleanWorkspace().then((result) {
       mailbox.send(new Msg('WORKSPACE_CLEAN', ''));
     });
   }
 
   void _buildWorkspace(Msg um) {
-    _currentWorkspace.buildWorkspace().then((result) {
-      String resultString = result.exitCode == 0 ? '' : result.stderr;
-      help.debug(resultString, 0);
-//      mailbox.send(new Msg('WORKSPACE_BUILD', resultString);
-      mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([_currentWorkspace.path])));
+    File log = new File(buildLogPath);
+    IOSink sink;
+    try {
+      sink = log.openWrite();
+    } on FileSystemException {
+      debug('Couldn\'t write build output to $buildLogPath', 1);
+    }
+
+    _currentWorkspace.buildWorkspace().listen((data) {
+      if (sink != null) sink.write(data);
+    })
+      ..onDone(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode(['${_currentWorkspace.path}/src'])));
+      })
+      ..onError(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode(['${_currentWorkspace.path}/src'])));
+      });
+  }
+
+  void _cleanPackage(Msg um) {
+    String packagePath = um.body;
+    String packageName = packagePath.split('/').last;
+
+    _currentWorkspace.cleanPackage(packageName).then((result) {
+      mailbox.send(new Msg('PACKAGE_CLEAN', packagePath));
     });
   }
 
   void _buildPackage(Msg um) {
     String packagePath = um.body;
     String packageName = packagePath.split('/').last;
-    _currentWorkspace.buildPackage(packageName).then((result) {
-      String resultString = result.exitCode == 0 ? '' : result.stderr;
-      help.debug(resultString, 0);
-//      mailbox.send(new Msg('PACKAGE_BUILD_RESULTS', resultString);
-      mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([packagePath])));
-    });
+
+    File log = new File(buildLogPath);
+    IOSink sink;
+    try {
+      sink = log.openWrite();
+    } on FileSystemException {
+      debug('Couldn\'t write build output to $buildLogPath', 1);
+    }
+
+    _currentWorkspace.buildPackage(packageName).listen((data) {
+      if (sink != null) sink.write(data);
+    })
+      ..onDone(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([packagePath])));
+      })
+      ..onError(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', JSON.encode([packagePath])));
+      });
   }
 
   void _buildPackages(Msg um) {
@@ -202,14 +241,28 @@ class CmdrExplorer {
     List<String> packagePaths = JSON.decode(data);
 
     List<String> packageNames = [];
-    packagePaths.forEach((String packagePath) => packageNames.add(packagePath.split('/').last));
+    packagePaths.forEach(
+        (String packagePath) => packageNames.add(packagePath.split('/').last));
 
-    _currentWorkspace.buildPackages(packageNames).then((result) {
-      String resultString = result.exitCode == 0 ? '' : result.stderr;
-      help.debug(resultString, 0);
-//      mailbox.send(new Msg('PACKAGE_BUILD_RESULTS', resultString);
-      mailbox.send(new Msg('BUILD_COMPLETE', data));
-    });
+    File log = new File(buildLogPath);
+    IOSink sink;
+    try {
+      sink = log.openWrite();
+    } on FileSystemException {
+      debug('Couldn\'t write build output to $buildLogPath', 1);
+    }
+
+    _currentWorkspace.buildPackages(packageNames).listen((data) {
+      if (sink != null) sink.write(data);
+    })
+      ..onDone(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', data));
+      })
+      ..onError(() {
+        if (sink != null) sink.close();
+        mailbox.send(new Msg('BUILD_COMPLETE', data));
+      });
   }
 
   void _createPackage(Msg um) {
@@ -219,7 +272,9 @@ class CmdrExplorer {
     List<String> dependencies = JSON.decode(split[1]);
 
     // A workspace that hasn't been built yet will cause problems.
-    _currentWorkspace.createPackage(name, dependencies).then((ProcessResult result) {
+    _currentWorkspace
+        .createPackage(name, dependencies)
+        .then((ProcessResult result) {
       String stderr = result.stderr;
       if (stderr.contains('devel/setup.bash: No such file or directory')) {
         mailbox.send(new Msg('CREATE_PACKAGE_FAILED', stderr));
@@ -245,7 +300,8 @@ class CmdrExplorer {
   }
 
   void _requestEditorList(Msg um) {
-    CmdrPostOffice.send(new ServerMessage('UpDroidClient', 0, um));
+    Msg messageWithSender = new Msg('REQUEST_EDITOR_LIST', '${refName}:$id:${um.body}');
+    CmdrPostOffice.send(new ServerMessage(refName, id, Tab.upcomName, 0, messageWithSender));
   }
 
   void _returnSelected(Msg um) {
@@ -254,7 +310,7 @@ class CmdrExplorer {
     String selectedList = split[1];
 
     Msg newMessage = new Msg(um.header, selectedList);
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', editorId, newMessage));
+    CmdrPostOffice.send(new ServerMessage(refName, id, editorRefName, editorId, newMessage));
   }
 
   void _sendEditorList(Msg um) => mailbox.send(um);
@@ -272,13 +328,13 @@ class CmdrExplorer {
     String fileString = isFile ? 'F:${path}' : 'D:${path}';
 
     Msg formatted = new Msg('${header}_UPDATE', fileString);
-    help.debug('Outgoing: ' + formatted.toString(), 0);
+    debug('Outgoing: ' + formatted.toString(), 0);
     if (header != 'MODIFY') mailbox.send(formatted);
   }
 
   void _setCurrentWorkspace(String newWorkspaceName) {
     Msg um = new Msg('SET_CURRENT_WORKSPACE', newWorkspaceName);
-    CmdrPostOffice.send(new ServerMessage('UpDroidEditor', 0, um));
+    CmdrPostOffice.send(new ServerMessage(refName, id, editorRefName, 0, um));
 
     if (_currentWatcherStream != null) _currentWatcherStream.cancel();
 
@@ -293,7 +349,7 @@ class CmdrExplorer {
   }
 
   void cleanup() {
-    CmdrPostOffice.deregisterStream(guiName, id);
+    CmdrPostOffice.deregisterStream(refName, id);
     _currentWatcherStream.cancel();
   }
 }

@@ -56,7 +56,8 @@ class ColumnView {
     ..attributes['role'] = 'tablist';
     columnContent.children.add(_navTabs);
 
-    LIElement controlLi = new LIElement();
+    LIElement controlLi = new LIElement()
+    ..classes.add('tab-control');
     _navTabs.children.add(controlLi);
 
     controlButton = new AnchorElement( )
@@ -171,7 +172,11 @@ class ColumnView {
 
   void cleanUp() {
     // TODO: make sure child nodes are all cleaned up.
-    columnContent.innerHtml = '';
-    columnContent = null;
+    columnContent.children.first.remove();
+    columnContent.children.first.innerHtml = '';
+    tabContent.innerHtml = '';
+
+//    columnContent.innerHtml = '';
+//    columnContent = null;
   }
 }

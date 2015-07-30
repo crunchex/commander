@@ -5,13 +5,13 @@
 ### New
 - Camera tabs now display the current video device on tab handle hover.
 - Added individual package cleaning via right-clicking on packages within the Explorer Workspace view.
-- Package build output is now appended to a file at /var/log/updroid/build.log. cmdr will attempt to create this file if the directory permissions allow it to.
+- Package build output is now appended to a file at `/var/log/updroid/build.log`. cmdr will attempt to create this file if the directory permissions allow it to.
 - Added a new top-level command to cmdr (see cmdr --help). Intended to be run within a Console tab to view package build output.
 
 ### Changed
-- Explorer now automatically loads solo workspaces detected in ~/uproot.
-- Internal installation path structure has changed (in /opt/updroid/cmdr).
-- The cmdr executable is now installed within /opt/updroid/cmdr with a symlink dropped into /usr/bin.
+- Explorer now automatically loads solo workspaces detected in `~/uproot`.
+- Internal installation path structure has changed (in `/opt/updroid/cmdr`).
+- The cmdr executable is now installed within `/opt/updroid/cmdr` with a symlink dropped into `/usr/bin`.
 - Console's "dark" theme is now a little darker.
 - Explorer's "build" buttons have been renamed "verify".
 - Explorer's verify button will now build the entire workspace by default if no packages are selected.
@@ -153,7 +153,7 @@
 ### New
 
 - Add/Close Workspace buttons have been implemented.
-- If /home/uproot is empty, a default workspace will be created and initialized for you. Note, it is not yet possible to rename workspaces through UpCom.
+- If `/home/uproot` is empty, a default workspace will be created and initialized for you. Note, it is not yet possible to rename workspaces through UpCom.
 
 ### Changed
 
@@ -170,13 +170,13 @@
 
 ### New
 
-- Explorer handles multiple workspaces contained in /home/uproot
+- Explorer handles multiple workspaces contained in `/home/uproot`
 - cmdr displays minimalist feedback once run from CLI.
 - CLI command to cmdr called 'info'.
 
 ### Changed
 
-- /home/uproot is now a directory for workspaces, rather than a workspace itself.
+- `/home/uproot` is now a directory for workspaces, rather than a workspace itself.
 - Available nodes and launch files are displayed in the Control portion of the Explorer, rather than in a popup.
 - The Run button runs the currently selected node, rather than displaying the available node list.
 

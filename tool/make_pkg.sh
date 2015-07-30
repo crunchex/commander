@@ -61,7 +61,6 @@ fpm -s dir -t deb -n cmdr -v 0.5.1 -p $TOPDIR/deploy/ \
     -d 'dart >= 1.9.3' -d 'ffmpeg >= 2.6.2' \
     --after-install=$TOPDIR/tool/packaging/after-install.sh \
     --after-remove=$TOPDIR/tool/packaging/after-remove.sh \
-    --after-upgrade=$TOPDIR/tool/packaging/after-upgrade.sh \
     ./build/bin=/opt/updroid/cmdr \
     ./build/web=/opt/updroid/cmdr > /dev/null
     #./build/bin/cmdr=/usr/bin/cmdr

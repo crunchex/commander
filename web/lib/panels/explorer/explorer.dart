@@ -111,8 +111,10 @@ class UpDroidExplorer extends PanelController {
 
     if (controller != null || view.content.children.isNotEmpty) return;
 
+    if (_workspaceNames.length == 1) _openExistingWorkspace(_workspaceNames.first);
+
     const String noWorkspaces = 'Create a new workspace from [File] menu.';
-    const String noOpenWorkspaces = 'Create a new workspace or open an existing one from [File] menu.';
+    const String noOpenWorkspaces = 'Several workspaces detected. Create a new workspace or open an existing one from [File] menu.';
 
     ParagraphElement placeholderText = new ParagraphElement()
       ..classes.add('explorer-placeholder')

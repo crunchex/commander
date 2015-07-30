@@ -92,12 +92,12 @@ mkdir -p $WEBTABS
 cp -r ../upcom-editor/build/bin $BINTABS/upcom-editor
 cp -r ../upcom-console/build/bin $BINTABS/upcom-console
 cp -r ../upcom-camera/build/bin $BINTABS/upcom-camera
-cp -r ../upcom-teleop/build/bin $BINTABS/upcom-teleop
+# cp -r ../upcom-teleop/build/bin $BINTABS/upcom-teleop
 
 cp -r ../upcom-editor/build/web $WEBTABS/upcom-editor
 cp -r ../upcom-console/build/web $WEBTABS/upcom-console
 cp -r ../upcom-camera/build/web $WEBTABS/upcom-camera
-cp -r ../upcom-teleop/build/web $WEBTABS/upcom-teleop
+# cp -r ../upcom-teleop/build/web $WEBTABS/upcom-teleop
 echo "OK"
 
 echo -n "Cleaning up gui................."

@@ -148,6 +148,14 @@ class UpDroidClient {
   void _initializeClient() {
     _openPanel(0, 1, explorerRefName);
 
+    String userAgent = window.navigator.userAgent;
+    if (userAgent.contains('Mobile')) {
+      querySelectorAll('html,body,#column-0,#col-0-tab-content,.footer,.text-muted')
+        .forEach((e) => e.classes.add('mobile'));
+      window.scrollTo(0, 1);
+      return;
+    }
+
     // TODO: make the initial min-width more responsive to how the tabs start out initially.
     // For now we assume they start off 50/50.
     querySelector('body').style.minWidth = '1211px';

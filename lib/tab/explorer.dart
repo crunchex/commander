@@ -24,10 +24,13 @@ class CmdrExplorer {
   Workspace _currentWorkspace;
   DirectoryWatcher _currentWatcher;
   StreamSubscription _currentWatcherStream;
+  bool _warningIssued;
 
   //TODO: make asynchroneous
   CmdrExplorer(this.id, this.uproot) {
     if (_currentWorkspace != null) return;
+
+    _warningIssued = false;
 
     mailbox = new CmdrMailbox(refName, id);
     _registerMailbox();
@@ -180,14 +183,47 @@ class CmdrExplorer {
     });
   }
 
-  void _buildWorkspace(Msg um) {
+  IOSink _getBuildLogSink() {
     File log = new File(buildLogPath);
     IOSink sink;
     try {
+      log.createSync(recursive: true);
       sink = log.openWrite();
+
+      return sink;
     } on FileSystemException {
+      if (!_warningIssued) {
+//        print('\nLogging build output requires write access to $buildLogPath.');
+//        print('Here\'s one way to enable (only need to do once):');
+//        print('  \$ sudo groupadd var-updroid');
+//        print('  \$ sudo usermod -a -G var-updroid ${Platform.environment['USER']}');
+//        print('  \$ sudo mkdir -p $buildLogPath');
+//        print('  \$ sudo chown -R root:var-updroid $buildLogPath');
+//        print('  \$ sudo chmod 2775 $buildLogPath');
+//        print('Log out and back in (or restart session) for changes to take effect.');
+
+        String warningText = 'Logging build output requires write access to $buildLogPath.\n';
+        warningText += 'Here\'s one way to enable (only need to do once):\n';
+        warningText += '\t\$ sudo groupadd var-updroid\n';
+        warningText += '\t\$ sudo usermod -a -G var-updroid ${Platform.environment['USER']}\n';
+        warningText += '\t\$ sudo mkdir -p $buildLogPath\n';
+        warningText += '\t\$ sudo chown -R root:var-updroid $buildLogPath\n';
+        warningText += '\t\$ sudo chmod 2775 $buildLogPath\n';
+        warningText += '\nLog out and back in (or restart session) for changes to take effect.';
+
+        Msg alertMsg = new Msg('ISSUE_ALERT', warningText);
+        CmdrPostOffice.send(new ServerMessage(refName, id, Tab.upcomName, 1, alertMsg));
+        _warningIssued = true;
+      }
+
       debug('Couldn\'t write build output to $buildLogPath', 1);
     }
+
+    return null;
+  }
+
+  void _buildWorkspace(Msg um) {
+    IOSink sink = _getBuildLogSink();
 
     _currentWorkspace.buildWorkspace().listen((data) {
       if (sink != null) sink.write(data);
@@ -215,13 +251,7 @@ class CmdrExplorer {
     String packagePath = um.body;
     String packageName = packagePath.split('/').last;
 
-    File log = new File(buildLogPath);
-    IOSink sink;
-    try {
-      sink = log.openWrite();
-    } on FileSystemException {
-      debug('Couldn\'t write build output to $buildLogPath', 1);
-    }
+    IOSink sink = _getBuildLogSink();
 
     _currentWorkspace.buildPackage(packageName).listen((data) {
       if (sink != null) sink.write(data);
@@ -244,13 +274,7 @@ class CmdrExplorer {
     packagePaths.forEach(
         (String packagePath) => packageNames.add(packagePath.split('/').last));
 
-    File log = new File(buildLogPath);
-    IOSink sink;
-    try {
-      sink = log.openWrite();
-    } on FileSystemException {
-      debug('Couldn\'t write build output to $buildLogPath', 1);
-    }
+    IOSink sink = _getBuildLogSink();
 
     _currentWorkspace.buildPackages(packageNames).listen((data) {
       if (sink != null) sink.write(data);

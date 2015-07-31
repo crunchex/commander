@@ -52,6 +52,7 @@ class UpDroidClient {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'MOVE_TAB', _moveTabFromServer);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'ISSUE_ALERT', _issueAlert);
     _mailbox.registerWebSocketEvent(EventType.ON_CLOSE, 'CLEAN_UP', _cleanUp);
   }
 
@@ -121,6 +122,8 @@ class UpDroidClient {
     TabInterface tab = _columnControllers[oldColIndex].removeTab(refName, id);
     _columnControllers[newColIndex].addTab(tab);
   }
+
+  void _issueAlert(Msg m) => window.alert(m.body);
 
   void _cleanUp(Msg m) {
     _panels.forEach((panel) {

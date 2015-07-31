@@ -142,6 +142,7 @@ class CmdrServer {
     _mailbox.registerServerMessageHandler('CLONE_TAB', _cloneTabFromServer);
     _mailbox.registerServerMessageHandler('MOVE_TAB', _moveTabFromServer);
     _mailbox.registerServerMessageHandler('REQUEST_EDITOR_LIST', _sendEditorList);
+    _mailbox.registerServerMessageHandler('ISSUE_ALERT', _relayAlert);
   }
 
   void _clientConfig(Msg um) {
@@ -264,6 +265,8 @@ class CmdrServer {
     Msg newMessage = new Msg('SEND_EDITOR_LIST', '$pathToOpen:$editorList');
     CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, senderClass, senderId, newMessage));
   }
+
+  void _relayAlert(Msg um) => _mailbox.send(um);
 
   void _cleanUpBackend() {
     debug('Client disconnected, cleaning up...', 0);

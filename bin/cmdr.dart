@@ -5,7 +5,7 @@ import 'package:args/command_runner.dart';
 import '../lib/server.dart';
 
 void main(List<String> args) {
-  const String version = '0.5.2 Alpha';
+  const String version = '0.5.3 Alpha';
 
   CommandRunner runner = new CommandRunner("cmdr", "UpDroid Commander - Robotics Software IDE.")
     ..addCommand(new InfoCommand(version))

@@ -53,6 +53,12 @@ html, body {
   overflow-x: hidden;
 }
 
+html.mobile,
+body.mobile {
+  min-height: 0;
+  overflow-y: hidden;
+}
+
 /* Login */
 
 .login-overlay {
@@ -172,6 +178,11 @@ html, body {
 
 .column-content.col-xs-2 {
   width: 220px;
+}
+
+.column-content.col-xs-2.mobile {
+  width: 100%;
+  height: 100%;
 }
 
 /* Nav/Logo */
@@ -524,6 +535,10 @@ li div input {
   height: ~"calc(100% - 29px)";
 }
 
+.column-content>.tab-content.mobile {
+  height: ~"calc(100% - 46px)";
+}
+
 .tab-pane > .tab-content {
   /* Height of menu tabs */
   height: ~"calc(100% - 24px)";
@@ -692,6 +707,10 @@ code, kbd, pre, samp {
   background-color: @upcom-white;
 }
 
+.footer.mobile {
+  height: 20px;
+}
+
 .text-muted {
   float: right;
   position: relative;
@@ -699,4 +718,8 @@ code, kbd, pre, samp {
   right: 10px;
   font-size: 8px;
   .font-avenir();
+}
+
+.text-muted.mobile {
+  margin-bottom: 0;
 }

@@ -52,6 +52,7 @@ class UpDroidClient {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'MOVE_TAB', _moveTabFromServer);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'ISSUE_ALERT', _issueAlert);
     _mailbox.registerWebSocketEvent(EventType.ON_CLOSE, 'CLEAN_UP', _cleanUp);
   }
 
@@ -122,6 +123,8 @@ class UpDroidClient {
     _columnControllers[newColIndex].addTab(tab);
   }
 
+  void _issueAlert(Msg m) => window.alert(m.body);
+
   void _cleanUp(Msg m) {
     _panels.forEach((panel) {
       panel.cleanUp();
@@ -147,6 +150,14 @@ class UpDroidClient {
   /// TODO: use isolates.
   void _initializeClient() {
     _openPanel(0, 1, explorerRefName);
+
+    String userAgent = window.navigator.userAgent;
+    if (userAgent.contains('Mobile')) {
+      querySelectorAll('html,body,#column-0,#col-0-tab-content,.footer,.text-muted')
+        .forEach((e) => e.classes.add('mobile'));
+      window.scrollTo(0, 1);
+      return;
+    }
 
     // TODO: make the initial min-width more responsive to how the tabs start out initially.
     // For now we assume they start off 50/50.

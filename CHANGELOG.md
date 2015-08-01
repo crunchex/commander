@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.5.3 - 2015-7-31
+
+### Changed
+- An alert is now displayed in the browser to give the user instructions on how to set up package build logging with the `cmdr buildlog` command.
+
+### Fixed
+- Fixed invalid Markdown in the Changelog.
+- Fixed Editor issues with the unsaved changes indicator (asterisk on the filename) not properly indicating the current state of the document.
+- Fixed serious bug where building a package in Explorer would crash cmdr if permissions weren't properly set on the build output log at `/var/log/updroid/build.log`.
+
 ## 0.5.2 - 2015-7-30
 
 ### New

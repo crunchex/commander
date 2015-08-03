@@ -173,37 +173,35 @@ class CmdrServer {
   }
 
   void _openPanel(Msg um) {
-    String id = um.body;
-    List idList = id.split(':');
-    int num = int.parse(idList[1]);
+    List idList = um.body.split(':');
+    int id = int.parse(idList[1]);
     String refName = idList[2];
 
     String binPath = '$_installationPath/bin';
 
-    debug('Open panel request received: $id', 0);
+    debug('Open panel request received: ${um.body}', 0);
 
     if (!_panels.containsKey(refName)) _panels[refName] = {};
 
-    _panels[refName][num] = new PanelInterface(binPath, refName, num, dir);
+    _panels[refName][id] = new PanelInterface(binPath, refName, id, dir);
   }
 
   void _openTab(Msg um) {
-    String id = um.body;
-    List idList = id.split(':');
-    int num = int.parse(idList[1]);
+    List idList = um.body.split(':');
+    int id = int.parse(idList[1]);
     String refName = idList[2];
 
     String binPath = '$_installationPath/bin';
 
-    debug('Open tab request received: $id', 0);
+    debug('Open tab request received: ${um.body}', 0);
 
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
 
     if (idList.length <= 3) {
-      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir);
+      _tabs[refName][id] = new TabInterface(binPath, refName, id, dir);
     } else {
       List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir, extra);
+      _tabs[refName][id] = new TabInterface(binPath, refName, id, dir, extra);
     }
   }
 

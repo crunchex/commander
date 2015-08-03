@@ -33,8 +33,8 @@ class CmdrServer {
   ArgResults _args;
 
 //  Map _panels = {};
-  Map<String, Map<int, dynamic>> _panels = {};
-  Map<String, Map<int, dynamic>> _tabs = {};
+  Map<String, Map<int, PanelInterface>> _panels = {};
+  Map<String, Map<int, TabInterface>> _tabs = {};
   CmdrMailbox _mailbox;
   String _installationPath;
   Directory dir;

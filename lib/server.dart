@@ -12,9 +12,9 @@ import 'package:upcom-api/git.dart';
 import 'package:upcom-api/tab_backend.dart';
 import 'package:upcom-api/debug.dart';
 
-import 'tab/explorer.dart';
 import 'server_mailbox.dart';
 import 'tab_interface.dart';
+import 'panel_interface.dart';
 import 'post_office.dart';
 
 part 'commands.dart';
@@ -32,7 +32,8 @@ class CmdrServer {
 
   ArgResults _args;
 
-  Map _panels = {};
+//  Map _panels = {};
+  Map<String, Map<int, dynamic>> _panels = {};
   Map<String, Map<int, dynamic>> _tabs = {};
   CmdrMailbox _mailbox;
   String _installationPath;
@@ -175,17 +176,15 @@ class CmdrServer {
     String id = um.body;
     List idList = id.split(':');
     int num = int.parse(idList[1]);
-    String type = idList[2];
+    String refName = idList[2];
+
+    String binPath = '$_installationPath/bin';
 
     debug('Open panel request received: $id', 0);
 
-    if (!_panels.containsKey(type)) _panels[type] = {};
+    if (!_panels.containsKey(refName)) _panels[refName] = {};
 
-    switch (type) {
-      case explorerRefName:
-        _panels[type][num] = new CmdrExplorer(num, dir);
-        break;
-    }
+    _panels[refName][num] = new PanelInterface(binPath, refName, num, dir);
   }
 
   void _openTab(Msg um) {

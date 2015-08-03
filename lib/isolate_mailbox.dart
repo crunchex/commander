@@ -1,4 +1,4 @@
-library commander.lib.tab_mailbox;
+library commander.lib.isolate_mailbox;
 
 import 'dart:io';
 import 'dart:async';

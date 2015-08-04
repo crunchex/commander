@@ -10,6 +10,13 @@ cd $WORKINGDIR/upcom-api
 git pull >/dev/null 2>&1
 echo "OK"
 
+echo "##### Building Panels #############"
+echo -n "Building upcom-explorer..........."
+cd $WORKINGDIR/upcom-explorer
+git pull >/dev/null 2>&1
+./tool/build.sh >/dev/null 2>&1
+echo "OK"
+
 echo "##### Building Tabs ###############"
 echo -n "Building upcom-editor..........."
 cd $WORKINGDIR/upcom-editor

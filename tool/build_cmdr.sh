@@ -89,11 +89,13 @@ mkdir -p $BINTABS
 mkdir -p $WEBTABS
 
 # TODO fix these hard-coded paths
+cp -r ../upcom-explorer/build/bin $BINTABS/upcom-explorer
 cp -r ../upcom-editor/build/bin $BINTABS/upcom-editor
 cp -r ../upcom-console/build/bin $BINTABS/upcom-console
 cp -r ../upcom-camera/build/bin $BINTABS/upcom-camera
 # cp -r ../upcom-teleop/build/bin $BINTABS/upcom-teleop
 
+cp -r ../upcom-explorer/build/web $WEBTABS/upcom-explorer
 cp -r ../upcom-editor/build/web $WEBTABS/upcom-editor
 cp -r ../upcom-console/build/web $WEBTABS/upcom-console
 cp -r ../upcom-camera/build/web $WEBTABS/upcom-camera

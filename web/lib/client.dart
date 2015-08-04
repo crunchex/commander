@@ -47,7 +47,7 @@ class UpDroidClient {
 
   void _registerMailbox() {
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'MAKE_REQUESTS', _makeInitialRequests);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'TABS_INFO', _refreshTabsInfo);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'PLUGINS_INFO', _refreshTabsInfo);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _setUpConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
@@ -65,7 +65,7 @@ class UpDroidClient {
   //\/\/ Mailbox Handlers /\/\//
 
   void _makeInitialRequests(Msg um) {
-    _mailbox.ws.send('[[REQUEST_TABSINFO]]');
+    _mailbox.ws.send('[[REQUEST_PLUGINSINFO]]');
     _mailbox.ws.send('[[CLIENT_CONFIG]]');
   }
 

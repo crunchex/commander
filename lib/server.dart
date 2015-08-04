@@ -132,7 +132,7 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
     _mailbox.registerWebSocketEvent('UPDATE_COLUMN', _updateColumn);
-    _mailbox.registerWebSocketEvent('REQUEST_TABSINFO', _sendTabInfo);
+    _mailbox.registerWebSocketEvent('REQUEST_PLUGINSINFO', _sendPluginInfo);
 //    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
 //    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
 
@@ -154,6 +154,7 @@ class CmdrServer {
         _mailbox.send(new Msg('SERVER_READY', strConfig));
       } else {
         List listConfig = [
+          [{'id': 1, 'class': explorerRefName}],
           [{'id': 1, 'class': editorRefName}],
           [{'id': 1, 'class': consoleRefName}]
         ];
@@ -215,13 +216,19 @@ class CmdrServer {
     CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
   }
 
-  void _sendTabInfo(Msg um) {
+  void _sendPluginInfo(Msg um) {
     // Specialized transformer that takes a tab directory as input and extracts tab info
     // from the json file within.
     StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
-      File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
-      String tabInfoString = tabInfoJson.readAsStringSync();
-      sink.add(JSON.decode(tabInfoString));
+      try {
+        File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
+        String tabInfoString = tabInfoJson.readAsStringSync();
+        sink.add(JSON.decode(tabInfoString));
+      } catch(e) {
+        File tabInfoJson = new File(pathLib.normalize('${event.path}/panelinfo.json'));
+        String tabInfoString = tabInfoJson.readAsStringSync();
+        sink.add(JSON.decode(tabInfoString));
+      }
     });
 
     Map tabsInfo = {};
@@ -229,7 +236,7 @@ class CmdrServer {
       .list()
       .transform(extractTabInfo)
       .listen((Map tabInfoMap) => tabsInfo[tabInfoMap['refName']] = tabInfoMap)
-      .onDone(() =>_mailbox.send(new Msg('TABS_INFO', JSON.encode(tabsInfo))));
+      .onDone(() =>_mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(tabsInfo))));
   }
 
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));

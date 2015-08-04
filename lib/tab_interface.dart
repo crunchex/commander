@@ -7,7 +7,7 @@ import 'dart:isolate';
 import 'package:upcom-api/tab_backend.dart';
 import 'package:path/path.dart';
 
-import 'tab_mailbox.dart';
+import 'isolate_mailbox.dart';
 
 class TabInterface {
   String refName;

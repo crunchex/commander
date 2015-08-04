@@ -107,7 +107,7 @@ class CmdrServer {
 
     if (type == explorerRefName) {
       WebSocketTransformer.upgrade(request)
-      .then((WebSocket ws) => _panels[type][objectID].mailbox.handleWebSocket(ws, request));
+      .then((WebSocket ws) => _panels[type][objectID].mailbox.receive(ws, request));
       return;
     }
 

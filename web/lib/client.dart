@@ -7,9 +7,10 @@ import 'dart:convert';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
 import 'package:quiver/async.dart';
 
-import 'panel_controller.dart';
-import 'panels/explorer/explorer.dart';
 import 'column_controller.dart';
+import 'panel_column_controller.dart';
+import 'tab_column_controller.dart';
+import 'panel_interface.dart';
 import 'tab_interface.dart';
 
 class UpDroidClient {
@@ -17,7 +18,8 @@ class UpDroidClient {
   static const String explorerRefName = 'upcom-explorer';
 
   List _config;
-  List<ColumnController> _columnControllers;
+  List<PanelColumnController> _panelColumnControllers;
+  List<TabColumnController> _tabColumnControllers;
   Map _tabsInfo;
   Completer _gotConfig, _gotTabInfo;
 
@@ -33,7 +35,7 @@ class UpDroidClient {
     readyForInitialization.add(_gotTabInfo.future);
 
     // TODO: figure out how to handle panels along with the logo.
-    _columnControllers = [];
+    _tabColumnControllers = [];
 
     _mailbox = new Mailbox(upcomName, 1);
 
@@ -83,7 +85,7 @@ class UpDroidClient {
     String refName = idList[0];
     int tabId = int.parse(idList[1]);
 
-    for (ColumnController controller in _columnControllers) {
+    for (TabColumnController controller in _tabColumnControllers) {
       // Break once one of the controllers finds the tab to close.
       if (controller.findAndCloseTab(tabId, refName)) break;
     }
@@ -97,7 +99,7 @@ class UpDroidClient {
 
     _tabsInfo.keys.forEach((String key) {
       if (_tabsInfo[key].containsValue(refName)) {
-        _columnControllers[col == 1 ? 0 : 1].openTabFromModal(_tabsInfo[key]);
+        _tabColumnControllers[col == 1 ? 0 : 1].openTabFromModal(_tabsInfo[key]);
       }
     });
   }
@@ -112,28 +114,29 @@ class UpDroidClient {
     int newColIndex = int.parse(idList[3]) - 1;
 
     // Don't go any further if a move request can't be done.
-    if (!_columnControllers[newColIndex].canAddMoreTabs) {
+    if (!_tabColumnControllers[newColIndex].canAddMoreTabs) {
       window.alert('Can\'t move tab. Already at max on this side.');
       return;
     }
 
-    TabInterface tab = _columnControllers[oldColIndex].removeTab(refName, id);
-    _columnControllers[newColIndex].addTab(tab);
+    TabInterface tab = _tabColumnControllers[oldColIndex].removeTab(refName, id);
+    _tabColumnControllers[newColIndex].addTab(tab);
   }
 
   void _issueAlert(Msg m) => window.alert(m.body);
 
   void _cleanUp(Msg m) {
-    _panels.forEach((panel) {
-      panel.cleanUp();
-      // TODO: need a less hacky way to clean up the explorer stuff.
-      // Right now we have to manually clean up *around* the logo button as it's
-      // part of col-0.
-      panel.view.tabHandle.remove();
-      panel.view.tabContainer.remove();
-    });
+//    _panels.forEach((panel) {
+//      panel.cleanUp();
+//      // TODO: need a less hacky way to clean up the explorer stuff.
+//      // Right now we have to manually clean up *around* the logo button as it's
+//      // part of col-0.
+//      panel.view.tabHandle.remove();
+//      panel.view.tabContainer.remove();
+//    });
 
-    _columnControllers.forEach((controller) => controller.cleanUp());
+    _panelColumnControllers.forEach((controller) => controller.cleanUp());
+    _tabColumnControllers.forEach((controller) => controller.cleanUp());
 
     String alertMessage = 'UpDroid Commander has lost connection to the server.';
     alertMessage = alertMessage + ' Please restart the server (if necessary) and refresh the page.';
@@ -147,7 +150,14 @@ class UpDroidClient {
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: use isolates.
   void _initializeClient() {
-    _openPanel(0, 1, explorerRefName);
+    PanelColumnController controller = new PanelColumnController(0, ColumnState.NORMAL, _config[0], _mailbox, _tabsInfo, _getAvailableId);
+    _panelColumnControllers.add(controller);
+
+    controller.columnEvents.listen((ColumnEvent event) {
+      if (event == ColumnEvent.LOST_FOCUS) {
+        _panelColumnControllers.firstWhere((c) => c != controller).getsFocus();
+      }
+    });
 
     String userAgent = window.navigator.userAgent;
     if (userAgent.contains('Mobile')) {
@@ -162,25 +172,25 @@ class UpDroidClient {
     querySelector('body').style.minWidth = '1211px';
 
     for (int i = 0; i < _config.length; i++) {
-      ColumnController controller = new ColumnController(i+1, ColumnState.NORMAL, _config[i], _mailbox, _tabsInfo, _getAvailableId);
-      _columnControllers.add(controller);
+      TabColumnController controller = new TabColumnController(i+1, ColumnState.NORMAL, _config[i], _mailbox, _tabsInfo, _getAvailableId);
+      _tabColumnControllers.add(controller);
 
       controller.columnStateChanges.listen((ColumnState newState) {
         if (newState == ColumnState.MAXIMIZED) {
           querySelector('body').style.minWidth = '770px';
-          _columnControllers.where((c) => c != controller).forEach((c) => c.minimize(false));
+          _tabColumnControllers.where((c) => c != controller).forEach((c) => c.minimize(false));
         } else if (newState == ColumnState.MINIMIZED) {
           querySelector('body').style.minWidth = '770px';
-          _columnControllers.where((c) => c != controller).forEach((c) => c.maximize(false));
+          _tabColumnControllers.where((c) => c != controller).forEach((c) => c.maximize(false));
         } else {
           querySelector('body').style.minWidth = '1211px';
-          _columnControllers.where((c) => c != controller).forEach((c) => c.resetToNormal(false));
+          _tabColumnControllers.where((c) => c != controller).forEach((c) => c.resetToNormal(false));
         }
       });
 
       controller.columnEvents.listen((ColumnEvent event) {
         if (event == ColumnEvent.LOST_FOCUS) {
-          _columnControllers.firstWhere((c) => c != controller).getsFocus();
+          _tabColumnControllers.firstWhere((c) => c != controller).getsFocus();
         }
       });
     }
@@ -190,7 +200,7 @@ class UpDroidClient {
     List ids = [];
 
     // Add all used ids for [className] to ids.
-    _columnControllers.forEach((controller) {
+    _tabColumnControllers.forEach((controller) {
       ids.addAll(controller.returnIds(className));
     });
 
@@ -203,20 +213,5 @@ class UpDroidClient {
     }
 
     return id;
-  }
-
-  void _openPanel(int column, int id, String refName) {
-    if (_panels.length >= 1) return;
-
-    if (_panels.isNotEmpty) {
-      for (var panel in _panels) {
-        panel.makeInactive();
-      }
-    }
-
-    if (refName == explorerRefName) {
-      _mailbox.ws.send('[[OPEN_PANEL]]' + '$column:$id:$refName');
-      _panels.add(new UpDroidExplorer(id, column));
-    }
   }
 }

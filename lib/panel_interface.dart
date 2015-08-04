@@ -21,7 +21,7 @@ class PanelInterface {
   PanelInterface(String binPath, this.refName, this.id, this.dir, [this.extra]) {
     mailbox = new IsolateMailbox(refName, id);
 
-    String panelPath = '$binPath/panels/$refName';
+    String panelPath = '$binPath/tabs/$refName';
     _spawnPanel(panelPath, new Uri.file(normalize('$panelPath/main.dart')));
   }
 

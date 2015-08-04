@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
 import 'package:quiver/async.dart';
 
-import 'panels/panel_controller.dart';
+import 'panel_controller.dart';
 import 'panels/explorer/explorer.dart';
 import 'column_controller.dart';
 import 'tab_interface.dart';
@@ -17,7 +17,6 @@ class UpDroidClient {
   static const String explorerRefName = 'upcom-explorer';
 
   List _config;
-  List<PanelController> _panels;
   List<ColumnController> _columnControllers;
   Map _tabsInfo;
   Completer _gotConfig, _gotTabInfo;
@@ -34,7 +33,6 @@ class UpDroidClient {
     readyForInitialization.add(_gotTabInfo.future);
 
     // TODO: figure out how to handle panels along with the logo.
-    _panels = [];
     _columnControllers = [];
 
     _mailbox = new Mailbox(upcomName, 1);

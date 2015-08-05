@@ -3,10 +3,11 @@ library tab_column_view;
 import 'dart:html';
 import 'dart:async';
 
+import 'column_view.dart';
 import 'column_controller.dart';
 
-class TabColumnView {
-  static Future<TabColumnView> createColumnView(int id, ColumnState state) {
+class TabColumnView extends ColumnView {
+  static Future<TabColumnView> createTabColumnView(int id, ColumnState state) {
     Completer c = new Completer();
     c.complete(new TabColumnView(id, state));
     return c.future;
@@ -18,28 +19,19 @@ class TabColumnView {
     ColumnState.MINIMIZED: 1
   };
 
-  int id;
   ColumnState state;
-  DivElement columnContent, tabContent;
   AnchorElement controlButton, maximizeButton;
   bool hideMinimizedCompletely;
 
   SpanElement _maximizeGlyph;
-  UListElement _navTabs;
-  DivElement _rowMain;
 
-  TabColumnView(this.id, this.state) {
+  TabColumnView(int id, this.state) : super(id) {
     // This controls whether or not a minimized column is hidden completely,
     // or stays visible as a col-xs-1 stub.
     // We may eventually decide to remove this option and a lot of code below.
     hideMinimizedCompletely = true;
 
-    _rowMain = querySelector('#row-main');
-
-    columnContent = new DivElement()
-    ..id = 'column-$id'
-    ..classes.addAll(['col-xs-${width[state]}', 'column-content']);
-    _rowMain.children.add(columnContent);
+    columnContent.classes.addAll(['col-xs-${width[state]}', 'column-content']);
 
     maximizeButton = new AnchorElement()
       ..id = 'column-$id-maximize'
@@ -51,14 +43,9 @@ class TabColumnView {
     ..classes.add((state == ColumnState.MAXIMIZED) ? 'glyphicons-resize-small' : 'glyphicons-resize-full');
     maximizeButton.children.add(_maximizeGlyph);
 
-    _navTabs = new UListElement()
-    ..classes.addAll(['nav', 'nav-tabs'])
-    ..attributes['role'] = 'tablist';
-    columnContent.children.add(_navTabs);
-
     LIElement controlLi = new LIElement()
     ..classes.add('tab-control');
-    _navTabs.children.add(controlLi);
+    navTabs.children.add(controlLi);
 
     controlButton = new AnchorElement( )
     ..id = 'column-$id-new'
@@ -68,11 +55,6 @@ class TabColumnView {
     SpanElement controlGlyph = new SpanElement()
     ..classes.addAll(['glyphicons', 'glyphicons-plus']);
     controlButton.children.add(controlGlyph);
-
-    tabContent = new DivElement()
-    ..id = 'col-$id-tab-content'
-    ..classes.add('tab-content');
-    columnContent.children.add(tabContent);
   }
 
   void maximize() {
@@ -147,9 +129,9 @@ class TabColumnView {
   /// Restores content and removes all the "hidden" styling effects.
   void _showTabsAndContent() {
     // TODO: move these styles to CSS and use classes instead.
-    _navTabs.style.visibility = 'visible';
+    navTabs.style.visibility = 'visible';
 
-    _navTabs.children.getRange(1, _navTabs.children.length)
+    navTabs.children.getRange(1, navTabs.children.length)
     .forEach((e) => e.children
     .forEach((e) => e.style.display = ''));
 
@@ -160,9 +142,9 @@ class TabColumnView {
   /// Hides content and tacks on additional "hidden" styling effects.
   void _hideTabsAndContent() {
     // TODO: move these styles to CSS and use classes instead.
-    _navTabs.style.visibility = 'hidden';
+    navTabs.style.visibility = 'hidden';
 
-    _navTabs.children.getRange(1, _navTabs.children.length)
+    navTabs.children.getRange(1, navTabs.children.length)
     .forEach((e) => e.children
     .forEach((e) => e.style.display = 'none'));
 

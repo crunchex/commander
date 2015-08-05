@@ -1,14 +1,14 @@
-library column_view;
+library tab_column_view;
 
 import 'dart:html';
 import 'dart:async';
 
 import 'column_controller.dart';
 
-class ColumnView {
-  static Future<ColumnView> createColumnView(int id, ColumnState state) {
+class TabColumnView {
+  static Future<TabColumnView> createColumnView(int id, ColumnState state) {
     Completer c = new Completer();
-    c.complete(new ColumnView(id, state));
+    c.complete(new TabColumnView(id, state));
     return c.future;
   }
 
@@ -28,7 +28,7 @@ class ColumnView {
   UListElement _navTabs;
   DivElement _rowMain;
 
-  ColumnView(this.id, this.state) {
+  TabColumnView(this.id, this.state) {
     // This controls whether or not a minimized column is hidden completely,
     // or stays visible as a col-xs-1 stub.
     // We may eventually decide to remove this option and a lot of code below.

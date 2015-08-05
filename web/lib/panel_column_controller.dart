@@ -6,16 +6,18 @@ import 'dart:html';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
 import 'package:upcom-api/web/modal/modal.dart';
 
-import 'column_view.dart';
+import 'panel_column_view.dart';
 import 'column_controller.dart';
 import 'panel_interface.dart';
 
 class PanelColumnController extends ColumnController {
   List<PanelInterface> _panels = [];
 
-  PanelColumnController(int columnId, ColumnState state, List config, Mailbox mailbox, Map panelInfo, Function getAvailableId) :
-  super(columnId, state, config, mailbox, panelInfo, getAvailableId) {
+  PanelColumnView panelColumnView;
 
+  PanelColumnController(int columnId, ColumnState state, List config, Mailbox mailbox, Map panelInfo, Function getAvailableId) :
+  super(columnId, state, config, mailbox, panelInfo, getAvailableId, (columnId) => PanelColumnView.createPanelColumnView(columnId)) {
+    panelColumnView = view;
   }
 
   Future setUpController() async {
@@ -25,21 +27,6 @@ class PanelColumnController extends ColumnController {
   }
 
   void registerEventHandlers() {
-    view.controlButton.onClick.listen((e) {
-      e.preventDefault();
-      if (!canAddMorepanels) return;
-
-      new UpDroidOpenTabModal(openPanelFromModal, pluginInfo);
-    });
-
-    view.maximizeButton.onClick.listen((e) {
-      if (state == ColumnState.NORMAL) {
-        maximize(true);
-      } else {
-        resetToNormal(true);
-      }
-    });
-
     // If we haven't enabled cycling, don't set up the folowing event handler.
     if (disableCyclingHotkeys) return;
     view.columnContent.onKeyDown.listen((e) {
@@ -183,5 +170,5 @@ class PanelColumnController extends ColumnController {
   }
 
   bool get canAddMorepanels => _panels.length < _maxpanels;
-  int get _maxpanels => (ColumnView.width[state] / 10 * 8).toInt();
+  int get _maxpanels => (TabColumnView.width[state] / 10 * 8).toInt();
 }

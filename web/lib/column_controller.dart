@@ -23,11 +23,12 @@ abstract class ColumnController {
   List config;
   Mailbox mailbox;
   Function getAvailableId;
+  Function viewStaticConstructor;
   bool disableCyclingHotkeys;
 
   ColumnView view;
 
-  ColumnController(this.columnId, this.state, this.config, this.mailbox, this.pluginInfo, this.getAvailableId) {
+  ColumnController(this.columnId, this.state, this.config, this.mailbox, this.pluginInfo, this.getAvailableId, this.viewStaticConstructor) {
     columnStateChangesController = new StreamController<ColumnState>();
     columnStateChanges = columnStateChangesController.stream;
     _columnEventsController = new StreamController<ColumnEvent>();
@@ -37,7 +38,7 @@ abstract class ColumnController {
     // TODO: figure out some good hotkeys to use.
     disableCyclingHotkeys = true;
 
-    ColumnView.createColumnView(columnId, state).then((columnView) {
+    viewStaticConstructor().then((columnView) {
       view = columnView;
 
       // General [ColumnController] controller setup.

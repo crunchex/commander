@@ -6,16 +6,18 @@ import 'dart:html';
 import 'package:upcom-api/web/mailbox/mailbox.dart';
 import 'package:upcom-api/web/modal/modal.dart';
 
-import 'column_view.dart';
+import 'tab_column_view.dart';
 import 'column_controller.dart';
 import 'tab_interface.dart';
 
 class TabColumnController extends ColumnController {
   List<TabInterface> _tabs = [];
 
-  TabColumnController(int columnId, ColumnState state, List config, Mailbox mailbox, Map tabInfo, Function getAvailableId) :
-  super(columnId, state, config, mailbox, tabInfo, getAvailableId) {
+  TabColumnView tabColumnView;
 
+  TabColumnController(int columnId, ColumnState state, List config, Mailbox mailbox, Map tabInfo, Function getAvailableId) :
+  super(columnId, state, config, mailbox, tabInfo, getAvailableId, (columnId, state) => TabColumnView.createTabColumnView(columnId, state)) {
+    tabColumnView = view;
   }
 
   Future setUpController() async {
@@ -25,14 +27,14 @@ class TabColumnController extends ColumnController {
   }
 
   void registerEventHandlers() {
-    view.controlButton.onClick.listen((e) {
+    tabColumnView.controlButton.onClick.listen((e) {
       e.preventDefault();
       if (!canAddMoreTabs) return;
 
       new UpDroidOpenTabModal(openTabFromModal, pluginInfo);
     });
 
-    view.maximizeButton.onClick.listen((e) {
+    tabColumnView.maximizeButton.onClick.listen((e) {
       if (state == ColumnState.NORMAL) {
         maximize(true);
       } else {
@@ -42,7 +44,7 @@ class TabColumnController extends ColumnController {
 
     // If we haven't enabled cycling, don't set up the folowing event handler.
     if (disableCyclingHotkeys) return;
-    view.columnContent.onKeyDown.listen((e) {
+    tabColumnView.columnContent.onKeyDown.listen((e) {
       if (!e.ctrlKey && ! e.shiftKey) return;
 
       // Cycle tabs.
@@ -74,7 +76,7 @@ class TabColumnController extends ColumnController {
   void maximize(bool internal) {
     state = ColumnState.MAXIMIZED;
     if (internal) columnStateChangesController.add(state);
-    view.maximize();
+    tabColumnView.maximize();
   }
 
   /// Resets the [ColumnController]'s state to normal. If [external] == true, then an
@@ -82,7 +84,7 @@ class TabColumnController extends ColumnController {
   void resetToNormal(bool internal) {
     state = ColumnState.NORMAL;
     if (internal) columnStateChangesController.add(state);
-    view.normalize();
+    tabColumnView.normalize();
   }
 
   /// Minimizes the [ColumnController]'s state. If [external] == true, then an
@@ -90,7 +92,7 @@ class TabColumnController extends ColumnController {
   void minimize(bool internal) {
     state = ColumnState.MINIMIZED;
     if (internal) columnStateChangesController.add(state);
-    view.minimize();
+    tabColumnView.minimize();
   }
 
   /// Returns a list of IDs of all tabs whose type match [refName].
@@ -183,5 +185,5 @@ class TabColumnController extends ColumnController {
   }
 
   bool get canAddMoreTabs => _tabs.length < _maxTabs;
-  int get _maxTabs => (ColumnView.width[state] / 10 * 8).toInt();
+  int get _maxTabs => (TabColumnView.width[state] / 10 * 8).toInt();
 }

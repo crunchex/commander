@@ -35,6 +35,7 @@ class UpDroidClient {
     readyForInitialization.add(_gotTabInfo.future);
 
     // TODO: figure out how to handle panels along with the logo.
+    _panelColumnControllers = [];
     _tabColumnControllers = [];
 
     _mailbox = new Mailbox(upcomName, 1);

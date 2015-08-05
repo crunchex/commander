@@ -171,8 +171,8 @@ class UpDroidClient {
     // For now we assume they start off 50/50.
     querySelector('body').style.minWidth = '1211px';
 
-    for (int i = 0; i < _config.length; i++) {
-      TabColumnController controller = new TabColumnController(i+1, ColumnState.NORMAL, _config[i], _mailbox, _tabsInfo, _getAvailableId);
+    for (int i = 1; i < _config.length; i++) {
+      TabColumnController controller = new TabColumnController(i, ColumnState.NORMAL, _config[i], _mailbox, _tabsInfo, _getAvailableId);
       _tabColumnControllers.add(controller);
 
       controller.columnStateChanges.listen((ColumnState newState) {

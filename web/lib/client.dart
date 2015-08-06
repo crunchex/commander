@@ -49,6 +49,7 @@ class UpDroidClient {
     _mailbox.registerWebSocketEvent(EventType.ON_OPEN, 'MAKE_REQUESTS', _makeInitialRequests);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'TABS_INFO', _refreshTabsInfo);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _setUpConfig);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REQUEST_TAB', _requestTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'MOVE_TAB', _moveTabFromServer);
@@ -77,6 +78,17 @@ class UpDroidClient {
   void _refreshTabsInfo(Msg um) {
     _tabsInfo = JSON.decode(um.body);
     _gotTabInfo.complete();
+  }
+
+  void _requestTabFromServer(Msg um) {
+    int tabId = _getAvailableId(um.body);
+
+    for (ColumnController controller in _columnControllers) {
+      if (controller.canAddMoreTabs) {
+        controller.openTab(tabId, _tabsInfo[um.body]);
+        break;
+      }
+    }
   }
 
   void _closeTabFromServer(Msg um) {

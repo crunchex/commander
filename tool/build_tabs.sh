@@ -35,4 +35,10 @@ git pull >/dev/null 2>&1
 ./tool/build.sh >/dev/null 2>&1
 echo "OK"
 
+echo -n "Building upcom-learn-demo......."
+cd $WORKINGDIR/upcom-learn-demo
+git pull >/dev/null 2>&1
+./tool/build.sh >/dev/null 2>&1
+echo "OK"
+
 echo "##### Tabs and API done ###########"

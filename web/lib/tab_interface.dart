@@ -16,10 +16,10 @@ class TabInterface {
   Mailbox _mailbox;
   ScriptElement _tabJs;
 
-  TabInterface(this.id, this.col, this.tabInfo, Mailbox mailbox) {
+  TabInterface(this.id, this.col, this.tabInfo, Mailbox mailbox, [bool asRequest=false]) {
     refName = tabInfo['refName'];
     _mailbox = mailbox;
-    setupComplete = _setUp();
+    setupComplete = _setUp(asRequest);
   }
 
   bool isActive() => view.isActive();
@@ -27,8 +27,8 @@ class TabInterface {
   void makeInactive() => view.makeInactive();
   void shutdownScript() => _tabJs.remove();
 
-  Future _setUp() async {
-    await _initiateTabSetup();
+  Future _setUp(bool asRequest) async {
+    await _initiateTabSetup(asRequest);
     await _sendIdEvent();
 
     // Set up an interface to the new Tab's view.
@@ -37,12 +37,16 @@ class TabInterface {
     return null;
   }
 
-  Future _initiateTabSetup() {
+  Future _initiateTabSetup(bool asRequest) {
     // Wait for the Tab's frontend to be ready to receive the ID event.
     EventStreamProvider<CustomEvent> tabReadyStream = new EventStreamProvider<CustomEvent>('TabReadyForId');
 
     // Launch the Tab's backend.
-    _mailbox.ws.send('[[OPEN_TAB]]' + '$col:$id:$refName');
+    if (asRequest) {
+      _mailbox.ws.send('[[OPEN_TAB_AS_REQUEST]]' + '$col:$id:$refName');
+    } else {
+      _mailbox.ws.send('[[OPEN_TAB]]' + '$col:$id:$refName');
+    }
 
     // Call the Tab's frontend (as a JS lib).
     _tabJs = new ScriptElement()

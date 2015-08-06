@@ -85,7 +85,7 @@ class UpDroidClient {
 
     for (ColumnController controller in _columnControllers) {
       if (controller.canAddMoreTabs) {
-        controller.openTab(tabId, _tabsInfo[um.body]);
+        controller.openTab(tabId, _tabsInfo[um.body], true);
         break;
       }
     }

@@ -34,6 +34,7 @@ class CmdrServer {
 
   Map _panels = {};
   Map<String, Map<int, dynamic>> _tabs = {};
+  Map<String, List<String>> _pendingTabRequests = {};
   CmdrMailbox _mailbox;
   String _installationPath;
   Directory dir;
@@ -128,6 +129,8 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('CLIENT_CONFIG', _clientConfig);
     _mailbox.registerWebSocketEvent('GIT_PUSH', _gitPush);
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
+    _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
+    _mailbox.registerWebSocketEvent('OPEN_TAB_AS_REQUEST', _openTabAsRequest);
     _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
     _mailbox.registerWebSocketEvent('UPDATE_COLUMN', _updateColumn);
@@ -189,6 +192,37 @@ class CmdrServer {
     }
   }
 
+  void _openTabAsRequest(Msg um) {
+    String id = um.body;
+    List idList = id.split(':');
+    int num = int.parse(idList[1]);
+    String refName = idList[2];
+
+    String binPath = '$_installationPath/bin';
+
+    debug('Open tab request received: $id', 0);
+
+    if (!_tabs.containsKey(refName)) _tabs[refName] = {};
+
+    if (idList.length <= 3) {
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir);
+    } else {
+      List extra = new List.from(idList.getRange(3, idList.length));
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir, extra);
+    }
+
+    // Send the ID of the new tab back to the original requester.
+    if (_pendingTabRequests.containsKey(refName) && _pendingTabRequests[refName].isNotEmpty) {
+      List<String> split = _pendingTabRequests[refName][0].split(':');
+      String requesterRefName = split[0];
+      int requesterId = int.parse(split[1]);
+
+      Msg m = new Msg('REQUEST_FULFILLED', '$refName:$num');
+      CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 1, requesterRefName, requesterId, m));
+      _pendingTabRequests[refName].removeAt(0);
+    }
+  }
+
   void _openTab(Msg um) {
     String id = um.body;
     List idList = id.split(':');
@@ -236,8 +270,16 @@ class CmdrServer {
       .onDone(() =>_mailbox.send(new Msg('TABS_INFO', JSON.encode(tabsInfo))));
   }
 
-  void _requestTabFromServer(Msg um) => _mailbox.send(new Msg('REQUEST_TAB', um.body));
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));
+
+  void _requestTabFromServer(Msg um) {
+    List<String> split = um.body.split(':');
+
+    if (_pendingTabRequests[split[2]] == null) _pendingTabRequests[split[2]] = [];
+
+    _pendingTabRequests[split[2]].add('${split[0]}:${split[1]}');
+    _mailbox.send(new Msg('REQUEST_TAB', split[2]));
+  }
 
   void _closeTab(Msg um) {
     List idList = um.body.split(':');

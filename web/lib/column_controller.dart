@@ -151,7 +151,7 @@ class ColumnController {
   }
 
   /// Opens a [TabController].
-  Future openTab(int id, Map tabInfo) async {
+  Future openTab(int id, Map tabInfo, [bool asRequest=false]) async {
     if (!canAddMoreTabs) return null;
 
     if (_tabs.isNotEmpty) {
@@ -160,7 +160,13 @@ class ColumnController {
       }
     }
 
-    TabInterface tab = new TabInterface(id, columnId, tabInfo, _mailbox);
+    TabInterface tab;
+    if (asRequest) {
+      tab = new TabInterface(id, columnId, tabInfo, _mailbox, true);
+    } else {
+      tab = new TabInterface(id, columnId, tabInfo, _mailbox);
+    }
+
     await tab.setupComplete;
     _tabs.add(tab);
 

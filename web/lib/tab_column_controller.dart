@@ -16,7 +16,7 @@ class TabColumnController extends ColumnController {
   TabColumnView tabColumnView;
 
   TabColumnController(int columnId, ColumnState state, List config, Mailbox mailbox, Map tabInfo, Function getAvailableId) :
-  super(columnId, state, config, mailbox, tabInfo, getAvailableId, (columnId, state) => TabColumnView.createTabColumnView(columnId, state)) {
+  super(columnId, config, mailbox, tabInfo, getAvailableId, TabColumnView.createTabColumnView, state) {
     tabColumnView = view;
   }
 

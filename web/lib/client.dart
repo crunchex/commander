@@ -163,7 +163,7 @@ class UpDroidClient {
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: use isolates.
   void _initializeClient() {
-    PanelColumnController controller = new PanelColumnController(0, ColumnState.NORMAL, _config[0], _mailbox, _tabsInfo, _getAvailableId);
+    PanelColumnController controller = new PanelColumnController(0, _config[0], _mailbox, _tabsInfo, _getAvailableId);
     _panelColumnControllers.add(controller);
 
     controller.columnEvents.listen((ColumnEvent event) {

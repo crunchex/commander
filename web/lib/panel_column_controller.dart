@@ -14,8 +14,8 @@ class PanelColumnController extends ColumnController {
 
   PanelColumnView panelColumnView;
 
-  PanelColumnController(int columnId, ColumnState state, List config, Mailbox mailbox, Map panelInfo, Function getAvailableId) :
-  super(columnId, state, config, mailbox, panelInfo, getAvailableId, (columnId) => PanelColumnView.createPanelColumnView(columnId)) {
+  PanelColumnController(int columnId, List config, Mailbox mailbox, Map panelInfo, Function getAvailableId) :
+  super(columnId, config, mailbox, panelInfo, getAvailableId, PanelColumnView.createPanelColumnView) {
     panelColumnView = view;
   }
 

@@ -28,9 +28,10 @@ abstract class ColumnController {
 
   ColumnView view;
 
-  ColumnController(this.columnId, this.state, this.config, this.mailbox, this.pluginInfo, this.getAvailableId, this.viewStaticConstructor) {
+  ColumnController(this.columnId, this.config, this.mailbox, this.pluginInfo, this.getAvailableId, this.viewStaticConstructor, [ColumnState state]) {
     columnStateChangesController = new StreamController<ColumnState>();
     columnStateChanges = columnStateChangesController.stream;
+
     _columnEventsController = new StreamController<ColumnEvent>();
     columnEvents = _columnEventsController.stream;
 
@@ -38,25 +39,31 @@ abstract class ColumnController {
     // TODO: figure out some good hotkeys to use.
     disableCyclingHotkeys = true;
 
-    viewStaticConstructor().then((columnView) {
-      view = columnView;
-
-      // General [ColumnController] controller setup.
-      _setUpController();
-
-      // Controller setup implemented by child class.
-      setUpController();
-
-      // General [ColumnController] Event Handlers.
-      _registerEventHandlers();
-
-      // Extra Event Handlers implemented by child class.
-      registerEventHandlers();
-    });
+    if (state == null) {
+      viewStaticConstructor(columnId).then((columnView) => _postViewSetupCallback(columnView));
+    } else {
+      viewStaticConstructor(columnId, state).then((columnView) => _postViewSetupCallback(columnView));
+    }
   }
 
   Future setUpController();
   void registerEventHandlers();
+
+  void _postViewSetupCallback(ColumnView columnView) {
+    view = columnView;
+
+    // General [ColumnController] controller setup.
+    _setUpController();
+
+    // Controller setup implemented by child class.
+    setUpController();
+
+    // General [ColumnController] Event Handlers.
+    _registerEventHandlers();
+
+    // Extra Event Handlers implemented by child class.
+    registerEventHandlers();
+  }
 
   void _setUpController() {
 

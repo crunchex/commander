@@ -12,9 +12,9 @@ import 'package:upcom-api/git.dart';
 import 'package:upcom-api/tab_backend.dart';
 import 'package:upcom-api/debug.dart';
 
+import 'tab/explorer.dart';
 import 'server_mailbox.dart';
 import 'tab_interface.dart';
-import 'panel_interface.dart';
 import 'post_office.dart';
 
 part 'commands.dart';
@@ -32,9 +32,10 @@ class CmdrServer {
 
   ArgResults _args;
 
-//  Map _panels = {};
+  Map _panels = {};
   Map<String, Map<int, PanelInterface>> _panels = {};
   Map<String, Map<int, TabInterface>> _tabs = {};
+  Map<String, List<String>> _pendingTabRequests = {};
   CmdrMailbox _mailbox;
   String _installationPath;
   Directory dir;
@@ -154,7 +155,6 @@ class CmdrServer {
         _mailbox.send(new Msg('SERVER_READY', strConfig));
       } else {
         List listConfig = [
-          [{'id': 1, 'class': explorerRefName}],
           [{'id': 1, 'class': editorRefName}],
           [{'id': 1, 'class': consoleRefName}]
         ];
@@ -174,7 +174,7 @@ class CmdrServer {
   }
 
   void _openPanel(Msg um) {
-    List idList = um.body.split(':');
+	List idList = um.body.split(':');
     int id = int.parse(idList[1]);
     String refName = idList[2];
 
@@ -185,6 +185,37 @@ class CmdrServer {
     if (!_panels.containsKey(refName)) _panels[refName] = {};
 
     _panels[refName][id] = new PanelInterface(binPath, refName, id, dir);
+  }
+
+  void _openTabAsRequest(Msg um) {
+    String id = um.body;
+    List idList = id.split(':');
+    int num = int.parse(idList[1]);
+    String refName = idList[2];
+
+    String binPath = '$_installationPath/bin';
+
+    debug('Open tab request received: $id', 0);
+
+    if (!_tabs.containsKey(refName)) _tabs[refName] = {};
+
+    if (idList.length <= 3) {
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir);
+    } else {
+      List extra = new List.from(idList.getRange(3, idList.length));
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir, extra);
+    }
+
+    // Send the ID of the new tab back to the original requester.
+    if (_pendingTabRequests.containsKey(refName) && _pendingTabRequests[refName].isNotEmpty) {
+      List<String> split = _pendingTabRequests[refName][0].split(':');
+      String requesterRefName = split[0];
+      int requesterId = int.parse(split[1]);
+
+      Msg m = new Msg('REQUEST_FULFILLED', '$refName:$num');
+      CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 1, requesterRefName, requesterId, m));
+      _pendingTabRequests[refName].removeAt(0);
+    }
   }
 
   void _openTab(Msg um) {

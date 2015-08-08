@@ -10,10 +10,14 @@ function usage {
 
 # process args
 onlycss=0
+debug=0
 while [ "$1" != "" ]; do
     case $1 in
         -o | --onlycss )        shift
                                 onlycss=1
+                                ;;
+        -d | --debug )       	shift
+                                debug=1
                                 ;;
         -h | --help )           usage
                                 exit
@@ -78,7 +82,11 @@ WEB=$TOPDIR/web
 rm $WEB/css/main.css
 lessc $WEB/css/main.less > $WEB/css/main.css
 cat $WEB/css/glyphicons.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
-pub build > /dev/null
+if [ $debug == 1 ]; then
+	pub build --mode=debug > /dev/null
+else
+	pub build > /dev/null
+fi
 echo "OK"
 
 echo -n "Setting up tabs................."
@@ -94,12 +102,14 @@ cp -r ../upcom-editor/build/bin $BINTABS/upcom-editor
 cp -r ../upcom-console/build/bin $BINTABS/upcom-console
 cp -r ../upcom-camera/build/bin $BINTABS/upcom-camera
 # cp -r ../upcom-teleop/build/bin $BINTABS/upcom-teleop
+# cp -r ../upcom-learn-demo/build/bin $BINTABS/upcom-learn-demo
 
 cp -r ../upcom-explorer/build/web $WEBTABS/upcom-explorer
 cp -r ../upcom-editor/build/web $WEBTABS/upcom-editor
 cp -r ../upcom-console/build/web $WEBTABS/upcom-console
 cp -r ../upcom-camera/build/web $WEBTABS/upcom-camera
 # cp -r ../upcom-teleop/build/web $WEBTABS/upcom-teleop
+# cp -r ../upcom-learn-demo/build/web $WEBTABS/upcom-learn-demo
 echo "OK"
 
 echo -n "Cleaning up gui................."
@@ -120,7 +130,11 @@ BINDIR=$TOPDIR/build/bin
 mkdir -p $BINDIR
 
 echo -n "Building (minifying) cmdr......."
-dart2js --output-type=dart --categories=Server --minify -o $BINDIR/cmdr cmdr.dart
+if [ $debug == 1 ]; then
+	dart2js --output-type=dart --categories=Server -o $BINDIR/cmdr cmdr.dart
+else
+	dart2js --output-type=dart --categories=Server --minify -o $BINDIR/cmdr cmdr.dart
+fi
 rm -rf $BINDIR/cmdr.deps
 sed -i '1i#!/usr/bin/env dart' $BINDIR/cmdr
 chmod +x $BINDIR/cmdr

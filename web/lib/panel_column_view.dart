@@ -1,13 +1,11 @@
-library tab_column_view;
+library panel_column_view;
 
-import 'dart:html';
 import 'dart:async';
 
 import 'column_view.dart';
-import 'column_controller.dart';
 
 class PanelColumnView extends ColumnView {
-  static Future<PanelColumnView> createPanelColumnView(int id, ColumnState state) {
+  static Future<PanelColumnView> createPanelColumnView(int id) {
     Completer c = new Completer();
     c.complete(new PanelColumnView(id));
     return c.future;

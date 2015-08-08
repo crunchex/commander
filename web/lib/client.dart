@@ -84,7 +84,7 @@ class UpDroidClient {
   void _requestTabFromServer(Msg um) {
     int tabId = _getAvailableId(um.body);
 
-    for (ColumnController controller in _columnControllers) {
+    for (TabColumnController controller in _tabColumnControllers) {
       if (controller.canAddMoreTabs) {
         controller.openTab(tabId, _tabsInfo[um.body], true);
         break;

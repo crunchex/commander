@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:upcom-api/web/mailbox/mailbox.dart';
-import 'package:upcom-api/web/modal/modal.dart';
 
 import 'panel_column_view.dart';
 import 'column_controller.dart';
@@ -54,30 +53,6 @@ class PanelColumnController extends ColumnController {
       _panels[currentActivePanelIndex + 1].makeActive();
       _panels[currentActivePanelIndex + 1].view.tabContent.focus();
     }
-  }
-
-  /// Maximizes the [ColumnController]'s state. If [external] == true, then an
-  /// event is not fired to avoid an endless loop.
-  void maximize(bool internal) {
-    state = ColumnState.MAXIMIZED;
-    if (internal) columnStateChangesController.add(state);
-    view.maximize();
-  }
-
-  /// Resets the [ColumnController]'s state to normal. If [external] == true, then an
-  /// event is not fired to avoid an endless loop.
-  void resetToNormal(bool internal) {
-    state = ColumnState.NORMAL;
-    if (internal) columnStateChangesController.add(state);
-    view.normalize();
-  }
-
-  /// Minimizes the [ColumnController]'s state. If [external] == true, then an
-  /// event is not fired to avoid an endless loop.
-  void minimize(bool internal) {
-    state = ColumnState.MINIMIZED;
-    if (internal) columnStateChangesController.add(state);
-    view.minimize();
   }
 
   /// Returns a list of IDs of all panels whose type match [refName].
@@ -169,6 +144,5 @@ class PanelColumnController extends ColumnController {
     _panels.add(panel);
   }
 
-  bool get canAddMorepanels => _panels.length < _maxpanels;
-  int get _maxpanels => (TabColumnView.width[state] / 10 * 8).toInt();
+  bool get canAddMorepanels => _panels.length < 1;
 }

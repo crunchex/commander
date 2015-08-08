@@ -12,9 +12,9 @@ import 'package:upcom-api/git.dart';
 import 'package:upcom-api/tab_backend.dart';
 import 'package:upcom-api/debug.dart';
 
-import 'tab/explorer.dart';
 import 'server_mailbox.dart';
 import 'tab_interface.dart';
+import 'panel_interface.dart';
 import 'post_office.dart';
 
 part 'commands.dart';
@@ -32,7 +32,6 @@ class CmdrServer {
 
   ArgResults _args;
 
-  Map _panels = {};
   Map<String, Map<int, PanelInterface>> _panels = {};
   Map<String, Map<int, TabInterface>> _tabs = {};
   Map<String, List<String>> _pendingTabRequests = {};
@@ -130,6 +129,7 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('CLIENT_CONFIG', _clientConfig);
     _mailbox.registerWebSocketEvent('GIT_PUSH', _gitPush);
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
+    _mailbox.registerWebSocketEvent('OPEN_TAB_AS_REQUEST', _openTabAsRequest);
     _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
     _mailbox.registerWebSocketEvent('UPDATE_COLUMN', _updateColumn);

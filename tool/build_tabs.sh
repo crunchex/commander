@@ -4,6 +4,26 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 WORKINGDIR=$DIR/../..
 
+function usage {
+    echo "usage: build [[[-d ] | [-h]]"
+}
+
+# process args
+debug=0
+while [ "$1" != "" ]; do
+    case $1 in
+        -d | --debug )       	shift
+                                debug=1
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+
 echo "##### Building API ################"
 echo -n "Updating upcom-api.............."
 cd $WORKINGDIR/upcom-api

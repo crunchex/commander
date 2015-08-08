@@ -42,7 +42,8 @@ abstract class ColumnController {
     if (state == null) {
       viewStaticConstructor(columnId).then((columnView) => _postViewSetupCallback(columnView));
     } else {
-      viewStaticConstructor(columnId, state).then((columnView) => _postViewSetupCallback(columnView));
+      this.state = state;
+      viewStaticConstructor(columnId, this.state).then((columnView) => _postViewSetupCallback(columnView));
     }
   }
 

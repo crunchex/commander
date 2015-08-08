@@ -177,7 +177,7 @@ class TabColumnController extends ColumnController {
     _tabs.forEach((TabInterface tab) => tab.makeInactive());
 
     // Move the tab handle.
-    querySelector('#column-${columnId.toString()}').children[1].children.add(tab.view.tabHandle);
+    querySelector('#column-${columnId.toString()}').children[0].children.add(tab.view.tabHandle);
     // Move the tab content.
     querySelector('#col-${columnId.toString()}-tab-content').children.add(tab.view.tabContainer);
 

@@ -139,15 +139,6 @@ class UpDroidClient {
   void _issueAlert(Msg m) => window.alert(m.body);
 
   void _cleanUp(Msg m) {
-//    _panels.forEach((panel) {
-//      panel.cleanUp();
-//      // TODO: need a less hacky way to clean up the explorer stuff.
-//      // Right now we have to manually clean up *around* the logo button as it's
-//      // part of col-0.
-//      panel.view.tabHandle.remove();
-//      panel.view.tabContainer.remove();
-//    });
-
     _panelColumnControllers.forEach((controller) => controller.cleanUp());
     _tabColumnControllers.forEach((controller) => controller.cleanUp());
 

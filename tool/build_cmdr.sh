@@ -116,7 +116,7 @@ echo -n "Cleaning up gui................."
 BUILD=$TOPDIR/build/web
 mkdir -p $BUILD/fonts
 cp $WEB/packages/bootjack/fonts/glyphicons-halflings-regular.* $BUILD/fonts/
-rm $BUILD/css/main.css $BUILD/css/main.less $BUILD/css/glyphicons.css
+rm -rf $BUILD/css/main.css $BUILD/css/main.less $BUILD/css/glyphicons.css $BUILD/css/src
 sed -i 's/main.css/cmdr-min.css/g' $BUILD/index.html
 sed -i 's/main.dart/main.dart.js/g' $BUILD/index.html
 echo "OK"

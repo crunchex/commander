@@ -16,9 +16,10 @@ class PanelColumnView extends ColumnView {
   }
 
   void cleanUp() {
-    // TODO: make sure child nodes are all cleaned up.
-    columnContent.children.first.remove();
+    // Empty out nav-tabs.
     columnContent.children.first.innerHtml = '';
+
+    // Empty the tab content.
     tabContent.innerHtml = '';
   }
 }

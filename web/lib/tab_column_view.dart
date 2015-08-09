@@ -153,12 +153,13 @@ class TabColumnView extends ColumnView {
   }
 
   void cleanUp() {
-    // TODO: make sure child nodes are all cleaned up.
-    columnContent.children.first.remove();
+    // Empty out nav-tabs.
     columnContent.children.first.innerHtml = '';
-    tabContent.innerHtml = '';
 
-//    columnContent.innerHtml = '';
-//    columnContent = null;
+    // Remove the maximize button.
+    columnContent.children.last.remove();
+
+    // Empty the tab content.
+    tabContent.innerHtml = '';
   }
 }

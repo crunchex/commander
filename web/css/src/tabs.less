@@ -24,8 +24,13 @@
 
 .column-content .nav-tabs>.tab-handle,
 .column-content .nav-tabs>.tab-control,
+.column-content .nav-tabs>.panel-control,
 .column-content .maximize-button {
   top: 17px;
+}
+
+.column-content .nav-tabs>.panel-control {
+  float: right;
 }
 
 li.tab-handle.panel-handle {
@@ -60,6 +65,10 @@ li.tab-handle.panel-handle {
   border-radius: 0;
 }
 
+.nav-tabs>.tab-handle.panel-handle>a {
+  padding: 4px 8px 4px 8px;
+}
+
 .nav-tabs>.tab-handle>.close-control-hitbox {
   cursor: pointer;
   position: relative;
@@ -92,15 +101,17 @@ li.tab-handle.panel-handle {
   color: @upcom-dark-grey;
 }
 
-.nav-tabs>li>a.new-tab-button {
-  padding: 4px 8px 4px 8px;
+.nav-tabs>li>a.new-tab-button,
+.nav-tabs>li>a.new-panel-button {
+  padding: 4px;
   background-color: transparent;
   border-bottom-width: 0;
   .font-avenir-demi();
   border-radius: 0;
 }
 
-.nav-tabs>li>a.new-tab-button:hover {
+.nav-tabs>li>a.new-tab-button:hover,
+.nav-tabs>li>a.new-panel-button:hover {
   cursor: pointer;
   color: @upcom-white;
   background-color:@brand-red;

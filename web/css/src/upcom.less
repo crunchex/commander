@@ -17,22 +17,22 @@
 
 div.tab-handle.upcom-logo-handle {
   position: absolute;
-  height: 36px;
-  width: 90px;
+  height: 40px;
+  width: 80px;
+  top: 5px;
   margin-left: 5px;
-  padding: 5px;
-  background-color: @brand-red;
 }
 
 div.tab-handle.upcom-logo-handle>a {
+  position: absolute;
   margin-right: 0;
   border: none;
   background-color: @brand-red;
-  height: 36px;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
+  height: 100%;
+  width: 100%;
+  padding: 5px;
+  z-index: 5;
+  .fade();
 }
 
 div.tab-handle.upcom-logo-handle>a>.upcom-logo {
@@ -40,31 +40,28 @@ div.tab-handle.upcom-logo-handle>a>.upcom-logo {
   width: 100%;
   fill: @upcom-white;
   position: relative;
-  top: -5px;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
+  top: -2px;
+  .fade();
 }
 
 div.tab-handle.upcom-logo-handle>a:hover>.upcom-logo {
   fill: @upcom-black;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
+  .fade();
 }
 
 a.help-button,
 a.help-button:active,
 a.help-button:visited {
-  position: fixed;
-  margin: 4px 0 0 106px;
+  position: absolute;
+  margin: 2px 0 0 88px;
   color: @brand-red;
+  z-index: 5;
+  .fade();
 }
 
 a.help-button:hover {
   color: @upcom-med-grey;
+  .fade();
 }
 
 a.help-button>.glyphicons.glyphicons-circle-question-mark {

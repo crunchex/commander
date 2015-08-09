@@ -79,9 +79,9 @@ cd $TOPDIR/
 
 echo -n "Building (minifying) gui........"
 WEB=$TOPDIR/web
-rm $WEB/css/main.css
+rm $WEB/css/main.css $WEB/css/cmdr-min.css
 lessc $WEB/css/main.less > $WEB/css/main.css
-cat $WEB/css/glyphicons.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
+cleancss $WEB/css/main.css -o $WEB/css/cmdr-min.css
 if [ $debug == 1 ]; then
 	pub build --mode=debug > /dev/null
 else
@@ -117,9 +117,7 @@ BUILD=$TOPDIR/build/web
 mkdir -p $BUILD/fonts
 cp $WEB/packages/bootjack/fonts/glyphicons-halflings-regular.* $BUILD/fonts/
 rm $BUILD/css/main.css $BUILD/css/main.less $BUILD/css/glyphicons.css
-sed -i '/glyphicons.css/d' $BUILD/index.html
-# sed -i '/bootstrap.min.css/d' $BUILD/index.html
-sed -i 's/main.css/cmdr.css/g' $BUILD/index.html
+sed -i 's/main.css/cmdr-min.css/g' $BUILD/index.html
 sed -i 's/main.dart/main.dart.js/g' $BUILD/index.html
 echo "OK"
 

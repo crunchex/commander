@@ -187,14 +187,22 @@ body.mobile {
 
 /* Nav/Logo */
 
-.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle {
-  float: left;
-  width: 100px;
-  margin-bottom: 10px;
-  top: 0;
+div.tab-handle.upcom-logo-handle {
+  position: absolute;
+  height: 36px;
+  width: 90px;
+  /* top: 14px; */
+  margin-left: 5px;
+  /* margin-bottom: 5px; */
+  padding: 5px;
+  background-color: @brand-red;
+  //float: left;
+  //width: 100px;
+  //margin-bottom: 10px;
+  //top: 0;
 }
 
-.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a {
+div.tab-handle.upcom-logo-handle>a {
   margin-right: 0;
   //border-bottom-right-radius: 0;
   border: none;
@@ -215,19 +223,19 @@ body.mobile {
 //  transition: all 0.5s ease;
 //}
 
-.upcom-logo {
+div.tab-handle.upcom-logo-handle>a>.upcom-logo {
   height: 100%;
   width: 100%;
   fill: @upcom-white;
   position: relative;
-  top: -4px;
+  top: -5px;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
 }
 
-.col-xs-2>.nav-tabs>li.tab-handle.upcom-logo-handle>a:hover>.upcom-logo {
+div.tab-handle.upcom-logo-handle>a:hover>.upcom-logo {
   fill: @upcom-black;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
@@ -263,7 +271,7 @@ a.help-button>.glyphicons.glyphicons-circle-question-mark {
   border-bottom-width: 0;
 }
 
-.column-content.col-xs-5>.nav-tabs {
+.column-content>.nav-tabs {
   height: 46px;
 }
 
@@ -281,14 +289,15 @@ a.help-button>.glyphicons.glyphicons-circle-question-mark {
   top: 17px;
 }
 
-.col-xs-2 .nav-tabs>li.tab-handle {
+li.tab-handle.panel-handle {
   float: right;
+  right: -2px;
 }
 
-.col-xs-2 .nav-tabs>li.tab-handle>a {
-  margin-right: 0;
-  border-bottom-right-radius: 2px;
-}
+//.col-xs-2 .nav-tabs>li.tab-handle>a {
+//  margin-right: 0;
+//  border-bottom-right-radius: 2px;
+//}
 
 .nav-tabs>li.active>a,
 .nav-tabs>li.active>a:hover,
@@ -317,9 +326,9 @@ a.help-button>.glyphicons.glyphicons-circle-question-mark {
   border-radius: 0;
 }
 
-.col-xs-2 .nav-tabs>.tab-handle>a {
-  padding: 4px 8px 4px 8px;
-}
+//.col-xs-2 .nav-tabs>.tab-handle>a {
+//  padding: 4px 8px 4px 8px;
+//}
 
 .nav-tabs>.tab-handle>.close-control-hitbox {
   cursor: pointer;

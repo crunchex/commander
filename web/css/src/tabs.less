@@ -36,6 +36,7 @@
 li.tab-handle.panel-handle {
   float: right;
   right: -2px;
+  max-width: 78px;
 }
 
 .nav-tabs>li.active>a,
@@ -44,6 +45,11 @@ li.tab-handle.panel-handle {
   color: @upcom-black;
   background-color: @upcom-white;
   .font-avenir-demi();
+}
+
+.nav-tabs>li.active.panel-handle>a {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-tabs>li>a.inner-tabs {

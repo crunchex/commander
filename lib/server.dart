@@ -141,6 +141,7 @@ class CmdrServer {
 
     _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
 
+    _mailbox.registerServerMessageHandler('REQUEST_TAB', _requestTabFromServer);
     _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
     _mailbox.registerServerMessageHandler('CLOSE_TAB', _closeTabFromServer);
     _mailbox.registerServerMessageHandler('CLONE_TAB', _cloneTabFromServer);
@@ -289,6 +290,15 @@ class CmdrServer {
   }
 
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));
+
+  void _requestTabFromServer(Msg um) {
+    List<String> split = um.body.split(':');
+
+    if (_pendingTabRequests[split[2]] == null) _pendingTabRequests[split[2]] = [];
+
+    _pendingTabRequests[split[2]].add('${split[0]}:${split[1]}');
+    _mailbox.send(new Msg('REQUEST_TAB', split[2]));
+  }
 
   void _closeTab(Msg um) {
     List idList = um.body.split(':');

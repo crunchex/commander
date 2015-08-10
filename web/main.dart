@@ -10,7 +10,7 @@ void main() {
 
   // To enable login, set below bool to true
   // and comment out .login-overlay display: none in main.css.
-  bool enableLogin = false;
+  bool enableLogin = true;
 
   if (!enableLogin) {
     new UpDroidClient();

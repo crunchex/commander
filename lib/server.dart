@@ -11,6 +11,7 @@ import 'package:path/path.dart' as pathLib;
 import 'package:upcom-api/git.dart';
 import 'package:upcom-api/tab_backend.dart';
 import 'package:upcom-api/debug.dart';
+import 'package:quiver/async.dart';
 
 import 'server_mailbox.dart';
 import 'tab_interface.dart';
@@ -252,23 +253,38 @@ class CmdrServer {
     // Specialized transformer that takes a tab directory as input and extracts tab info
     // from the json file within.
     StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
-      try {
-        File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
-        String tabInfoString = tabInfoJson.readAsStringSync();
-        sink.add(JSON.decode(tabInfoString));
-      } catch(e) {
-        File tabInfoJson = new File(pathLib.normalize('${event.path}/panelinfo.json'));
-        String tabInfoString = tabInfoJson.readAsStringSync();
-        sink.add(JSON.decode(tabInfoString));
-      }
+      File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
+      String tabInfoString = tabInfoJson.readAsStringSync();
+      sink.add(JSON.decode(tabInfoString));
     });
 
-    Map tabsInfo = {};
-    new Directory('$_installationPath/bin/tabs')
+    StreamTransformer extractPanelInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
+      File tabInfoJson = new File(pathLib.normalize('${event.path}/panelinfo.json'));
+      String tabInfoString = tabInfoJson.readAsStringSync();
+      sink.add(JSON.decode(tabInfoString));
+    });
+
+    FutureGroup group = new FutureGroup();
+    Completer panelsDone = new Completer();
+    Completer tabsDone = new Completer();
+    group.add(panelsDone.future);
+    group.add(tabsDone.future);
+
+    Map pluginsInfo = {'panels': {}, 'tabs': {}};
+
+    new Directory('$_installationPath/bin/panels')
       .list()
-      .transform(extractTabInfo)
-      .listen((Map tabInfoMap) => tabsInfo[tabInfoMap['refName']] = tabInfoMap)
-      .onDone(() =>_mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(tabsInfo))));
+      .transform(extractPanelInfo)
+      .listen((Map panelInfoMap) => pluginsInfo['panels'][panelInfoMap['refName']] = panelInfoMap)
+      .onDone(() => panelsDone.complete());
+
+    new Directory('$_installationPath/bin/tabs')
+    .list()
+    .transform(extractTabInfo)
+    .listen((Map tabInfoMap) => pluginsInfo['tabs'][tabInfoMap['refName']] = tabInfoMap)
+    .onDone(() => tabsDone.complete());
+
+    group.future.then((_) => _mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(pluginsInfo))));
   }
 
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));

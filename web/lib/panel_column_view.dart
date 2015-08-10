@@ -1,6 +1,7 @@
 library panel_column_view;
 
 import 'dart:async';
+import 'dart:html';
 
 import 'column_view.dart';
 
@@ -11,14 +12,30 @@ class PanelColumnView extends ColumnView {
     return c.future;
   }
 
+  AnchorElement controlButton;
+
   PanelColumnView(int id) : super(id) {
     columnContent.classes.addAll(['col-xs-2', 'column-content']);
+
+    LIElement controlLi = new LIElement()
+      ..classes.add('panel-control');
+    navTabs.children.add(controlLi);
+
+    controlButton = new AnchorElement( )
+      ..id = 'column-$id-new'
+      ..classes.add('new-panel-button');
+    controlLi.children.add(controlButton);
+
+    SpanElement controlGlyph = new SpanElement()
+      ..classes.addAll(['glyphicons', 'glyphicons-chevron-down']);
+    controlButton.children.add(controlGlyph);
   }
 
   void cleanUp() {
-    // TODO: make sure child nodes are all cleaned up.
-    columnContent.children.first.remove();
+    // Empty out nav-tabs.
     columnContent.children.first.innerHtml = '';
+
+    // Empty the tab content.
     tabContent.innerHtml = '';
   }
 }

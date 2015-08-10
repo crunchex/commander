@@ -20,8 +20,8 @@ class UpDroidClient {
   List _config;
   List<PanelColumnController> _panelColumnControllers;
   List<TabColumnController> _tabColumnControllers;
-  Map _tabsInfo;
-  Completer _gotConfig, _gotTabInfo;
+  Map _panelsInfo, _tabsInfo;
+  Completer _gotConfig, _gotPluginsInfo;
 
   bool disconnectAlert = false;
 
@@ -29,10 +29,10 @@ class UpDroidClient {
 
   UpDroidClient() {
     _gotConfig = new Completer();
-    _gotTabInfo = new Completer();
+    _gotPluginsInfo = new Completer();
     FutureGroup readyForInitialization = new FutureGroup();
     readyForInitialization.add(_gotConfig.future);
-    readyForInitialization.add(_gotTabInfo.future);
+    readyForInitialization.add(_gotPluginsInfo.future);
 
     // TODO: figure out how to handle panels along with the logo.
     _panelColumnControllers = [];
@@ -77,8 +77,10 @@ class UpDroidClient {
   }
 
   void _refreshTabsInfo(Msg um) {
-    _tabsInfo = JSON.decode(um.body);
-    _gotTabInfo.complete();
+    Map pluginsInfo = JSON.decode(um.body);
+    _panelsInfo = pluginsInfo['panels'];
+    _tabsInfo = pluginsInfo['tabs'];
+    _gotPluginsInfo.complete();
   }
 
   void _requestTabFromServer(Msg um) {
@@ -139,15 +141,6 @@ class UpDroidClient {
   void _issueAlert(Msg m) => window.alert(m.body);
 
   void _cleanUp(Msg m) {
-//    _panels.forEach((panel) {
-//      panel.cleanUp();
-//      // TODO: need a less hacky way to clean up the explorer stuff.
-//      // Right now we have to manually clean up *around* the logo button as it's
-//      // part of col-0.
-//      panel.view.tabHandle.remove();
-//      panel.view.tabContainer.remove();
-//    });
-
     _panelColumnControllers.forEach((controller) => controller.cleanUp());
     _tabColumnControllers.forEach((controller) => controller.cleanUp());
 
@@ -163,7 +156,7 @@ class UpDroidClient {
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: use isolates.
   void _initializeClient() {
-    PanelColumnController controller = new PanelColumnController(0, _config[0], _mailbox, _tabsInfo, _getAvailableId);
+    PanelColumnController controller = new PanelColumnController(0, _config[0], _mailbox, _panelsInfo, _getAvailableId);
     _panelColumnControllers.add(controller);
 
     controller.columnEvents.listen((ColumnEvent event) {

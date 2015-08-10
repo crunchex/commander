@@ -1,0 +1,204 @@
+@import (reference) "vars";
+
+.tab-pane {
+  height: 100%;
+}
+
+/* Tab Handles */
+
+.column-content .nav-tabs {
+  border-bottom-width: 0;
+}
+
+.column-content>.nav-tabs {
+  height: 46px;
+}
+
+.nav-tabs>li>a {
+  color: @upcom-dark-grey;
+  background-color: @upcom-white;
+  .font-avenir-demi();
+  font-size: 14px;
+  border-bottom: 1px;
+}
+
+.column-content .nav-tabs>.tab-handle,
+.column-content .nav-tabs>.tab-control,
+.column-content .nav-tabs>.panel-control,
+.column-content .maximize-button {
+  top: 17px;
+}
+
+.column-content .nav-tabs>.panel-control {
+  float: right;
+}
+
+li.tab-handle.panel-handle {
+  float: right;
+  right: -2px;
+  max-width: 78px;
+}
+
+.nav-tabs>li.active>a,
+.nav-tabs>li.active>a:hover,
+.nav-tabs>li.active>a:focus {
+  color: @upcom-black;
+  background-color: @upcom-white;
+  .font-avenir-demi();
+}
+
+.nav-tabs>li.active.panel-handle>a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-tabs>li>a.inner-tabs {
+  border-bottom: 0;
+}
+
+.nav-tabs.inner-tabs {
+  margin-bottom: 1px;
+}
+
+.nav-tabs>.tab-handle {
+  width: auto;
+}
+
+.nav-tabs>.tab-handle>a {
+  color: @upcom-dark-grey;
+  background-color: @upcom-light-grey;
+  padding: 4px 18px 4px 8px;
+  border-radius: 0;
+}
+
+.nav-tabs>.tab-handle.panel-handle>a {
+  padding: 4px 8px 4px 8px;
+}
+
+.nav-tabs>.tab-handle>.close-control-hitbox {
+  cursor: pointer;
+  position: relative;
+  float: right;
+  height: 14px;
+  top: 4px;
+  right: 2px;
+  padding: 1px;
+  z-index: 2;
+}
+
+.nav-tabs>.tab-handle>.close-control-hitbox>.close-control {
+  position: relative;
+  top: 0;
+  margin: 3px 3px 0 0;
+  font-size: 12px;
+  color: @upcom-white;
+  z-index: 2;
+}
+
+.nav-tabs>.tab-handle>.close-control-hitbox:hover>.close-control {
+  color: @upcom-dark-grey;
+}
+
+.nav-tabs>.tab-handle.active>.close-control-hitbox>.close-control {
+  color: @upcom-med-grey;
+}
+
+.nav-tabs>.tab-handle.active>.close-control-hitbox:hover>.close-control {
+  color: @upcom-dark-grey;
+}
+
+.nav-tabs>li>a.new-tab-button,
+.nav-tabs>li>a.new-panel-button {
+  padding: 4px;
+  background-color: transparent;
+  border-bottom-width: 0;
+  .font-avenir-demi();
+  border-radius: 0;
+}
+
+.nav-tabs>li>a.new-tab-button:hover,
+.nav-tabs>li>a.new-panel-button:hover {
+  cursor: pointer;
+  color: @upcom-white;
+  background-color:@brand-red;
+  border-color:@brand-red;
+  .fade();
+}
+
+.column-content>.maximize-button {
+  position: absolute;
+  right: 0;
+  padding: 4px 8px 4px 8px;
+  margin: 0 5px 0 0;
+  border: 1px solid @upcom-white;
+  border-bottom-width: 0;
+  color: @upcom-dark-grey;
+  font-size: 14px;
+}
+
+.column-content>.maximize-button:hover {
+  color: @upcom-white;
+  background-color: @brand-red;
+  border-color: @brand-red;
+  .fade();
+}
+
+/* Tab Menus */
+
+.inner-tabs .dropdown-toggle {
+  border-width: 0 0 1px 0;
+  padding: 5px 8px 3px 8px;
+  .font-avenir();
+  font-size: 12px;
+  color: @upcom-black;
+}
+
+.inner-tabs .dropdown-toggle:hover {
+  border-color: @upcom-med-grey;
+  background-color: @upcom-white;
+  color: @upcom-dark-grey;
+}
+
+.inner-tabs .dropdown-toggle:focus {
+  border-color: @upcom-med-grey;
+  background-color: @upcom-white;
+  color: @upcom-dark-grey;
+}
+
+.nav .open>a,
+.nav .open>a:hover,
+.nav .open>a:focus {
+  border-width: 0 0 1px 0;
+  border-color: @upcom-med-grey;
+  background-color: transparent;
+}
+
+.extra-menubar {
+  .font-monosten();
+  font-size: 12px;
+  padding: 3px 8px 0 0;
+  float: right !important;
+}
+
+/* Tab Content */
+
+.column-content>.tab-content {
+  border: 1px solid @upcom-med-grey;
+  /* Height of nav-tabs */
+  height: ~"calc(100% - 29px)";
+}
+
+.column-content>.tab-content.mobile {
+  height: ~"calc(100% - 46px)";
+}
+
+.tab-pane > .tab-content {
+  /* Height of menu tabs */
+  height: ~"calc(100% - 24px)";
+  padding: 0 4px 4px 4px;
+  outline: none;
+}
+
+.tab-pane > .tab-content:focus {
+  outline: none;
+}

@@ -25,4 +25,4 @@ bin/cmdr
 *.deb
 deploy/
 main.css
-cmdr.css
+cmdr-min.css

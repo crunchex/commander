@@ -79,9 +79,9 @@ cd $TOPDIR/
 
 echo -n "Building (minifying) gui........"
 WEB=$TOPDIR/web
-rm $WEB/css/main.css
+rm $WEB/css/main.css $WEB/css/cmdr-min.css
 lessc $WEB/css/main.less > $WEB/css/main.css
-cat $WEB/css/glyphicons.css $WEB/css/main.css | cleancss -o $WEB/css/cmdr.css
+cleancss $WEB/css/main.css -o $WEB/css/cmdr-min.css
 if [ $debug == 1 ]; then
 	pub build --mode=debug > /dev/null
 else
@@ -89,22 +89,28 @@ else
 fi
 echo "OK"
 
-echo -n "Setting up tabs................."
+echo -n "Setting up plugins.............."
 BUILD=$TOPDIR/build/
+
 BINTABS=$BUILD/bin/tabs
 WEBTABS=$BUILD/web/tabs
 mkdir -p $BINTABS
 mkdir -p $WEBTABS
 
+BINPANELS=$BUILD/bin/panels
+WEBPANELS=$BUILD/web/panels
+mkdir -p $BINPANELS
+mkdir -p $WEBPANELS
+
 # TODO fix these hard-coded paths
-cp -r ../upcom-explorer/build/bin $BINTABS/upcom-explorer
+cp -r ../upcom-explorer/build/bin $BINPANELS/upcom-explorer
 cp -r ../upcom-editor/build/bin $BINTABS/upcom-editor
 cp -r ../upcom-console/build/bin $BINTABS/upcom-console
 cp -r ../upcom-camera/build/bin $BINTABS/upcom-camera
 # cp -r ../upcom-teleop/build/bin $BINTABS/upcom-teleop
 # cp -r ../upcom-learn-demo/build/bin $BINTABS/upcom-learn-demo
 
-cp -r ../upcom-explorer/build/web $WEBTABS/upcom-explorer
+cp -r ../upcom-explorer/build/web $WEBPANELS/upcom-explorer
 cp -r ../upcom-editor/build/web $WEBTABS/upcom-editor
 cp -r ../upcom-console/build/web $WEBTABS/upcom-console
 cp -r ../upcom-camera/build/web $WEBTABS/upcom-camera
@@ -116,10 +122,8 @@ echo -n "Cleaning up gui................."
 BUILD=$TOPDIR/build/web
 mkdir -p $BUILD/fonts
 cp $WEB/packages/bootjack/fonts/glyphicons-halflings-regular.* $BUILD/fonts/
-rm $BUILD/css/main.css $BUILD/css/main.less $BUILD/css/glyphicons.css
-sed -i '/glyphicons.css/d' $BUILD/index.html
-# sed -i '/bootstrap.min.css/d' $BUILD/index.html
-sed -i 's/main.css/cmdr.css/g' $BUILD/index.html
+rm -rf $BUILD/css/main.css $BUILD/css/main.less $BUILD/css/glyphicons.css $BUILD/css/src
+sed -i 's/main.css/cmdr-min.css/g' $BUILD/index.html
 sed -i 's/main.dart/main.dart.js/g' $BUILD/index.html
 echo "OK"
 

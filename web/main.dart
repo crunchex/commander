@@ -12,10 +12,9 @@ void main() {
   // and comment out .login-overlay display: none in main.css.
   bool enableLogin = true;
 
-  if (!enableLogin) {
-    new UpDroidClient();
-    return;
-  }
+  new UpDroidClient();
+
+  if (!enableLogin) return;
 
   DivElement loginOverlay = querySelector('#login-overlay');
   DivElement loginLogo = querySelector('#login-logo');
@@ -32,26 +31,30 @@ void main() {
     List<StreamSubscription> subs = [];
 
     subs.add(username.onKeyUp.listen((e) {
-      checkCredentials(e, username, password, loginOverlay, subs);
+      checkCredentials(e, username, password, loginOverlay, loginHeading, subs);
     }));
 
     subs.add(password.onKeyUp.listen((e) {
-      checkCredentials(e, username, password, loginOverlay, subs);
+      checkCredentials(e, username, password, loginOverlay, loginHeading, subs);
     }));
   });
 }
 
-void checkCredentials(KeyboardEvent e, InputElement username, InputElement password, DivElement loginOverlay, List<StreamSubscription> subs) {
+void checkCredentials(KeyboardEvent e, InputElement username, InputElement password, DivElement loginOverlay, DivElement loginHeading, List<StreamSubscription> subs) {
   var keyEvent = new KeyEvent.wrap(e);
   if (keyEvent.keyCode == KeyCode.ENTER) {
-    if (username.value == 'updroid' && password.value == 'weareupdroid') {
-      subs.forEach((sub) => sub.cancel());
-      new UpDroidClient();
+    if (username.value != 'updroid' || password.value != 'weareupdroid') return;
+
+    loginHeading.text = 'Loading...';
+    subs.forEach((sub) => sub.cancel());
+
+    new Timer(new Duration(milliseconds: 1000), () {
+      loginHeading.text = 'Loading complete.';
       loginOverlay.classes.add('granted');
       new Timer(new Duration(milliseconds: 800), () {
         loginOverlay.style.display = 'none';
       });
-    }
+    });
   }
 }
 

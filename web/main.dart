@@ -22,6 +22,12 @@ void main() {
   InputElement username = querySelector('#login-username-input');
   InputElement password = querySelector('#login-password-input');
 
+  String userAgent = window.navigator.userAgent;
+  if (userAgent.contains('Mobile')) {
+    loginHeading.classes.add('mobile');
+    window.scrollTo(0, 1);
+  }
+
   new Timer(new Duration(seconds: 1), () {
     loginLogo.classes.add('animate-end');
     loginHeading.classes.add('animate-end');

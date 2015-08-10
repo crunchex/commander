@@ -22,7 +22,7 @@
   display: block;
   width: ~"calc(425px / 2)";
   height: ~"calc(161px / 2)";
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   fill: @upcom-white;
@@ -31,7 +31,7 @@
 }
 
 .login-overlay > h1 {
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   /* bring your own prefixes */
@@ -39,6 +39,10 @@
   color: @upcom-white;
   font-size: 36px;
   .font-avenir-bold();
+}
+
+.login-overlay > h1.mobile {
+  font-size: 14px;
 }
 
 .animate-end {
@@ -56,7 +60,7 @@
 .login-overlay > input {
   display: block;
   opacity: 0;
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   border: 5px solid @upcom-white;

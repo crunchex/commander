@@ -11,6 +11,7 @@ import 'package:path/path.dart' as pathLib;
 import 'package:upcom-api/git.dart';
 import 'package:upcom-api/tab_backend.dart';
 import 'package:upcom-api/debug.dart';
+import 'package:upcom-api/ros.dart';
 import 'package:quiver/async.dart';
 
 import 'server_mailbox.dart';
@@ -51,7 +52,7 @@ class CmdrServer {
     _mailbox = new CmdrMailbox(Tab.upcomName, 1);
     _registerMailbox();
 
-    // A stream that pushes anything it receives onto the main websocket to the client.
+    Ros.startRosCore();
   }
 
   /// Returns a [VirtualDirectory] set up with a path from [results].

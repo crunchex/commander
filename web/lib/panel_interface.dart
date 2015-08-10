@@ -48,7 +48,7 @@ class PanelInterface {
     _panelJs = new ScriptElement()
       ..id = '$refName-$id-script'
       ..type = 'text/javascript'
-      ..src = 'tabs/$refName/index.dart.js';
+      ..src = 'panels/$refName/index.dart.js';
 
     document.body.children.add(_panelJs);
 

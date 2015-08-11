@@ -14,20 +14,20 @@ void main() {
 
   new UpDroidClient();
 
-  DivElement loginOverlay = querySelector('#login-overlay');
-
   String userAgent = window.navigator.userAgent;
   if (userAgent.contains('Mobile') || !enableLogin) {
-    loginOverlay.style.display = 'none';
     return;
 //    loginHeading.classes.add('mobile');
 //    window.scrollTo(0, 1);
   }
 
+  DivElement loginOverlay = querySelector('#login-overlay');
   DivElement loginLogo = querySelector('#login-logo');
   DivElement loginHeading = querySelector('#login-heading');
   InputElement username = querySelector('#login-username-input');
   InputElement password = querySelector('#login-password-input');
+
+  loginOverlay.style.display = 'block';
 
   new Timer(new Duration(seconds: 1), () {
     loginLogo.classes.add('animate-end');

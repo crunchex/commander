@@ -107,6 +107,7 @@ cp -r ../upcom-explorer/build/bin $BINPANELS/upcom-explorer
 cp -r ../upcom-editor/build/bin $BINTABS/upcom-editor
 cp -r ../upcom-console/build/bin $BINTABS/upcom-console
 cp -r ../upcom-camera/build/bin $BINTABS/upcom-camera
+cp -r ../upcom-shop/build/bin $BINTABS/upcom-shop
 # cp -r ../upcom-teleop/build/bin $BINTABS/upcom-teleop
 # cp -r ../upcom-learn-demo/build/bin $BINTABS/upcom-learn-demo
 

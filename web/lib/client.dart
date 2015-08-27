@@ -56,6 +56,7 @@ class UpDroidClient {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'MOVE_TAB', _moveTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'ISSUE_ALERT', _issueAlert);
     _mailbox.registerWebSocketEvent(EventType.ON_CLOSE, 'CLEAN_UP', _cleanUp);
+    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SHOW_BUTTON', _showButton);
   }
 
   /// Sets up external event handlers for the various Commander classes. These
@@ -65,6 +66,12 @@ class UpDroidClient {
   }
 
   //\/\/ Mailbox Handlers /\/\//
+
+  void _showButton(Msg um) {
+    print("got here");
+    var _teleopButton = document.querySelector('#teleop');
+    _teleopButton.classes.remove('hidden');
+  }
 
   void _makeInitialRequests(Msg um) {
     _mailbox.ws.send('[[REQUEST_PLUGINSINFO]]');

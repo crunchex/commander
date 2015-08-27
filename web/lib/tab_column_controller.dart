@@ -12,6 +12,7 @@ import 'tab_interface.dart';
 
 class TabColumnController extends ColumnController {
   List<TabInterface> _tabs = [];
+  var i = 0;
 
   TabColumnController(int columnId, ColumnState state, List config, Mailbox mailbox, Map tabInfo, Function getAvailableId) :
   super(columnId, config, mailbox, tabInfo, getAvailableId, TabColumnView.createTabColumnView, state) {
@@ -29,8 +30,13 @@ class TabColumnController extends ColumnController {
     tabColumnView.controlButton.onClick.listen((e) {
       e.preventDefault();
       if (!canAddMoreTabs) return;
-
-      new UpDroidOpenTabModal(openTabFromModal, pluginInfo);
+      if (i == 0 ) {
+        new UpDroidOpenTabModal(openTabFromModal, pluginInfo, fake: true);
+      }
+      else {
+        new UpDroidOpenTabModal(openTabFromModal, pluginInfo);
+      }
+      i++;
     });
 
     tabColumnView.maximizeButton.onClick.listen((e) {

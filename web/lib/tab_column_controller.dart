@@ -30,13 +30,7 @@ class TabColumnController extends ColumnController {
     tabColumnView.controlButton.onClick.listen((e) {
       e.preventDefault();
       if (!canAddMoreTabs) return;
-      if (i == 0 ) {
-        new UpDroidOpenTabModal(openTabFromModal, pluginInfo, fake: true);
-      }
-      else {
-        new UpDroidOpenTabModal(openTabFromModal, pluginInfo);
-      }
-      i++;
+      new UpDroidOpenTabModal(openTabFromModal, pluginInfo);
     });
 
     tabColumnView.maximizeButton.onClick.listen((e) {

@@ -254,7 +254,6 @@ class CmdrServer {
   void _sendPluginInfo(Msg um) {
     // Specialized transformer that takes a tab directory as input and extracts tab info
     // from the json file within.
-    print("plugins requested");
     StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
       File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
       String tabInfoString = tabInfoJson.readAsStringSync();

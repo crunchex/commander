@@ -82,12 +82,12 @@ class UpDroidClient {
     _tabsInfo = pluginsInfo['tabs'];
     for (var controller in _tabColumnControllers) {
       controller.pluginInfo = _tabsInfo;
-      print("new tab info: " + controller.pluginInfo.toString());
     }
     for (var panelController in _panelColumnControllers) {
       panelController.pluginInfo = _panelsInfo;
     }
-    _gotPluginsInfo.complete();
+    // refresh calls more than once but only needs to complete the first time
+    if(_gotPluginsInfo.isCompleted == false) _gotPluginsInfo.complete();
   }
 
   void _requestTabFromServer(Msg um) {

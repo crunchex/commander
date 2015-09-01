@@ -141,7 +141,6 @@ class CmdrServer {
 
     _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
 
-    _mailbox.registerServerMessageHandler('SHOW_BUTTON', _showButton);
     _mailbox.registerServerMessageHandler('REQUEST_TAB', _requestTabFromServer);
     _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
     _mailbox.registerServerMessageHandler('CLOSE_TAB', _closeTabFromServer);
@@ -149,11 +148,6 @@ class CmdrServer {
     _mailbox.registerServerMessageHandler('MOVE_TAB', _moveTabFromServer);
     _mailbox.registerServerMessageHandler('REQUEST_EDITOR_LIST', _sendEditorList);
     _mailbox.registerServerMessageHandler('ISSUE_ALERT', _relayAlert);
-  }
-
-  void _showButton(Msg um) {
-    _mailbox.send(new Msg('SHOW_BUTTON', ''));
-    print('test 456');
   }
 
   void _clientConfig(Msg um) {
@@ -260,6 +254,7 @@ class CmdrServer {
   void _sendPluginInfo(Msg um) {
     // Specialized transformer that takes a tab directory as input and extracts tab info
     // from the json file within.
+    print("plugins requested");
     StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
       File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
       String tabInfoString = tabInfoJson.readAsStringSync();

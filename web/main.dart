@@ -10,7 +10,7 @@ void main() {
 
   // To enable login, set below bool to true
   // and comment out .login-overlay display: none in main.css.
-  bool enableLogin = false;
+  bool enableLogin = true;
 
   new UpDroidClient();
 
@@ -50,7 +50,7 @@ void main() {
 void checkCredentials(KeyboardEvent e, InputElement username, InputElement password, DivElement loginOverlay, DivElement loginHeading, List<StreamSubscription> subs) {
   var keyEvent = new KeyEvent.wrap(e);
   if (keyEvent.keyCode == KeyCode.ENTER) {
-    if (username.value != 'updroid' || password.value != 'weareupdroid') return;
+    if (username.value != 'updroid' || password.value != 'updroid') return;
 
     loginHeading.text = 'Loading...';
     subs.forEach((sub) => sub.cancel());

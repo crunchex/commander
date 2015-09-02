@@ -37,10 +37,6 @@ packages:
     description: csslib
     source: hosted
     version: "0.12.0"
-  dnd:
-    description: dnd
-    source: hosted
-    version: "0.3.0"
   dquery:
     description: dquery
     source: hosted
@@ -113,20 +109,12 @@ packages:
     description: stack_trace
     source: hosted
     version: "1.3.2"
-  terminal:
-    description: terminal
-    source: hosted
-    version: "0.1.2"
-  tokenizr:
-    description: tokenizr
-    source: hosted
-    version: "0.0.1+1"
   upcom-api:
     description:
-      path: "/home/dong/git/upcom-api/"
+      path: "/home/crunchex/work/upcom-api/"
       relative: false
     source: path
-    version: "0.1.0"
+    version: "0.5.3"
   utf:
     description: utf
     source: hosted

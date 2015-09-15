@@ -108,6 +108,7 @@ cp -r ../upcom-console/build/bin $BINTABS/upcom-console
 # cp -r ../upcom-camera/build/bin $BINTABS/upcom-camera
 # cp -r ../upcom-shop/build/bin $BINTABS/upcom-shop
 # cp -r ../upcom-teleop/build/bin $BINTABS/upcom-teleop
+# cp -r ../upcom-viz/build/bin $BINTABS/upcom-viz
 # cp -r ../upcom-learn-demo/build/bin $BINTABS/upcom-learn-demo
 
 cp -r ../upcom-explorer/build/web $WEBPANELS/upcom-explorer
@@ -115,6 +116,7 @@ cp -r ../upcom-editor/build/web $WEBTABS/upcom-editor
 cp -r ../upcom-console/build/web $WEBTABS/upcom-console
 # cp -r ../upcom-camera/build/web $WEBTABS/upcom-camera
 # cp -r ../upcom-teleop/build/web $WEBTABS/upcom-teleop
+# cp -r ../upcom-viz/build/web $WEBTABS/upcom-viz
 # cp -r ../upcom-learn-demo/build/web $WEBTABS/upcom-learn-demo
 echo "OK"
 

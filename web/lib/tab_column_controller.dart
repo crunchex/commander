@@ -12,7 +12,6 @@ import 'tab_interface.dart';
 
 class TabColumnController extends ColumnController {
   List<TabInterface> _tabs = [];
-  var i = 0;
 
   TabColumnController(int columnId, ColumnState state, List config, Mailbox mailbox, Map tabInfo, Function getAvailableId) :
   super(columnId, config, mailbox, tabInfo, getAvailableId, TabColumnView.createTabColumnView, state) {

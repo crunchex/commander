@@ -58,7 +58,7 @@ fpm -s dir -t deb -n cmdr -v 0.5.3 -p $TOPDIR/deploy/ \
     --maintainer "Mike Lewis <mike@updroid.com>" \
     --iteration 1 \
     --url http://www.updroid.com \
-    -d 'dart >= 1.9.3' -d 'ffmpeg >= 2.6.2' \
+    -d 'dart >= 1.9.3' -d 'ffmpeg >= 2.6.2' -d 'zip >= 3.0' \
     --after-install=$TOPDIR/tool/packaging/after-install.sh \
     --after-remove=$TOPDIR/tool/packaging/after-remove.sh \
     ./build/bin=/opt/updroid/cmdr \

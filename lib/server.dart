@@ -141,6 +141,7 @@ class CmdrServer {
 
     _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
 
+    _mailbox.registerServerMessageHandler('UPDATE_TABS', _sendPluginInfo);
     _mailbox.registerServerMessageHandler('REQUEST_TAB', _requestTabFromServer);
     _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
     _mailbox.registerServerMessageHandler('CLOSE_TAB', _closeTabFromServer);

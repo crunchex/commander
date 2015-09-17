@@ -29,7 +29,6 @@ class TabColumnController extends ColumnController {
     tabColumnView.controlButton.onClick.listen((e) {
       e.preventDefault();
       if (!canAddMoreTabs) return;
-      mailbox.ws.send('[[REQUEST_PLUGINSINFO]]');
       new UpDroidOpenTabModal(openTabFromModal, pluginInfo);
     });
 

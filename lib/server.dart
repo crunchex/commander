@@ -47,6 +47,7 @@ class CmdrServer {
 
     dir = new Directory(_args['workspace']);
     dir.create();
+    _createPackagesDirectory();
     _initServer(_getVirDir());
 
     _mailbox = new CmdrMailbox(Tab.upcomName, 1);
@@ -71,6 +72,19 @@ class CmdrServer {
         };
 
     return virDir;
+  }
+
+  void _createPackagesDirectory() {
+    Directory packages = new Directory(Platform.environment['HOME'] + '/.cmdr');
+    if(!packages.existsSync()) {
+      packages.create();
+      Process.run('mkdir', [Platform.environment['HOME'] + '/.cmdr/bin']);
+      Process.run('mkdir', [Platform.environment['HOME'] + '/.cmdr/bin/panels']);
+      Process.run('mkdir', [Platform.environment['HOME'] + '/.cmdr/bin/tabs']);
+      Process.run('mkdir', [Platform.environment['HOME'] + '/.cmdr/web']);
+      Process.run('mkdir', [Platform.environment['HOME'] + '/.cmdr/web/panels']);
+      Process.run('mkdir', [Platform.environment['HOME'] + '/.cmdr/web/tabs']);
+    }
   }
 
   /// Initializes and HTTP server to serve the gui and handle [WebSocket] requests.

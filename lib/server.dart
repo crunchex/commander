@@ -24,7 +24,7 @@ part 'commands.dart';
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
   static final String defaultUprootPath = '/home/${Platform.environment['USER']}/uproot';
-  static final String packageFolder = Platform.environment['USER'] + '/.cmdr';
+  static final String packageFolder = Platform.environment['HOME'] + '/.cmdr';
   static const String defaultInstallationPath = '/opt/updroid/cmdr';
   static const bool defaultDebugFlag = false;
   static const bool defaultQuiet = false;
@@ -308,22 +308,26 @@ class CmdrServer {
     new Directory(Platform.environment['HOME'] + '/.cmdr/bin/panels')
     .list()
     .transform(extractPanelInfo)
-    .listen((Map panelInfoMap) {
-      pluginsInfo['panels'][panelInfoMap['refName']] = panelInfoMap;
-      panelInfoMap.putIfAbsent('packagePath', packagePath);
-    })
+    .listen((Map panelInfoMap) => pluginsInfo['panels'][panelInfoMap['refName']] = panelInfoMap)
     .onDone(() => customPanelsDone.complete());
 
     new Directory(Platform.environment['HOME'] + '/.cmdr/bin/tabs')
     .list()
     .transform(extractTabInfo)
-    .listen((Map tabInfoMap) {
-      pluginsInfo['tabs'][tabInfoMap['refName']] = tabInfoMap;
-      tabInfoMap.putIfAbsent('packagePath', packagePath);
-    })
+    .listen((Map tabInfoMap) => pluginsInfo['tabs'][tabInfoMap['refName']] = tabInfoMap)
     .onDone(() => customTabsDone.complete());
 
-    group.future.then((_) => _mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(pluginsInfo))));
+    group.future.then((_) {
+      List official = ['upcom-explorer', 'upcom-editor', 'upcom-console', 'upcom-shop'];
+      pluginsInfo.forEach((k,v) {
+        v.forEach((k, v) {
+          if(!official.contains(k)) {
+            v.putIfAbsent('packagePath', () => packageFolder);
+          }
+        });
+      });
+      _mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(pluginsInfo)));
+    });
   }
 
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));

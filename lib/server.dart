@@ -24,6 +24,7 @@ part 'commands.dart';
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class CmdrServer {
   static final String defaultUprootPath = '/home/${Platform.environment['USER']}/uproot';
+  static final String packageFolder = Platform.environment['USER'] + '/.cmdr';
   static const String defaultInstallationPath = '/opt/updroid/cmdr';
   static const bool defaultDebugFlag = false;
   static const bool defaultQuiet = false;
@@ -284,6 +285,8 @@ class CmdrServer {
     FutureGroup group = new FutureGroup();
     Completer panelsDone = new Completer();
     Completer tabsDone = new Completer();
+    Completer customPanelsDone = new Completer();
+    Completer customTabsDone = new Completer();
     group.add(panelsDone.future);
     group.add(tabsDone.future);
 
@@ -300,6 +303,18 @@ class CmdrServer {
     .transform(extractTabInfo)
     .listen((Map tabInfoMap) => pluginsInfo['tabs'][tabInfoMap['refName']] = tabInfoMap)
     .onDone(() => tabsDone.complete());
+
+    new Directory(Platform.environment['HOME'] + '/.cmdr/bin/panels')
+    .list()
+    .transform(extractPanelInfo)
+    .listen((Map panelInfoMap) => pluginsInfo['panels'][panelInfoMap['refName']] = panelInfoMap)
+    .onDone(() => customPanelsDone.complete());
+
+    new Directory(Platform.environment['HOME'] + '/.cmdr/bin/tabs')
+    .list()
+    .transform(extractTabInfo)
+    .listen((Map tabInfoMap) => pluginsInfo['tabs'][tabInfoMap['refName']] = tabInfoMap)
+    .onDone(() => customTabsDone.complete());
 
     group.future.then((_) => _mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(pluginsInfo))));
   }

@@ -102,6 +102,12 @@ WEBPANELS=$BUILD/web/panels
 mkdir -p $BINPANELS
 mkdir -p $WEBPANELS
 
+# Make folder to house JS files from custom packages
+CUSTOMPANELS=$BUILD/web/custom/panels
+CUSTOMTABS=$BUILD/web/custom/tabs
+mkdir -p $CUSTOMPANELS
+mkdir -p $CUSTOMTABS
+
 # TODO fix these hard-coded paths
 cp -r ../upcom-explorer/build/bin $BINPANELS/upcom-explorer
 cp -r ../upcom-editor/build/bin $BINTABS/upcom-editor

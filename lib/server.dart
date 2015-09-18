@@ -268,6 +268,7 @@ class CmdrServer {
   }
 
   void _sendPluginInfo(Msg um) {
+    var packagePath = packageFolder;
     // Specialized transformer that takes a tab directory as input and extracts tab info
     // from the json file within.
     StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
@@ -307,13 +308,19 @@ class CmdrServer {
     new Directory(Platform.environment['HOME'] + '/.cmdr/bin/panels')
     .list()
     .transform(extractPanelInfo)
-    .listen((Map panelInfoMap) => pluginsInfo['panels'][panelInfoMap['refName']] = panelInfoMap)
+    .listen((Map panelInfoMap) {
+      pluginsInfo['panels'][panelInfoMap['refName']] = panelInfoMap;
+      panelInfoMap.putIfAbsent('packagePath', packagePath);
+    })
     .onDone(() => customPanelsDone.complete());
 
     new Directory(Platform.environment['HOME'] + '/.cmdr/bin/tabs')
     .list()
     .transform(extractTabInfo)
-    .listen((Map tabInfoMap) => pluginsInfo['tabs'][tabInfoMap['refName']] = tabInfoMap)
+    .listen((Map tabInfoMap) {
+      pluginsInfo['tabs'][tabInfoMap['refName']] = tabInfoMap;
+      tabInfoMap.putIfAbsent('packagePath', packagePath);
+    })
     .onDone(() => customTabsDone.complete());
 
     group.future.then((_) => _mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(pluginsInfo))));

@@ -45,10 +45,13 @@ class PanelInterface {
     _mailbox.ws.send('[[OPEN_PANEL]]' + '$col:$id:$refName');
 
     // Call the Panel's frontend (as a JS lib).
+    var jsPath = 'panels/$refName/index.dart.js';
+    if(panelInfo['packagePath'] != null) jsPath = panelInfo['packagePath'] + '/web/panels/$refName/index.dart.js';
+
     _panelJs = new ScriptElement()
       ..id = '$refName-$id-script'
       ..type = 'text/javascript'
-      ..src = 'panels/$refName/index.dart.js';
+      ..src = jsPath;
 
     document.body.children.add(_panelJs);
 

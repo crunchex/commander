@@ -40,17 +40,23 @@ class TabInterface {
   Future _initiateTabSetup(bool asRequest) {
     // Wait for the Tab's frontend to be ready to receive the ID event.
     EventStreamProvider<CustomEvent> tabReadyStream = new EventStreamProvider<CustomEvent>('TabReadyForId');
+    var jsPath = 'tabs/$refName/index.dart.js';
+    bool official = true;
+    if(tabInfo.containsKey('packagePath')) {
+      jsPath = '/custom/tabs/$refName/index.dart.js';
+      official = false;
+    }
 
     // Launch the Tab's backend.
     if (asRequest) {
-      _mailbox.ws.send('[[OPEN_TAB_AS_REQUEST]]' + '$col:$id:$refName');
+      official == true ? _mailbox.ws.send('[[OPEN_TAB_AS_REQUEST]]' + '$col:$id:$refName') :
+      _mailbox.ws.send('[[OPEN_TAB_AS_REQUEST]]' + '$col:$id:$refName:custom');
     } else {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$col:$id:$refName');
+      official == true ? _mailbox.ws.send('[[OPEN_TAB]]' + '$col:$id:$refName') :
+      _mailbox.ws.send('[[OPEN_TAB]]' + '$col:$id:$refName:custom');
     }
 
     // Call the Tab's frontend (as a JS lib).
-    var jsPath = 'tabs/$refName/index.dart.js';
-    if(tabInfo['packagePath'] != null) jsPath = tabInfo['packagePath'] + '/web/tabs/$refName/index.dart.js';
 
     _tabJs = new ScriptElement()
     ..id = '$refName-$id-script'

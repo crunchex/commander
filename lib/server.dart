@@ -214,6 +214,10 @@ class CmdrServer {
     String refName = idList[2];
 
     String binPath = '$_installationPath/bin';
+    if(idList.contains('custom')) {
+      binPath = packageFolder + '/bin';
+      idList.remove('custom');
+    }
 
     debug('Open tab request received: $id', 0);
 
@@ -244,6 +248,10 @@ class CmdrServer {
     String refName = idList[2];
 
     String binPath = '$_installationPath/bin';
+    if(idList.contains('custom')) {
+      binPath = packageFolder + '/bin';
+      idList.remove('custom');
+    }
 
     debug('Open tab request received: ${um.body}', 0);
 

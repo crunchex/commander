@@ -351,7 +351,7 @@ class CmdrServer {
 
     print('[UpDroid Commander serving on port 12060]');
     print('You can now enter "localhost:12060" in your browser on this machine,');
-    print('  or "<this machine\'s IP>:12060" on a machine in the same network.');
+    print('  or "${Process.runSync('hostname', ['-I']).stdout.replaceAll('\n', '').trim()}:12060" on a machine in the same network.');
 
     ProcessResult pkgStatus = Process.runSync('dpkg' , ['-s', 'libnss-mdns', '|', 'grep', 'Status']);
     if (pkgStatus.stdout.contains('install ok installed')) {

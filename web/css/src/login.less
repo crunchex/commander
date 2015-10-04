@@ -18,16 +18,31 @@
   transition: all 0.8s ease;
 }
 
+.login-logo-div {
+  display: block;
+  position: absolute;
+  width: auto;
+  height: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100px);
+}
+
 .login-logo {
   display: block;
   width: ~"calc(425px / 2)";
   height: ~"calc(161px / 2)";
-  position: absolute;
-  top: 50%;
-  left: 50%;
   fill: @upcom-white;
-  /* bring your own prefixes */
-  transform: translate(-50%, -100px);
+}
+
+.login-logo-div > p {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin-bottom: 0;
+  color: @upcom-white;
+  font-size: 12px;
+  .font-avenir-bold();
 }
 
 .login-overlay > h1 {
@@ -49,7 +64,7 @@
   .fade();
 }
 
-.login-logo.animate-end {
+.login-logo-div.animate-end {
   transform: translate(-50%, -130px);
 }
 

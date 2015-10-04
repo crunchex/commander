@@ -22,7 +22,7 @@ void main() {
   }
 
   DivElement loginOverlay = querySelector('#login-overlay');
-  DivElement loginLogo = querySelector('#login-logo');
+  DivElement loginLogoDiv = querySelector('#login-logo-div');
   DivElement loginHeading = querySelector('#login-heading');
   InputElement username = querySelector('#login-username-input');
   InputElement password = querySelector('#login-password-input');
@@ -30,7 +30,7 @@ void main() {
   loginOverlay.style.display = 'block';
 
   new Timer(new Duration(seconds: 1), () {
-    loginLogo.classes.add('animate-end');
+    loginLogoDiv.classes.add('animate-end');
     loginHeading.classes.add('animate-end');
     username.classes.add('animate-end');
     password.classes.add('animate-end');

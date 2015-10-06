@@ -41,6 +41,16 @@ else
 fi
 echo "OK"
 
+echo -n "Building upcom-speak........."
+cd $WORKINGDIR/upcom-speak
+git pull >/dev/null 2>&1
+if [ $debug == 1 ]; then
+	./tool/build.sh -d >/dev/null 2>&1
+else
+	./tool/build.sh >/dev/null 2>&1
+fi
+echo "OK"
+
 echo "##### Building Tabs ###############"
 echo -n "Building upcom-editor..........."
 cd $WORKINGDIR/upcom-editor

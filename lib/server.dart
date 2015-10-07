@@ -29,6 +29,7 @@ class CmdrServer {
   static const bool defaultQuiet = false;
 
   static const String explorerRefName = 'upcom-explorer';
+  static const String speakRefName = 'upcom-speak';
   static const String editorRefName = 'upcom-editor';
   static const String consoleRefName = 'upcom-console';
 
@@ -107,14 +108,13 @@ class CmdrServer {
       return;
     }
 
-    if (type == explorerRefName) {
+    if (_tabs.containsKey(type)) {
       WebSocketTransformer.upgrade(request)
-      .then((WebSocket ws) => _panels[type][objectID].mailbox.receive(ws, request));
-      return;
+        .then((WebSocket ws) => _tabs[type][objectID].mailbox.receive(ws, request));
+    } else if (_panels.containsKey(type)) {
+      WebSocketTransformer.upgrade(request)
+        .then((WebSocket ws) => _panels[type][objectID].mailbox.receive(ws, request));
     }
-
-    WebSocketTransformer.upgrade(request)
-    .then((WebSocket ws) => _tabs[type][objectID].mailbox.receive(ws, request));
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {

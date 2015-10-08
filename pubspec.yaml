@@ -20,6 +20,6 @@ dependencies:
   quiver: any
   script_inliner: any
   upcom-api:
-    path: /home/crunchex/work/upcom-api/
+    path: ../upcom-api/
 transformers:
 - script_inliner

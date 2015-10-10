@@ -111,8 +111,8 @@ packages:
     version: "1.3.2"
   upcom-api:
     description:
-      path: "/home/crunchex/work/upcom-api/"
-      relative: false
+      path: "../upcom-api"
+      relative: true
     source: path
     version: "0.5.3"
   utf:

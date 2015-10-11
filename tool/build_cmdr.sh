@@ -127,13 +127,12 @@ BUILD=$TOPDIR/build/web
 mkdir -p $BUILD/fonts
 cp $WEB/packages/bootjack/fonts/glyphicons-halflings-regular.* $BUILD/fonts/
 rm -rf $BUILD/css/main.css $BUILD/css/main.less $BUILD/css/glyphicons.css $BUILD/css/src
-if [ $(uname -s) != "Darwin" ]; then
-    sed -i 's/main.css/cmdr-min.css/g' $BUILD/index.html
-    sed -i 's/main.dart/main.dart.js/g' $BUILD/index.html
-fi
 if [ $(uname -s) == "Darwin" ]; then
     sed -i '' 's/main.css/cmdr-min.css/' $BUILD/index.html
     sed -i '' 's/main.dart/main.dart.js/' $BUILD/index.html
+else
+    sed -i 's/main.css/cmdr-min.css/g' $BUILD/index.html
+    sed -i 's/main.dart/main.dart.js/g' $BUILD/index.html
 fi
 echo "OK"
 
@@ -150,11 +149,10 @@ else
 	dart2js --output-type=dart --categories=Server --minify -o $BINDIR/cmdr cmdr.dart
 fi
 rm -rf $BINDIR/cmdr.deps
-if [ $(uname -s) != "Darwin" ]; then
-    sed -i '1i#!/usr/bin/env dart' $BINDIR/cmdr
-fi
 if [ $(uname -s) == "Darwin" ]; then
     perl -pi -e 'print "#!/usr/bin/env dart\n" if $. == 1' $BINDIR/cmdr
+else
+    sed -i '1i#!/usr/bin/env dart' $BINDIR/cmdr
 fi
 chmod +x $BINDIR/cmdr
 echo "OK"

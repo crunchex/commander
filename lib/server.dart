@@ -353,9 +353,11 @@ class CmdrServer {
     print('You can now enter "localhost:12060" in your browser on this machine,');
     print('  or "${Process.runSync('hostname', ['-I']).stdout.replaceAll('\n', '').trim()}:12060" on a machine in the same network.');
 
-    ProcessResult pkgStatus = Process.runSync('dpkg' , ['-s', 'libnss-mdns', '|', 'grep', 'Status']);
-    if (pkgStatus.stdout.contains('install ok installed')) {
-      print('  or "${Platform.localHostname}.local:12060" on a Bonjour/libnss-mdns equipped machine.');
+    if (!Platform.isMacOS) {
+      ProcessResult pkgStatus = Process.runSync('dpkg' , ['-s', 'libnss-mdns', '|', 'grep', 'Status']);
+      if (pkgStatus.stdout.contains('install ok installed')) {
+        print('  or "${Platform.localHostname}.local:12060" on a Bonjour/libnss-mdns equipped machine.');
+      }
     }
 
     print('Ctrl-C to exit.');

@@ -55,6 +55,12 @@ class TabColumnView extends ColumnView {
     SpanElement controlGlyph = new SpanElement()
     ..classes.addAll(['glyphicons', 'glyphicons-plus']);
     controlButton.children.add(controlGlyph);
+
+    if (state == ColumnState.MAXIMIZED) {
+      maximize();
+    } else if (state == ColumnState.MINIMIZED) {
+      minimize();
+    }
   }
 
   void maximize() {

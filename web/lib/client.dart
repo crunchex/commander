@@ -178,7 +178,10 @@ class UpDroidClient {
     querySelector('body').style.minWidth = '1211px';
 
     for (int i = 1; i < _config.length; i++) {
-      TabColumnController controller = new TabColumnController(i, ColumnState.NORMAL, _config[i], _mailbox, _tabsInfo, _getAvailableId);
+      // Start the Client with Column 1 maximized by default.
+      ColumnState defaultState = i == 1 ? ColumnState.MAXIMIZED : ColumnState.MINIMIZED;
+
+      TabColumnController controller = new TabColumnController(i, defaultState, _config[i], _mailbox, _tabsInfo, _getAvailableId);
       _tabColumnControllers.add(controller);
 
       controller.columnStateChanges.listen((ColumnState newState) {

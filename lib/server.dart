@@ -159,8 +159,9 @@ class CmdrServer {
       } else {
         List listConfig = [
           [{'id': 1, 'class': explorerRefName}],
-          [{'id': 1, 'class': editorRefName}],
-          [{'id': 1, 'class': consoleRefName}]
+          [{'id': 1, 'class': consoleRefName},
+          {'id': 1, 'class': editorRefName}],
+          []
         ];
 
         String strConfig = JSON.encode(listConfig);

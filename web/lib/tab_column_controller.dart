@@ -9,6 +9,7 @@ import 'package:upcom-api/web/modal/modal.dart';
 import 'tab_column_view.dart';
 import 'column_controller.dart';
 import 'tab_interface.dart';
+import 'launcher_view.dart';
 
 class TabColumnController extends ColumnController {
   List<TabInterface> _tabs = [];
@@ -19,6 +20,9 @@ class TabColumnController extends ColumnController {
   }
 
   Future setUpController() async {
+//    setUpLauncher(pluginInfo);
+    await LauncherView.createLauncherView(id, col, refName, fullName, shortName, menuConfig, externalCssPath);
+
     for (Map tab in config) {
       await openTab(tab['id'], pluginInfo[tab['class']]);
     }
@@ -26,12 +30,12 @@ class TabColumnController extends ColumnController {
 
   void registerEventHandlers() {
     TabColumnView tabColumnView = view;
-    tabColumnView.controlButton.onClick.listen((e) {
-      e.preventDefault();
-      if (!canAddMoreTabs) return;
-
-      new UpDroidOpenTabModal(openTabFromModal, pluginInfo);
-    });
+//    tabColumnView.controlButton.onClick.listen((e) {
+//      e.preventDefault();
+//      if (!canAddMoreTabs) return;
+//
+//      new UpDroidOpenTabModal(openTabFromModal, pluginInfo);
+//    });
 
     tabColumnView.maximizeButton.onClick.listen((e) {
       if (state == ColumnState.NORMAL) {
@@ -190,6 +194,28 @@ class TabColumnController extends ColumnController {
 
     tab.makeActive();
     _tabs.add(tab);
+  }
+
+  Future setUpLauncher(Map tabsInfo) {
+    Completer c = new Completer();
+
+    InputElement searchInput= new InputElement()
+      ..placeholder = 'Enter plugin name'
+      ..classes.add('search-input');
+    querySelector('col-$columnId-tab-content').children.add(searchInput);
+
+    for (Map tabInfo in tabsInfo.values) {
+      ButtonElement tabButton = new ButtonElement()
+        ..text = tabInfo['shortName'];
+      querySelector('col-$columnId-tab-content').children.add(tabButton);
+
+      tabButton.onClick.listen((e) {
+        openTabFromModal(tabInfo);
+      });
+    };
+
+    c.complete();
+    return c.future;
   }
 
   bool get canAddMoreTabs => _tabs.length < _maxTabs;

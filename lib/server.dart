@@ -159,10 +159,11 @@ class CmdrServer {
         _mailbox.send(new Msg('SERVER_READY', strConfig));
       } else {
         List listConfig = [
-          [{'id': 1, 'class': explorerRefName}],
-          [{'id': 1, 'class': consoleRefName},
-          {'id': 1, 'class': editorRefName}],
-          []
+          [], [], []
+//          [{'id': 1, 'class': explorerRefName}],
+//          [{'id': 1, 'class': consoleRefName},
+//          {'id': 1, 'class': editorRefName}],
+//          []
         ];
 
         String strConfig = JSON.encode(listConfig);

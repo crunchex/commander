@@ -44,16 +44,16 @@ class TabColumnView extends ColumnView {
     maximizeButton.children.add(_maximizeGlyph);
 
     LIElement controlLi = new LIElement()
-    ..classes.add('tab-control');
+      ..classes.add('tab-control');
     navTabs.children.add(controlLi);
 
     controlButton = new AnchorElement( )
-    ..id = 'column-$id-new'
-    ..classes.add('new-tab-button');
+      ..id = 'column-$id-new'
+      ..classes.add('new-tab-button');
     controlLi.children.add(controlButton);
 
     SpanElement controlGlyph = new SpanElement()
-    ..classes.addAll(['glyphicons', 'glyphicons-plus']);
+      ..classes.addAll(['glyphicons', 'glyphicons-plus']);
     controlButton.children.add(controlGlyph);
 
     if (state == ColumnState.MAXIMIZED) {

@@ -104,6 +104,7 @@ mkdir -p $WEBPANELS
 
 cp -r ../upcom-explorer/build/bin $BINPANELS/upcom-explorer
 cp -r ../upcom-speak/build/bin $BINPANELS/upcom-speak
+cp -r ../upcom-launcher/build/bin $BINTABS/upcom-launcher
 cp -r ../upcom-editor/build/bin $BINTABS/upcom-editor
 cp -r ../upcom-console/build/bin $BINTABS/upcom-console
 # cp -r ../upcom-shop/build/bin $BINTABS/upcom-shop
@@ -113,6 +114,7 @@ cp -r ../upcom-learn-demo/build/bin $BINTABS/upcom-learn-demo
 
 cp -r ../upcom-explorer/build/web $WEBPANELS/upcom-explorer
 cp -r ../upcom-speak/build/web $WEBPANELS/upcom-speak
+cp -r ../upcom-launcher/build/web $WEBTABS/upcom-launcher
 cp -r ../upcom-editor/build/web $WEBTABS/upcom-editor
 cp -r ../upcom-console/build/web $WEBTABS/upcom-console
 cp -r ../upcom-teleop/build/web $WEBTABS/upcom-teleop

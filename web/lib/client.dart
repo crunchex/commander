@@ -114,7 +114,8 @@ class UpDroidClient {
 
     _tabsInfo.keys.forEach((String key) {
       if (_tabsInfo[key].containsValue(refName)) {
-        _tabColumnControllers[col == 1 ? 0 : 1].openTabFromModal(_tabsInfo[key]);
+        int id = _getAvailableId(_tabsInfo[key]);
+        _tabColumnControllers[col == 1 ? 0 : 1].openTab(id, _tabsInfo[key]);
       }
     });
   }

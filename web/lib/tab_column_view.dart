@@ -20,7 +20,7 @@ class TabColumnView extends ColumnView {
   };
 
   ColumnState state;
-  AnchorElement controlButton, maximizeButton;
+  AnchorElement maximizeButton;
   bool hideMinimizedCompletely;
 
   SpanElement _maximizeGlyph;
@@ -42,19 +42,6 @@ class TabColumnView extends ColumnView {
     ..classes.add('glyphicons')
     ..classes.add((state == ColumnState.MAXIMIZED) ? 'glyphicons-resize-small' : 'glyphicons-resize-full');
     maximizeButton.children.add(_maximizeGlyph);
-
-    LIElement controlLi = new LIElement()
-    ..classes.add('tab-control');
-    navTabs.children.add(controlLi);
-
-    controlButton = new AnchorElement( )
-    ..id = 'column-$id-new'
-    ..classes.add('new-tab-button');
-    controlLi.children.add(controlButton);
-
-    SpanElement controlGlyph = new SpanElement()
-    ..classes.addAll(['glyphicons', 'glyphicons-plus']);
-    controlButton.children.add(controlGlyph);
 
     if (state == ColumnState.MAXIMIZED) {
       maximize();

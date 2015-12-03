@@ -141,6 +141,7 @@ class CmdrServer {
 
     _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
 
+    _mailbox.registerServerMessageHandler('GET_TABS_INFO', _sendTabsInfo);
     _mailbox.registerServerMessageHandler('REQUEST_TAB', _requestTabFromServer);
     _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
     _mailbox.registerServerMessageHandler('CLOSE_TAB', _closeTabFromServer);
@@ -250,6 +251,31 @@ class CmdrServer {
 
     Msg newMessage = new Msg(um.header, newColumn);
     CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
+  }
+
+  void _sendTabsInfo(Msg um) {
+    List idList = um.body.split(':');
+    String type = idList[0];
+    int id = int.parse(idList[1]);
+
+    // Specialized transformer that takes a tab directory as input and extracts tab info
+    // from the json file within.
+    StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
+      File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
+      String tabInfoString = tabInfoJson.readAsStringSync();
+      sink.add(JSON.decode(tabInfoString));
+    });
+
+    Map tabsInfo = {};
+
+    new Directory('$_installationPath/bin/tabs')
+      .list()
+      .transform(extractTabInfo)
+      .listen((Map tabInfoMap) => tabsInfo[tabInfoMap['refName']] = tabInfoMap)
+      .onDone(() {
+        Msg newMessage = new Msg('SEND_TABS_INFO', JSON.encode(tabsInfo));
+        CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
+      });
   }
 
   void _sendPluginInfo(Msg um) {

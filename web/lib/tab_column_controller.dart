@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:upcom-api/web/mailbox/mailbox.dart';
-import 'package:upcom-api/web/modal/modal.dart';
 
 import 'tab_column_view.dart';
 import 'column_controller.dart';
@@ -19,6 +18,11 @@ class TabColumnController extends ColumnController {
   }
 
   Future setUpController() async {
+    // Always open a launcher tab first.
+    int id = getAvailableId('upcom-launcher');
+    Map launcherInfo = {'refName': 'upcom-launcher', 'fullName': 'UpDroid Launcher', 'shortName': 'Launcher'};
+    await openTab(id, launcherInfo);
+
     for (Map tab in config) {
       await openTab(tab['id'], pluginInfo[tab['class']]);
     }
@@ -26,12 +30,6 @@ class TabColumnController extends ColumnController {
 
   void registerEventHandlers() {
     TabColumnView tabColumnView = view;
-    tabColumnView.controlButton.onClick.listen((e) {
-      e.preventDefault();
-      if (!canAddMoreTabs) return;
-
-      new UpDroidOpenTabModal(openTabFromModal, pluginInfo);
-    });
 
     tabColumnView.maximizeButton.onClick.listen((e) {
       if (state == ColumnState.NORMAL) {
@@ -127,12 +125,6 @@ class TabColumnController extends ColumnController {
     _tabs.add(tab);
 
     return null;
-  }
-
-  /// A wrapper for [openTab] when an availble ID needs to be chosen across all open [ColumnController]s.
-  void openTabFromModal(Map tabInfo) {
-    int id = getAvailableId(tabInfo['refName']);
-    openTab(id, tabInfo);
   }
 
   /// Locates a [TabController] by [tabId] and [refName] and closes it. Returns true if

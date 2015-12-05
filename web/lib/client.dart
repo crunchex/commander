@@ -26,6 +26,7 @@ class UpDroidClient {
   bool disconnectAlert = false;
 
   Mailbox _mailbox;
+  bool _requestIDLocked = false;
 
   UpDroidClient() {
     _gotConfig = new Completer();
@@ -182,7 +183,7 @@ class UpDroidClient {
       // Start the Client with Column 1 maximized by default.
       ColumnState defaultState = i == 1 ? ColumnState.MAXIMIZED : ColumnState.MINIMIZED;
 
-      TabColumnController controller = new TabColumnController(i, defaultState, _config[i], _mailbox, _tabsInfo, _getAvailableId);
+      TabColumnController controller = new TabColumnController(i, ColumnState.NORMAL, _config[i], _mailbox, _tabsInfo, _getAvailableId);
       _tabColumnControllers.add(controller);
 
       controller.columnStateChanges.listen((ColumnState newState) {
@@ -207,6 +208,10 @@ class UpDroidClient {
   }
 
   int _getAvailableId(String className) {
+    if (_requestIDLocked) return -1;
+    _requestIDLocked = true;
+    print('requestIDLocked: true');
+
     List ids = [];
 
     // Add all used ids for [className] to ids.
@@ -222,6 +227,8 @@ class UpDroidClient {
       if (!ids.contains(id)) break;
     }
 
+    _requestIDLocked = false;
+    print('requestIDLocked: false');
     return id;
   }
 }

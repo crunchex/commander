@@ -19,9 +19,13 @@ class TabColumnController extends ColumnController {
 
   Future setUpController() async {
     // Always open a launcher tab first.
-    int id = getAvailableId('upcom-launcher');
+    int id = -1;
+    while (id == -1) {
+      id = getAvailableId('upcom-launcher');
+      print('id: $id');
+    }
     Map launcherInfo = {'refName': 'upcom-launcher', 'fullName': 'UpDroid Launcher', 'shortName': 'Launcher'};
-    await openTab(id, launcherInfo);
+    await openTab(columnId, launcherInfo);
 
     for (Map tab in config) {
       await openTab(tab['id'], pluginInfo[tab['class']]);
@@ -113,6 +117,8 @@ class TabColumnController extends ColumnController {
         tab.makeInactive();
       }
     }
+
+    print('opening tab: $id ${tabInfo.toString()}');
 
     TabInterface tab;
     if (asRequest) {

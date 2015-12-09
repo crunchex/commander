@@ -38,7 +38,7 @@ class CmdrServer {
   Map<String, Map<int, PanelInterface>> _panels = {};
   Map<String, Map<int, TabInterface>> _tabs = {};
 
-  Map<String, List<int>> _idQueue = {};
+  Map<String, List<String>> _idQueue = {};
   Map<String, List<String>> _pendingTabRequests = {};
 
   CmdrMailbox _mailbox;
@@ -239,12 +239,13 @@ class CmdrServer {
 
   void _openTab(Msg um) {
     List idList = um.body.split(':');
+    int col= int.parse(idList[0]);
     int id = int.parse(idList[1]);
     String refName = idList[2];
 
     // Add the ID to the queue so the Tab's frontend can pick it up.
     if (!_idQueue.containsKey(refName)) _idQueue[refName] = [];
-    _idQueue[refName].add(id);
+    _idQueue[refName].add(JSON.encode([id, col]));
 
     String binPath = '$_installationPath/bin';
 
@@ -341,7 +342,7 @@ class CmdrServer {
     if (_pendingTabRequests[split[2]] == null) _pendingTabRequests[split[2]] = [];
 
     _pendingTabRequests[split[2]].add('${split[0]}:${split[1]}');
-    _mailbox.send(new Msg('REQUEST_TAB', split[2]));
+    _mailbox.send(new Msg('REQUEST_TAB', '${split[2]}:${split[3]}'));
   }
 
   void _closeTabFromServer(Msg um) {

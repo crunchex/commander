@@ -91,8 +91,21 @@ class UpDroidClient {
   }
 
   void _requestTabFromServer(Msg um) {
+    // Column is specified in the message body.
+    if (um.body.contains(':')) {
+      List<String> list = um.body.split(':');
+      String refName = list[0];
+      int col = int.parse(list[1]);
+
+      int tabId = _getAvailableId(refName);
+      _tabColumnControllers[col - 1].openTab(tabId, _tabsInfo[refName], PluginType.TAB);
+
+      return;
+    }
+
     int tabId = _getAvailableId(um.body);
 
+    // A column wasn't specified, so the lowest Tab column that can add more tabs is used.
     for (TabColumnController controller in _tabColumnControllers) {
       if (controller.canAddMoreTabs) {
         controller.openTab(tabId, _tabsInfo[um.body], PluginType.TAB);
@@ -191,7 +204,6 @@ class UpDroidClient {
         ColumnState defaultState = i == 1 ? ColumnState.MAXIMIZED : ColumnState.MINIMIZED;
 
         TabColumnView.createTabColumnView(i, ColumnState.NORMAL).then((view) {
-          print('tab column view done.');
           TabColumnController controller = new TabColumnController(i, view, _config[i], _mailbox, _tabsInfo, _tabIds, ColumnState.NORMAL);
           _tabColumnControllers.add(controller);
 
@@ -232,7 +244,6 @@ class UpDroidClient {
 
     // Add the new ID to the registry before handing it back out.
     _tabIds[refName].add(id);
-    print('tabIds in client: ${_tabIds.toString()}');
     return id;
   }
 }

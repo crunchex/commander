@@ -90,7 +90,6 @@ abstract class ColumnController {
 
     // Add the new ID to the registry before handing it back out.
     tabIds[refName].add(id);
-    print('tabIds in column_controller: ${tabIds.toString()}');
     return id;
   }
 

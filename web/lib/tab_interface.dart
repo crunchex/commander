@@ -5,21 +5,30 @@ import 'dart:convert';
 import 'dart:html';
 
 import 'package:upcom-api/web/mailbox/mailbox.dart';
+import 'package:upcom-api/web/tab/tab_controller.dart';
+
+import 'container_view.dart';
+import 'tab_view.dart';
+import 'panel_view.dart';
+import 'launcher_view.dart';
 
 class TabInterface {
   int id, col;
-  TabViewInterface view;
+  ContainerView view;
   Map tabInfo;
-  String refName;
-  Future setupComplete;
+  String refName, fullName, shortName;
 
   Mailbox _mailbox;
   ScriptElement _tabJs;
 
-  TabInterface(this.id, this.col, this.tabInfo, Mailbox mailbox, [bool asRequest=false]) {
+  TabInterface(this.id, this.col, this.tabInfo, Mailbox mailbox, UListElement navTabs, DivElement columnContent, PluginType type, [bool asRequest=false]) {
     refName = tabInfo['refName'];
+    fullName = tabInfo['fullName'];
+    shortName = tabInfo['shortName'];
+
     _mailbox = mailbox;
-    setupComplete = _setUp(asRequest);
+
+    _initiateTabSetup(type, navTabs, columnContent, asRequest);
   }
 
   bool isActive() => view.isActive();
@@ -27,26 +36,22 @@ class TabInterface {
   void makeInactive() => view.makeInactive();
   void shutdownScript() => _tabJs.remove();
 
-  Future _setUp(bool asRequest) async {
-    await _initiateTabSetup(asRequest);
-    await _sendIdEvent();
-
-    // Set up an interface to the new Tab's view.
-    view = new TabViewInterface(id, col, refName);
-
-    return null;
-  }
-
-  Future _initiateTabSetup(bool asRequest) {
-    // Wait for the Tab's frontend to be ready to receive the ID event.
-    EventStreamProvider<CustomEvent> tabReadyStream = new EventStreamProvider<CustomEvent>('TabReadyForId');
+  void _initiateTabSetup(PluginType type, UListElement navTabs, DivElement columnContent, bool asRequest) {
+    switch (type) {
+      case PluginType.LAUNCHER:
+        view = new LauncherView(id, col, refName, fullName, shortName, navTabs, columnContent);
+        break;
+      case PluginType.TAB:
+        view = new TabView(id, col, refName, fullName, shortName, navTabs, columnContent);
+        break;
+      case PluginType.PANEL:
+        view = new PanelView(id, col, refName, fullName, shortName, navTabs, columnContent);
+        break;
+    }
 
     // Launch the Tab's backend.
-    if (asRequest) {
-      _mailbox.ws.send('[[OPEN_TAB_AS_REQUEST]]' + '$col:$id:$refName');
-    } else {
-      _mailbox.ws.send('[[OPEN_TAB]]' + '$col:$id:$refName');
-    }
+    String header = asRequest ? '[[OPEN_TAB_AS_REQUEST]]' : '[[OPEN_TAB]]';
+    _mailbox.ws.send(header + '$col:$id:$refName');
 
     // Call the Tab's frontend (as a JS lib).
     _tabJs = new ScriptElement()
@@ -55,45 +60,5 @@ class TabInterface {
     ..src = 'tabs/$refName/index.dart.js';
 
     document.body.children.add(_tabJs);
-
-    return tabReadyStream.forTarget(window).where((CustomEvent e) => e.detail == refName).first;
-  }
-
-  Future _sendIdEvent() {
-    // Wait for the Tab's frontend to be ready to receive the ID event.
-    EventStreamProvider<CustomEvent> tabDoneStream = new EventStreamProvider<CustomEvent>('TabSetupComplete');
-
-    // Dispatch a custom event to pass ID info to the Tab's frontend.
-    String detail = JSON.encode({ 'id': id, 'col': col, 'refName': refName });
-    CustomEvent event = new CustomEvent('TabIdEvent', canBubble: false, cancelable: false, detail: detail);
-    window.dispatchEvent(event);
-
-    return tabDoneStream.forTarget(window).where((e) => e.detail == refName).first;
-  }
-}
-
-class TabViewInterface {
-  int id, col;
-  String refName;
-  DivElement tabHandle, tabContainer, tabContent;
-
-  TabViewInterface(this.id, this.col, this.refName) {
-    tabHandle = querySelector('#tab-$refName-$id-handle');
-    tabContainer = querySelector('#tab-$refName-$id-container');
-    tabContent = querySelector('#tab-$refName-$id-content');
-  }
-
-  bool isActive() => tabHandle.classes.contains('active');
-
-  /// Adds the CSS classes to make a tab 'active'.
-  void makeActive() {
-    tabHandle.classes.add('active');
-    tabContainer.classes.add('active');
-  }
-
-  /// Removes the CSS classes to make a tab 'inactive'.
-  void makeInactive() {
-    tabHandle.classes.remove('active');
-    tabContainer.classes.remove('active');
   }
 }

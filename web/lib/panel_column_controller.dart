@@ -14,15 +14,15 @@ class PanelColumnController extends ColumnController {
 
   PanelColumnView panelColumnView;
 
-  PanelColumnController(int columnId, List config, Mailbox mailbox, Map panelInfo, Function getAvailableId) :
-  super(columnId, config, mailbox, panelInfo, getAvailableId, PanelColumnView.createPanelColumnView) {
+  PanelColumnController(int columnId, PanelColumnView view, List config, Mailbox mailbox, Map panelInfo, Map tabIds) :
+  super(columnId, view, config, mailbox, panelInfo, tabIds) {
     panelColumnView = view;
   }
 
-  Future setUpController() async {
-    for (Map panel in config) {
-      await openPanel(panel['id'], pluginInfo[panel['class']]);
-    }
+  void setUpController() {
+//    for (Map panel in config) {
+//      await openPanel(panel['id'], pluginInfo[panel['class']]);
+//    }
   }
 
   void registerEventHandlers() {

@@ -4,27 +4,34 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:upcom-api/web/mailbox/mailbox.dart';
+import 'package:upcom-api/web/tab/tab_controller.dart';
 
 import 'tab_column_view.dart';
 import 'column_controller.dart';
 import 'tab_interface.dart';
+import 'container_view.dart';
 
 class TabColumnController extends ColumnController {
   List<TabInterface> _tabs = [];
 
-  TabColumnController(int columnId, ColumnState state, List config, Mailbox mailbox, Map tabInfo, Function getAvailableId) :
-  super(columnId, config, mailbox, tabInfo, getAvailableId, TabColumnView.createTabColumnView, state) {
+  ColumnState state;
 
-  }
+  TabColumnController(int columnId, TabColumnView view, List config, Mailbox mailbox, Map tabInfo, Map tabIds, this.state) :
+  super(columnId, view, config, mailbox, tabInfo, tabIds);
 
-  Future setUpController() async {
+  void setUpController() {
     // Always open a launcher tab first.
     int id = getAvailableId('upcom-launcher');
     Map launcherInfo = {'refName': 'upcom-launcher', 'fullName': 'UpDroid Launcher', 'shortName': 'Launcher'};
-    await openTab(id, launcherInfo);
+    openTab(id, launcherInfo, PluginType.LAUNCHER);
 
     for (Map tab in config) {
-      await openTab(tab['id'], pluginInfo[tab['class']]);
+      int id = tab['id'];
+      String refName = tab['class'];
+
+      if (!tabIds.containsKey(refName)) tabIds[refName] = [];
+      tabIds[refName].add(tab['id']);
+      openTab(id, pluginInfo[refName], PluginType.TAB);
     }
   }
 
@@ -105,7 +112,7 @@ class TabColumnController extends ColumnController {
   }
 
   /// Opens a [TabController].
-  Future openTab(int id, Map tabInfo, [bool asRequest=false]) async {
+  Future openTab(int id, Map tabInfo, PluginType type, [bool asRequest=false]) async {
     if (!canAddMoreTabs) return null;
 
     if (_tabs.isNotEmpty) {
@@ -116,14 +123,12 @@ class TabColumnController extends ColumnController {
 
     TabInterface tab;
     if (asRequest) {
-      tab = new TabInterface(id, columnId, tabInfo, mailbox, true);
+      tab = new TabInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, type, true);
     } else {
-      tab = new TabInterface(id, columnId, tabInfo, mailbox);
+      tab = new TabInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, type);
     }
 
-    await tab.setupComplete;
     _tabs.add(tab);
-
     return null;
   }
 
@@ -134,6 +139,9 @@ class TabColumnController extends ColumnController {
     for (int i = 0; i < _tabs.length; i++) {
       if (_tabs[i].refName == refName && _tabs[i].id == tabId) {
         found = true;
+
+        tabIds[refName].remove(_tabs[i].id);
+        _tabs[i].view.destroy();
         _tabs[i].shutdownScript();
         _tabs.removeAt(i);
         break;
@@ -142,11 +150,8 @@ class TabColumnController extends ColumnController {
 
     // Make all tabs in that column inactive except the last.
     _tabs.forEach((TabInterface tab) => tab.makeInactive());
-
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
-
-    mailbox.ws.send('[[CLOSE_TAB]]' + refName + ':' + tabId.toString());
 
     return found;
   }

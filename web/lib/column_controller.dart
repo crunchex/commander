@@ -16,19 +16,18 @@ abstract class ColumnController {
   Stream<ColumnState> columnStateChanges;
   Stream<ColumnEvent> columnEvents;
   Map pluginInfo;
+  Map<String, List<int>> tabIds;
 
   StreamController<ColumnState> columnStateChangesController;
   StreamController<ColumnEvent> _columnEventsController;
 
   List config;
   Mailbox mailbox;
-  Function getAvailableId;
-  Function viewStaticConstructor;
   bool disableCyclingHotkeys;
 
   ColumnView view;
 
-  ColumnController(this.columnId, this.config, this.mailbox, this.pluginInfo, this.getAvailableId, this.viewStaticConstructor, [ColumnState state]) {
+  ColumnController(this.columnId, this.view, this.config, this.mailbox, this.pluginInfo, this.tabIds) {
     columnStateChangesController = new StreamController<ColumnState>();
     columnStateChanges = columnStateChangesController.stream;
 
@@ -39,20 +38,13 @@ abstract class ColumnController {
     // TODO: figure out some good hotkeys to use.
     disableCyclingHotkeys = true;
 
-    if (state == null) {
-      viewStaticConstructor(columnId).then((columnView) => _postViewSetupCallback(columnView));
-    } else {
-      this.state = state;
-      viewStaticConstructor(columnId, this.state).then((columnView) => _postViewSetupCallback(columnView));
-    }
+    _setUp();
   }
 
-  Future setUpController();
+  void setUpController();
   void registerEventHandlers();
 
-  void _postViewSetupCallback(ColumnView columnView) {
-    view = columnView;
-
+  void _setUp() {
     // General [ColumnController] controller setup.
     _setUpController();
 
@@ -83,6 +75,23 @@ abstract class ColumnController {
         }
       }
     });
+  }
+
+  int getAvailableId(String refName) {
+    if (!tabIds.containsKey(refName)) tabIds[refName] = [];
+
+    // Find the lowest unused ID possible.
+    int id = 0;
+    bool found = false;
+    while (!found) {
+      id++;
+      if (!tabIds[refName].contains(id)) break;
+    }
+
+    // Add the new ID to the registry before handing it back out.
+    tabIds[refName].add(id);
+    print('tabIds in column_controller: ${tabIds.toString()}');
+    return id;
   }
 
   void getsFocus() {

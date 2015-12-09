@@ -37,7 +37,10 @@ class CmdrServer {
 
   Map<String, Map<int, PanelInterface>> _panels = {};
   Map<String, Map<int, TabInterface>> _tabs = {};
+
+  Map<String, List<int>> _idQueue = {};
   Map<String, List<String>> _pendingTabRequests = {};
+
   CmdrMailbox _mailbox;
   String _installationPath;
   Directory dir;
@@ -118,7 +121,19 @@ class CmdrServer {
   }
 
   void _handleStandardRequest(HttpRequest request, VirtualDirectory virDir) {
-//    debug("${request.method} request for: ${request.uri.path}", 0);
+    debug("${request.method} request for: ${request.uri.path}", 0);
+
+    List<String> segs = request.uri.pathSegments;
+    if (segs.length > 1 && segs[segs.length - 2] == 'requestId') {
+      request.response
+        ..headers.contentType = ContentType.JSON
+        ..write(_idQueue[segs.last].first)
+        ..close();
+
+      // Pop the ID off the queue.
+      _idQueue[segs.last].removeAt(0);
+      return;
+    }
 
     if (virDir != null) {
       virDir.serveRequest(request);
@@ -132,7 +147,6 @@ class CmdrServer {
     _mailbox.registerWebSocketEvent('GIT_PUSH', _gitPush);
     _mailbox.registerWebSocketEvent('OPEN_TAB', _openTab);
     _mailbox.registerWebSocketEvent('OPEN_TAB_AS_REQUEST', _openTabAsRequest);
-    _mailbox.registerWebSocketEvent('CLOSE_TAB', _closeTab);
     _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
     _mailbox.registerWebSocketEvent('UPDATE_COLUMN', _updateColumn);
     _mailbox.registerWebSocketEvent('REQUEST_PLUGINSINFO', _sendPluginInfo);
@@ -159,10 +173,9 @@ class CmdrServer {
         _mailbox.send(new Msg('SERVER_READY', strConfig));
       } else {
         List listConfig = [
-          [{'id': 1, 'class': explorerRefName}],
-          [{'id': 1, 'class': consoleRefName},
-          {'id': 1, 'class': editorRefName}],
-          []
+          [],
+          [{'id': 1, 'class': consoleRefName}],
+          [{'id': 2, 'class': consoleRefName}]
         ];
 
         String strConfig = JSON.encode(listConfig);
@@ -228,6 +241,10 @@ class CmdrServer {
     List idList = um.body.split(':');
     int id = int.parse(idList[1]);
     String refName = idList[2];
+
+    // Add the ID to the queue so the Tab's frontend can pick it up.
+    if (!_idQueue.containsKey(refName)) _idQueue[refName] = [];
+    _idQueue[refName].add(id);
 
     String binPath = '$_installationPath/bin';
 
@@ -327,20 +344,23 @@ class CmdrServer {
     _mailbox.send(new Msg('REQUEST_TAB', split[2]));
   }
 
-  void _closeTab(Msg um) {
+  void _closeTabFromServer(Msg um) {
     List idList = um.body.split(':');
     String type = idList[0];
     int id = int.parse(idList[1]);
 
     debug('Close tab request received: ${idList.toString()}', 0);
 
+    // Send a message to Client to shut down the tab's script and remove the view.
+    _mailbox.send(new Msg('CLOSE_TAB', um.body));
+
+    // Shut down the tab's Server side.
     if (_tabs[type][id] != null) {
       _tabs[type][id].close();
       _tabs[type].remove(id);
     }
   }
 
-  void _closeTabFromServer(Msg um) => _mailbox.send(new Msg('CLOSE_TAB', um.body));
   void _cloneTabFromServer(Msg um) => _mailbox.send(new Msg('CLONE_TAB', um.body));
   void _moveTabFromServer(Msg um) => _mailbox.send(new Msg('MOVE_TAB', um.body));
 

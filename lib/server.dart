@@ -44,20 +44,20 @@ class Cmdr {
 
   CmdrMailbox _mailbox;
   String _installationPath;
-  Directory dir;
+  Directory uproot;
 
   Cmdr (ArgResults results) {
     _args = results;
     _installationPath = _args['path'];
 
-    dir = new Directory(_args['workspace']);
-    dir.create();
+    uproot = new Directory(_args['uproot']);
+    uproot.create();
 
     _mailbox = new CmdrMailbox(Tab.upcomName, 1);
 
     WebServer webserver = new WebServer(_args, _mailbox, _tabs, _panels, _idQueue);
     webserver.init();
-    
+
     _registerMailbox();
 
     Ros.startRosCore();
@@ -129,10 +129,10 @@ class Cmdr {
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
 
     if (idList.length <= 3) {
-      _tabs[refName][id] = new TabInterface(binPath, refName, id, dir);
+      _tabs[refName][id] = new TabInterface(binPath, refName, id, uproot);
     } else {
       List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[refName][id] = new TabInterface(binPath, refName, id, dir, extra);
+      _tabs[refName][id] = new TabInterface(binPath, refName, id, uproot, extra);
     }
   }
 
@@ -149,10 +149,10 @@ class Cmdr {
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
 
     if (idList.length <= 3) {
-      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir);
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, uproot);
     } else {
       List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[refName][num] = new TabInterface(binPath, refName, num, dir, extra);
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, uproot, extra);
     }
 
     // Send the ID of the new tab back to the original requester.
@@ -178,7 +178,7 @@ class Cmdr {
 
     if (!_panels.containsKey(refName)) _panels[refName] = {};
 
-    _panels[refName][id] = new PanelInterface(binPath, refName, id, dir);
+    _panels[refName][id] = new PanelInterface(binPath, refName, id, uproot);
   }
 
   void _updateColumn(Msg um) {

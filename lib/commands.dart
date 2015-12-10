@@ -9,8 +9,8 @@ class CmdrGuiCommand extends Command {
         help: 'Prints debug messages to /var/log/updroid/cmdr.log');
     argParser.addFlag('quiet', abbr: 'q', defaultsTo: Cmdr.defaultQuiet,
         help: 'Starts cmdr with no output on stdout.');
-    argParser.addOption('workspace', abbr: 'w', defaultsTo: Cmdr.defaultUprootPath,
-        help: 'Overrides the default workspaces directory for cmdr.');
+    argParser.addOption('uproot', abbr: 'u', defaultsTo: Cmdr.defaultUprootPath,
+        help: 'Overrides the default workspaces directory (uproot) for cmdr.');
     argParser.addOption('path', abbr: 'p', defaultsTo: Cmdr.defaultInstallationPath,
         help: 'Overrides cmdr\'s default installation path.\nLocation of executables, static gui files, and misc.\nOnly useful for cmdr developers.');
   }

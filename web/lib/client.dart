@@ -127,17 +127,12 @@ class UpDroidClient {
   }
 
   void _cloneTabFromServer(Msg um) {
-    String id = um.body;
-    List idList = id.split(':');
+    List idList = um.body.split(':');
     String refName = idList[0];
     int col = int.parse(idList[2]);
 
-    _tabsInfo.keys.forEach((String key) {
-      if (_tabsInfo[key].containsValue(refName)) {
-        int id = _getAvailableId(_tabsInfo[key]);
-        _tabColumnControllers[col == 1 ? 0 : 1].openTab(id, _tabsInfo[key], PluginType.TAB);
-      }
-    });
+    int id = _getAvailableId(refName);
+    _tabColumnControllers[col - 1].openTab(id, _tabsInfo[refName], PluginType.TAB);
   }
 
   void _moveTabFromServer(Msg um) {

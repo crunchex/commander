@@ -59,7 +59,6 @@ class UpDroidClient {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _setUpConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REQUEST_TAB', _requestTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'MOVE_TAB', _moveTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'ISSUE_ALERT', _issueAlert);
     _mailbox.registerWebSocketEvent(EventType.ON_CLOSE, 'CLEAN_UP', _cleanUp);
@@ -124,15 +123,6 @@ class UpDroidClient {
       // Break once one of the controllers finds the tab to close.
       if (controller.findAndCloseTab(tabId, refName)) break;
     }
-  }
-
-  void _cloneTabFromServer(Msg um) {
-    List idList = um.body.split(':');
-    String refName = idList[0];
-    int col = int.parse(idList[2]);
-
-    int id = _getAvailableId(refName);
-    _tabColumnControllers[col - 1].openTab(id, _tabsInfo[refName], PluginType.TAB);
   }
 
   void _moveTabFromServer(Msg um) {

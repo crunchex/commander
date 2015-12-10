@@ -159,7 +159,6 @@ class CmdrServer {
     _mailbox.registerServerMessageHandler('REQUEST_TAB', _requestTabFromServer);
     _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
     _mailbox.registerServerMessageHandler('CLOSE_TAB', _closeTabFromServer);
-    _mailbox.registerServerMessageHandler('CLONE_TAB', _cloneTabFromServer);
     _mailbox.registerServerMessageHandler('MOVE_TAB', _moveTabFromServer);
     _mailbox.registerServerMessageHandler('REQUEST_EDITOR_LIST', _sendEditorList);
     _mailbox.registerServerMessageHandler('ISSUE_ALERT', _relayAlert);
@@ -362,7 +361,6 @@ class CmdrServer {
     }
   }
 
-  void _cloneTabFromServer(Msg um) => _mailbox.send(new Msg('CLONE_TAB', um.body));
   void _moveTabFromServer(Msg um) => _mailbox.send(new Msg('MOVE_TAB', um.body));
 
   void _sendEditorList(Msg um) {

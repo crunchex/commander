@@ -113,7 +113,14 @@ class TabColumnController extends ColumnController {
 
   /// Opens a [TabController].
   Future openTab(int id, Map tabInfo, PluginType type, [bool asRequest=false]) async {
-    if (!canAddMoreTabs) return null;
+    if (!canAddMoreTabs) {
+      // "Cancel opening" by removing the ID that was just added to the registry.
+      // TODO: fix the following corner case:
+      // where we could end up with an apparent "ID skip" if two of the same tabs were
+      // being opened at almost the same time and the lower one was cancelled.
+      tabIds[tabInfo['refName']].remove(id);
+      return null;
+    }
 
     if (_tabs.isNotEmpty) {
       for (TabInterface tab in _tabs) {

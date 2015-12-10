@@ -5,19 +5,19 @@ class CmdrGuiCommand extends Command {
   final description = "Launch UpDroid Commander in your browser.";
 
   CmdrGuiCommand() {
-    argParser.addFlag('debug', abbr: 'd', defaultsTo: CmdrServer.defaultDebugFlag,
+    argParser.addFlag('debug', abbr: 'd', defaultsTo: Cmdr.defaultDebugFlag,
         help: 'Prints debug messages to /var/log/updroid/cmdr.log');
-    argParser.addFlag('quiet', abbr: 'q', defaultsTo: CmdrServer.defaultQuiet,
+    argParser.addFlag('quiet', abbr: 'q', defaultsTo: Cmdr.defaultQuiet,
         help: 'Starts cmdr with no output on stdout.');
-    argParser.addOption('workspace', abbr: 'w', defaultsTo: CmdrServer.defaultUprootPath,
+    argParser.addOption('workspace', abbr: 'w', defaultsTo: Cmdr.defaultUprootPath,
         help: 'Overrides the default workspaces directory for cmdr.');
-    argParser.addOption('path', abbr: 'p', defaultsTo: CmdrServer.defaultInstallationPath,
+    argParser.addOption('path', abbr: 'p', defaultsTo: Cmdr.defaultInstallationPath,
         help: 'Overrides cmdr\'s default installation path.\nLocation of executables, static gui files, and misc.\nOnly useful for cmdr developers.');
   }
 
   void run() {
     enableDebug(argResults['debug']);
-    new CmdrServer(argResults);
+    new Cmdr(argResults);
   }
 }
 

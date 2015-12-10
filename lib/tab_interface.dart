@@ -32,7 +32,7 @@ class TabInterface {
     List args = [tabPath, id, dir.path];
     if (extra != null) args.addAll(extra);
 
-    await Isolate.spawnUri(tabFile, args, initialSendPort);
+    tab = await Isolate.spawnUri(tabFile, args, initialSendPort);
 
     await for (var received in mailbox.receivePort) {
       if (mailbox.sendPort == null) {
@@ -58,7 +58,10 @@ class TabInterface {
     }
   }
 
-  void close() {
+  void close([int priority=Isolate.BEFORE_NEXT_EVENT]) {
+    if (tab == null) return;
+
     mailbox.close();
+    tab.kill(priority);
   }
 }

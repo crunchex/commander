@@ -19,6 +19,7 @@ import 'tab_interface.dart';
 import 'panel_interface.dart';
 import 'post_office.dart';
 
+part 'cmdr_lib.dart';
 part 'commands.dart';
 part 'webserver.dart';
 
@@ -191,41 +192,25 @@ class Cmdr {
   }
 
   void _sendPluginInfo(Msg um) {
-    // Specialized transformer that takes a tab directory as input and extracts tab info
-    // from the json file within.
-    StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
-      File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
-      String tabInfoString = tabInfoJson.readAsStringSync();
-      sink.add(JSON.decode(tabInfoString));
-    });
-
-    StreamTransformer extractPanelInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
-      File tabInfoJson = new File(pathLib.normalize('${event.path}/panelinfo.json'));
-      String tabInfoString = tabInfoJson.readAsStringSync();
-      sink.add(JSON.decode(tabInfoString));
-    });
-
     FutureGroup group = new FutureGroup();
     Completer panelsDone = new Completer();
     Completer tabsDone = new Completer();
     group.add(panelsDone.future);
     group.add(tabsDone.future);
 
-    Map pluginsInfo = {'panels': {}, 'tabs': {}};
+    Map pluginsInfoMap = {};
 
-    new Directory('$_installationPath/bin/panels')
-      .list()
-      .transform(extractPanelInfo)
-      .listen((Map panelInfoMap) => pluginsInfo['panels'][panelInfoMap['refName']] = panelInfoMap)
-      .onDone(() => panelsDone.complete());
+    getPluginsInfo('panel', _installationPath).then((Map panelsInfo) {
+      pluginsInfoMap['panels'] = panelsInfo;
+      panelsDone.complete();
+    });
 
-    new Directory('$_installationPath/bin/tabs')
-      .list()
-      .transform(extractTabInfo)
-      .listen((Map tabInfoMap) => pluginsInfo['tabs'][tabInfoMap['refName']] = tabInfoMap)
-      .onDone(() => tabsDone.complete());
+    getPluginsInfo('tab', _installationPath).then((Map tabsInfo) {
+      pluginsInfoMap['tabs'] = tabsInfo;
+      tabsDone.complete();
+    });
 
-    group.future.then((_) => _mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(pluginsInfo))));
+    group.future.then((_) => _mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(pluginsInfoMap))));
   }
 
   void _sendTabsInfo(Msg um) {
@@ -233,24 +218,10 @@ class Cmdr {
     String type = idList[0];
     int id = int.parse(idList[1]);
 
-    // Specialized transformer that takes a tab directory as input and extracts tab info
-    // from the json file within.
-    StreamTransformer extractTabInfo = new StreamTransformer.fromHandlers(handleData: (event, sink) {
-      File tabInfoJson = new File(pathLib.normalize('${event.path}/tabinfo.json'));
-      String tabInfoString = tabInfoJson.readAsStringSync();
-      sink.add(JSON.decode(tabInfoString));
+    getPluginsInfo('tab', _installationPath).then((Map tabsInfo) {
+      Msg newMessage = new Msg('SEND_TABS_INFO', JSON.encode(tabsInfo));
+      CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
     });
-
-    Map tabsInfo = {};
-
-    new Directory('$_installationPath/bin/tabs')
-      .list()
-      .transform(extractTabInfo)
-      .listen((Map tabInfoMap) => tabsInfo[tabInfoMap['refName']] = tabInfoMap)
-      .onDone(() {
-        Msg newMessage = new Msg('SEND_TABS_INFO', JSON.encode(tabsInfo));
-        CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
-      });
   }
 
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));

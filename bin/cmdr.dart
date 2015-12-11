@@ -2,7 +2,7 @@
 
 import 'package:args/command_runner.dart';
 
-import '../lib/server.dart';
+import '../lib/cmdr.dart';
 
 void main(List<String> args) {
   const String version = '0.5.3 Alpha';

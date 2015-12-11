@@ -1,38 +1,35 @@
-library panel_interface;
+part of cmdr;
 
-import 'dart:async';
-import 'dart:io';
-import 'dart:isolate';
-
-import 'package:upcom-api/tab_backend.dart';
-import 'package:path/path.dart';
-
-import 'mailbox/mailbox.dart';
-
-class PanelInterface {
+class PluginInterface {
   String refName;
   int id;
   Directory dir;
   List extra;
 
-  Isolate panel;
+  Isolate plugin;
   IsolateMailbox mailbox;
 
-  PanelInterface(String binPath, this.refName, this.id, this.dir, [this.extra]) {
+  PluginInterface(PluginType type, String binPath, this.refName, this.id, this.dir, [this.extra]) {
     mailbox = new IsolateMailbox(refName, id);
 
-    String panelPath = '$binPath/panels/$refName';
-    _spawnPanel(panelPath, new Uri.file(normalize('$panelPath/main.dart')));
+    String pluginPath;
+    if (type == PluginType.TAB) {
+      pluginPath = '$binPath/tabs/$refName';
+    } else if (type == PluginType.PANEL) {
+      pluginPath = '$binPath/panels/$refName';
+    }
+
+    _spawnPlugin(pluginPath, new Uri.file(pathLib.normalize('$pluginPath/main.dart')));
   }
 
-  Future _spawnPanel(String panelPath, Uri panelFile) async {
+  Future _spawnPlugin(String pluginPath, Uri pluginFile) async {
     SendPort initialSendPort = mailbox.receivePort.sendPort;
 
     // Prepare the args.
-    List args = [panelPath, id, dir.path];
+    List args = [pluginPath, id, dir.path];
     if (extra != null) args.addAll(extra);
 
-    await Isolate.spawnUri(panelFile, args, initialSendPort);
+    plugin = await Isolate.spawnUri(pluginFile, args, initialSendPort);
 
     await for (var received in mailbox.receivePort) {
       if (mailbox.sendPort == null) {
@@ -58,7 +55,10 @@ class PanelInterface {
     }
   }
 
-  void close() {
+  void close([int priority=Isolate.BEFORE_NEXT_EVENT]) {
+    if (plugin == null) return;
+
     mailbox.close();
+    plugin.kill(priority);
   }
 }

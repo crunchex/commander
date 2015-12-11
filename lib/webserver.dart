@@ -3,8 +3,7 @@ part of cmdr;
 class WebServer {
   ArgResults _args;
   CmdrMailbox _mailbox;
-  Map<String, Map<int, PanelInterface>> _panels;
-  Map<String, Map<int, TabInterface>> _tabs;
+  Map<String, Map<int, PluginInterface>> _panels, _tabs;
   Map<String, List<String>> _idQueue;
 
   WebServer(ArgResults args, CmdrMailbox mailbox, Map tabs, Map panels, Map idQueue) {

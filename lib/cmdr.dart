@@ -1,8 +1,9 @@
 library cmdr;
 
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:isolate';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
@@ -15,12 +16,13 @@ import 'package:upcom-api/ros.dart';
 import 'package:quiver/async.dart';
 
 import 'mailbox/mailbox.dart';
-import 'tab_interface.dart';
-import 'panel_interface.dart';
 
 part 'cmdr_lib.dart';
 part 'commands.dart';
 part 'webserver.dart';
+part 'plugin_interface.dart';
+
+enum PluginType { TAB, PANEL }
 
 /// A class that serves the Commander frontend and handles [WebSocket] duties.
 class Cmdr {
@@ -35,8 +37,7 @@ class Cmdr {
 
   ArgResults args;
 
-  Map<String, Map<int, PanelInterface>> _panels;
-  Map<String, Map<int, TabInterface>> _tabs;
+  Map<String, Map<int, PluginInterface>> _panels, _tabs;
   Map<String, List<String>> _idQueue, _pendingTabRequests;
 
   CmdrMailbox _mailbox;
@@ -129,10 +130,10 @@ class Cmdr {
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
 
     if (idList.length <= 3) {
-      _tabs[refName][id] = new TabInterface(binPath, refName, id, _uproot);
+      _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot);
     } else {
       List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[refName][id] = new TabInterface(binPath, refName, id, _uproot, extra);
+      _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot, extra);
     }
   }
 
@@ -140,7 +141,7 @@ class Cmdr {
     debug('Open tab request received: ${um.body}', 0);
 
     List idList = um.body.split(':');
-    int num = int.parse(idList[1]);
+    int id = int.parse(idList[1]);
     String refName = idList[2];
 
     String binPath = '$_installationPath/bin';
@@ -148,10 +149,10 @@ class Cmdr {
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
 
     if (idList.length <= 3) {
-      _tabs[refName][num] = new TabInterface(binPath, refName, num, _uproot);
+      _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot);
     } else {
       List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[refName][num] = new TabInterface(binPath, refName, num, _uproot, extra);
+      _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot, extra);
     }
 
     // Send the ID of the new tab back to the original requester.
@@ -160,7 +161,7 @@ class Cmdr {
       String requesterRefName = split[0];
       int requesterId = int.parse(split[1]);
 
-      Msg m = new Msg('REQUEST_FULFILLED', '$refName:$num');
+      Msg m = new Msg('REQUEST_FULFILLED', '$refName:$id');
       CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 1, requesterRefName, requesterId, m));
       _pendingTabRequests[refName].removeAt(0);
     }
@@ -177,7 +178,7 @@ class Cmdr {
 
     if (!_panels.containsKey(refName)) _panels[refName] = {};
 
-    _panels[refName][id] = new PanelInterface(binPath, refName, id, _uproot);
+    _panels[refName][id] = new PluginInterface(PluginType.PANEL, binPath, refName, id, _uproot);
   }
 
   void _updateColumn(Msg um) {
@@ -199,12 +200,12 @@ class Cmdr {
 
     Map pluginsInfoMap = {};
 
-    getPluginsInfo('panel', _installationPath).then((Map panelsInfo) {
+    getPluginsInfo(PluginType.PANEL, _installationPath).then((Map panelsInfo) {
       pluginsInfoMap['panels'] = panelsInfo;
       panelsDone.complete();
     });
 
-    getPluginsInfo('tab', _installationPath).then((Map tabsInfo) {
+    getPluginsInfo(PluginType.TAB, _installationPath).then((Map tabsInfo) {
       pluginsInfoMap['tabs'] = tabsInfo;
       tabsDone.complete();
     });
@@ -217,7 +218,7 @@ class Cmdr {
     String type = idList[0];
     int id = int.parse(idList[1]);
 
-    getPluginsInfo('tab', _installationPath).then((Map tabsInfo) {
+    getPluginsInfo(PluginType.TAB, _installationPath).then((Map tabsInfo) {
       Msg newMessage = new Msg('SEND_TABS_INFO', JSON.encode(tabsInfo));
       CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
     });

@@ -30,36 +30,38 @@ class Cmdr {
   static const bool defaultQuiet = false;
 
   static const String explorerRefName = 'upcom-explorer';
-  static const String speakRefName = 'upcom-speak';
   static const String editorRefName = 'upcom-editor';
   static const String consoleRefName = 'upcom-console';
 
-  ArgResults _args;
+  ArgResults args;
 
-  Map<String, Map<int, PanelInterface>> _panels = {};
-  Map<String, Map<int, TabInterface>> _tabs = {};
-
-  Map<String, List<String>> _idQueue = {};
-  Map<String, List<String>> _pendingTabRequests = {};
+  Map<String, Map<int, PanelInterface>> _panels;
+  Map<String, Map<int, TabInterface>> _tabs;
+  Map<String, List<String>> _idQueue, _pendingTabRequests;
 
   CmdrMailbox _mailbox;
   String _installationPath;
-  Directory uproot;
+  Directory _uproot;
 
-  Cmdr (ArgResults results) {
-    _args = results;
-    _installationPath = _args['path'];
+  Cmdr(this.args) {
+    // Process args.
+    _installationPath = args['path'];
+    _uproot = new Directory(args['uproot'])..create();
 
-    uproot = new Directory(_args['uproot']);
-    uproot.create();
-
+    // Set up Cmdr's mailbox.
     _mailbox = new CmdrMailbox(Tab.upcomName, 1);
-
-    WebServer webserver = new WebServer(_args, _mailbox, _tabs, _panels, _idQueue);
-    webserver.init();
-
     _registerMailbox();
 
+    // Initialize the maps.
+    _panels = {};
+    _tabs = {};
+    _idQueue = {};
+    _pendingTabRequests = {};
+
+    // Create the webserver and start serving UpCom.
+    new WebServer(args, _mailbox, _tabs, _panels, _idQueue)..init();
+
+    // Start up ROS.
     Ros.startRosCore();
   }
 
@@ -71,10 +73,6 @@ class Cmdr {
     _mailbox.registerWebSocketEvent('OPEN_PANEL', _openPanel);
     _mailbox.registerWebSocketEvent('UPDATE_COLUMN', _updateColumn);
     _mailbox.registerWebSocketEvent('REQUEST_PLUGINSINFO', _sendPluginInfo);
-//    _mailbox.registerWebSocketEvent('ADD_EXPLORER', _newExplorerCmdr);
-//    _mailbox.registerWebSocketEvent('CLOSE_EXPLORER', _closeExplorerCmdr);
-
-    _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
 
     _mailbox.registerServerMessageHandler('GET_TABS_INFO', _sendTabsInfo);
     _mailbox.registerServerMessageHandler('REQUEST_TAB', _requestTabFromServer);
@@ -83,6 +81,8 @@ class Cmdr {
     _mailbox.registerServerMessageHandler('MOVE_TAB', _moveTabFromServer);
     _mailbox.registerServerMessageHandler('REQUEST_EDITOR_LIST', _sendEditorList);
     _mailbox.registerServerMessageHandler('ISSUE_ALERT', _relayAlert);
+
+    _mailbox.registerWebSocketCloseEvent(_cleanUpBackend);
   }
 
   void _clientConfig(Msg um) {
@@ -113,6 +113,8 @@ class Cmdr {
   }
 
   void _openTab(Msg um) {
+    debug('Open tab request received: ${um.body}', 0);
+
     List idList = um.body.split(':');
     int col= int.parse(idList[0]);
     int id = int.parse(idList[1]);
@@ -124,35 +126,32 @@ class Cmdr {
 
     String binPath = '$_installationPath/bin';
 
-    debug('Open tab request received: ${um.body}', 0);
-
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
 
     if (idList.length <= 3) {
-      _tabs[refName][id] = new TabInterface(binPath, refName, id, uproot);
+      _tabs[refName][id] = new TabInterface(binPath, refName, id, _uproot);
     } else {
       List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[refName][id] = new TabInterface(binPath, refName, id, uproot, extra);
+      _tabs[refName][id] = new TabInterface(binPath, refName, id, _uproot, extra);
     }
   }
 
   void _openTabAsRequest(Msg um) {
-    String id = um.body;
-    List idList = id.split(':');
+    debug('Open tab request received: ${um.body}', 0);
+
+    List idList = um.body.split(':');
     int num = int.parse(idList[1]);
     String refName = idList[2];
 
     String binPath = '$_installationPath/bin';
 
-    debug('Open tab request received: $id', 0);
-
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
 
     if (idList.length <= 3) {
-      _tabs[refName][num] = new TabInterface(binPath, refName, num, uproot);
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, _uproot);
     } else {
       List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[refName][num] = new TabInterface(binPath, refName, num, uproot, extra);
+      _tabs[refName][num] = new TabInterface(binPath, refName, num, _uproot, extra);
     }
 
     // Send the ID of the new tab back to the original requester.
@@ -168,17 +167,17 @@ class Cmdr {
   }
 
   void _openPanel(Msg um) {
+    debug('Open panel request received: ${um.body}', 0);
+
     List idList = um.body.split(':');
     int id = int.parse(idList[1]);
     String refName = idList[2];
 
     String binPath = '$_installationPath/bin';
 
-    debug('Open panel request received: ${um.body}', 0);
-
     if (!_panels.containsKey(refName)) _panels[refName] = {};
 
-    _panels[refName][id] = new PanelInterface(binPath, refName, id, uproot);
+    _panels[refName][id] = new PanelInterface(binPath, refName, id, _uproot);
   }
 
   void _updateColumn(Msg um) {
@@ -215,16 +214,16 @@ class Cmdr {
     Map pluginsInfo = {'panels': {}, 'tabs': {}};
 
     new Directory('$_installationPath/bin/panels')
-    .list()
-    .transform(extractPanelInfo)
-    .listen((Map panelInfoMap) => pluginsInfo['panels'][panelInfoMap['refName']] = panelInfoMap)
-    .onDone(() => panelsDone.complete());
+      .list()
+      .transform(extractPanelInfo)
+      .listen((Map panelInfoMap) => pluginsInfo['panels'][panelInfoMap['refName']] = panelInfoMap)
+      .onDone(() => panelsDone.complete());
 
     new Directory('$_installationPath/bin/tabs')
-    .list()
-    .transform(extractTabInfo)
-    .listen((Map tabInfoMap) => pluginsInfo['tabs'][tabInfoMap['refName']] = tabInfoMap)
-    .onDone(() => tabsDone.complete());
+      .list()
+      .transform(extractTabInfo)
+      .listen((Map tabInfoMap) => pluginsInfo['tabs'][tabInfoMap['refName']] = tabInfoMap)
+      .onDone(() => tabsDone.complete());
 
     group.future.then((_) => _mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(pluginsInfo))));
   }
@@ -245,13 +244,13 @@ class Cmdr {
     Map tabsInfo = {};
 
     new Directory('$_installationPath/bin/tabs')
-    .list()
-    .transform(extractTabInfo)
-    .listen((Map tabInfoMap) => tabsInfo[tabInfoMap['refName']] = tabInfoMap)
-    .onDone(() {
-      Msg newMessage = new Msg('SEND_TABS_INFO', JSON.encode(tabsInfo));
-      CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
-    });
+      .list()
+      .transform(extractTabInfo)
+      .listen((Map tabInfoMap) => tabsInfo[tabInfoMap['refName']] = tabInfoMap)
+      .onDone(() {
+        Msg newMessage = new Msg('SEND_TABS_INFO', JSON.encode(tabsInfo));
+        CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
+      });
   }
 
   void _openTabFromServer(Msg um) => _mailbox.send(new Msg('OPEN_TAB', um.body));
@@ -266,11 +265,11 @@ class Cmdr {
   }
 
   void _closeTabFromServer(Msg um) {
+    debug('Close tab request received: ${um.body}', 0);
+
     List idList = um.body.split(':');
     String type = idList[0];
     int id = int.parse(idList[1]);
-
-    debug('Close tab request received: ${idList.toString()}', 0);
 
     // Send a message to Client to shut down the tab's script and remove the view.
     _mailbox.send(new Msg('CLOSE_TAB', um.body));
@@ -304,10 +303,9 @@ class Cmdr {
     _panels = {};
 
     _tabs.values.forEach((Map<int, dynamic> tabMap) {
-      tabMap.values.forEach((dynamic tab) {
-        tab.close();
-      });
+      tabMap.values.forEach((dynamic tab) => tab.close());
     });
+
     _tabs = {};
 
     debug('Clean up done.', 0);

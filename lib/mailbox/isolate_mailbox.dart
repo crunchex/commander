@@ -19,24 +19,21 @@ class IsolateMailbox extends Mailbox {
   /// over Websocket, such as in the case of array buffered/binary data.
   void sendFromEndpoint(String s) => ws.add(JSON.decode(s));
 
-  void receive(WebSocket ws, HttpRequest request) {
-    this.ws = ws;
+  void receive(WebSocket websocket, HttpRequest request) {
+    ws = websocket;
 
     if (endpointRegistry.contains(request.uri.path)) {
       debug('Sending endpoint connection confirmation to: ${request.uri.path}', 0);
-      Msg um = new Msg(request.uri.path, '');
-      sendPort.send(um.toString());
+      sendPort.send(new Msg(request.uri.path, '').toString());
     }
 
     ws.listen((String s) {
       if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == refName) {
         Msg um = new Msg.fromString(s);
         debug('$refName incoming: ' + um.header, 0);
-
         sendPort.send(um.toString());
       } else if (endpointRegistry.contains(request.uri.path)) {
-        Msg um = new Msg(request.uri.path, s);
-        sendPort.send(um.toString());
+        sendPort.send(new Msg(request.uri.path, s).toString());
       } else {
         debug('Cannot deliver message to Isolate: ${request.uri.path}', 0);
       }
@@ -59,7 +56,5 @@ class IsolateMailbox extends Mailbox {
     }
   }
 
-  void close() {
-    CmdrPostOffice.deregisterStream(refName, id);
-  }
+  Future close() => CmdrPostOffice.deregisterStream(refName, id);
 }

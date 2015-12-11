@@ -24,13 +24,13 @@ class CmdrMailbox extends Mailbox {
     });
   }
 
-  void handleWebSocket(WebSocket ws, HttpRequest request) {
-    this.ws = ws;
+  void handleWebSocket(WebSocket websocket, HttpRequest request) {
+    ws = websocket;
+
     if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == refName) {
       ws.listen((String s) {
         Msg um = new Msg.fromString(s);
         debug('$refName incoming: ' + um.header, 0);
-
         _wsRegistry[um.header](um);
       }).onDone(() => _wsCloseRegistry.forEach((f()) => f()));
     } else {

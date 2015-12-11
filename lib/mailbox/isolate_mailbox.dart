@@ -1,37 +1,19 @@
-library commander.lib.isolate_mailbox;
+part of mailbox;
 
-import 'dart:io';
-import 'dart:async';
-import 'dart:isolate';
-import 'dart:convert';
-
-import 'package:upcom-api/debug.dart';
-import 'package:upcom-api/tab_backend.dart';
-
-import 'post_office.dart';
-
-class IsolateMailbox {
-  String refName;
-  int id;
-  WebSocket ws;
-  Stream<Msg> inbox;
+class IsolateMailbox extends Mailbox {
   ReceivePort receivePort;
   SendPort sendPort;
   Set endpointRegistry;
 
-  IsolateMailbox(this.refName, this.id) {
+  IsolateMailbox(String refName, int id) : super(refName, id) {
     endpointRegistry = new Set<String>();
     receivePort = new ReceivePort();
-
-    inbox = CmdrPostOffice.registerClass(refName, id);
 
     inbox.listen((Msg um) {
       debug('[${refName}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
       sendPort.send(um.toString());
     });
   }
-
-  void send(Msg m) => ws.add(m.toString());
 
   /// Use this function for special cases where raw data needs to be sent
   /// over Websocket, such as in the case of array buffered/binary data.

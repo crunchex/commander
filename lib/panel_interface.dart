@@ -7,7 +7,7 @@ import 'dart:isolate';
 import 'package:upcom-api/tab_backend.dart';
 import 'package:path/path.dart';
 
-import 'isolate_mailbox.dart';
+import 'mailbox/mailbox.dart';
 
 class PanelInterface {
   String refName;

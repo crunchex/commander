@@ -14,10 +14,9 @@ import 'package:upcom-api/debug.dart';
 import 'package:upcom-api/ros.dart';
 import 'package:quiver/async.dart';
 
-import 'mailbox.dart';
+import 'mailbox/mailbox.dart';
 import 'tab_interface.dart';
 import 'panel_interface.dart';
-import 'post_office.dart';
 
 part 'cmdr_lib.dart';
 part 'commands.dart';

@@ -1,9 +1,4 @@
-library post_office;
-
-import 'dart:async';
-
-import 'package:upcom-api/debug.dart';
-import 'package:upcom-api/tab_backend.dart';
+part of mailbox;
 
 CmdrPostOffice _postOffice;
 

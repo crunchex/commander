@@ -95,8 +95,8 @@ class Cmdr {
       } else {
         List listConfig = [
           [],
-          [{'id': 1, 'class': consoleRefName}],
-          [{'id': 2, 'class': consoleRefName}]
+          [],
+          []
         ];
 
         String strConfig = JSON.encode(listConfig);
@@ -129,7 +129,7 @@ class Cmdr {
 
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
     List extra = (idList.length > 3) ? new List.from(idList.getRange(3, idList.length)) : null;
-    _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot, extra);
+    _tabs[refName][id] = new PluginInterface(binPath, refName, id, _uproot, extra);
   }
 
   void _openTabAsRequest(Msg um) {
@@ -143,7 +143,7 @@ class Cmdr {
 
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
     List extra = (idList.length > 3) ? new List.from(idList.getRange(3, idList.length)) : null;
-    _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot, extra);
+    _tabs[refName][id] = new PluginInterface(binPath, refName, id, _uproot, extra);
 
     // Send the ID of the new tab back to the original requester.
     if (_pendingTabRequests.containsKey(refName) && _pendingTabRequests[refName].isNotEmpty) {
@@ -168,7 +168,7 @@ class Cmdr {
 
     if (!_panels.containsKey(refName)) _panels[refName] = {};
 
-    _panels[refName][id] = new PluginInterface(PluginType.PANEL, binPath, refName, id, _uproot);
+    _panels[refName][id] = new PluginInterface(binPath, refName, id, _uproot);
   }
 
   void _updateColumn(Msg um) {
@@ -190,12 +190,12 @@ class Cmdr {
 
     Map pluginsInfoMap = {};
 
-    getPluginsInfo(PluginType.PANEL, _installationPath).then((Map panelsInfo) {
+    getPluginsInfo(_installationPath, PluginType.PANEL).then((Map panelsInfo) {
       pluginsInfoMap['panels'] = panelsInfo;
       panelsDone.complete();
     });
 
-    getPluginsInfo(PluginType.TAB, _installationPath).then((Map tabsInfo) {
+    getPluginsInfo(_installationPath, PluginType.TAB).then((Map tabsInfo) {
       pluginsInfoMap['tabs'] = tabsInfo;
       tabsDone.complete();
     });
@@ -208,7 +208,7 @@ class Cmdr {
     String type = idList[0];
     int id = int.parse(idList[1]);
 
-    getPluginsInfo(PluginType.TAB, _installationPath).then((Map tabsInfo) {
+    getPluginsInfo(_installationPath, PluginType.TAB).then((Map tabsInfo) {
       Msg newMessage = new Msg('SEND_TABS_INFO', JSON.encode(tabsInfo));
       CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
     });

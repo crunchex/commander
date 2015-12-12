@@ -9,16 +9,10 @@ class PluginInterface {
   Isolate plugin;
   IsolateMailbox mailbox;
 
-  PluginInterface(PluginType type, String binPath, this.refName, this.id, this.dir, [this.extra]) {
+  PluginInterface(String binPath, this.refName, this.id, this.dir, [this.extra]) {
     mailbox = new IsolateMailbox(refName, id);
 
-    String pluginPath;
-    if (type == PluginType.TAB) {
-      pluginPath = '$binPath/tabs/$refName';
-    } else if (type == PluginType.PANEL) {
-      pluginPath = '$binPath/panels/$refName';
-    }
-
+    String pluginPath = '$binPath/plugins/$refName';
     _spawnPlugin(pluginPath, new Uri.file(pathLib.normalize('$pluginPath/main.dart')));
   }
 

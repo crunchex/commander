@@ -9,7 +9,7 @@ import 'container_view.dart';
 class PanelView extends ContainerView {
   PanelView(int id, int col, String refName, String fullName, String shortName, UListElement navTabs, DivElement columnContent) :
   super(id, col, refName, fullName, shortName, navTabs, columnContent) {
-    loadExternalCss('panels/$refName/${shortName.toLowerCase()}.css');
+    loadExternalCss('plugins/$refName/${shortName.toLowerCase()}.css');
 
     tabHandle
       ..id = 'tab-$refName-$id-handle'

@@ -92,34 +92,29 @@ echo "OK"
 echo -n "Setting up plugins.............."
 BUILD=$TOPDIR/build/
 
-BINTABS=$BUILD/bin/tabs
-WEBTABS=$BUILD/web/tabs
-mkdir -p $BINTABS
-mkdir -p $WEBTABS
+BINPLUGINS=$BUILD/bin/plugins
+WEBPLUGINS=$BUILD/web/plugins
+mkdir -p $BINPLUGINS
+mkdir -p $WEBPLUGINS
 
-BINPANELS=$BUILD/bin/panels
-WEBPANELS=$BUILD/web/panels
-mkdir -p $BINPANELS
-mkdir -p $WEBPANELS
+#cp -r ../upcom-explorer/build/bin $BINPLUGINS/upcom-explorer
+#cp -r ../upcom-speak/build/bin $BINPLUGINS/upcom-speak
+cp -r ../upcom-launcher/build/bin $BINPLUGINS/upcom-launcher
+#cp -r ../upcom-editor/build/bin $BINPLUGINS/upcom-editor
+#cp -r ../upcom-console/build/bin $BINPLUGINS/upcom-console
+# cp -r ../upcom-shop/build/bin $BINPLUGINS/upcom-shop
+#cp -r ../upcom-teleop/build/bin $BINPLUGINS/upcom-teleop
+#cp -r ../upcom-viz/build/bin $BINPLUGINS/upcom-viz
+#cp -r ../upcom-learn-demo/build/bin $BINPLUGINS/upcom-learn-demo
 
-cp -r ../upcom-explorer/build/bin $BINPANELS/upcom-explorer
-cp -r ../upcom-speak/build/bin $BINPANELS/upcom-speak
-cp -r ../upcom-launcher/build/bin $BINTABS/upcom-launcher
-cp -r ../upcom-editor/build/bin $BINTABS/upcom-editor
-cp -r ../upcom-console/build/bin $BINTABS/upcom-console
-# cp -r ../upcom-shop/build/bin $BINTABS/upcom-shop
-cp -r ../upcom-teleop/build/bin $BINTABS/upcom-teleop
-cp -r ../upcom-viz/build/bin $BINTABS/upcom-viz
-cp -r ../upcom-learn-demo/build/bin $BINTABS/upcom-learn-demo
-
-cp -r ../upcom-explorer/build/web $WEBPANELS/upcom-explorer
-cp -r ../upcom-speak/build/web $WEBPANELS/upcom-speak
-cp -r ../upcom-launcher/build/web $WEBTABS/upcom-launcher
-cp -r ../upcom-editor/build/web $WEBTABS/upcom-editor
-cp -r ../upcom-console/build/web $WEBTABS/upcom-console
-cp -r ../upcom-teleop/build/web $WEBTABS/upcom-teleop
-cp -r ../upcom-viz/build/web $WEBTABS/upcom-viz
-cp -r ../upcom-learn-demo/build/web $WEBTABS/upcom-learn-demo
+#cp -r ../upcom-explorer/build/web $WEBPLUGINS/upcom-explorer
+#cp -r ../upcom-speak/build/web $WEBPLUGINS/upcom-speak
+cp -r ../upcom-launcher/build/web $WEBPLUGINS/upcom-launcher
+#cp -r ../upcom-editor/build/web $WEBPLUGINS/upcom-editor
+#cp -r ../upcom-console/build/web $WEBPLUGINS/upcom-console
+#cp -r ../upcom-teleop/build/web $WEBPLUGINS/upcom-teleop
+#cp -r ../upcom-viz/build/web $WEBPLUGINS/upcom-viz
+#cp -r ../upcom-learn-demo/build/web $WEBPLUGINS/upcom-learn-demo
 echo "OK"
 
 echo -n "Cleaning up gui................."

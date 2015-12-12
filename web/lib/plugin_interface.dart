@@ -59,7 +59,7 @@ class PluginInterface {
     _pluginJs = new ScriptElement()
     ..id = '$refName-$id-script'
     ..type = 'text/javascript'
-    ..src = '$pluginDir/$refName/index.dart.js';
+    ..src = 'plugins/$refName/index.dart.js';
 
     document.body.children.add(_pluginJs);
   }

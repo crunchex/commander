@@ -8,7 +8,6 @@ import 'package:upcom-api/web/tab/tab_controller.dart';
 import 'container_view.dart';
 import 'tab_view.dart';
 import 'panel_view.dart';
-import 'launcher_view.dart';
 
 class PluginInterface {
   int id, col;
@@ -35,13 +34,16 @@ class PluginInterface {
   void shutdownScript() => _pluginJs.remove();
 
   void _initiateTabSetup(PluginType type, UListElement navTabs, DivElement columnContent, bool asRequest) {
-    String pluginDir;
+    String icon;
+    if (refName == 'upcom-launcher' && type == PluginType.TAB) {
+      icon = 'plus';
+    } else if (refName == 'upcom-launcher' && type == PluginType.PANEL) {
+      icon = 'dropdown';
+    }
+
     switch (type) {
-      case PluginType.LAUNCHER:
-        view = new TabView(id, col, refName, fullName, shortName, navTabs, columnContent, icon: 'plus');
-        break;
       case PluginType.TAB:
-        view = new TabView(id, col, refName, fullName, shortName, navTabs, columnContent);
+        view = new TabView(id, col, refName, fullName, shortName, navTabs, columnContent, icon: icon);
         break;
       case PluginType.PANEL:
         view = new PanelView(id, col, refName, fullName, shortName, navTabs, columnContent);

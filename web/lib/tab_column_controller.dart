@@ -23,7 +23,7 @@ class TabColumnController extends ColumnController {
     // Always open a launcher tab first.
     int id = getAvailableId('upcom-launcher');
     Map launcherInfo = {'refName': 'upcom-launcher', 'fullName': 'UpDroid Launcher', 'shortName': 'Launcher'};
-    openTab(id, launcherInfo, PluginType.LAUNCHER);
+    openTab(id, launcherInfo, PluginType.TAB);
 
     for (Map tab in config) {
       int id = tab['id'];

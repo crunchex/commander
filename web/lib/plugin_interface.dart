@@ -38,16 +38,13 @@ class PluginInterface {
     String pluginDir;
     switch (type) {
       case PluginType.LAUNCHER:
-        view = new LauncherView(id, col, refName, fullName, shortName, navTabs, columnContent);
-        pluginDir = 'tabs';
+        view = new TabView(id, col, refName, fullName, shortName, navTabs, columnContent, icon: 'plus');
         break;
       case PluginType.TAB:
         view = new TabView(id, col, refName, fullName, shortName, navTabs, columnContent);
-        pluginDir = 'tabs';
         break;
       case PluginType.PANEL:
         view = new PanelView(id, col, refName, fullName, shortName, navTabs, columnContent);
-        pluginDir = 'panels';
         break;
     }
 

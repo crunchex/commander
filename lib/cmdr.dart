@@ -128,13 +128,8 @@ class Cmdr {
     String binPath = '$_installationPath/bin';
 
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
-
-    if (idList.length <= 3) {
-      _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot);
-    } else {
-      List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot, extra);
-    }
+    List extra = (idList.length > 3) ? new List.from(idList.getRange(3, idList.length)) : null;
+    _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot, extra);
   }
 
   void _openTabAsRequest(Msg um) {
@@ -147,13 +142,8 @@ class Cmdr {
     String binPath = '$_installationPath/bin';
 
     if (!_tabs.containsKey(refName)) _tabs[refName] = {};
-
-    if (idList.length <= 3) {
-      _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot);
-    } else {
-      List extra = new List.from(idList.getRange(3, idList.length));
-      _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot, extra);
-    }
+    List extra = (idList.length > 3) ? new List.from(idList.getRange(3, idList.length)) : null;
+    _tabs[refName][id] = new PluginInterface(PluginType.TAB, binPath, refName, id, _uproot, extra);
 
     // Send the ID of the new tab back to the original requester.
     if (_pendingTabRequests.containsKey(refName) && _pendingTabRequests[refName].isNotEmpty) {

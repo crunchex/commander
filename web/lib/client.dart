@@ -13,7 +13,7 @@ import 'panel_column_controller.dart';
 import 'tab_column_controller.dart';
 import 'tab_column_view.dart';
 import 'panel_column_view.dart';
-import 'tab_interface.dart';
+import 'plugin_interface.dart';
 
 class UpDroidClient {
   static const String upcomName = 'upcom';

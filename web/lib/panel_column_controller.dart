@@ -8,7 +8,7 @@ import 'package:upcom-api/web/tab/tab_controller.dart';
 
 import 'panel_column_view.dart';
 import 'column_controller.dart';
-import 'tab_interface.dart';
+import 'plugin_interface.dart';
 
 class PanelColumnController extends ColumnController {
   List<PluginInterface> _panels = [];

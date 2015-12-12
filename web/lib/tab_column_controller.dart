@@ -12,7 +12,7 @@ import 'tab_interface.dart';
 import 'container_view.dart';
 
 class TabColumnController extends ColumnController {
-  List<TabInterface> _tabs = [];
+  List<PluginInterface> _tabs = [];
 
   ColumnState state;
 
@@ -52,7 +52,7 @@ class TabColumnController extends ColumnController {
       if (!e.ctrlKey && ! e.shiftKey) return;
 
       // Cycle tabs.
-      TabInterface currentActiveTab = _tabs.firstWhere((TabInterface tab) => tab.isActive());
+      PluginInterface currentActiveTab = _tabs.firstWhere((PluginInterface tab) => tab.isActive());
       int currentActiveTabIndex = _tabs.indexOf(currentActiveTab);
 
       if (e.keyCode == KeyCode.PAGE_DOWN && currentActiveTabIndex > 0) {
@@ -63,7 +63,7 @@ class TabColumnController extends ColumnController {
     });
   }
 
-  void cycleTab(bool left, TabInterface currentActiveTab, int currentActiveTabIndex) {
+  void cycleTab(bool left, PluginInterface currentActiveTab, int currentActiveTabIndex) {
     currentActiveTab.makeInactive();
 
     if (left) {
@@ -123,16 +123,16 @@ class TabColumnController extends ColumnController {
     }
 
     if (_tabs.isNotEmpty) {
-      for (TabInterface tab in _tabs) {
+      for (PluginInterface tab in _tabs) {
         tab.makeInactive();
       }
     }
 
-    TabInterface tab;
+    PluginInterface tab;
     if (asRequest) {
-      tab = new TabInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, type, true);
+      tab = new PluginInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, type, true);
     } else {
-      tab = new TabInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, type);
+      tab = new PluginInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, type);
     }
 
     _tabs.add(tab);
@@ -156,19 +156,19 @@ class TabColumnController extends ColumnController {
     }
 
     // Make all tabs in that column inactive except the last.
-    _tabs.forEach((TabInterface tab) => tab.makeInactive());
+    _tabs.forEach((PluginInterface tab) => tab.makeInactive());
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
 
     return found;
   }
 
-  TabInterface removeTab(String refName, int id) {
-    TabInterface tab = _tabs.firstWhere((TabInterface t) => t.refName == refName && t.id == id);
+  PluginInterface removeTab(String refName, int id) {
+    PluginInterface tab = _tabs.firstWhere((PluginInterface t) => t.refName == refName && t.id == id);
     _tabs.remove(tab);
 
     // Make all tabs in that column inactive except the last.
-    _tabs.forEach((TabInterface tab) => tab.makeInactive());
+    _tabs.forEach((PluginInterface tab) => tab.makeInactive());
 
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
@@ -176,9 +176,9 @@ class TabColumnController extends ColumnController {
     return tab;
   }
 
-  void addTab(TabInterface tab) {
+  void addTab(PluginInterface tab) {
     // Make all tabs in that column inactive before adding the new one.
-    _tabs.forEach((TabInterface tab) => tab.makeInactive());
+    _tabs.forEach((PluginInterface tab) => tab.makeInactive());
 
     // Move the tab handle.
     querySelector('#column-${columnId.toString()}').children[0].children.add(tab.view.tabHandle);

@@ -4,13 +4,14 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:upcom-api/web/mailbox/mailbox.dart';
+import 'package:upcom-api/web/tab/tab_controller.dart';
 
 import 'panel_column_view.dart';
 import 'column_controller.dart';
-import 'panel_interface.dart';
+import 'tab_interface.dart';
 
 class PanelColumnController extends ColumnController {
-  List<PanelInterface> _panels = [];
+  List<PluginInterface> _panels = [];
 
   PanelColumnView panelColumnView;
 
@@ -32,7 +33,7 @@ class PanelColumnController extends ColumnController {
       if (!e.ctrlKey && ! e.shiftKey) return;
 
       // Cycle panels.
-      PanelInterface currentActivePanel = _panels.firstWhere((PanelInterface panel) => panel.isActive());
+      PluginInterface currentActivePanel = _panels.firstWhere((PluginInterface panel) => panel.isActive());
       int currentActivePanelIndex = _panels.indexOf(currentActivePanel);
 
       if (e.keyCode == KeyCode.PAGE_DOWN && currentActivePanelIndex > 0) {
@@ -43,7 +44,7 @@ class PanelColumnController extends ColumnController {
     });
   }
 
-  void cyclePanel(bool left, PanelInterface currentActivePanel, int currentActivePanelIndex) {
+  void cyclePanel(bool left, PluginInterface currentActivePanel, int currentActivePanelIndex) {
     currentActivePanel.makeInactive();
 
     if (left) {
@@ -69,13 +70,12 @@ class PanelColumnController extends ColumnController {
     if (!canAddMorepanels) return null;
 
     if (_panels.isNotEmpty) {
-      for (PanelInterface panel in _panels) {
+      for (PluginInterface panel in _panels) {
         panel.makeInactive();
       }
     }
 
-    PanelInterface panel = new PanelInterface(id, columnId, panelInfo, mailbox);
-    await panel.setupComplete;
+    PluginInterface panel = new PluginInterface(id, columnId, panelInfo, mailbox, view.navTabs, view.tabContent, PluginType.PANEL);
     _panels.add(panel);
 
     return null;
@@ -101,7 +101,7 @@ class PanelColumnController extends ColumnController {
     }
 
     // Make all panels in that column inactive except the last.
-    _panels.forEach((PanelInterface panel) => panel.makeInactive());
+    _panels.forEach((PluginInterface panel) => panel.makeInactive());
 
     // If there's at least one panel left, make the last one active.
     if (_panels.isNotEmpty) _panels.last.makeActive();
@@ -111,12 +111,12 @@ class PanelColumnController extends ColumnController {
     return found;
   }
 
-  PanelInterface removePanel(String refName, int id) {
-    PanelInterface panel = _panels.firstWhere((PanelInterface t) => t.refName == refName && t.id == id);
+  PluginInterface removePanel(String refName, int id) {
+    PluginInterface panel = _panels.firstWhere((PluginInterface t) => t.refName == refName && t.id == id);
     _panels.remove(panel);
 
     // Make all panels in that column inactive except the last.
-    _panels.forEach((PanelInterface panel) => panel.makeInactive());
+    _panels.forEach((PluginInterface panel) => panel.makeInactive());
 
     // If there's at least one panel left, make the last one active.
     if (_panels.isNotEmpty) _panels.last.makeActive();
@@ -124,9 +124,9 @@ class PanelColumnController extends ColumnController {
     return panel;
   }
 
-  void addPanel(PanelInterface panel) {
+  void addPanel(PluginInterface panel) {
     // Make all panels in that column inactive before adding the new one.
-    _panels.forEach((PanelInterface panel) => panel.makeInactive());
+    _panels.forEach((PluginInterface panel) => panel.makeInactive());
 
     // Move the tab handle.
     querySelector('#column-${columnId.toString()}').children[1].children.add(panel.view.tabHandle);
@@ -136,7 +136,7 @@ class PanelColumnController extends ColumnController {
     // Send a message to update the column on the real classes.
     mailbox.ws.send('[[UPDATE_COLUMN]]' + panel.refName + ':' + panel.id.toString() + ':' + columnId.toString());
 
-    // Update the [PanelInterface] and [PanelViewInterface]'s columns.
+    // Update the [TabInterface] and [PanelViewInterface]'s columns.
     panel.col = columnId;
     panel.view.col = columnId;
 

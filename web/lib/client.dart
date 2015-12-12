@@ -140,7 +140,7 @@ class UpDroidClient {
       return;
     }
 
-    TabInterface tab = _tabColumnControllers[oldColIndex].removeTab(refName, id);
+    PluginInterface tab = _tabColumnControllers[oldColIndex].removeTab(refName, id);
     _tabColumnControllers[newColIndex].addTab(tab);
   }
 

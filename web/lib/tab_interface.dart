@@ -12,19 +12,19 @@ import 'tab_view.dart';
 import 'panel_view.dart';
 import 'launcher_view.dart';
 
-class TabInterface {
+class PluginInterface {
   int id, col;
   ContainerView view;
-  Map tabInfo;
+  Map pluginInfo;
   String refName, fullName, shortName;
 
   Mailbox _mailbox;
-  ScriptElement _tabJs;
+  ScriptElement _pluginJs;
 
-  TabInterface(this.id, this.col, this.tabInfo, Mailbox mailbox, UListElement navTabs, DivElement columnContent, PluginType type, [bool asRequest=false]) {
-    refName = tabInfo['refName'];
-    fullName = tabInfo['fullName'];
-    shortName = tabInfo['shortName'];
+  PluginInterface(this.id, this.col, this.pluginInfo, Mailbox mailbox, UListElement navTabs, DivElement columnContent, PluginType type, [bool asRequest=false]) {
+    refName = pluginInfo['refName'];
+    fullName = pluginInfo['fullName'];
+    shortName = pluginInfo['shortName'];
 
     _mailbox = mailbox;
 
@@ -34,18 +34,22 @@ class TabInterface {
   bool isActive() => view.isActive();
   void makeActive() => view.makeActive();
   void makeInactive() => view.makeInactive();
-  void shutdownScript() => _tabJs.remove();
+  void shutdownScript() => _pluginJs.remove();
 
   void _initiateTabSetup(PluginType type, UListElement navTabs, DivElement columnContent, bool asRequest) {
+    String pluginDir;
     switch (type) {
       case PluginType.LAUNCHER:
         view = new LauncherView(id, col, refName, fullName, shortName, navTabs, columnContent);
+        pluginDir = 'tabs';
         break;
       case PluginType.TAB:
         view = new TabView(id, col, refName, fullName, shortName, navTabs, columnContent);
+        pluginDir = 'tabs';
         break;
       case PluginType.PANEL:
         view = new PanelView(id, col, refName, fullName, shortName, navTabs, columnContent);
+        pluginDir = 'panels';
         break;
     }
 
@@ -54,11 +58,11 @@ class TabInterface {
     _mailbox.ws.send(header + '$col:$id:$refName');
 
     // Call the Tab's frontend (as a JS lib).
-    _tabJs = new ScriptElement()
+    _pluginJs = new ScriptElement()
     ..id = '$refName-$id-script'
     ..type = 'text/javascript'
-    ..src = 'tabs/$refName/index.dart.js';
+    ..src = '$pluginDir/$refName/index.dart.js';
 
-    document.body.children.add(_tabJs);
+    document.body.children.add(_pluginJs);
   }
 }

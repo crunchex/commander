@@ -38,7 +38,7 @@ class PluginInterface {
     if (refName == 'upcom-launcher' && type == PluginType.TAB) {
       icon = 'plus';
     } else if (refName == 'upcom-launcher' && type == PluginType.PANEL) {
-      icon = 'dropdown';
+      icon = 'chevron-down';
     }
 
     switch (type) {
@@ -46,7 +46,7 @@ class PluginInterface {
         view = new TabView(id, col, refName, fullName, shortName, navTabs, columnContent, icon: icon);
         break;
       case PluginType.PANEL:
-        view = new PanelView(id, col, refName, fullName, shortName, navTabs, columnContent);
+        view = new PanelView(id, col, refName, fullName, shortName, navTabs, columnContent, icon: icon);
         break;
     }
 

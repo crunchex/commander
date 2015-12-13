@@ -17,18 +17,18 @@ class PanelColumnView extends ColumnView {
   PanelColumnView(int id) : super(id) {
     columnContent.classes.addAll(['col-xs-2', 'column-content']);
 
-    LIElement controlLi = new LIElement()
-      ..classes.add('panel-control');
-    navTabs.children.add(controlLi);
-
-    controlButton = new AnchorElement( )
-      ..id = 'column-$id-new'
-      ..classes.add('new-panel-button');
-    controlLi.children.add(controlButton);
-
-    SpanElement controlGlyph = new SpanElement()
-      ..classes.addAll(['glyphicons', 'glyphicons-chevron-down']);
-    controlButton.children.add(controlGlyph);
+//    LIElement controlLi = new LIElement()
+//      ..classes.add('panel-control');
+//    navTabs.children.add(controlLi);
+//
+//    controlButton = new AnchorElement( )
+//      ..id = 'column-$id-new'
+//      ..classes.add('new-panel-button');
+//    controlLi.children.add(controlButton);
+//
+//    SpanElement controlGlyph = new SpanElement()
+//      ..classes.addAll(['glyphicons', 'glyphicons-chevron-down']);
+//    controlButton.children.add(controlGlyph);
   }
 
   void cleanUp() {

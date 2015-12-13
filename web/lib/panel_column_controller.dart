@@ -21,9 +21,16 @@ class PanelColumnController extends ColumnController {
   }
 
   void setUpController() {
-//    for (Map panel in config) {
-//      await openPanel(panel['id'], pluginInfo[panel['class']]);
-//    }
+    // Always open a launcher tab first.
+    int id = getAvailableId('upcom-launcher');
+    Map launcherInfo = {'refName': 'upcom-launcher', 'fullName': 'UpDroid Launcher', 'shortName': 'Launcher'};
+    openPanel(id, launcherInfo);
+
+    for (Map panel in config) {
+      int id = panel['id'];
+      String refName = panel['class'];
+      openPanel(id, pluginInfo[refName]);
+    }
   }
 
   void registerEventHandlers() {
@@ -82,10 +89,10 @@ class PanelColumnController extends ColumnController {
   }
 
   /// A wrapper for [openPanel] when an availble ID needs to be chosen across all open [ColumnController]s.
-  void openPanelFromModal(Map panelInfo) {
-    int id = getAvailableId(panelInfo['refName']);
-    openPanel(id, panelInfo);
-  }
+//  void openPanelFromModal(Map panelInfo) {
+//    int id = getAvailableId(panelInfo['refName']);
+//    openPanel(id, panelInfo);
+//  }
 
   /// Locates a [PanelController] by [panelId] and [refName] and closes it. Returns true if
   /// said panel was found.
@@ -144,5 +151,5 @@ class PanelColumnController extends ColumnController {
     _panels.add(panel);
   }
 
-  bool get canAddMorepanels => _panels.length < 1;
+  bool get canAddMorepanels => _panels.length < 2;
 }

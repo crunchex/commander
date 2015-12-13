@@ -23,7 +23,7 @@ class TabColumnController extends ColumnController {
     // Always open a launcher tab first.
     int id = getAvailableId('upcom-launcher');
     Map launcherInfo = {'refName': 'upcom-launcher', 'fullName': 'UpDroid Launcher', 'shortName': 'Launcher'};
-    openTab(id, launcherInfo, PluginType.TAB);
+    openTab(id, launcherInfo);
 
     for (Map tab in config) {
       int id = tab['id'];
@@ -31,7 +31,7 @@ class TabColumnController extends ColumnController {
 
       if (!tabIds.containsKey(refName)) tabIds[refName] = [];
       tabIds[refName].add(tab['id']);
-      openTab(id, pluginInfo[refName], PluginType.TAB);
+      openTab(id, pluginInfo[refName]);
     }
   }
 
@@ -112,7 +112,7 @@ class TabColumnController extends ColumnController {
   }
 
   /// Opens a [TabController].
-  Future openTab(int id, Map tabInfo, PluginType type, [bool asRequest=false]) async {
+  Future openTab(int id, Map tabInfo, [bool asRequest=false]) async {
     if (!canAddMoreTabs) {
       // "Cancel opening" by removing the ID that was just added to the registry.
       // TODO: fix the following corner case:
@@ -130,9 +130,9 @@ class TabColumnController extends ColumnController {
 
     PluginInterface tab;
     if (asRequest) {
-      tab = new PluginInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, type, true);
+      tab = new PluginInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, PluginType.TAB, true);
     } else {
-      tab = new PluginInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, type);
+      tab = new PluginInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, PluginType.TAB);
     }
 
     _tabs.add(tab);

@@ -97,7 +97,7 @@ class UpDroidClient {
       int col = int.parse(list[1]);
 
       int tabId = _getAvailableId(refName);
-      _tabColumnControllers[col - 1].openTab(tabId, _tabsInfo[refName], PluginType.TAB);
+      _tabColumnControllers[col - 1].openTab(tabId, _tabsInfo[refName]);
 
       return;
     }
@@ -107,7 +107,7 @@ class UpDroidClient {
     // A column wasn't specified, so the lowest Tab column that can add more tabs is used.
     for (TabColumnController controller in _tabColumnControllers) {
       if (controller.canAddMoreTabs) {
-        controller.openTab(tabId, _tabsInfo[um.body], PluginType.TAB);
+        controller.openTab(tabId, _tabsInfo[um.body]);
         break;
       }
     }

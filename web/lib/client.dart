@@ -97,7 +97,11 @@ class UpDroidClient {
       int col = int.parse(list[1]);
 
       int tabId = _getAvailableId(refName);
-      _tabColumnControllers[col - 1].openTab(tabId, _tabsInfo[refName]);
+      if (col == 0) {
+        _panelColumnControllers[0].openPanel(tabId, _panelsInfo[refName]);
+      } else {
+        _tabColumnControllers[col - 1].openTab(tabId, _tabsInfo[refName]);
+      }
 
       return;
     }

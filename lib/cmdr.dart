@@ -75,6 +75,7 @@ class Cmdr {
     _mailbox.registerWebSocketEvent('UPDATE_COLUMN', _updateColumn);
     _mailbox.registerWebSocketEvent('REQUEST_PLUGINSINFO', _sendPluginInfo);
 
+    _mailbox.registerServerMessageHandler('GET_PANELS_INFO', _sendPanelsInfo);
     _mailbox.registerServerMessageHandler('GET_TABS_INFO', _sendTabsInfo);
     _mailbox.registerServerMessageHandler('REQUEST_TAB', _requestTabFromServer);
     _mailbox.registerServerMessageHandler('OPEN_TAB', _openTabFromServer);
@@ -201,6 +202,17 @@ class Cmdr {
     });
 
     group.future.then((_) => _mailbox.send(new Msg('PLUGINS_INFO', JSON.encode(pluginsInfoMap))));
+  }
+
+  void _sendPanelsInfo(Msg um) {
+    List idList = um.body.split(':');
+    String type = idList[0];
+    int id = int.parse(idList[1]);
+
+    getPluginsInfo(_installationPath, PluginType.PANEL).then((Map panelsInfo) {
+      Msg newMessage = new Msg('SEND_PANELS_INFO', JSON.encode(panelsInfo));
+      CmdrPostOffice.send(new ServerMessage(Tab.upcomName, 0, type, id, newMessage));
+    });
   }
 
   void _sendTabsInfo(Msg um) {

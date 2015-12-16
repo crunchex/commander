@@ -100,7 +100,7 @@ mkdir -p $WEBPLUGINS
 cp -r ../upcom-explorer/build/bin $BINPLUGINS/upcom-explorer
 #cp -r ../upcom-speak/build/bin $BINPLUGINS/upcom-speak
 cp -r ../upcom-launcher/build/bin $BINPLUGINS/upcom-launcher
-#cp -r ../upcom-editor/build/bin $BINPLUGINS/upcom-editor
+cp -r ../upcom-editor/build/bin $BINPLUGINS/upcom-editor
 cp -r ../upcom-console/build/bin $BINPLUGINS/upcom-console
 # cp -r ../upcom-shop/build/bin $BINPLUGINS/upcom-shop
 #cp -r ../upcom-teleop/build/bin $BINPLUGINS/upcom-teleop
@@ -110,7 +110,7 @@ cp -r ../upcom-console/build/bin $BINPLUGINS/upcom-console
 cp -r ../upcom-explorer/build/web $WEBPLUGINS/upcom-explorer
 #cp -r ../upcom-speak/build/web $WEBPLUGINS/upcom-speak
 cp -r ../upcom-launcher/build/web $WEBPLUGINS/upcom-launcher
-#cp -r ../upcom-editor/build/web $WEBPLUGINS/upcom-editor
+cp -r ../upcom-editor/build/web $WEBPLUGINS/upcom-editor
 cp -r ../upcom-console/build/web $WEBPLUGINS/upcom-console
 #cp -r ../upcom-teleop/build/web $WEBPLUGINS/upcom-teleop
 #cp -r ../upcom-viz/build/web $WEBPLUGINS/upcom-viz

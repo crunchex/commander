@@ -231,6 +231,9 @@ class Cmdr {
   void _requestTabFromServer(Msg um) {
     List<String> split = um.body.split(':');
 
+    // If there was no column for the new tab specified, add a -1 for that param.
+    if (split.length < 4) split.add('-1');
+
     if (_pendingTabRequests[split[2]] == null) _pendingTabRequests[split[2]] = [];
 
     _pendingTabRequests[split[2]].add('${split[0]}:${split[1]}');

@@ -90,28 +90,24 @@ class UpDroidClient {
   }
 
   void _requestTabFromServer(Msg um) {
+    List<String> list = um.body.split(':');
+    String refName = list[0];
+    int col = int.parse(list[1]);
+    int tabId = _getAvailableId(refName);
+
     // Column is specified in the message body.
-    if (um.body.contains(':')) {
-      List<String> list = um.body.split(':');
-      String refName = list[0];
-      int col = int.parse(list[1]);
-
-      int tabId = _getAvailableId(refName);
-      if (col == 0) {
-        _panelColumnControllers[0].openPanel(tabId, _panelsInfo[refName]);
-      } else {
-        _tabColumnControllers[col - 1].openTab(tabId, _tabsInfo[refName]);
-      }
-
+    if (col > 0) {
+      _tabColumnControllers[col - 1].openTab(tabId, _tabsInfo[refName]);
+      return;
+    } else if (col == 0) {
+      _panelColumnControllers[0].openPanel(tabId, _panelsInfo[refName]);
       return;
     }
 
-    int tabId = _getAvailableId(um.body);
-
-    // A column wasn't specified, so the lowest Tab column that can add more tabs is used.
+    // A column wasn't specified (-1), so the lowest Tab column that can add more tabs is used.
     for (TabColumnController controller in _tabColumnControllers) {
       if (controller.canAddMoreTabs) {
-        controller.openTab(tabId, _tabsInfo[um.body]);
+        controller.openTab(tabId, _tabsInfo[refName]);
         break;
       }
     }

@@ -22,11 +22,6 @@ class TabView extends ContainerView {
       ..href = '#tab-$refName-$id-container'
       ..dataset['toggle'] = 'tab';
 
-//    extra = new LIElement()
-//      ..id = 'extra-$id'
-//      ..classes.add('extra-menubar');
-//    menus.children.add(extra);
-
     if (icon != null) {
       tabHandle.classes.addAll(['tab-control', 'active']);
 

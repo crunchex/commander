@@ -5,13 +5,15 @@ import 'dart:html';
 import 'dart:convert';
 
 import 'package:upcom-api/web/mailbox/mailbox.dart';
+import 'package:upcom-api/web/tab/tab_controller.dart';
 import 'package:quiver/async.dart';
 
 import 'column_controller.dart';
 import 'panel_column_controller.dart';
 import 'tab_column_controller.dart';
-import 'panel_interface.dart';
-import 'tab_interface.dart';
+import 'tab_column_view.dart';
+import 'panel_column_view.dart';
+import 'plugin_interface.dart';
 
 class UpDroidClient {
   static const String upcomName = 'upcom';
@@ -21,6 +23,7 @@ class UpDroidClient {
   List<PanelColumnController> _panelColumnControllers;
   List<TabColumnController> _tabColumnControllers;
   Map _panelsInfo, _tabsInfo;
+  Map<String, List<int>> _tabIds;
   Completer _gotConfig, _gotPluginsInfo;
 
   bool disconnectAlert = false;
@@ -38,6 +41,10 @@ class UpDroidClient {
     _panelColumnControllers = [];
     _tabColumnControllers = [];
 
+    // Since tabs can be created asyncronously via tab columns, IDs need to be
+    // registered to a central pool as soon as they are created.
+    _tabIds= {};
+
     _mailbox = new Mailbox(upcomName, 1);
 
     _registerMailbox();
@@ -52,7 +59,6 @@ class UpDroidClient {
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'SERVER_READY', _setUpConfig);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'REQUEST_TAB', _requestTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLOSE_TAB', _closeTabFromServer);
-    _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'CLONE_TAB', _cloneTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'MOVE_TAB', _moveTabFromServer);
     _mailbox.registerWebSocketEvent(EventType.ON_MESSAGE, 'ISSUE_ALERT', _issueAlert);
     _mailbox.registerWebSocketEvent(EventType.ON_CLOSE, 'CLEAN_UP', _cleanUp);
@@ -84,11 +90,24 @@ class UpDroidClient {
   }
 
   void _requestTabFromServer(Msg um) {
-    int tabId = _getAvailableId(um.body);
+    List<String> list = um.body.split(':');
+    String refName = list[0];
+    int col = int.parse(list[1]);
+    int tabId = _getAvailableId(refName);
 
+    // Column is specified in the message body.
+    if (col > 0) {
+      _tabColumnControllers[col - 1].openTab(tabId, _tabsInfo[refName]);
+      return;
+    } else if (col == 0) {
+      _panelColumnControllers[0].openPanel(tabId, _panelsInfo[refName]);
+      return;
+    }
+
+    // A column wasn't specified (-1), so the lowest Tab column that can add more tabs is used.
     for (TabColumnController controller in _tabColumnControllers) {
       if (controller.canAddMoreTabs) {
-        controller.openTab(tabId, _tabsInfo[um.body], true);
+        controller.openTab(tabId, _tabsInfo[refName]);
         break;
       }
     }
@@ -106,20 +125,6 @@ class UpDroidClient {
     }
   }
 
-  void _cloneTabFromServer(Msg um) {
-    String id = um.body;
-    List idList = id.split(':');
-    String refName = idList[0];
-    int col = int.parse(idList[2]);
-
-    _tabsInfo.keys.forEach((String key) {
-      if (_tabsInfo[key].containsValue(refName)) {
-        int id = _getAvailableId(_tabsInfo[key]);
-        _tabColumnControllers[col == 1 ? 0 : 1].openTab(id, _tabsInfo[key]);
-      }
-    });
-  }
-
   void _moveTabFromServer(Msg um) {
     List idList = um.body.split(':');
     String refName = idList[0];
@@ -135,7 +140,7 @@ class UpDroidClient {
       return;
     }
 
-    TabInterface tab = _tabColumnControllers[oldColIndex].removeTab(refName, id);
+    PluginInterface tab = _tabColumnControllers[oldColIndex].removeTab(refName, id);
     _tabColumnControllers[newColIndex].addTab(tab);
   }
 
@@ -157,71 +162,73 @@ class UpDroidClient {
   /// Initializes all classes based on the loaded configuration in [_config].
   /// TODO: use isolates.
   void _initializeClient() {
-    PanelColumnController controller = new PanelColumnController(0, _config[0], _mailbox, _panelsInfo, _getAvailableId);
-    _panelColumnControllers.add(controller);
-
-    controller.columnEvents.listen((ColumnEvent event) {
-      if (event == ColumnEvent.LOST_FOCUS) {
-        _panelColumnControllers.firstWhere((c) => c != controller).getsFocus();
-      }
-    });
-
-    String userAgent = window.navigator.userAgent;
-    if (userAgent.contains('Mobile')) {
-      querySelectorAll('html,body,#column-0,#col-0-tab-content,.footer,.text-muted')
-        .forEach((e) => e.classes.add('mobile'));
-      window.scrollTo(0, 1);
-      return;
-    }
-
-    // TODO: make the initial min-width more responsive to how the tabs start out initially.
-    // For now we assume they start off 50/50.
-    querySelector('body').style.minWidth = '1211px';
-
-    for (int i = 1; i < _config.length; i++) {
-      // Start the Client with Column 1 maximized by default.
-      ColumnState defaultState = i == 1 ? ColumnState.MAXIMIZED : ColumnState.MINIMIZED;
-
-      TabColumnController controller = new TabColumnController(i, defaultState, _config[i], _mailbox, _tabsInfo, _getAvailableId);
-      _tabColumnControllers.add(controller);
-
-      controller.columnStateChanges.listen((ColumnState newState) {
-        if (newState == ColumnState.MAXIMIZED) {
-          querySelector('body').style.minWidth = '770px';
-          _tabColumnControllers.where((c) => c != controller).forEach((c) => c.minimize(false));
-        } else if (newState == ColumnState.MINIMIZED) {
-          querySelector('body').style.minWidth = '770px';
-          _tabColumnControllers.where((c) => c != controller).forEach((c) => c.maximize(false));
-        } else {
-          querySelector('body').style.minWidth = '1211px';
-          _tabColumnControllers.where((c) => c != controller).forEach((c) => c.resetToNormal(false));
-        }
-      });
+    PanelColumnView.createPanelColumnView(0).then((view) {
+      PanelColumnController controller = new PanelColumnController(0, view, _config[0], _mailbox, _panelsInfo, _tabIds);
+      _panelColumnControllers.add(controller);
 
       controller.columnEvents.listen((ColumnEvent event) {
         if (event == ColumnEvent.LOST_FOCUS) {
-          _tabColumnControllers.firstWhere((c) => c != controller).getsFocus();
+          _panelColumnControllers.firstWhere((c) => c != controller).getsFocus();
         }
       });
-    }
+
+      String userAgent = window.navigator.userAgent;
+      if (userAgent.contains('Mobile')) {
+        querySelectorAll('html,body,#column-0,#col-0-tab-content,.footer,.text-muted')
+        .forEach((e) => e.classes.add('mobile'));
+        window.scrollTo(0, 1);
+        return;
+      }
+
+      // TODO: make the initial min-width more responsive to how the tabs start out initially.
+      // For now we assume they start off 50/50.
+      querySelector('body').style.minWidth = '1211px';
+
+      for (int i = 1; i < _config.length; i++) {
+        // Start the Client with Column 1 maximized by default.
+        ColumnState defaultState = i == 1 ? ColumnState.MAXIMIZED : ColumnState.MINIMIZED;
+
+        TabColumnView.createTabColumnView(i, ColumnState.NORMAL).then((view) {
+          TabColumnController controller = new TabColumnController(i, view, _config[i], _mailbox, _tabsInfo, _tabIds, ColumnState.NORMAL);
+          _tabColumnControllers.add(controller);
+
+          controller.columnStateChanges.listen((ColumnState newState) {
+            if (newState == ColumnState.MAXIMIZED) {
+              querySelector('body').style.minWidth = '770px';
+              _tabColumnControllers.where((c) => c != controller).forEach((c) => c.minimize(false));
+            } else if (newState == ColumnState.MINIMIZED) {
+              querySelector('body').style.minWidth = '770px';
+              _tabColumnControllers.where((c) => c != controller).forEach((c) => c.maximize(false));
+            } else {
+              querySelector('body').style.minWidth = '1211px';
+              _tabColumnControllers.where((c) => c != controller).forEach((c) => c.resetToNormal(false));
+            }
+          });
+
+          controller.columnEvents.listen((ColumnEvent event) {
+            if (event == ColumnEvent.LOST_FOCUS) {
+              _tabColumnControllers.firstWhere((c) => c != controller).getsFocus();
+            }
+          });
+        });
+      }
+
+    });
   }
 
-  int _getAvailableId(String className) {
-    List ids = [];
-
-    // Add all used ids for [className] to ids.
-    _tabColumnControllers.forEach((controller) {
-      ids.addAll(controller.returnIds(className));
-    });
+  int _getAvailableId(String refName) {
+    if (!_tabIds.containsKey(refName)) _tabIds[refName] = [];
 
     // Find the lowest unused ID possible.
     int id = 0;
     bool found = false;
     while (!found) {
       id++;
-      if (!ids.contains(id)) break;
+      if (!_tabIds[refName].contains(id)) break;
     }
 
+    // Add the new ID to the registry before handing it back out.
+    _tabIds[refName].add(id);
     return id;
   }
 }

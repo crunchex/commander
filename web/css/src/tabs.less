@@ -35,7 +35,7 @@
 
 li.tab-handle.panel-handle {
   float: right;
-  right: -2px;
+  //right: -2px;
   max-width: 78px;
 }
 
@@ -71,7 +71,8 @@ li.tab-handle.panel-handle {
   border-radius: 0;
 }
 
-.nav-tabs>.tab-control>a {
+.nav-tabs>.tab-control>a,
+.nav-tabs>.panel-control>a {
   color: @upcom-dark-grey;
   background-color: @upcom-light-grey;
   padding: 4px 4px 4px 4px;
@@ -79,7 +80,12 @@ li.tab-handle.panel-handle {
   z-index: 1;
 }
 
-.nav-tabs>.tab-control>a>span {
+.nav-tabs>.panel-control>a {
+  margin-right: 0;
+}
+
+.nav-tabs>.tab-control>a>span,
+.nav-tabs>.panel-control>a>span {
   z-index: -1;
 }
 

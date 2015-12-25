@@ -4,27 +4,34 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:upcom-api/web/mailbox/mailbox.dart';
+import 'package:upcom-api/web/tab/tab_controller.dart';
 
 import 'tab_column_view.dart';
 import 'column_controller.dart';
-import 'tab_interface.dart';
+import 'plugin_interface.dart';
+import 'container_view.dart';
 
 class TabColumnController extends ColumnController {
-  List<TabInterface> _tabs = [];
+  List<PluginInterface> _tabs = [];
 
-  TabColumnController(int columnId, ColumnState state, List config, Mailbox mailbox, Map tabInfo, Function getAvailableId) :
-  super(columnId, config, mailbox, tabInfo, getAvailableId, TabColumnView.createTabColumnView, state) {
+  ColumnState state;
 
-  }
+  TabColumnController(int columnId, TabColumnView view, List config, Mailbox mailbox, Map tabInfo, Map tabIds, this.state) :
+  super(columnId, view, config, mailbox, tabInfo, tabIds);
 
-  Future setUpController() async {
+  void setUpController() {
     // Always open a launcher tab first.
     int id = getAvailableId('upcom-launcher');
     Map launcherInfo = {'refName': 'upcom-launcher', 'fullName': 'UpDroid Launcher', 'shortName': 'Launcher'};
-    await openTab(id, launcherInfo);
+    openTab(id, launcherInfo);
 
     for (Map tab in config) {
-      await openTab(tab['id'], pluginInfo[tab['class']]);
+      int id = tab['id'];
+      String refName = tab['class'];
+
+      if (!tabIds.containsKey(refName)) tabIds[refName] = [];
+      tabIds[refName].add(tab['id']);
+      openTab(id, pluginInfo[refName]);
     }
   }
 
@@ -45,7 +52,7 @@ class TabColumnController extends ColumnController {
       if (!e.ctrlKey && ! e.shiftKey) return;
 
       // Cycle tabs.
-      TabInterface currentActiveTab = _tabs.firstWhere((TabInterface tab) => tab.isActive());
+      PluginInterface currentActiveTab = _tabs.firstWhere((PluginInterface tab) => tab.isActive());
       int currentActiveTabIndex = _tabs.indexOf(currentActiveTab);
 
       if (e.keyCode == KeyCode.PAGE_DOWN && currentActiveTabIndex > 0) {
@@ -56,7 +63,7 @@ class TabColumnController extends ColumnController {
     });
   }
 
-  void cycleTab(bool left, TabInterface currentActiveTab, int currentActiveTabIndex) {
+  void cycleTab(bool left, PluginInterface currentActiveTab, int currentActiveTabIndex) {
     currentActiveTab.makeInactive();
 
     if (left) {
@@ -106,24 +113,29 @@ class TabColumnController extends ColumnController {
 
   /// Opens a [TabController].
   Future openTab(int id, Map tabInfo, [bool asRequest=false]) async {
-    if (!canAddMoreTabs) return null;
+    if (!canAddMoreTabs) {
+      // "Cancel opening" by removing the ID that was just added to the registry.
+      // TODO: fix the following corner case:
+      // where we could end up with an apparent "ID skip" if two of the same tabs were
+      // being opened at almost the same time and the lower one was cancelled.
+      tabIds[tabInfo['refName']].remove(id);
+      return null;
+    }
 
     if (_tabs.isNotEmpty) {
-      for (TabInterface tab in _tabs) {
+      for (PluginInterface tab in _tabs) {
         tab.makeInactive();
       }
     }
 
-    TabInterface tab;
+    PluginInterface tab;
     if (asRequest) {
-      tab = new TabInterface(id, columnId, tabInfo, mailbox, true);
+      tab = new PluginInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, PluginType.TAB, true);
     } else {
-      tab = new TabInterface(id, columnId, tabInfo, mailbox);
+      tab = new PluginInterface(id, columnId, tabInfo, mailbox, view.navTabs, view.tabContent, PluginType.TAB);
     }
 
-    await tab.setupComplete;
     _tabs.add(tab);
-
     return null;
   }
 
@@ -134,6 +146,9 @@ class TabColumnController extends ColumnController {
     for (int i = 0; i < _tabs.length; i++) {
       if (_tabs[i].refName == refName && _tabs[i].id == tabId) {
         found = true;
+
+        tabIds[refName].remove(_tabs[i].id);
+        _tabs[i].view.destroy();
         _tabs[i].shutdownScript();
         _tabs.removeAt(i);
         break;
@@ -141,22 +156,19 @@ class TabColumnController extends ColumnController {
     }
 
     // Make all tabs in that column inactive except the last.
-    _tabs.forEach((TabInterface tab) => tab.makeInactive());
-
+    _tabs.forEach((PluginInterface tab) => tab.makeInactive());
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
-
-    mailbox.ws.send('[[CLOSE_TAB]]' + refName + ':' + tabId.toString());
 
     return found;
   }
 
-  TabInterface removeTab(String refName, int id) {
-    TabInterface tab = _tabs.firstWhere((TabInterface t) => t.refName == refName && t.id == id);
+  PluginInterface removeTab(String refName, int id) {
+    PluginInterface tab = _tabs.firstWhere((PluginInterface t) => t.refName == refName && t.id == id);
     _tabs.remove(tab);
 
     // Make all tabs in that column inactive except the last.
-    _tabs.forEach((TabInterface tab) => tab.makeInactive());
+    _tabs.forEach((PluginInterface tab) => tab.makeInactive());
 
     // If there's at least one tab left, make the last one active.
     if (_tabs.isNotEmpty) _tabs.last.makeActive();
@@ -164,9 +176,9 @@ class TabColumnController extends ColumnController {
     return tab;
   }
 
-  void addTab(TabInterface tab) {
+  void addTab(PluginInterface tab) {
     // Make all tabs in that column inactive before adding the new one.
-    _tabs.forEach((TabInterface tab) => tab.makeInactive());
+    _tabs.forEach((PluginInterface tab) => tab.makeInactive());
 
     // Move the tab handle.
     querySelector('#column-${columnId.toString()}').children[0].children.add(tab.view.tabHandle);

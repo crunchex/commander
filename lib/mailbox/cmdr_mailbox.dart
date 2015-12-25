@@ -1,31 +1,16 @@
-library server_mailbox;
+part of mailbox;
 
-import 'dart:io';
-import 'dart:async';
-
-import 'package:upcom-api/tab_backend.dart';
-import 'package:upcom-api/debug.dart';
-
-import 'post_office.dart';
-
-class CmdrMailbox {
-  String refName;
-  int id;
-  WebSocket ws;
-  Stream<Msg> inbox;
-
+class CmdrMailbox extends Mailbox {
   Map _wsRegistry;
   List<Function> _wsCloseRegistry;
   Map _endpointRegistry;
   Map _serverStreamRegistry;
 
-  CmdrMailbox(this.refName, this.id) {
+  CmdrMailbox(String refName, int id) : super(refName, id) {
     _wsRegistry = {};
     _wsCloseRegistry = [];
     _endpointRegistry = {};
     _serverStreamRegistry = {};
-
-    inbox = CmdrPostOffice.registerClass(refName, id);
 
     inbox.listen((Msg um) {
       debug('[${refName}\'s Mailbox] UpDroid Message received with header: ${um.header}', 0);
@@ -39,15 +24,13 @@ class CmdrMailbox {
     });
   }
 
-  void send(Msg m) => ws.add(m.toString());
+  void handleWebSocket(WebSocket websocket, HttpRequest request) {
+    ws = websocket;
 
-  void handleWebSocket(WebSocket ws, HttpRequest request) {
-    this.ws = ws;
     if (request.uri.pathSegments.length == 2 && request.uri.pathSegments.first == refName) {
       ws.listen((String s) {
         Msg um = new Msg.fromString(s);
         debug('$refName incoming: ' + um.header, 0);
-
         _wsRegistry[um.header](um);
       }).onDone(() => _wsCloseRegistry.forEach((f()) => f()));
     } else {
